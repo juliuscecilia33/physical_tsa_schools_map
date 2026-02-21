@@ -11,6 +11,26 @@ interface FacilityMapProps {
   facilities: Facility[];
 }
 
+// Activity categories and their colors
+const ACTIVITY_CATEGORIES = {
+  fitness: { color: '#10b981', label: 'Fitness & Wellness' }, // green
+  sports: { color: '#f97316', label: 'Sports Venues' },       // orange
+  education: { color: '#3b82f6', label: 'Educational' },      // blue
+  other: { color: '#6b7280', label: 'Other' }                 // gray
+};
+
+// Categorize facility based on sport types
+function getFacilityCategory(sportTypes: string[]): keyof typeof ACTIVITY_CATEGORIES {
+  const fitnessTypes = ['gym', 'spa'];
+  const sportsTypes = ['stadium', 'bowling_alley'];
+  const educationTypes = ['school'];
+
+  if (sportTypes.some(type => fitnessTypes.includes(type))) return 'fitness';
+  if (sportTypes.some(type => sportsTypes.includes(type))) return 'sports';
+  if (sportTypes.some(type => educationTypes.includes(type))) return 'education';
+  return 'other';
+}
+
 export default function FacilityMap({ facilities }: FacilityMapProps) {
   const [selectedFacility, setSelectedFacility] = useState<Facility | null>(null);
   const mapRef = useRef<MapRef>(null);
@@ -24,28 +44,32 @@ export default function FacilityMap({ facilities }: FacilityMapProps) {
     zoom: 5.5,
   };
 
-  // Convert facilities to GeoJSON format (no clustering, all individual)
+  // Convert facilities to GeoJSON format with color coding
   const geojsonData = useMemo(() => {
     return {
       type: "FeatureCollection" as const,
-      features: facilities.map((facility) => ({
-        type: "Feature" as const,
-        properties: {
-          place_id: facility.place_id,
-          name: facility.name,
-          // Store the full facility data
-          facilityData: JSON.stringify(facility),
-        },
-        geometry: {
-          type: "Point" as const,
-          coordinates: [facility.location.lng, facility.location.lat],
-        },
-      })),
+      features: facilities.map((facility) => {
+        const category = getFacilityCategory(facility.sport_types);
+        const color = ACTIVITY_CATEGORIES[category].color;
+
+        return {
+          type: "Feature" as const,
+          properties: {
+            place_id: facility.place_id,
+            name: facility.name,
+            category,
+            color,
+            // Store the full facility data
+            facilityData: JSON.stringify(facility),
+          },
+          geometry: {
+            type: "Point" as const,
+            coordinates: [facility.location.lng, facility.location.lat],
+          },
+        };
+      }),
     };
   }, [facilities]);
-
-  // Track current zoom level
-  const [zoom, setZoom] = useState(INITIAL_VIEW_STATE.zoom);
 
   // Handle click on individual markers
   const onMarkerClick = (event: MapLayerMouseEvent) => {
@@ -68,7 +92,6 @@ export default function FacilityMap({ facilities }: FacilityMapProps) {
         style={{ width: "100%", height: "100%" }}
         mapStyle="mapbox://styles/mapbox/streets-v12"
         interactiveLayerIds={["facility-dots-low-zoom", "facility-dots-high-zoom"]}
-        onZoom={(e) => setZoom(e.viewState.zoom)}
         onClick={(e) => {
           if (e.features && e.features.length > 0) {
             onMarkerClick(e);
@@ -82,29 +105,33 @@ export default function FacilityMap({ facilities }: FacilityMapProps) {
           type="geojson"
           data={geojsonData}
         >
-          {/* Small colored dots at low zoom (zoom < 10) */}
+          {/* Modern flat colored dots at low zoom (zoom < 10) */}
           <Layer
             id="facility-dots-low-zoom"
             type="circle"
             maxzoom={10}
             paint={{
-              "circle-color": "#3b82f6",
-              "circle-radius": 4,
+              "circle-color": ["get", "color"],
+              "circle-radius": 5,
+              "circle-opacity": 0.7,
               "circle-stroke-width": 1,
-              "circle-stroke-color": "#1e40af",
+              "circle-stroke-color": ["get", "color"],
+              "circle-stroke-opacity": 0.9,
             }}
           />
 
-          {/* Larger detailed dots at high zoom (zoom >= 10) */}
+          {/* Larger modern dots at high zoom (zoom >= 10) */}
           <Layer
             id="facility-dots-high-zoom"
             type="circle"
             minzoom={10}
             paint={{
-              "circle-color": "#3b82f6",
-              "circle-radius": 8,
-              "circle-stroke-width": 2,
-              "circle-stroke-color": "#1e40af",
+              "circle-color": ["get", "color"],
+              "circle-radius": 10,
+              "circle-opacity": 0.7,
+              "circle-stroke-width": 1,
+              "circle-stroke-color": ["get", "color"],
+              "circle-stroke-opacity": 0.9,
             }}
           />
         </Source>
@@ -121,6 +148,22 @@ export default function FacilityMap({ facilities }: FacilityMapProps) {
         <p className="text-xs text-gray-500 mt-2">
           Click on a marker to view details
         </p>
+
+        {/* Color Legend */}
+        <div className="mt-4 pt-3 border-t border-gray-200">
+          <h3 className="text-xs font-semibold text-gray-700 mb-2">Categories</h3>
+          <div className="space-y-1.5">
+            {Object.entries(ACTIVITY_CATEGORIES).map(([key, { color, label }]) => (
+              <div key={key} className="flex items-center gap-2">
+                <div
+                  className="w-3 h-3 rounded-full opacity-70"
+                  style={{ backgroundColor: color }}
+                />
+                <span className="text-xs text-gray-600">{label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Sidebar */}

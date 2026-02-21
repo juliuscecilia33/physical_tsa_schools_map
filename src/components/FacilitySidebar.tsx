@@ -82,7 +82,13 @@ export default function FacilitySidebar({ facility, onClose }: FacilitySidebarPr
             {facility.sport_types
               .filter(
                 (type) =>
-                  !["establishment", "point_of_interest", "health"].includes(type)
+                  ![
+                    "establishment", "point_of_interest", "health",
+                    "food", "restaurant", "cafe", "bar", "lodging",
+                    "store", "clothing_store", "shopping_mall",
+                    "amusement_park", "movie_theater", "aquarium",
+                    "night_club", "tourist_attraction"
+                  ].includes(type)
               )
               .map((type) => (
                 <span
