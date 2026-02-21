@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { supabase } from "@/lib/supabase";
 import { Facility } from "@/types/facility";
+import ProgressBar from "@/components/ProgressBar";
 
 const FacilityMap = dynamic(() => import("@/components/FacilityMap"), {
   ssr: false,
@@ -21,11 +22,29 @@ export default function Home() {
   const [facilities, setFacilities] = useState<Facility[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [totalFacilityCount, setTotalFacilityCount] = useState<number | null>(null);
+  const [loadedFacilityCount, setLoadedFacilityCount] = useState(0);
 
   useEffect(() => {
     async function loadFacilities() {
       try {
         setLoading(true);
+        setLoadingProgress(0);
+
+        // First, get the total count of facilities
+        const { data: countData, error: countError } = await supabase
+          .rpc("get_facilities_count");
+
+        let totalCount = 0;
+        if (countError) {
+          console.error("Error getting facility count:", countError);
+          // Continue without count if error
+        } else {
+          totalCount = Number(countData);
+          setTotalFacilityCount(totalCount);
+          console.log(`Total facilities in database: ${totalCount}`);
+        }
 
         // Fetch all facilities using pagination to bypass 1000 row limit
         const allFacilities: any[] = [];
@@ -44,7 +63,16 @@ export default function Home() {
             allFacilities.push(...data);
             from += pageSize;
 
-            console.log(`Loaded ${allFacilities.length} facilities so far...`);
+            // Update progress
+            const loaded = allFacilities.length;
+            setLoadedFacilityCount(loaded);
+
+            if (totalCount > 0) {
+              const progress = (loaded / totalCount) * 100;
+              setLoadingProgress(Math.min(progress, 100));
+            }
+
+            console.log(`Loaded ${loaded} facilities so far...`);
 
             // If we got less than pageSize, we're done
             if (data.length < pageSize) {
@@ -56,6 +84,7 @@ export default function Home() {
         }
 
         console.log(`Total loaded: ${allFacilities.length} facilities from database`);
+        setLoadingProgress(100);
 
         // Transform data from Supabase format to Facility format
         const transformedFacilities: Facility[] = allFacilities.map((row: any) => ({
@@ -94,10 +123,11 @@ export default function Home() {
   if (loading) {
     return (
       <div className="w-full h-screen flex items-center justify-center bg-gray-100">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading facilities from database...</p>
-        </div>
+        <ProgressBar
+          progress={loadingProgress}
+          loadedCount={loadedFacilityCount}
+          totalCount={totalFacilityCount}
+        />
       </div>
     );
   }
