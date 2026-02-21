@@ -23,6 +23,7 @@
   "dependencies": {
     "@eslint/eslintrc": "^3.3.3",
     "@googlemaps/google-maps-services-js": "^3.4.2",
+    "@supabase/supabase-js": "^2.97.0",
     "@tailwindcss/postcss": "^4.2.0",
     "dotenv": "^17.3.1",
     "mapbox-gl": "^3.18.1",
