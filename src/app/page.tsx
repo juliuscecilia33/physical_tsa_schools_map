@@ -18,6 +18,8 @@ const FacilityMap = dynamic(() => import("@/components/FacilityMap"), {
   ),
 });
 
+export type FilterOption = 'UNHIDDEN_ONLY' | 'ALL' | 'HIDDEN_ONLY';
+
 export default function Home() {
   const [facilities, setFacilities] = useState<Facility[]>([]);
   const [loading, setLoading] = useState(true);
@@ -25,9 +27,9 @@ export default function Home() {
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [totalFacilityCount, setTotalFacilityCount] = useState<number | null>(null);
   const [loadedFacilityCount, setLoadedFacilityCount] = useState(0);
+  const [filterOption, setFilterOption] = useState<FilterOption>('UNHIDDEN_ONLY');
 
-  useEffect(() => {
-    async function loadFacilities() {
+  const loadFacilities = async () => {
       try {
         setLoading(true);
         setLoadingProgress(0);
@@ -54,7 +56,10 @@ export default function Home() {
 
         while (hasMore) {
           const { data, error } = await supabase
-            .rpc("get_facilities_with_coords", { row_limit: 10000 })
+            .rpc("get_facilities_with_coords", {
+              row_limit: 10000,
+              include_hidden: true
+            })
             .range(from, from + pageSize - 1);
 
           if (error) throw error;
@@ -104,6 +109,7 @@ export default function Home() {
           photo_references: row.photo_references || [],
           opening_hours: row.opening_hours,
           business_status: row.business_status,
+          hidden: row.hidden || false,
         }));
 
         console.log(`Loaded ${transformedFacilities.length} athletic facilities`);
@@ -115,10 +121,22 @@ export default function Home() {
       } finally {
         setLoading(false);
       }
-    }
+    };
 
+  useEffect(() => {
     loadFacilities();
   }, []);
+
+  // Optimistic update for facility hidden status
+  const updateFacilityHidden = (place_id: string, hidden: boolean) => {
+    setFacilities(prevFacilities =>
+      prevFacilities.map(facility =>
+        facility.place_id === place_id
+          ? { ...facility, hidden }
+          : facility
+      )
+    );
+  };
 
   if (loading) {
     return (
@@ -164,7 +182,12 @@ export default function Home() {
 
   return (
     <main className="w-full h-screen">
-      <FacilityMap facilities={facilities} />
+      <FacilityMap
+        facilities={facilities}
+        filterOption={filterOption}
+        onFilterOptionChange={setFilterOption}
+        onUpdateFacility={updateFacilityHidden}
+      />
     </main>
   );
 }

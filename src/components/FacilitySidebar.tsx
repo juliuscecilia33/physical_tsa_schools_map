@@ -11,19 +11,53 @@ import {
   Star,
   StarHalf,
   CheckCircle2,
-  XCircle
+  XCircle,
+  EyeOff,
+  Eye
 } from "lucide-react";
 import { useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 interface FacilitySidebarProps {
   facility: Facility | null;
   onClose: () => void;
+  onUpdateFacility: (place_id: string, hidden: boolean) => void;
 }
 
-export default function FacilitySidebar({ facility, onClose }: FacilitySidebarProps) {
+export default function FacilitySidebar({ facility, onClose, onUpdateFacility }: FacilitySidebarProps) {
   const [loadingImages, setLoadingImages] = useState<{ [key: number]: boolean }>({});
 
   if (!facility) return null;
+
+  const handleToggleHidden = () => {
+    const newHiddenValue = !facility.hidden;
+
+    // Optimistically update local state immediately
+    onUpdateFacility(facility.place_id, newHiddenValue);
+
+    // Close sidebar immediately
+    onClose();
+
+    // Sync to database in background (no await needed)
+    supabase
+      .from("sports_facilities")
+      .update({ hidden: newHiddenValue })
+      .eq("place_id", facility.place_id)
+      .then(({ error }) => {
+        if (error) {
+          console.error("Error updating facility hidden status:", error);
+          // Revert optimistic update on error
+          onUpdateFacility(facility.place_id, !newHiddenValue);
+          alert("Failed to update facility. The change has been reverted.");
+        }
+      })
+      .catch((err) => {
+        console.error("Error updating facility:", err);
+        // Revert optimistic update on error
+        onUpdateFacility(facility.place_id, !newHiddenValue);
+        alert("Failed to update facility. The change has been reverted.");
+      });
+  };
 
   const getPhotoUrl = (photoReference: string) => {
     const maxWidth = 400;
@@ -166,6 +200,36 @@ export default function FacilitySidebar({ facility, onClose }: FacilitySidebarPr
               </span>
             </motion.div>
           )}
+
+          {/* Hide/Unhide Button */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+          >
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={handleToggleHidden}
+              className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium text-sm shadow-sm transition-all ${
+                facility.hidden
+                  ? "bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white"
+                  : "bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-gray-700"
+              }`}
+            >
+              {facility.hidden ? (
+                <>
+                  <Eye className="w-4 h-4" />
+                  <span>Unhide Facility</span>
+                </>
+              ) : (
+                <>
+                  <EyeOff className="w-4 h-4" />
+                  <span>Hide from Map</span>
+                </>
+              )}
+            </motion.button>
+          </motion.div>
 
           {/* Photos */}
           {facility.photo_references && facility.photo_references.length > 0 && (

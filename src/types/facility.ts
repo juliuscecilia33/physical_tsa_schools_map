@@ -15,6 +15,7 @@ export interface Facility {
   photo_references?: string[];
   opening_hours?: OpeningHours;
   business_status?: string;
+  hidden?: boolean;
 }
 
 export interface Review {

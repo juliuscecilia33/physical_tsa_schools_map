@@ -1,14 +1,18 @@
 "use client";
 
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useRef, useState, useMemo } from "react";
 import Map, { Source, Layer, NavigationControl } from "react-map-gl";
 import type { MapRef, MapLayerMouseEvent } from "react-map-gl";
 import { Facility } from "@/types/facility";
+import { FilterOption } from "@/app/page";
 import FacilitySidebar from "./FacilitySidebar";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 interface FacilityMapProps {
   facilities: Facility[];
+  filterOption: FilterOption;
+  onFilterOptionChange: (option: FilterOption) => void;
+  onUpdateFacility: (place_id: string, hidden: boolean) => void;
 }
 
 // Activity categories and their colors
@@ -34,7 +38,12 @@ function getFacilityCategory(sportTypes: string[]): keyof typeof ACTIVITY_CATEGO
   return 'other';
 }
 
-export default function FacilityMap({ facilities }: FacilityMapProps) {
+export default function FacilityMap({
+  facilities,
+  filterOption,
+  onFilterOptionChange,
+  onUpdateFacility,
+}: FacilityMapProps) {
   const [selectedFacility, setSelectedFacility] = useState<Facility | null>(null);
   const mapRef = useRef<MapRef>(null);
 
@@ -47,11 +56,24 @@ export default function FacilityMap({ facilities }: FacilityMapProps) {
     zoom: 5.5,
   };
 
-  // Convert facilities to GeoJSON format with color coding
+  // Client-side filtering based on filterOption
+  const filteredFacilities = useMemo(() => {
+    switch (filterOption) {
+      case 'ALL':
+        return facilities;
+      case 'HIDDEN_ONLY':
+        return facilities.filter(f => f.hidden === true);
+      case 'UNHIDDEN_ONLY':
+      default:
+        return facilities.filter(f => !f.hidden);
+    }
+  }, [facilities, filterOption]);
+
+  // Convert filtered facilities to GeoJSON format with color coding
   const geojsonData = useMemo(() => {
     return {
       type: "FeatureCollection" as const,
-      features: facilities.map((facility) => {
+      features: filteredFacilities.map((facility) => {
         const category = getFacilityCategory(facility.sport_types);
         const color = ACTIVITY_CATEGORIES[category].color;
 
@@ -72,7 +94,7 @@ export default function FacilityMap({ facilities }: FacilityMapProps) {
         };
       }),
     };
-  }, [facilities]);
+  }, [filteredFacilities]);
 
   // Handle click on individual markers
   const onMarkerClick = (event: MapLayerMouseEvent) => {
@@ -146,14 +168,54 @@ export default function FacilityMap({ facilities }: FacilityMapProps) {
           Sports Facilities in Texas
         </h2>
         <p className="text-sm text-gray-600">
-          Showing {facilities.length.toLocaleString()} facilities
+          Showing {filteredFacilities.length.toLocaleString()} of {facilities.length.toLocaleString()} facilities
         </p>
         <p className="text-xs text-gray-500 mt-2">
           Click on a marker to view details
         </p>
 
+        {/* Filter Options */}
+        <div className="mt-3 pt-3 border-t border-gray-200">
+          <h3 className="text-xs font-semibold text-gray-700 mb-2">Display</h3>
+          <div className="space-y-2">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="filter"
+                value="UNHIDDEN_ONLY"
+                checked={filterOption === 'UNHIDDEN_ONLY'}
+                onChange={(e) => onFilterOptionChange(e.target.value as FilterOption)}
+                className="w-4 h-4 text-blue-600 focus:ring-2 focus:ring-blue-500"
+              />
+              <span className="text-xs text-gray-600">Unhidden Only</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="filter"
+                value="ALL"
+                checked={filterOption === 'ALL'}
+                onChange={(e) => onFilterOptionChange(e.target.value as FilterOption)}
+                className="w-4 h-4 text-blue-600 focus:ring-2 focus:ring-blue-500"
+              />
+              <span className="text-xs text-gray-600">All Facilities</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="filter"
+                value="HIDDEN_ONLY"
+                checked={filterOption === 'HIDDEN_ONLY'}
+                onChange={(e) => onFilterOptionChange(e.target.value as FilterOption)}
+                className="w-4 h-4 text-blue-600 focus:ring-2 focus:ring-blue-500"
+              />
+              <span className="text-xs text-gray-600">Hidden Only</span>
+            </label>
+          </div>
+        </div>
+
         {/* Color Legend */}
-        <div className="mt-4 pt-3 border-t border-gray-200">
+        <div className="mt-3 pt-3 border-t border-gray-200">
           <h3 className="text-xs font-semibold text-gray-700 mb-2">Categories</h3>
           <div className="space-y-1.5">
             {Object.entries(ACTIVITY_CATEGORIES).map(([key, { color, label }]) => (
@@ -173,6 +235,7 @@ export default function FacilityMap({ facilities }: FacilityMapProps) {
       <FacilitySidebar
         facility={selectedFacility}
         onClose={() => setSelectedFacility(null)}
+        onUpdateFacility={onUpdateFacility}
       />
     </div>
   );
