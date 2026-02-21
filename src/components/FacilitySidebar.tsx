@@ -178,7 +178,7 @@ export default function FacilitySidebar({ facility, onClose }: FacilitySidebarPr
                 Photos
               </h3>
               <div className="grid grid-cols-2 gap-3">
-                {facility.photo_references.slice(0, 6).map((photoRef, idx) => (
+                {facility.photo_references.slice(0, 10).map((photoRef, idx) => (
                   <motion.div
                     key={idx}
                     initial={{ opacity: 0, scale: 0.9 }}
