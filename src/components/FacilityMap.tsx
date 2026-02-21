@@ -7,7 +7,7 @@ import { Facility } from "@/types/facility";
 import { FilterOption } from "@/app/page";
 import FacilitySidebar from "./FacilitySidebar";
 import { motion } from "framer-motion";
-import { Filter, Layers } from "lucide-react";
+import { Filter, Layers, Check } from "lucide-react";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 interface FacilityMapProps {
@@ -181,13 +181,13 @@ export default function FacilityMap({
       </Map>
 
       {/* Modern Info Panel */}
-      <div className="absolute top-4 right-4 bg-white rounded-xl shadow-2xl p-5 max-w-sm z-10 border border-gray-100">
-        <div className="flex items-center gap-2 mb-3">
-          <div className="p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg">
-            <Layers className="w-4 h-4 text-white" />
+      <div className="absolute top-4 right-4 bg-white rounded-xl shadow-2xl p-4 max-w-xs z-10 border border-gray-100">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="p-1.5 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg">
+            <Layers className="w-3.5 h-3.5 text-white" />
           </div>
           <div>
-            <h2 className="text-base font-bold text-gray-900">
+            <h2 className="text-sm font-bold text-gray-900">
               Texas Sports Facilities
             </h2>
             <p className="text-xs text-gray-500">
@@ -196,78 +196,81 @@ export default function FacilityMap({
           </div>
         </div>
 
-        <p className="text-xs text-gray-500 mb-4 flex items-center gap-1">
+        <p className="text-xs text-gray-500 mb-3 flex items-center gap-1">
           <span className="inline-block w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
           Click any marker for details
         </p>
 
         {/* Modern Filter Options */}
-        <div className="mb-4">
-          <div className="flex items-center gap-2 mb-3">
-            <Filter className="w-3.5 h-3.5 text-gray-600" />
+        <div className="mb-3">
+          <div className="flex items-center gap-1.5 mb-2">
+            <Filter className="w-3 h-3 text-gray-600" />
             <h3 className="text-xs font-semibold text-gray-700 tracking-wide uppercase">Display Filter</h3>
           </div>
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => onFilterOptionChange('UNHIDDEN_ONLY')}
-              className={`w-full px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 ${
+              className={`w-full px-3 py-2 rounded-lg text-xs font-medium transition-all duration-300 flex items-center justify-between ${
                 filterOption === 'UNHIDDEN_ONLY'
                   ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
                   : 'bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 hover:from-gray-100 hover:to-gray-200 border border-gray-200'
               }`}
             >
-              Unhidden Only
+              <span>Unhidden Only</span>
+              {filterOption === 'UNHIDDEN_ONLY' && <Check className="w-3.5 h-3.5" />}
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => onFilterOptionChange('ALL')}
-              className={`w-full px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 ${
+              className={`w-full px-3 py-2 rounded-lg text-xs font-medium transition-all duration-300 flex items-center justify-between ${
                 filterOption === 'ALL'
                   ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
                   : 'bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 hover:from-gray-100 hover:to-gray-200 border border-gray-200'
               }`}
             >
-              All Facilities
+              <span>All Facilities</span>
+              {filterOption === 'ALL' && <Check className="w-3.5 h-3.5" />}
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => onFilterOptionChange('HIDDEN_ONLY')}
-              className={`w-full px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 ${
+              className={`w-full px-3 py-2 rounded-lg text-xs font-medium transition-all duration-300 flex items-center justify-between ${
                 filterOption === 'HIDDEN_ONLY'
                   ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
                   : 'bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 hover:from-gray-100 hover:to-gray-200 border border-gray-200'
               }`}
             >
-              Hidden Only
+              <span>Hidden Only</span>
+              {filterOption === 'HIDDEN_ONLY' && <Check className="w-3.5 h-3.5" />}
             </motion.button>
           </div>
         </div>
 
         {/* Category Sub-Cards */}
         <div>
-          <h3 className="text-xs font-semibold text-gray-700 mb-3 tracking-wide uppercase">Categories</h3>
-          <div className="space-y-2">
+          <h3 className="text-xs font-semibold text-gray-700 mb-2 tracking-wide uppercase">Categories</h3>
+          <div className="space-y-1.5">
             {Object.entries(ACTIVITY_CATEGORIES).map(([key, { color, label }], idx) => (
               <motion.div
                 key={key}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.05 }}
-                className="bg-gradient-to-br from-white to-gray-50/50 rounded-lg p-3 border border-gray-100 hover:shadow-md transition-all duration-300"
+                className="bg-gradient-to-br from-white to-gray-50/50 rounded-lg p-2.5 border border-gray-100 hover:shadow-md transition-all duration-300"
               >
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
                     <div
-                      className="w-4 h-4 rounded-full shadow-sm"
+                      className="w-3 h-3 rounded-full shadow-sm"
                       style={{ backgroundColor: color, opacity: 0.9 }}
                     />
-                    <span className="text-sm font-medium text-gray-700">{label}</span>
+                    <span className="text-xs font-medium text-gray-700">{label}</span>
                   </div>
-                  <span className="text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                  <span className="text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
                     {categoryCounts[key as keyof typeof ACTIVITY_CATEGORIES].toLocaleString()}
                   </span>
                 </div>
