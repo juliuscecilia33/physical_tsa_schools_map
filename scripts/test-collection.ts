@@ -56,7 +56,7 @@ interface Facility {
     author_name: string;
     rating: number;
     text: string;
-    time: number;
+    time: string;
     relative_time_description: string;
   }>;
   photo_references?: string[];
