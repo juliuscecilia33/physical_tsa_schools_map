@@ -65,6 +65,8 @@ export default function FacilityMap({
         return facilities;
       case 'HIDDEN_ONLY':
         return facilities.filter(f => f.hidden === true);
+      case 'WITH_NOTES_ONLY':
+        return facilities.filter(f => f.has_notes === true);
       case 'UNHIDDEN_ONLY':
       default:
         return facilities.filter(f => !f.hidden);
@@ -246,6 +248,19 @@ export default function FacilityMap({
             >
               <span>Hidden Only</span>
               {filterOption === 'HIDDEN_ONLY' && <Check className="w-3.5 h-3.5" />}
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => onFilterOptionChange('WITH_NOTES_ONLY')}
+              className={`w-full px-3 py-2 rounded-lg text-xs font-medium transition-all duration-300 flex items-center justify-between ${
+                filterOption === 'WITH_NOTES_ONLY'
+                  ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
+                  : 'bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 hover:from-gray-100 hover:to-gray-200 border border-gray-200'
+              }`}
+            >
+              <span>With Notes Only</span>
+              {filterOption === 'WITH_NOTES_ONLY' && <Check className="w-3.5 h-3.5" />}
             </motion.button>
           </div>
         </div>

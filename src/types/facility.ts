@@ -16,6 +16,8 @@ export interface Facility {
   opening_hours?: OpeningHours;
   business_status?: string;
   hidden?: boolean;
+  notes?: Note[];
+  has_notes?: boolean;
 }
 
 export interface Review {
@@ -29,4 +31,12 @@ export interface Review {
 export interface OpeningHours {
   open_now?: boolean;
   weekday_text?: string[];
+}
+
+export interface Note {
+  id: string;
+  place_id: string;
+  note_text: string;
+  created_at: string;
+  updated_at: string;
 }

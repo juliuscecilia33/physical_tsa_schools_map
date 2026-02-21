@@ -1,6 +1,6 @@
 "use client";
 
-import { Facility } from "@/types/facility";
+import { Facility, Note } from "@/types/facility";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
@@ -13,9 +13,15 @@ import {
   CheckCircle2,
   XCircle,
   EyeOff,
-  Eye
+  Eye,
+  StickyNote,
+  Plus,
+  Edit2,
+  Trash2,
+  Save,
+  XCircle as XIcon
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 
 interface FacilitySidebarProps {
@@ -26,8 +32,163 @@ interface FacilitySidebarProps {
 
 export default function FacilitySidebar({ facility, onClose, onUpdateFacility }: FacilitySidebarProps) {
   const [loadingImages, setLoadingImages] = useState<{ [key: number]: boolean }>({});
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [loadingNotes, setLoadingNotes] = useState(false);
+  const [newNoteText, setNewNoteText] = useState("");
+  const [addingNote, setAddingNote] = useState(false);
+  const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
+  const [editNoteText, setEditNoteText] = useState("");
 
-  if (!facility) return null;
+  // Fetch notes when facility changes
+  useEffect(() => {
+    const fetchNotes = async () => {
+      if (!facility) return;
+
+      setLoadingNotes(true);
+      try {
+        const { data, error } = await supabase
+          .from("facility_notes")
+          .select("*")
+          .eq("place_id", facility.place_id)
+          .order("created_at", { ascending: false });
+
+        if (error) throw error;
+        setNotes(data || []);
+      } catch (error) {
+        console.error("Error fetching notes:", error);
+      } finally {
+        setLoadingNotes(false);
+      }
+    };
+
+    fetchNotes();
+  }, [facility]);
+
+  // Add new note
+  const handleAddNote = async () => {
+    if (!newNoteText.trim()) return;
+
+    setAddingNote(true);
+    const tempNote: Note = {
+      id: `temp-${Date.now()}`,
+      place_id: facility.place_id,
+      note_text: newNoteText,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+
+    // Optimistic update
+    setNotes(prev => [tempNote, ...prev]);
+    setNewNoteText("");
+
+    try {
+      const { data, error } = await supabase
+        .from("facility_notes")
+        .insert({
+          place_id: facility.place_id,
+          note_text: newNoteText,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Replace temp note with real note from database
+      setNotes(prev => prev.map(n => n.id === tempNote.id ? data : n));
+    } catch (error) {
+      console.error("Error adding note:", error);
+      // Revert optimistic update
+      setNotes(prev => prev.filter(n => n.id !== tempNote.id));
+      alert("Failed to add note. Please try again.");
+    } finally {
+      setAddingNote(false);
+    }
+  };
+
+  // Start editing a note
+  const handleStartEdit = (note: Note) => {
+    setEditingNoteId(note.id);
+    setEditNoteText(note.note_text);
+  };
+
+  // Cancel editing
+  const handleCancelEdit = () => {
+    setEditingNoteId(null);
+    setEditNoteText("");
+  };
+
+  // Save edited note
+  const handleSaveEdit = async (noteId: string) => {
+    if (!editNoteText.trim()) return;
+
+    const oldNote = notes.find(n => n.id === noteId);
+    if (!oldNote) return;
+
+    // Optimistic update
+    setNotes(prev => prev.map(n =>
+      n.id === noteId
+        ? { ...n, note_text: editNoteText, updated_at: new Date().toISOString() }
+        : n
+    ));
+    setEditingNoteId(null);
+
+    try {
+      const { error } = await supabase
+        .from("facility_notes")
+        .update({ note_text: editNoteText })
+        .eq("id", noteId);
+
+      if (error) throw error;
+    } catch (error) {
+      console.error("Error updating note:", error);
+      // Revert optimistic update
+      setNotes(prev => prev.map(n => n.id === noteId ? oldNote : n));
+      alert("Failed to update note. Please try again.");
+    }
+  };
+
+  // Delete note
+  const handleDeleteNote = async (noteId: string) => {
+    if (!confirm("Are you sure you want to delete this note?")) return;
+
+    const deletedNote = notes.find(n => n.id === noteId);
+    if (!deletedNote) return;
+
+    // Optimistic update
+    setNotes(prev => prev.filter(n => n.id !== noteId));
+
+    try {
+      const { error } = await supabase
+        .from("facility_notes")
+        .delete()
+        .eq("id", noteId);
+
+      if (error) throw error;
+    } catch (error) {
+      console.error("Error deleting note:", error);
+      // Revert optimistic update
+      setNotes(prev => [...prev, deletedNote].sort((a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      ));
+      alert("Failed to delete note. Please try again.");
+    }
+  };
+
+  // Format relative time
+  const formatRelativeTime = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return date.toLocaleDateString();
+  };
 
   const handleToggleHidden = () => {
     const newHiddenValue = !facility.hidden;
@@ -102,6 +263,9 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
   const handleImageLoadStart = (idx: number) => {
     setLoadingImages(prev => ({ ...prev, [idx]: true }));
   };
+
+  // Early return after all hooks are declared (Rules of Hooks)
+  if (!facility) return null;
 
   return (
     <AnimatePresence>
@@ -229,6 +393,131 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                 </>
               )}
             </motion.button>
+          </motion.div>
+
+          {/* Notes Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide flex items-center gap-2">
+                <StickyNote className="w-4 h-4" />
+                Notes ({notes.length})
+              </h3>
+            </div>
+
+            {/* Add New Note Form */}
+            <div className="mb-4">
+              <div className="flex gap-2">
+                <textarea
+                  value={newNoteText}
+                  onChange={(e) => setNewNoteText(e.target.value)}
+                  placeholder="Add a note..."
+                  className="flex-1 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                  rows={2}
+                  disabled={addingNote}
+                />
+              </div>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleAddNote}
+                disabled={!newNoteText.trim() || addingNote}
+                className="mt-2 w-full flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg text-sm font-medium shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Plus className="w-4 h-4" />
+                <span>{addingNote ? "Adding..." : "Add Note"}</span>
+              </motion.button>
+            </div>
+
+            {/* Notes List */}
+            {loadingNotes ? (
+              <div className="text-center py-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+              </div>
+            ) : notes.length === 0 ? (
+              <div className="text-center py-6 bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-xl border border-gray-100">
+                <StickyNote className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                <p className="text-sm text-gray-500">No notes yet</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {notes.map((note, idx) => (
+                  <motion.div
+                    key={note.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.35 + idx * 0.05 }}
+                    className="bg-gradient-to-br from-white to-gray-50/50 rounded-xl p-3 shadow-sm border border-gray-100"
+                  >
+                    {editingNoteId === note.id ? (
+                      // Edit Mode
+                      <div className="space-y-2">
+                        <textarea
+                          value={editNoteText}
+                          onChange={(e) => setEditNoteText(e.target.value)}
+                          className="w-full px-3 py-2 text-sm text-gray-900 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                          rows={3}
+                        />
+                        <div className="flex gap-2">
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => handleSaveEdit(note.id)}
+                            className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-lg text-xs font-medium"
+                          >
+                            <Save className="w-3 h-3" />
+                            Save
+                          </motion.button>
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={handleCancelEdit}
+                            className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-xs font-medium"
+                          >
+                            <XIcon className="w-3 h-3" />
+                            Cancel
+                          </motion.button>
+                        </div>
+                      </div>
+                    ) : (
+                      // View Mode
+                      <>
+                        <p className="text-sm text-gray-700 leading-relaxed mb-2">
+                          {note.note_text}
+                        </p>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-gray-500">
+                            {formatRelativeTime(note.created_at)}
+                            {note.updated_at !== note.created_at && " (edited)"}
+                          </span>
+                          <div className="flex gap-2">
+                            <motion.button
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                              onClick={() => handleStartEdit(note)}
+                              className="p-1 hover:bg-blue-100 rounded text-blue-600"
+                            >
+                              <Edit2 className="w-3.5 h-3.5" />
+                            </motion.button>
+                            <motion.button
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                              onClick={() => handleDeleteNote(note.id)}
+                              className="p-1 hover:bg-red-100 rounded text-red-600"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </motion.button>
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </motion.div>
+                ))}
+              </div>
+            )}
           </motion.div>
 
           {/* Photos */}

@@ -18,7 +18,7 @@ const FacilityMap = dynamic(() => import("@/components/FacilityMap"), {
   ),
 });
 
-export type FilterOption = 'UNHIDDEN_ONLY' | 'ALL' | 'HIDDEN_ONLY';
+export type FilterOption = 'UNHIDDEN_ONLY' | 'ALL' | 'HIDDEN_ONLY' | 'WITH_NOTES_ONLY';
 
 export default function Home() {
   const [facilities, setFacilities] = useState<Facility[]>([]);
@@ -110,6 +110,7 @@ export default function Home() {
           opening_hours: row.opening_hours,
           business_status: row.business_status,
           hidden: row.hidden || false,
+          has_notes: row.has_notes || false,
         }));
 
         console.log(`Loaded ${transformedFacilities.length} athletic facilities`);

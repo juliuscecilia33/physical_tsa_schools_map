@@ -1,5 +1,5 @@
--- Drop the old function
-DROP FUNCTION IF EXISTS get_facilities_with_coords();
+-- Drop the old function with full signature (including parameter types)
+DROP FUNCTION IF EXISTS get_facilities_with_coords(INT, BOOLEAN);
 
 -- Create new function that accepts a limit parameter and optional hidden filter
 CREATE OR REPLACE FUNCTION get_facilities_with_coords(
@@ -23,6 +23,7 @@ RETURNS TABLE (
   opening_hours JSONB,
   business_status TEXT,
   hidden BOOLEAN,
+  has_notes BOOLEAN,
   created_at TIMESTAMPTZ,
   updated_at TIMESTAMPTZ
 ) AS $$
@@ -45,10 +46,16 @@ BEGIN
     sf.opening_hours,
     sf.business_status,
     sf.hidden,
+    CASE WHEN COUNT(fn.id) > 0 THEN TRUE ELSE FALSE END AS has_notes,
     sf.created_at,
     sf.updated_at
   FROM sports_facilities sf
+  LEFT JOIN facility_notes fn ON sf.place_id = fn.place_id
   WHERE include_hidden = TRUE OR sf.hidden = FALSE
+  GROUP BY sf.id, sf.place_id, sf.name, sf.sport_types, sf.address, sf.location,
+           sf.phone, sf.website, sf.rating, sf.user_ratings_total, sf.reviews,
+           sf.photo_references, sf.opening_hours, sf.business_status, sf.hidden,
+           sf.created_at, sf.updated_at
   LIMIT row_limit;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER STABLE;
