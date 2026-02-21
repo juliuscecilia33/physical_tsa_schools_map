@@ -13,7 +13,8 @@ interface FacilityMapProps {
 
 // Activity categories and their colors
 const ACTIVITY_CATEGORIES = {
-  fitness: { color: '#10b981', label: 'Fitness & Wellness' }, // green
+  parks: { color: '#22c55e', label: 'Parks & Fields' },       // bright green
+  fitness: { color: '#06b6d4', label: 'Fitness & Wellness' }, // cyan
   sports: { color: '#f97316', label: 'Sports Venues' },       // orange
   education: { color: '#3b82f6', label: 'Educational' },      // blue
   other: { color: '#6b7280', label: 'Other' }                 // gray
@@ -21,10 +22,12 @@ const ACTIVITY_CATEGORIES = {
 
 // Categorize facility based on sport types
 function getFacilityCategory(sportTypes: string[]): keyof typeof ACTIVITY_CATEGORIES {
-  const fitnessTypes = ['gym', 'spa'];
-  const sportsTypes = ['stadium', 'bowling_alley'];
+  const parkTypes = ['park', 'athletic_field', 'sports_complex'];
+  const fitnessTypes = ['gym', 'fitness_center', 'spa'];
+  const sportsTypes = ['stadium', 'recreation_center', 'community_center'];
   const educationTypes = ['school'];
 
+  if (sportTypes.some(type => parkTypes.includes(type))) return 'parks';
   if (sportTypes.some(type => fitnessTypes.includes(type))) return 'fitness';
   if (sportTypes.some(type => sportsTypes.includes(type))) return 'sports';
   if (sportTypes.some(type => educationTypes.includes(type))) return 'education';

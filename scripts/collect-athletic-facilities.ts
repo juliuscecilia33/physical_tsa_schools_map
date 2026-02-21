@@ -19,75 +19,84 @@ if (!GOOGLE_API_KEY || !supabaseUrl || !supabaseAnonKey) {
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// Texas bounding box
-const TEXAS_BOUNDS = {
-  minLng: -106.6,
-  maxLng: -93.5,
-  minLat: 25.8,
-  maxLat: 36.5,
-};
-
-// Grid cell size in degrees (roughly 50km)
-const GRID_SIZE = 0.45;
-
-// Athletic field and court-based facility types
-const SPORT_TYPES = [
-  "park",              // Municipal/county parks with athletic fields
-  "gym",
-  "stadium",
-  "athletic_field",
-  "fitness_center",
-  "sports_complex",
-  "sports_club",
-  "swimming_pool",
-  "tennis_court",
-  "golf_course",
-  "community_center",  // May have basketball/volleyball courts
-  "recreation_center", // May have indoor/outdoor fields
+// Top 50 Texas cities by population
+const TEXAS_CITIES = [
+  "Houston, Texas",
+  "San Antonio, Texas",
+  "Dallas, Texas",
+  "Austin, Texas",
+  "Fort Worth, Texas",
+  "El Paso, Texas",
+  "Arlington, Texas",
+  "Corpus Christi, Texas",
+  "Plano, Texas",
+  "Laredo, Texas",
+  "Lubbock, Texas",
+  "Garland, Texas",
+  "Irving, Texas",
+  "Amarillo, Texas",
+  "Grand Prairie, Texas",
+  "Brownsville, Texas",
+  "McKinney, Texas",
+  "Frisco, Texas",
+  "Pasadena, Texas",
+  "Mesquite, Texas",
+  "Killeen, Texas",
+  "McAllen, Texas",
+  "Waco, Texas",
+  "Carrollton, Texas",
+  "Denton, Texas",
+  "Midland, Texas",
+  "Abilene, Texas",
+  "Beaumont, Texas",
+  "Round Rock, Texas",
+  "Odessa, Texas",
+  "Wichita Falls, Texas",
+  "Richardson, Texas",
+  "Lewisville, Texas",
+  "Tyler, Texas",
+  "College Station, Texas",
+  "Pearland, Texas",
+  "San Angelo, Texas",
+  "Allen, Texas",
+  "League City, Texas",
+  "Sugar Land, Texas",
+  "Longview, Texas",
+  "Edinburg, Texas",
+  "Mission, Texas",
+  "Bryan, Texas",
+  "Baytown, Texas",
+  "Pharr, Texas",
+  "Temple, Texas",
+  "Missouri City, Texas",
+  "Flower Mound, Texas",
+  "Harlingen, Texas",
 ];
 
-interface GridCell {
-  lat: number;
-  lng: number;
-  index: number;
-}
+// Athletic facility search queries (field and court-based mainstream sports)
+const FACILITY_SEARCHES = [
+  "soccer field",
+  "football field",
+  "baseball field",
+  "basketball court",
+  "sports park",
+  "athletic park",
+  "athletic complex",
+  "recreation park",
+  "tennis court",
+  "volleyball court",
+];
 
 interface ProgressState {
-  processedCells: number[];
+  processedCities: string[];
   totalFacilities: number;
   lastUpdated: Date;
 }
 
-const PROGRESS_FILE = path.join(__dirname, "../.texas-collection-progress.json");
+const PROGRESS_FILE = path.join(__dirname, "../.athletic-facilities-progress.json");
 
 // Rate limiting helper
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-// Generate grid cells covering all of Texas
-function generateGrid(): GridCell[] {
-  const cells: GridCell[] = [];
-  let index = 0;
-
-  for (
-    let lat = TEXAS_BOUNDS.minLat;
-    lat < TEXAS_BOUNDS.maxLat;
-    lat += GRID_SIZE
-  ) {
-    for (
-      let lng = TEXAS_BOUNDS.minLng;
-      lng < TEXAS_BOUNDS.maxLng;
-      lng += GRID_SIZE
-    ) {
-      cells.push({
-        lat: lat + GRID_SIZE / 2,
-        lng: lng + GRID_SIZE / 2,
-        index: index++,
-      });
-    }
-  }
-
-  return cells;
-}
 
 // Load progress from file
 function loadProgress(): ProgressState {
@@ -96,7 +105,7 @@ function loadProgress(): ProgressState {
     return JSON.parse(data);
   }
   return {
-    processedCells: [],
+    processedCities: [],
     totalFacilities: 0,
     lastUpdated: new Date(),
   };
@@ -124,29 +133,26 @@ async function facilityExists(placeId: string): Promise<boolean> {
   return data && data.length > 0;
 }
 
-// Search for places near a location
-async function searchNearbyPlaces(
-  location: { lat: number; lng: number },
-  type: string,
-  radius: number = 50000
+// Search for places using text search
+async function searchPlacesByText(
+  query: string
 ): Promise<string[]> {
   try {
-    const response = await client.placesNearby({
+    const response = await client.textSearch({
       params: {
-        location,
-        radius,
-        type,
+        query,
         key: GOOGLE_API_KEY,
       },
     });
 
     if (response.data.status !== "OK" && response.data.status !== "ZERO_RESULTS") {
+      console.error(`  ⚠️  Search status: ${response.data.status}`);
       return [];
     }
 
     return response.data.results.map((place) => place.place_id!).filter(Boolean);
   } catch (error: any) {
-    console.error(`  ⚠️  Error searching ${type}:`, error.message);
+    console.error(`  ⚠️  Error searching:`, error.message);
     return [];
   }
 }
@@ -229,31 +235,48 @@ async function fetchAndInsertPlace(placeId: string): Promise<boolean> {
   }
 }
 
-// Process a single grid cell
-async function processGridCell(
-  cell: GridCell,
+// Process a single city
+async function processCity(
+  city: string,
+  cityIndex: number,
+  totalCities: number,
   progress: ProgressState
 ): Promise<number> {
-  console.log(`\n📍 Processing Cell ${cell.index + 1} (${cell.lat.toFixed(2)}, ${cell.lng.toFixed(2)})`);
+  console.log(`\n${"=".repeat(60)}`);
+  console.log(`📍 [${cityIndex + 1}/${totalCities}] Processing: ${city}`);
+  console.log("=".repeat(60));
 
   const placeIds = new Set<string>();
 
-  // Search all sport types in this cell
-  for (const sportType of SPORT_TYPES) {
-    const ids = await searchNearbyPlaces({ lat: cell.lat, lng: cell.lng }, sportType);
+  // Search all facility types in this city
+  for (let i = 0; i < FACILITY_SEARCHES.length; i++) {
+    const facilityType = FACILITY_SEARCHES[i];
+    const query = `${facilityType} in ${city}`;
+
+    console.log(`  [${i + 1}/${FACILITY_SEARCHES.length}] Searching: ${facilityType}...`);
+
+    const ids = await searchPlacesByText(query);
     ids.forEach((id) => placeIds.add(id));
+
+    console.log(`    Found ${ids.length} results`);
+
     await delay(500); // Rate limiting between searches
   }
 
-  console.log(`  🔍 Found ${placeIds.size} unique facilities in this cell`);
+  console.log(`\n  🔍 Total unique facilities found: ${placeIds.size}`);
 
   let newFacilities = 0;
+  let skippedExisting = 0;
+  let processed = 0;
 
   // Process each facility
   for (const placeId of placeIds) {
+    processed++;
+
     // Check if already in database
     const exists = await facilityExists(placeId);
     if (exists) {
+      skippedExisting++;
       continue;
     }
 
@@ -262,68 +285,72 @@ async function processGridCell(
       newFacilities++;
       progress.totalFacilities++;
 
-      console.log(
-        `  ✅ [${progress.totalFacilities}] Inserted new facility`
-      );
+      if (newFacilities % 10 === 0) {
+        console.log(
+          `  ✅ [${processed}/${placeIds.size}] Inserted ${newFacilities} new facilities (${skippedExisting} already existed)`
+        );
+      }
     }
   }
 
-  console.log(`  ➕ Added ${newFacilities} new facilities from this cell`);
+  console.log(`\n  ✅ City Complete:`);
+  console.log(`     New facilities: ${newFacilities}`);
+  console.log(`     Already existed: ${skippedExisting}`);
+  console.log(`     Total in database: ${progress.totalFacilities}`);
 
   return newFacilities;
 }
 
-async function collectTexasFacilities() {
-  console.log("🚀 Starting Full Texas Sports Facilities Collection");
+async function collectAthleticFacilities() {
+  console.log("🚀 Starting Texas Athletic Facilities Collection");
   console.log("=" .repeat(60));
-  console.log(`📊 Coverage: All of Texas`);
-  console.log(`📍 Grid Size: 50km x 50km cells`);
-  console.log(`🏃 Sport Types: ${SPORT_TYPES.length} types`);
+  console.log(`📊 Cities: ${TEXAS_CITIES.length} major Texas cities`);
+  console.log(`🏃 Facility Types: ${FACILITY_SEARCHES.length} types per city`);
+  console.log(`📋 Searches: soccer/football/baseball fields, basketball/tennis/volleyball courts, athletic parks`);
   console.log("=" .repeat(60) + "\n");
-
-  const grid = generateGrid();
-  console.log(`📐 Generated ${grid.length} grid cells\n`);
 
   const progress = loadProgress();
 
-  if (progress.processedCells.length > 0) {
+  if (progress.processedCities.length > 0) {
     console.log(
-      `♻️  Resuming from previous run: ${progress.processedCells.length}/${grid.length} cells processed\n`
+      `♻️  Resuming: ${progress.processedCities.length}/${TEXAS_CITIES.length} cities processed\n`
     );
-    console.log(`   Total facilities so far: ${progress.totalFacilities}\n`);
+    console.log(`   Total facilities: ${progress.totalFacilities}\n`);
   }
 
   const startTime = Date.now();
 
-  for (const cell of grid) {
-    // Skip already processed cells
-    if (progress.processedCells.includes(cell.index)) {
+  for (let i = 0; i < TEXAS_CITIES.length; i++) {
+    const city = TEXAS_CITIES[i];
+
+    // Skip already processed cities
+    if (progress.processedCities.includes(city)) {
       continue;
     }
 
     try {
-      await processGridCell(cell, progress);
+      await processCity(city, i, TEXAS_CITIES.length, progress);
 
-      progress.processedCells.push(cell.index);
+      progress.processedCities.push(city);
       saveProgress(progress);
 
-      // Progress summary every 10 cells
-      if (progress.processedCells.length % 10 === 0) {
+      // Progress summary every 5 cities
+      if (progress.processedCities.length % 5 === 0) {
         const elapsed = (Date.now() - startTime) / 1000 / 60; // minutes
-        const rate = progress.processedCells.length / elapsed;
-        const remaining = grid.length - progress.processedCells.length;
+        const rate = progress.processedCities.length / elapsed;
+        const remaining = TEXAS_CITIES.length - progress.processedCities.length;
         const eta = remaining / rate;
 
         console.log("\n" + "=".repeat(60));
-        console.log("📊 Progress Summary:");
-        console.log(`   Cells: ${progress.processedCells.length}/${grid.length}`);
+        console.log("📊 Overall Progress:");
+        console.log(`   Cities: ${progress.processedCities.length}/${TEXAS_CITIES.length}`);
         console.log(`   Total Facilities: ${progress.totalFacilities}`);
         console.log(`   Elapsed: ${elapsed.toFixed(0)} minutes`);
         console.log(`   ETA: ${eta.toFixed(0)} minutes (~${(eta / 60).toFixed(1)} hours)`);
         console.log("=".repeat(60) + "\n");
       }
     } catch (error: any) {
-      console.error(`\n❌ Error processing cell ${cell.index}:`, error.message);
+      console.error(`\n❌ Error processing ${city}:`, error.message);
       console.log("   Saving progress and continuing...\n");
       saveProgress(progress);
     }
@@ -334,7 +361,7 @@ async function collectTexasFacilities() {
   console.log("=".repeat(60));
   console.log(`📊 Final Statistics:`);
   console.log(`   Total Facilities: ${progress.totalFacilities}`);
-  console.log(`   Cells Processed: ${progress.processedCells.length}/${grid.length}`);
+  console.log(`   Cities Processed: ${progress.processedCities.length}/${TEXAS_CITIES.length}`);
   console.log(`   Runtime: ${((Date.now() - startTime) / 1000 / 60 / 60).toFixed(2)} hours`);
   console.log("=".repeat(60));
 
@@ -345,7 +372,7 @@ async function collectTexasFacilities() {
 }
 
 // Run the collection
-collectTexasFacilities().catch((error) => {
+collectAthleticFacilities().catch((error) => {
   console.error("❌ Fatal error:", error);
   process.exit(1);
 });

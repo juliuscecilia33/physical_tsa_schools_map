@@ -77,21 +77,9 @@ export default function Home() {
           business_status: row.business_status,
         }));
 
-        // Filter out non-sport facilities
-        const NON_SPORT_TYPES = [
-          'food', 'restaurant', 'cafe', 'bar', 'lodging', 'store',
-          'clothing_store', 'shopping_mall', 'amusement_park',
-          'movie_theater', 'aquarium', 'night_club', 'tourist_attraction'
-        ];
+        console.log(`Loaded ${transformedFacilities.length} athletic facilities`);
 
-        const sportFacilities = transformedFacilities.filter((facility) => {
-          // Keep facility if it has at least one sport type that isn't in the exclusion list
-          return facility.sport_types.some(type => !NON_SPORT_TYPES.includes(type));
-        });
-
-        console.log(`Filtered to ${sportFacilities.length} sport facilities (removed ${transformedFacilities.length - sportFacilities.length} non-sport facilities)`);
-
-        setFacilities(sportFacilities);
+        setFacilities(transformedFacilities);
       } catch (err: any) {
         console.error("Error loading facilities:", err);
         setError(err.message);
