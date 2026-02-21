@@ -19,25 +19,28 @@ interface FacilityMapProps {
 
 // Activity categories and their colors
 const ACTIVITY_CATEGORIES = {
-  parks: { color: '#22c55e', label: 'Parks & Fields' },       // bright green
-  fitness: { color: '#06b6d4', label: 'Fitness & Wellness' }, // cyan
-  sports: { color: '#f97316', label: 'Sports Venues' },       // orange
-  education: { color: '#3b82f6', label: 'Educational' },      // blue
-  other: { color: '#6b7280', label: 'Other' }                 // gray
+  parks: { color: "#22c55e", label: "Parks & Fields" }, // bright green
+  fitness: { color: "#06b6d4", label: "Fitness & Wellness" }, // cyan
+  sports: { color: "#f97316", label: "Sports Venues" }, // orange
+  education: { color: "#3b82f6", label: "Educational" }, // blue
+  other: { color: "#6b7280", label: "Other" }, // gray
 };
 
 // Categorize facility based on sport types
-function getFacilityCategory(sportTypes: string[]): keyof typeof ACTIVITY_CATEGORIES {
-  const parkTypes = ['park', 'athletic_field', 'sports_complex'];
-  const fitnessTypes = ['gym', 'fitness_center', 'spa'];
-  const sportsTypes = ['stadium', 'recreation_center', 'community_center'];
-  const educationTypes = ['school'];
+function getFacilityCategory(
+  sportTypes: string[],
+): keyof typeof ACTIVITY_CATEGORIES {
+  const parkTypes = ["park", "athletic_field", "sports_complex"];
+  const fitnessTypes = ["gym", "fitness_center", "spa"];
+  const sportsTypes = ["stadium", "recreation_center", "community_center"];
+  const educationTypes = ["school"];
 
-  if (sportTypes.some(type => parkTypes.includes(type))) return 'parks';
-  if (sportTypes.some(type => fitnessTypes.includes(type))) return 'fitness';
-  if (sportTypes.some(type => sportsTypes.includes(type))) return 'sports';
-  if (sportTypes.some(type => educationTypes.includes(type))) return 'education';
-  return 'other';
+  if (sportTypes.some((type) => parkTypes.includes(type))) return "parks";
+  if (sportTypes.some((type) => fitnessTypes.includes(type))) return "fitness";
+  if (sportTypes.some((type) => sportsTypes.includes(type))) return "sports";
+  if (sportTypes.some((type) => educationTypes.includes(type)))
+    return "education";
+  return "other";
 }
 
 export default function FacilityMap({
@@ -46,7 +49,9 @@ export default function FacilityMap({
   onFilterOptionChange,
   onUpdateFacility,
 }: FacilityMapProps) {
-  const [selectedFacility, setSelectedFacility] = useState<Facility | null>(null);
+  const [selectedFacility, setSelectedFacility] = useState<Facility | null>(
+    null,
+  );
   const mapRef = useRef<MapRef>(null);
 
   const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
@@ -61,15 +66,15 @@ export default function FacilityMap({
   // Client-side filtering based on filterOption
   const filteredFacilities = useMemo(() => {
     switch (filterOption) {
-      case 'ALL':
+      case "ALL":
         return facilities;
-      case 'HIDDEN_ONLY':
-        return facilities.filter(f => f.hidden === true);
-      case 'WITH_NOTES_ONLY':
-        return facilities.filter(f => f.has_notes === true);
-      case 'UNHIDDEN_ONLY':
+      case "HIDDEN_ONLY":
+        return facilities.filter((f) => f.hidden === true);
+      case "WITH_NOTES_ONLY":
+        return facilities.filter((f) => f.has_notes === true);
+      case "UNHIDDEN_ONLY":
       default:
-        return facilities.filter(f => !f.hidden);
+        return facilities.filter((f) => !f.hidden);
     }
   }, [facilities, filterOption]);
 
@@ -82,7 +87,7 @@ export default function FacilityMap({
       education: 0,
       other: 0,
     };
-    filteredFacilities.forEach(facility => {
+    filteredFacilities.forEach((facility) => {
       const category = getFacilityCategory(facility.sport_types);
       counts[category]++;
     });
@@ -136,7 +141,10 @@ export default function FacilityMap({
         initialViewState={INITIAL_VIEW_STATE}
         style={{ width: "100%", height: "100%" }}
         mapStyle="mapbox://styles/mapbox/streets-v12"
-        interactiveLayerIds={["facility-dots-low-zoom", "facility-dots-high-zoom"]}
+        interactiveLayerIds={[
+          "facility-dots-low-zoom",
+          "facility-dots-high-zoom",
+        ]}
         onClick={(e) => {
           if (e.features && e.features.length > 0) {
             onMarkerClick(e);
@@ -145,11 +153,7 @@ export default function FacilityMap({
       >
         <NavigationControl position="top-left" />
 
-        <Source
-          id="facilities"
-          type="geojson"
-          data={geojsonData}
-        >
+        <Source id="facilities" type="geojson" data={geojsonData}>
           {/* Modern flat colored dots at low zoom (zoom < 10) */}
           <Layer
             id="facility-dots-low-zoom"
@@ -193,7 +197,8 @@ export default function FacilityMap({
               Texas Sports Facilities
             </h2>
             <p className="text-xs text-gray-500">
-              {filteredFacilities.length.toLocaleString()} of {facilities.length.toLocaleString()} shown
+              {filteredFacilities.length.toLocaleString()} of{" "}
+              {facilities.length.toLocaleString()} shown
             </p>
           </div>
         </div>
@@ -207,90 +212,106 @@ export default function FacilityMap({
         <div className="mb-3">
           <div className="flex items-center gap-1.5 mb-2">
             <Filter className="w-3 h-3 text-gray-600" />
-            <h3 className="text-xs font-semibold text-gray-700 tracking-wide uppercase">Display Filter</h3>
+            <h3 className="text-xs font-semibold text-gray-700 tracking-wide uppercase">
+              Display Filter
+            </h3>
           </div>
           <div className="space-y-1.5">
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => onFilterOptionChange('UNHIDDEN_ONLY')}
+              onClick={() => onFilterOptionChange("UNHIDDEN_ONLY")}
               className={`w-full px-3 py-2 rounded-lg text-xs font-medium transition-all duration-300 flex items-center justify-between ${
-                filterOption === 'UNHIDDEN_ONLY'
-                  ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
-                  : 'bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 hover:from-gray-100 hover:to-gray-200 border border-gray-200'
+                filterOption === "UNHIDDEN_ONLY"
+                  ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md"
+                  : "bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 hover:from-gray-100 hover:to-gray-200 border border-gray-200"
               }`}
             >
-              <span>Unhidden Only</span>
-              {filterOption === 'UNHIDDEN_ONLY' && <Check className="w-3.5 h-3.5" />}
+              <span>All (Unhidden)</span>
+              {filterOption === "UNHIDDEN_ONLY" && (
+                <Check className="w-3.5 h-3.5" />
+              )}
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => onFilterOptionChange('ALL')}
+              onClick={() => onFilterOptionChange("ALL")}
               className={`w-full px-3 py-2 rounded-lg text-xs font-medium transition-all duration-300 flex items-center justify-between ${
-                filterOption === 'ALL'
-                  ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
-                  : 'bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 hover:from-gray-100 hover:to-gray-200 border border-gray-200'
+                filterOption === "ALL"
+                  ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md"
+                  : "bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 hover:from-gray-100 hover:to-gray-200 border border-gray-200"
               }`}
             >
               <span>All Facilities</span>
-              {filterOption === 'ALL' && <Check className="w-3.5 h-3.5" />}
+              {filterOption === "ALL" && <Check className="w-3.5 h-3.5" />}
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => onFilterOptionChange('HIDDEN_ONLY')}
+              onClick={() => onFilterOptionChange("HIDDEN_ONLY")}
               className={`w-full px-3 py-2 rounded-lg text-xs font-medium transition-all duration-300 flex items-center justify-between ${
-                filterOption === 'HIDDEN_ONLY'
-                  ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
-                  : 'bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 hover:from-gray-100 hover:to-gray-200 border border-gray-200'
+                filterOption === "HIDDEN_ONLY"
+                  ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md"
+                  : "bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 hover:from-gray-100 hover:to-gray-200 border border-gray-200"
               }`}
             >
               <span>Hidden Only</span>
-              {filterOption === 'HIDDEN_ONLY' && <Check className="w-3.5 h-3.5" />}
+              {filterOption === "HIDDEN_ONLY" && (
+                <Check className="w-3.5 h-3.5" />
+              )}
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => onFilterOptionChange('WITH_NOTES_ONLY')}
+              onClick={() => onFilterOptionChange("WITH_NOTES_ONLY")}
               className={`w-full px-3 py-2 rounded-lg text-xs font-medium transition-all duration-300 flex items-center justify-between ${
-                filterOption === 'WITH_NOTES_ONLY'
-                  ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
-                  : 'bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 hover:from-gray-100 hover:to-gray-200 border border-gray-200'
+                filterOption === "WITH_NOTES_ONLY"
+                  ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md"
+                  : "bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 hover:from-gray-100 hover:to-gray-200 border border-gray-200"
               }`}
             >
               <span>With Notes Only</span>
-              {filterOption === 'WITH_NOTES_ONLY' && <Check className="w-3.5 h-3.5" />}
+              {filterOption === "WITH_NOTES_ONLY" && (
+                <Check className="w-3.5 h-3.5" />
+              )}
             </motion.button>
           </div>
         </div>
 
         {/* Category Sub-Cards */}
         <div>
-          <h3 className="text-xs font-semibold text-gray-700 mb-2 tracking-wide uppercase">Categories</h3>
+          <h3 className="text-xs font-semibold text-gray-700 mb-2 tracking-wide uppercase">
+            Categories
+          </h3>
           <div className="space-y-1.5">
-            {Object.entries(ACTIVITY_CATEGORIES).map(([key, { color, label }], idx) => (
-              <motion.div
-                key={key}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.05 }}
-                className="bg-gradient-to-br from-white to-gray-50/50 rounded-lg p-2.5 border border-gray-100 hover:shadow-md transition-all duration-300"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div
-                      className="w-3 h-3 rounded-full shadow-sm"
-                      style={{ backgroundColor: color, opacity: 0.9 }}
-                    />
-                    <span className="text-xs font-medium text-gray-700">{label}</span>
+            {Object.entries(ACTIVITY_CATEGORIES).map(
+              ([key, { color, label }], idx) => (
+                <motion.div
+                  key={key}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.05 }}
+                  className="bg-gradient-to-br from-white to-gray-50/50 rounded-lg p-2.5 border border-gray-100 hover:shadow-md transition-all duration-300"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-3 h-3 rounded-full shadow-sm"
+                        style={{ backgroundColor: color, opacity: 0.9 }}
+                      />
+                      <span className="text-xs font-medium text-gray-700">
+                        {label}
+                      </span>
+                    </div>
+                    <span className="text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+                      {categoryCounts[
+                        key as keyof typeof ACTIVITY_CATEGORIES
+                      ].toLocaleString()}
+                    </span>
                   </div>
-                  <span className="text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
-                    {categoryCounts[key as keyof typeof ACTIVITY_CATEGORIES].toLocaleString()}
-                  </span>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              ),
+            )}
           </div>
         </div>
       </div>
