@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import Map, { Marker, NavigationControl } from "react-map-gl";
+import { useEffect, useRef, useState, useMemo } from "react";
+import Map, { Source, Layer, NavigationControl } from "react-map-gl";
+import type { MapRef, MapLayerMouseEvent } from "react-map-gl";
 import { Facility } from "@/types/facility";
 import FacilitySidebar from "./FacilitySidebar";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -12,7 +13,7 @@ interface FacilityMapProps {
 
 export default function FacilityMap({ facilities }: FacilityMapProps) {
   const [selectedFacility, setSelectedFacility] = useState<Facility | null>(null);
-  const mapRef = useRef(null);
+  const mapRef = useRef<MapRef>(null);
 
   const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
 
@@ -23,6 +24,41 @@ export default function FacilityMap({ facilities }: FacilityMapProps) {
     zoom: 5.5,
   };
 
+  // Convert facilities to GeoJSON format (no clustering, all individual)
+  const geojsonData = useMemo(() => {
+    return {
+      type: "FeatureCollection" as const,
+      features: facilities.map((facility) => ({
+        type: "Feature" as const,
+        properties: {
+          place_id: facility.place_id,
+          name: facility.name,
+          // Store the full facility data
+          facilityData: JSON.stringify(facility),
+        },
+        geometry: {
+          type: "Point" as const,
+          coordinates: [facility.location.lng, facility.location.lat],
+        },
+      })),
+    };
+  }, [facilities]);
+
+  // Track current zoom level
+  const [zoom, setZoom] = useState(INITIAL_VIEW_STATE.zoom);
+
+  // Handle click on individual markers
+  const onMarkerClick = (event: MapLayerMouseEvent) => {
+    const feature = event.features?.[0];
+    if (!feature) return;
+
+    const facilityData = feature.properties?.facilityData;
+    if (facilityData) {
+      const facility: Facility = JSON.parse(facilityData);
+      setSelectedFacility(facility);
+    }
+  };
+
   return (
     <div className="relative w-full h-screen">
       <Map
@@ -31,39 +67,47 @@ export default function FacilityMap({ facilities }: FacilityMapProps) {
         initialViewState={INITIAL_VIEW_STATE}
         style={{ width: "100%", height: "100%" }}
         mapStyle="mapbox://styles/mapbox/streets-v12"
+        interactiveLayerIds={["facility-dots-low-zoom", "facility-dots-high-zoom"]}
+        onZoom={(e) => setZoom(e.viewState.zoom)}
+        onClick={(e) => {
+          if (e.features && e.features.length > 0) {
+            onMarkerClick(e);
+          }
+        }}
       >
         <NavigationControl position="top-left" />
 
-        {facilities.map((facility) => (
-          <Marker
-            key={facility.place_id}
-            longitude={facility.location.lng}
-            latitude={facility.location.lat}
-            anchor="bottom"
-            onClick={(e) => {
-              e.originalEvent.stopPropagation();
-              setSelectedFacility(facility);
+        <Source
+          id="facilities"
+          type="geojson"
+          data={geojsonData}
+        >
+          {/* Small colored dots at low zoom (zoom < 10) */}
+          <Layer
+            id="facility-dots-low-zoom"
+            type="circle"
+            maxzoom={10}
+            paint={{
+              "circle-color": "#3b82f6",
+              "circle-radius": 4,
+              "circle-stroke-width": 1,
+              "circle-stroke-color": "#1e40af",
             }}
-          >
-            <div className="cursor-pointer hover:scale-110 transition-transform">
-              <svg
-                width="32"
-                height="32"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"
-                  fill="#3b82f6"
-                  stroke="#1e40af"
-                  strokeWidth="1"
-                />
-                <circle cx="12" cy="9" r="2.5" fill="white" />
-              </svg>
-            </div>
-          </Marker>
-        ))}
+          />
+
+          {/* Larger detailed dots at high zoom (zoom >= 10) */}
+          <Layer
+            id="facility-dots-high-zoom"
+            type="circle"
+            minzoom={10}
+            paint={{
+              "circle-color": "#3b82f6",
+              "circle-radius": 8,
+              "circle-stroke-width": 2,
+              "circle-stroke-color": "#1e40af",
+            }}
+          />
+        </Source>
       </Map>
 
       {/* Info Panel */}
