@@ -27,13 +27,38 @@ export default function Home() {
       try {
         setLoading(true);
 
-        // Query with PostGIS functions to extract lat/lng
-        const { data, error } = await supabase.rpc("get_facilities_with_coords");
+        // Fetch all facilities using pagination to bypass 1000 row limit
+        const allFacilities: any[] = [];
+        let from = 0;
+        const pageSize = 1000;
+        let hasMore = true;
 
-        if (error) throw error;
+        while (hasMore) {
+          const { data, error } = await supabase
+            .rpc("get_facilities_with_coords", { row_limit: 10000 })
+            .range(from, from + pageSize - 1);
+
+          if (error) throw error;
+
+          if (data && data.length > 0) {
+            allFacilities.push(...data);
+            from += pageSize;
+
+            console.log(`Loaded ${allFacilities.length} facilities so far...`);
+
+            // If we got less than pageSize, we're done
+            if (data.length < pageSize) {
+              hasMore = false;
+            }
+          } else {
+            hasMore = false;
+          }
+        }
+
+        console.log(`Total loaded: ${allFacilities.length} facilities from database`);
 
         // Transform data from Supabase format to Facility format
-        const transformedFacilities: Facility[] = data.map((row: any) => ({
+        const transformedFacilities: Facility[] = allFacilities.map((row: any) => ({
           place_id: row.place_id,
           name: row.name,
           sport_types: row.sport_types || [],

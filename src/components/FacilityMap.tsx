@@ -16,11 +16,11 @@ export default function FacilityMap({ facilities }: FacilityMapProps) {
 
   const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
 
-  // Houston center coordinates
+  // Texas center coordinates
   const INITIAL_VIEW_STATE = {
-    longitude: -95.3698,
-    latitude: 29.7604,
-    zoom: 11,
+    longitude: -99.9018,
+    latitude: 31.9686,
+    zoom: 5.5,
   };
 
   return (
@@ -69,10 +69,10 @@ export default function FacilityMap({ facilities }: FacilityMapProps) {
       {/* Info Panel */}
       <div className="absolute top-4 right-4 bg-white rounded-lg shadow-lg p-4 max-w-xs z-10">
         <h2 className="text-lg font-bold text-gray-900 mb-2">
-          Houston Sports Facilities
+          Sports Facilities in Texas
         </h2>
         <p className="text-sm text-gray-600">
-          Showing {facilities.length} facilities
+          Showing {facilities.length.toLocaleString()} facilities
         </p>
         <p className="text-xs text-gray-500 mt-2">
           Click on a marker to view details
