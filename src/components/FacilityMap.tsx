@@ -235,36 +235,36 @@ export default function FacilityMap({
       </Map>
 
       {/* Modern Info Panel */}
-      <div className="absolute top-4 right-4 bg-white rounded-xl shadow-2xl p-4 max-w-xs z-10 border border-gray-100">
-        <div className="flex items-center gap-2 mb-2">
-          <div className="p-1.5 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg">
-            <Layers className="w-3.5 h-3.5 text-white" />
+      <div className="absolute top-4 right-4 bg-white rounded-xl shadow-2xl p-6 max-w-md max-h-[90vh] overflow-y-auto z-10 border border-gray-100">
+        <div className="flex items-center gap-2 mb-3">
+          <div className="p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg">
+            <Layers className="w-4 h-4 text-white" />
           </div>
           <div>
-            <h2 className="text-sm font-bold text-gray-900">
+            <h2 className="text-base font-bold text-gray-900">
               Texas Sports Facilities
             </h2>
-            <p className="text-xs text-gray-500">
+            <p className="text-sm text-gray-500">
               {filteredFacilities.length.toLocaleString()} of{" "}
               {facilities.length.toLocaleString()} shown
             </p>
           </div>
         </div>
 
-        <p className="text-xs text-gray-500 mb-3 flex items-center gap-1">
-          <span className="inline-block w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
+        <p className="text-sm text-gray-500 mb-4 flex items-center gap-1.5">
+          <span className="inline-block w-2 h-2 bg-blue-500 rounded-full"></span>
           Click any marker for details
         </p>
 
         {/* Modern Filter Options */}
-        <div className="mb-3">
+        <div className="mb-4">
           <button
             onClick={() => toggleSection('displayFilter')}
-            className="flex items-center justify-between w-full mb-2 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+            className="flex items-center justify-between w-full mb-3 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
           >
-            <div className="flex items-center gap-1.5">
-              <Filter className="w-3 h-3 text-gray-600" />
-              <h3 className="text-xs font-semibold text-gray-700 tracking-wide uppercase">
+            <div className="flex items-center gap-2">
+              <Filter className="w-4 h-4 text-gray-600" />
+              <h3 className="text-sm font-semibold text-gray-700 tracking-wide uppercase">
                 Display Filter
               </h3>
             </div>
@@ -281,7 +281,7 @@ export default function FacilityMap({
                 animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
                 transition={{ duration: 0.2 }}
-                className="space-y-1.5 overflow-hidden"
+                className="space-y-2 overflow-hidden"
               >
             <motion.button
               whileHover={{ scale: 1.02 }}
@@ -348,14 +348,14 @@ export default function FacilityMap({
 
         {/* Sport Filter */}
         {availableSports.length > 0 && (
-          <div className="mb-3">
+          <div className="mb-4">
             <button
               onClick={() => toggleSection('sportFilter')}
-              className="flex items-center justify-between w-full mb-2 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+              className="flex items-center justify-between w-full mb-3 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
             >
-              <div className="flex items-center gap-1.5">
-                <Filter className="w-3 h-3 text-gray-600" />
-                <h3 className="text-xs font-semibold text-gray-700 tracking-wide uppercase">
+              <div className="flex items-center gap-2">
+                <Filter className="w-4 h-4 text-gray-600" />
+                <h3 className="text-sm font-semibold text-gray-700 tracking-wide uppercase">
                   Filter by Sport
                 </h3>
               </div>
@@ -374,7 +374,7 @@ export default function FacilityMap({
                   transition={{ duration: 0.2 }}
                   className="overflow-hidden"
                 >
-                  <div className="max-h-48 overflow-y-auto space-y-1.5">
+                  <div className="max-h-56 overflow-y-auto space-y-2">
               {availableSports.map((sport) => (
                 <motion.button
                   key={sport}
@@ -424,11 +424,11 @@ export default function FacilityMap({
         <div>
           <button
             onClick={() => toggleSection('categories')}
-            className="flex items-center justify-between w-full mb-2 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+            className="flex items-center justify-between w-full mb-3 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
           >
-            <div className="flex items-center gap-1.5">
-              <Layers className="w-3 h-3 text-gray-600" />
-              <h3 className="text-xs font-semibold text-gray-700 tracking-wide uppercase">
+            <div className="flex items-center gap-2">
+              <Layers className="w-4 h-4 text-gray-600" />
+              <h3 className="text-sm font-semibold text-gray-700 tracking-wide uppercase">
                 Categories
               </h3>
             </div>
@@ -445,7 +445,7 @@ export default function FacilityMap({
                 animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
                 transition={{ duration: 0.2 }}
-                className="space-y-1.5 overflow-hidden"
+                className="space-y-2 overflow-hidden"
               >
             {Object.entries(ACTIVITY_CATEGORIES).map(
               ([key, { color, label }], idx) => (
@@ -454,19 +454,19 @@ export default function FacilityMap({
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.05 }}
-                  className="bg-gradient-to-br from-white to-gray-50/50 rounded-lg p-2.5 border border-gray-100 hover:shadow-md transition-all duration-300"
+                  className="bg-gradient-to-br from-white to-gray-50/50 rounded-lg p-3 border border-gray-100 hover:shadow-md transition-all duration-300"
                 >
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2.5">
                       <div
-                        className="w-3 h-3 rounded-full shadow-sm"
+                        className="w-3.5 h-3.5 rounded-full shadow-sm"
                         style={{ backgroundColor: color, opacity: 0.9 }}
                       />
-                      <span className="text-xs font-medium text-gray-700">
+                      <span className="text-sm font-medium text-gray-700">
                         {label}
                       </span>
                     </div>
-                    <span className="text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+                    <span className="text-sm font-semibold text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full">
                       {categoryCounts[
                         key as keyof typeof ACTIVITY_CATEGORIES
                       ].toLocaleString()}
