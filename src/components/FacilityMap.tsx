@@ -7,9 +7,11 @@ import { Facility } from "@/types/facility";
 import { FilterOption } from "@/app/page";
 import FacilitySidebar from "./FacilitySidebar";
 import FacilitySearch from "./FacilitySearch";
+import AISearchPanel from "./AISearchPanel";
 import { motion, AnimatePresence } from "framer-motion";
-import { Filter, Layers, Check, ChevronDown, ChevronUp } from "lucide-react";
+import { Filter, Layers, Check, ChevronDown, ChevronUp, Sparkles } from "lucide-react";
 import "mapbox-gl/dist/mapbox-gl.css";
+import { AISearchFilters } from "@/app/api/ai-search/route";
 
 interface FacilityMapProps {
   facilities: Facility[];
@@ -29,6 +31,29 @@ const ACTIVITY_CATEGORIES = {
   other: { color: "#6b7280", label: "Other" }, // gray
 };
 
+// Map AI sport names to Google Places types (since identified_sports is null)
+const SPORT_TO_TYPE_MAPPING: Record<string, string[]> = {
+  "Gym/Fitness": ["gym", "health"],
+  "CrossFit": ["gym", "health"],
+  "Yoga": ["gym", "health"],
+  "Pilates": ["gym", "health"],
+  "Swimming": ["aquarium", "swimming_pool"],
+  "Basketball": ["stadium", "sports_complex", "recreation_center"],
+  "Soccer": ["stadium", "sports_complex", "recreation_center", "athletic_field"],
+  "Baseball": ["stadium", "sports_complex", "recreation_center", "athletic_field"],
+  "Football": ["stadium", "sports_complex", "recreation_center", "athletic_field"],
+  "Tennis": ["sports_complex", "recreation_center"],
+  "Volleyball": ["sports_complex", "recreation_center"],
+  "Track & Field": ["stadium", "sports_complex", "athletic_field"],
+  "Golf": ["golf"],
+  "Bowling": ["bowling_alley"],
+  "Skating": ["skating_rink"],
+  "Climbing": ["gym"],
+  "Martial Arts": ["gym"],
+  "Boxing": ["gym"],
+  "Wrestling": ["stadium", "sports_complex"],
+};
+
 // Categorize facility based on sport types
 function getFacilityCategory(
   sportTypes: string[],
@@ -44,6 +69,92 @@ function getFacilityCategory(
   if (sportTypes.some((type) => educationTypes.includes(type)))
     return "education";
   return "other";
+}
+
+// Helper function to extract city from address
+function extractCity(address: string): string {
+  // Format: "Street, City, State ZIP, Country"
+  const parts = address.split(",");
+  if (parts.length >= 2) {
+    // City is the second part (index 1)
+    return parts[1].trim().toLowerCase();
+  }
+  return address.toLowerCase();
+}
+
+// Helper function to apply AI filters to facilities
+function applyAIFilters(facilities: Facility[], aiFilters: AISearchFilters | null): Facility[] {
+  if (!aiFilters) return facilities;
+
+  let filtered = facilities;
+
+  // Filter by city
+  if (aiFilters.city) {
+    const targetCity = aiFilters.city.toLowerCase();
+    filtered = filtered.filter((facility) => {
+      const facilityCity = extractCity(facility.address);
+      return facilityCity.includes(targetCity) || targetCity.includes(facilityCity);
+    });
+  }
+
+  // Filter by rating
+  if (aiFilters.rating) {
+    filtered = filtered.filter((facility) => {
+      if (!facility.rating) return false;
+      const meetsMin = !aiFilters.rating?.min || facility.rating >= aiFilters.rating.min;
+      const meetsMax = !aiFilters.rating?.max || facility.rating <= aiFilters.rating.max;
+      return meetsMin && meetsMax;
+    });
+  }
+
+  // Filter by review count
+  if (aiFilters.reviewCount) {
+    filtered = filtered.filter((facility) => {
+      if (!facility.user_ratings_total) return false;
+      const meetsMin = !aiFilters.reviewCount?.min || facility.user_ratings_total >= aiFilters.reviewCount.min;
+      const meetsMax = !aiFilters.reviewCount?.max || facility.user_ratings_total <= aiFilters.reviewCount.max;
+      return meetsMin && meetsMax;
+    });
+  }
+
+  // Filter by sports
+  if (aiFilters.sports && aiFilters.sports.length > 0) {
+    filtered = filtered.filter((facility) => {
+      const requiredTypes = aiFilters.sports!.flatMap(
+        sport => SPORT_TO_TYPE_MAPPING[sport] || []
+      );
+
+      if (requiredTypes.length === 0) {
+        if (facility.identified_sports && facility.identified_sports.length > 0) {
+          return aiFilters.sports!.some((sport) =>
+            facility.identified_sports!.includes(sport)
+          );
+        }
+        return false;
+      }
+
+      return requiredTypes.some((type) =>
+        facility.sport_types.includes(type)
+      );
+    });
+  }
+
+  // Filter by minimum sport count
+  if (aiFilters.sportCountMin) {
+    filtered = filtered.filter((facility) => {
+      const sportCount = facility.sport_types?.length || 0;
+      return sportCount >= aiFilters.sportCountMin!;
+    });
+  }
+
+  // Filter by business status
+  if (aiFilters.businessStatus) {
+    filtered = filtered.filter((facility) => {
+      return facility.business_status === aiFilters.businessStatus;
+    });
+  }
+
+  return filtered;
 }
 
 export default function FacilityMap({
@@ -62,6 +173,8 @@ export default function FacilityMap({
     sportFilter: true,
     categories: false,
   });
+  const [isAISearchOpen, setIsAISearchOpen] = useState(false);
+  const [currentAIFilters, setCurrentAIFilters] = useState<AISearchFilters | null>(null);
   const mapRef = useRef<MapRef>(null);
 
   const toggleSection = (section: keyof typeof expandedSections) => {
@@ -91,7 +204,7 @@ export default function FacilityMap({
     return Array.from(sportsSet).sort();
   }, [facilities]);
 
-  // Client-side filtering based on filterOption and selectedSports
+  // Client-side filtering based on filterOption, selectedSports, and AI filters
   const filteredFacilities = useMemo(() => {
     let filtered = facilities;
 
@@ -111,7 +224,7 @@ export default function FacilityMap({
         break;
     }
 
-    // Apply sport filter
+    // Apply sport filter (from manual selection)
     if (selectedSports.length > 0) {
       filtered = filtered.filter((facility) => {
         if (
@@ -126,6 +239,9 @@ export default function FacilityMap({
         );
       });
     }
+
+    // Don't apply AI filters to the map - only manual filters
+    // AI filters will be used by AISearchPanel to show results as cards
 
     return filtered;
   }, [facilities, filterOption, selectedSports]);
@@ -199,6 +315,25 @@ export default function FacilityMap({
     setSelectedFacility(facility);
   };
 
+  // Handle AI filters applied - store for AISearchPanel to use
+  const handleAIFiltersApplied = (filters: AISearchFilters) => {
+    setCurrentAIFilters(filters);
+  };
+
+  // Handle facility selection from AI search results
+  const handleAIFacilitySelect = (facility: Facility) => {
+    // Zoom to facility on map
+    const map = mapRef.current?.getMap();
+    map?.flyTo({
+      center: [facility.location.lng, facility.location.lat],
+      zoom: 16,
+      duration: 1500,
+    });
+
+    // Open facility sidebar
+    setSelectedFacility(facility);
+  };
+
   return (
     <div className="relative w-full h-screen">
       <Map
@@ -253,11 +388,22 @@ export default function FacilityMap({
       </Map>
 
       {/* Search Bar - Centered */}
-      <div className="absolute top-7 left-1/2 -translate-x-1/2 z-10">
+      <div className="absolute top-7 left-1/2 -translate-x-1/2 z-10 flex items-center gap-3">
         <FacilitySearch
           facilities={filteredFacilities}
           onSelectFacility={handleSearchSelect}
         />
+
+        {/* AI Search Toggle Button */}
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setIsAISearchOpen(true)}
+          className="px-5 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-2xl shadow-2xl hover:shadow-purple-500/30 transition-all duration-300 font-semibold flex items-center gap-2 border border-purple-400/20"
+        >
+          <Sparkles className="w-5 h-5" />
+          <span>AI Search</span>
+        </motion.button>
       </div>
 
       {/* Modern Info Panel */}
@@ -512,6 +658,16 @@ export default function FacilityMap({
         facility={selectedFacility}
         onClose={() => setSelectedFacility(null)}
         onUpdateFacility={onUpdateFacility}
+      />
+
+      {/* AI Search Panel */}
+      <AISearchPanel
+        isOpen={isAISearchOpen}
+        onClose={() => setIsAISearchOpen(false)}
+        onFiltersApplied={handleAIFiltersApplied}
+        onFacilitySelect={handleAIFacilitySelect}
+        allFacilities={facilities}
+        currentFilters={currentAIFilters}
       />
     </div>
   );

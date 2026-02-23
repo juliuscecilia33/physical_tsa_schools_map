@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/juliuscecilia33/physical_tsa_schools_map#readme",
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.78.0",
     "@eslint/eslintrc": "^3.3.3",
     "@googlemaps/google-maps-services-js": "^3.4.2",
     "@supabase/supabase-js": "^2.97.0",
