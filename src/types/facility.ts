@@ -2,6 +2,7 @@ export interface Facility {
   place_id: string;
   name: string;
   sport_types: string[];
+  identified_sports?: string[];
   address: string;
   location: {
     lat: number;

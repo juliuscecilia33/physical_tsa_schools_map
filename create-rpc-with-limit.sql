@@ -11,6 +11,7 @@ RETURNS TABLE (
   place_id TEXT,
   name TEXT,
   sport_types TEXT[],
+  identified_sports TEXT[],
   address TEXT,
   lat FLOAT,
   lng FLOAT,
@@ -34,6 +35,7 @@ BEGIN
     sf.place_id,
     sf.name,
     sf.sport_types,
+    sf.identified_sports,
     sf.address,
     ST_Y(sf.location::geometry) AS lat,
     ST_X(sf.location::geometry) AS lng,
@@ -52,7 +54,7 @@ BEGIN
   FROM sports_facilities sf
   LEFT JOIN facility_notes fn ON sf.place_id = fn.place_id
   WHERE include_hidden = TRUE OR sf.hidden = FALSE
-  GROUP BY sf.id, sf.place_id, sf.name, sf.sport_types, sf.address, sf.location,
+  GROUP BY sf.id, sf.place_id, sf.name, sf.sport_types, sf.identified_sports, sf.address, sf.location,
            sf.phone, sf.website, sf.rating, sf.user_ratings_total, sf.reviews,
            sf.photo_references, sf.opening_hours, sf.business_status, sf.hidden,
            sf.created_at, sf.updated_at

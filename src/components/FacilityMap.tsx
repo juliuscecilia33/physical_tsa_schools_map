@@ -14,6 +14,8 @@ interface FacilityMapProps {
   facilities: Facility[];
   filterOption: FilterOption;
   onFilterOptionChange: (option: FilterOption) => void;
+  selectedSports: string[];
+  onSelectedSportsChange: (sports: string[]) => void;
   onUpdateFacility: (place_id: string, hidden: boolean) => void;
 }
 
@@ -47,6 +49,8 @@ export default function FacilityMap({
   facilities,
   filterOption,
   onFilterOptionChange,
+  selectedSports,
+  onSelectedSportsChange,
   onUpdateFacility,
 }: FacilityMapProps) {
   const [selectedFacility, setSelectedFacility] = useState<Facility | null>(
@@ -63,20 +67,52 @@ export default function FacilityMap({
     zoom: 5.5,
   };
 
-  // Client-side filtering based on filterOption
+  // Calculate all available sports from facilities
+  const availableSports = useMemo(() => {
+    const sportsSet = new Set<string>();
+    facilities.forEach((facility) => {
+      if (facility.identified_sports) {
+        facility.identified_sports.forEach((sport) => sportsSet.add(sport));
+      }
+    });
+    return Array.from(sportsSet).sort();
+  }, [facilities]);
+
+  // Client-side filtering based on filterOption and selectedSports
   const filteredFacilities = useMemo(() => {
+    let filtered = facilities;
+
+    // Apply visibility filter
     switch (filterOption) {
       case "ALL":
-        return facilities;
+        break;
       case "HIDDEN_ONLY":
-        return facilities.filter((f) => f.hidden === true);
+        filtered = filtered.filter((f) => f.hidden === true);
+        break;
       case "WITH_NOTES_ONLY":
-        return facilities.filter((f) => f.has_notes === true);
+        filtered = filtered.filter((f) => f.has_notes === true);
+        break;
       case "UNHIDDEN_ONLY":
       default:
-        return facilities.filter((f) => !f.hidden);
+        filtered = filtered.filter((f) => !f.hidden);
+        break;
     }
-  }, [facilities, filterOption]);
+
+    // Apply sport filter
+    if (selectedSports.length > 0) {
+      filtered = filtered.filter((facility) => {
+        if (!facility.identified_sports || facility.identified_sports.length === 0) {
+          return false;
+        }
+        // Check if facility has at least one of the selected sports
+        return selectedSports.some((sport) =>
+          facility.identified_sports!.includes(sport)
+        );
+      });
+    }
+
+    return filtered;
+  }, [facilities, filterOption, selectedSports]);
 
   // Calculate category counts
   const categoryCounts = useMemo(() => {
@@ -277,6 +313,58 @@ export default function FacilityMap({
             </motion.button>
           </div>
         </div>
+
+        {/* Sport Filter */}
+        {availableSports.length > 0 && (
+          <div className="mb-3">
+            <div className="flex items-center gap-1.5 mb-2">
+              <Filter className="w-3 h-3 text-gray-600" />
+              <h3 className="text-xs font-semibold text-gray-700 tracking-wide uppercase">
+                Filter by Sport
+              </h3>
+            </div>
+            <div className="max-h-48 overflow-y-auto space-y-1">
+              {availableSports.map((sport) => (
+                <motion.button
+                  key={sport}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => {
+                    if (selectedSports.includes(sport)) {
+                      onSelectedSportsChange(
+                        selectedSports.filter((s) => s !== sport)
+                      );
+                    } else {
+                      onSelectedSportsChange([...selectedSports, sport]);
+                    }
+                  }}
+                  className={`w-full px-3 py-2 rounded-lg text-xs font-medium transition-all duration-300 flex items-center justify-between ${
+                    selectedSports.includes(sport)
+                      ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-md"
+                      : "bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 hover:from-gray-100 hover:to-gray-200 border border-gray-200"
+                  }`}
+                >
+                  <span>{sport}</span>
+                  {selectedSports.includes(sport) && (
+                    <Check className="w-3.5 h-3.5" />
+                  )}
+                </motion.button>
+              ))}
+            </div>
+            {selectedSports.length > 0 && (
+              <motion.button
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => onSelectedSportsChange([])}
+                className="w-full mt-2 px-3 py-2 rounded-lg text-xs font-medium bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 transition-all duration-300"
+              >
+                Clear Sport Filter ({selectedSports.length})
+              </motion.button>
+            )}
+          </div>
+        )}
 
         {/* Category Sub-Cards */}
         <div>

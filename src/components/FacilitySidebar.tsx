@@ -42,6 +42,45 @@ interface FacilitySidebarProps {
   onUpdateFacility: (place_id: string, hidden: boolean) => void;
 }
 
+// Sport emoji mapping
+const SPORT_EMOJIS: { [key: string]: string } = {
+  // Core Sports
+  "Basketball": "🏀",
+  "Soccer": "⚽",
+  "Baseball": "⚾",
+  "Football": "🏈",
+  "Tennis": "🎾",
+  "Volleyball": "🏐",
+  "Swimming": "🏊",
+  "Track & Field": "🏃",
+
+  // Extended Sports
+  "Golf": "⛳",
+  "Hockey": "🏒",
+  "Lacrosse": "🥍",
+  "Softball": "🥎",
+  "Wrestling": "🤼",
+  "Gymnastics": "🤸",
+  "Pickleball": "🏓",
+  "Racquetball": "🎾",
+  "Squash": "🎾",
+  "Badminton": "🏸",
+
+  // Fitness Activities
+  "Gym/Fitness": "💪",
+  "CrossFit": "🏋️",
+  "Yoga": "🧘",
+  "Pilates": "🧘‍♀️",
+  "Martial Arts": "🥋",
+  "Boxing": "🥊",
+
+  // Other Sports
+  "Bowling": "🎳",
+  "Skating": "⛸️",
+  "Climbing": "🧗",
+  "Water Sports": "🚣",
+};
+
 export default function FacilitySidebar({ facility, onClose, onUpdateFacility }: FacilitySidebarProps) {
   const [activeTab, setActiveTab] = useState<TabId>('overview');
   const [direction, setDirection] = useState(0);
@@ -445,6 +484,34 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                         ))}
                     </div>
                   </motion.div>
+
+                  {/* Identified Sports */}
+                  {facility.identified_sports && facility.identified_sports.length > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.08 }}
+                    >
+                      <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
+                        Available Sports
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        {facility.identified_sports.map((sport, idx) => (
+                          <motion.span
+                            key={sport}
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: 0.12 + idx * 0.05 }}
+                            whileHover={{ scale: 1.05 }}
+                            className="px-4 py-2 bg-gradient-to-r from-green-50 to-green-100/50 text-green-700 rounded-full text-sm font-medium shadow-sm hover:shadow-md transition-all cursor-default flex items-center gap-2"
+                          >
+                            <span className="text-lg">{SPORT_EMOJIS[sport] || "🏅"}</span>
+                            <span>{sport}</span>
+                          </motion.span>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
 
                   {/* Business Status */}
                   {facility.business_status && (

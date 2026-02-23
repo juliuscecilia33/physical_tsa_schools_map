@@ -28,6 +28,7 @@ export default function Home() {
   const [totalFacilityCount, setTotalFacilityCount] = useState<number | null>(null);
   const [loadedFacilityCount, setLoadedFacilityCount] = useState(0);
   const [filterOption, setFilterOption] = useState<FilterOption>('UNHIDDEN_ONLY');
+  const [selectedSports, setSelectedSports] = useState<string[]>([]);
 
   const loadFacilities = async () => {
       try {
@@ -96,6 +97,7 @@ export default function Home() {
           place_id: row.place_id,
           name: row.name,
           sport_types: row.sport_types || [],
+          identified_sports: row.identified_sports || [],
           address: row.address,
           location: {
             lat: row.lat ? parseFloat(row.lat) : 0,
@@ -187,6 +189,8 @@ export default function Home() {
         facilities={facilities}
         filterOption={filterOption}
         onFilterOptionChange={setFilterOption}
+        selectedSports={selectedSports}
+        onSelectedSportsChange={setSelectedSports}
         onUpdateFacility={updateFacilityHidden}
       />
     </main>

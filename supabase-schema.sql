@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS sports_facilities (
   place_id TEXT UNIQUE NOT NULL,
   name TEXT NOT NULL,
   sport_types TEXT[] DEFAULT '{}',
+  identified_sports TEXT[] DEFAULT '{}',
   address TEXT,
   location GEOGRAPHY(POINT, 4326),
   phone TEXT,
@@ -27,6 +28,9 @@ CREATE INDEX IF NOT EXISTS idx_sports_facilities_location
 
 CREATE INDEX IF NOT EXISTS idx_sports_facilities_sport_types
   ON sports_facilities USING GIN (sport_types);
+
+CREATE INDEX IF NOT EXISTS idx_sports_facilities_identified_sports
+  ON sports_facilities USING GIN (identified_sports);
 
 CREATE INDEX IF NOT EXISTS idx_sports_facilities_place_id
   ON sports_facilities (place_id);
