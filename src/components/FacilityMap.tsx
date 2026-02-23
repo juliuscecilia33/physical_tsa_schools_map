@@ -487,7 +487,9 @@ export default function FacilityMap({
       </div>
 
       {/* Modern Info Panel */}
-      <div className="absolute inset-y-4 right-4 bg-white rounded-xl shadow-xl p-6 max-w-lg h-[calc(100vh-2rem)] overflow-y-auto z-10 border border-[#E8E9EB]">
+      <div className={`absolute inset-y-4 right-4 bg-white rounded-xl shadow-xl p-6 max-w-lg h-[calc(100vh-2rem)] overflow-y-auto z-10 border border-[#E8E9EB] transition-opacity duration-300 ${
+        selectedFacility ? "opacity-0 pointer-events-none" : "opacity-100"
+      }`}>
         {/* TSA Logo */}
         <div className="flex justify-center pb-4 mb-4 border-b border-[#E8E9EB]">
           <motion.img

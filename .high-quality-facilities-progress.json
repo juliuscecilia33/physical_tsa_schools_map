@@ -9,7 +9,9 @@
     "Arlington, Texas",
     "Corpus Christi, Texas",
     "Plano, Texas",
-    "Laredo, Texas"
+    "Laredo, Texas",
+    "Lubbock, Texas",
+    "Irving, Texas"
   ],
   "processedChains": [
     "FieldhouseUSA",
@@ -22,13 +24,13 @@
     "Sports Academy",
     "Velocity Sports Performance"
   ],
-  "totalFacilities": 236,
+  "totalFacilities": 256,
   "statistics": {
-    "searched": 1643,
-    "filteredLowQuality": 631,
-    "filteredDuplicate": 776,
+    "searched": 1924,
+    "filteredLowQuality": 724,
+    "filteredDuplicate": 944,
     "filteredNonSport": 0,
-    "inserted": 236
+    "inserted": 256
   },
-  "lastUpdated": "2026-02-23T22:40:49.440Z"
+  "lastUpdated": "2026-02-23T22:43:23.211Z"
 }
