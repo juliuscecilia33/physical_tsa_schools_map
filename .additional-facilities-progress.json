@@ -142,15 +142,17 @@
     "Donna, Texas",
     "Mercedes, Texas",
     "Pampa, Texas",
-    "Humble, Texas"
+    "Humble, Texas",
+    "Hewitt, Texas",
+    "Sulphur Springs, Texas"
   ],
-  "totalFacilities": 2470,
+  "totalFacilities": 2503,
   "statistics": {
-    "searched": 9923,
-    "filteredNonSport": 3867,
-    "filteredDuplicate": 3400,
-    "filteredLowQuality": 183,
-    "inserted": 2470
+    "searched": 10068,
+    "filteredNonSport": 3928,
+    "filteredDuplicate": 3450,
+    "filteredLowQuality": 184,
+    "inserted": 2503
   },
-  "lastUpdated": "2026-02-23T20:02:26.098Z"
+  "lastUpdated": "2026-02-23T20:04:10.904Z"
 }

@@ -429,7 +429,7 @@ export default function FacilityMap({
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setIsAISearchOpen(true)}
-          className="px-4 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-2xl shadow-2xl hover:shadow-purple-500/30 transition-all duration-300 font-semibold flex items-center gap-2 border border-purple-400/20"
+          className="px-4 py-4 bg-gray-900 text-white rounded-2xl shadow-2xl hover:bg-gray-800 transition-all duration-300 font-semibold flex items-center gap-2 border border-gray-700"
         >
           <Sparkles className="w-5 h-5" />
         </motion.button>
