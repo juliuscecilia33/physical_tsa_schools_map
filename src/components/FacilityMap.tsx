@@ -431,7 +431,7 @@ export default function FacilityMap({
           }
         }}
       >
-        <NavigationControl position="top-left" />
+        <NavigationControl position="top-right" />
 
         <Source id="facilities" type="geojson" data={geojsonData}>
           {/* Modern flat colored dots at low zoom (zoom < 10) */}
@@ -486,7 +486,7 @@ export default function FacilityMap({
 
       {/* Modern Info Panel */}
       <div
-        className={`absolute inset-y-4 right-4 bg-white rounded-xl shadow-xl p-6 w-[400px] h-[calc(100vh-2rem)] overflow-y-auto z-10 border border-[#E8E9EB] transition-opacity duration-300 ${
+        className={`absolute inset-y-4 left-4 bg-white rounded-xl shadow-xl p-6 w-[400px] h-[calc(100vh-2rem)] overflow-y-auto z-10 border border-[#E8E9EB] transition-opacity duration-300 ${
           selectedFacility ? "opacity-0 pointer-events-none" : "opacity-100"
         }`}
       >

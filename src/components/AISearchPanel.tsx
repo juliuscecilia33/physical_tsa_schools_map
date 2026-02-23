@@ -240,13 +240,13 @@ export default function AISearchPanel({
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Panel - Left side, no backdrop */}
+          {/* Panel - Right side, no backdrop */}
           <motion.div
-            initial={{ x: "-100%" }}
+            initial={{ x: "100%" }}
             animate={{ x: 0 }}
-            exit={{ x: "-100%" }}
+            exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed left-0 top-0 bottom-0 w-[500px] bg-white shadow-2xl z-50 flex flex-col"
+            className="fixed right-0 top-0 bottom-0 w-[500px] bg-white shadow-2xl z-50 flex flex-col"
           >
             {/* Header */}
             <div className="bg-gray-900 border-b border-gray-800 p-6 flex-shrink-0">
