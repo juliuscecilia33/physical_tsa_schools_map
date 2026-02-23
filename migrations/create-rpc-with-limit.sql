@@ -3,7 +3,7 @@ DROP FUNCTION IF EXISTS get_facilities_with_coords(INT, BOOLEAN);
 
 -- Create new function that accepts a limit parameter and optional hidden filter
 CREATE OR REPLACE FUNCTION get_facilities_with_coords(
-  row_limit INT DEFAULT 10000,
+  row_limit INT DEFAULT 20000,
   include_hidden BOOLEAN DEFAULT FALSE
 )
 RETURNS TABLE (

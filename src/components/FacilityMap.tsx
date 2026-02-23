@@ -31,33 +31,33 @@ interface FacilityMapProps {
 
 // Sport emoji mapping
 const SPORT_EMOJIS: { [key: string]: string } = {
-  "Basketball": "🏀",
-  "Soccer": "⚽",
-  "Baseball": "⚾",
-  "Football": "🏈",
-  "Tennis": "🎾",
-  "Volleyball": "🏐",
-  "Swimming": "🏊",
+  Basketball: "🏀",
+  Soccer: "⚽",
+  Baseball: "⚾",
+  Football: "🏈",
+  Tennis: "🎾",
+  Volleyball: "🏐",
+  Swimming: "🏊",
   "Track & Field": "🏃",
-  "Golf": "⛳",
-  "Hockey": "🏒",
-  "Lacrosse": "🥍",
-  "Softball": "🥎",
-  "Wrestling": "🤼",
-  "Gymnastics": "🤸",
-  "Pickleball": "🏓",
-  "Racquetball": "🎾",
-  "Squash": "🎾",
-  "Badminton": "🏸",
+  Golf: "⛳",
+  Hockey: "🏒",
+  Lacrosse: "🥍",
+  Softball: "🥎",
+  Wrestling: "🤼",
+  Gymnastics: "🤸",
+  Pickleball: "🏓",
+  Racquetball: "🎾",
+  Squash: "🎾",
+  Badminton: "🏸",
   "Gym/Fitness": "💪",
-  "CrossFit": "🏋️",
-  "Yoga": "🧘",
-  "Pilates": "🧘‍♀️",
+  CrossFit: "🏋️",
+  Yoga: "🧘",
+  Pilates: "🧘‍♀️",
   "Martial Arts": "🥋",
-  "Boxing": "🥊",
-  "Bowling": "🎳",
-  "Skating": "⛸️",
-  "Climbing": "🧗",
+  Boxing: "🥊",
+  Bowling: "🎳",
+  Skating: "⛸️",
+  Climbing: "🧗",
   "Water Sports": "🚣",
 };
 
@@ -310,10 +310,7 @@ export default function FacilityMap({
     }
 
     // Apply category filter
-    if (
-      selectedCategories.length > 0 &&
-      selectedCategories.length < 5
-    ) {
+    if (selectedCategories.length > 0 && selectedCategories.length < 5) {
       // Only filter if not all categories are selected
       filtered = filtered.filter((facility) => {
         const category = getFacilityCategory(facility.sport_types);
@@ -487,9 +484,11 @@ export default function FacilityMap({
       </div>
 
       {/* Modern Info Panel */}
-      <div className={`absolute inset-y-4 right-4 bg-white rounded-xl shadow-xl p-6 max-w-lg h-[calc(100vh-2rem)] overflow-y-auto z-10 border border-[#E8E9EB] transition-opacity duration-300 ${
-        selectedFacility ? "opacity-0 pointer-events-none" : "opacity-100"
-      }`}>
+      <div
+        className={`absolute inset-y-4 right-4 bg-white rounded-xl shadow-xl p-6 w-[400px] h-[calc(100vh-2rem)] overflow-y-auto z-10 border border-[#E8E9EB] transition-opacity duration-300 ${
+          selectedFacility ? "opacity-0 pointer-events-none" : "opacity-100"
+        }`}
+      >
         {/* TSA Logo */}
         <div className="flex justify-center pb-4 mb-4 border-b border-[#E8E9EB]">
           <motion.img
@@ -546,79 +545,52 @@ export default function FacilityMap({
                 animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
                 transition={{ duration: 0.2 }}
-                className="space-y-2 overflow-hidden"
+                className="grid grid-cols-2 gap-2 overflow-hidden"
               >
                 <motion.button
-                  whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => onFilterOptionChange("UNHIDDEN_ONLY")}
-                  className={`w-full px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 flex items-center justify-between ${
+                  className={`px-2 py-3 rounded-lg text-xs font-medium transition-all duration-300 flex flex-col items-center justify-center gap-1 cursor-pointer relative ${
                     filterOption === "UNHIDDEN_ONLY"
                       ? "bg-gradient-to-r from-[#004aad] to-[#004aad]/90 text-white shadow-lg shadow-[#004aad]/20"
                       : "bg-gradient-to-r from-[#E8E9EB]/50 to-[#E8E9EB] text-gray-700 hover:from-[#E8E9EB] hover:to-[#E8E9EB]/80 border border-[#E8E9EB]"
                   }`}
                 >
-                  <span>All (Unhidden)</span>
+                  <span className="text-center leading-tight">
+                    All (Unhidden)
+                  </span>
                   {filterOption === "UNHIDDEN_ONLY" && (
-                    <Check className="w-3.5 h-3.5" />
+                    <Check className="w-3 h-3 absolute top-1 right-1" />
                   )}
                 </motion.button>
                 <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => onFilterOptionChange("ALL")}
-                  className={`w-full px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 flex items-center justify-between ${
-                    filterOption === "ALL"
-                      ? "bg-gradient-to-r from-[#004aad] to-[#004aad]/90 text-white shadow-lg shadow-[#004aad]/20"
-                      : "bg-gradient-to-r from-[#E8E9EB]/50 to-[#E8E9EB] text-gray-700 hover:from-[#E8E9EB] hover:to-[#E8E9EB]/80 border border-[#E8E9EB]"
-                  }`}
-                >
-                  <span>All Facilities</span>
-                  {filterOption === "ALL" && <Check className="w-3.5 h-3.5" />}
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => onFilterOptionChange("HIDDEN_ONLY")}
-                  className={`w-full px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 flex items-center justify-between ${
+                  className={`px-2 py-3 rounded-lg text-xs font-medium transition-all duration-300 flex flex-col items-center justify-center gap-1 cursor-pointer relative ${
                     filterOption === "HIDDEN_ONLY"
                       ? "bg-gradient-to-r from-[#004aad] to-[#004aad]/90 text-white shadow-lg shadow-[#004aad]/20"
                       : "bg-gradient-to-r from-[#E8E9EB]/50 to-[#E8E9EB] text-gray-700 hover:from-[#E8E9EB] hover:to-[#E8E9EB]/80 border border-[#E8E9EB]"
                   }`}
                 >
-                  <span>Hidden Only</span>
+                  <span className="text-center leading-tight">Hidden Only</span>
                   {filterOption === "HIDDEN_ONLY" && (
-                    <Check className="w-3.5 h-3.5" />
+                    <Check className="w-3 h-3 absolute top-1 right-1" />
                   )}
                 </motion.button>
                 <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => onFilterOptionChange("CLEANED_UP_ONLY")}
-                  className={`w-full px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 flex items-center justify-between ${
-                    filterOption === "CLEANED_UP_ONLY"
-                      ? "bg-gradient-to-r from-[#f97316] to-[#f97316]/90 text-white shadow-lg shadow-[#f97316]/20"
-                      : "bg-gradient-to-r from-[#fed7aa]/50 to-[#fed7aa] text-[#9a3412] hover:from-[#fed7aa] hover:to-[#fed7aa]/80 border border-[#fdba74]"
-                  }`}
-                >
-                  <span>Cleaned Up (Low Quality)</span>
-                  {filterOption === "CLEANED_UP_ONLY" && (
-                    <Check className="w-3.5 h-3.5" />
-                  )}
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => onFilterOptionChange("WITH_NOTES_ONLY")}
-                  className={`w-full px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 flex items-center justify-between ${
+                  className={`px-2 py-3 rounded-lg text-xs font-medium transition-all duration-300 flex flex-col items-center justify-center gap-1 cursor-pointer relative col-span-2 ${
                     filterOption === "WITH_NOTES_ONLY"
                       ? "bg-gradient-to-r from-[#004aad] to-[#004aad]/90 text-white shadow-lg shadow-[#004aad]/20"
                       : "bg-gradient-to-r from-[#E8E9EB]/50 to-[#E8E9EB] text-gray-700 hover:from-[#E8E9EB] hover:to-[#E8E9EB]/80 border border-[#E8E9EB]"
                   }`}
                 >
-                  <span>With Notes Only</span>
+                  <span className="text-center leading-tight">
+                    With Notes Only
+                  </span>
                   {filterOption === "WITH_NOTES_ONLY" && (
-                    <Check className="w-3.5 h-3.5" />
+                    <Check className="w-3 h-3 absolute top-1 right-1" />
                   )}
                 </motion.button>
               </motion.div>
@@ -654,11 +626,10 @@ export default function FacilityMap({
                   transition={{ duration: 0.2 }}
                   className="overflow-hidden"
                 >
-                  <div className="max-h-96 overflow-y-auto space-y-2">
+                  <div className="max-h-96 overflow-y-auto grid grid-cols-2 gap-2">
                     {availableSports.map((sport) => (
                       <motion.button
                         key={sport}
-                        whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => {
                           if (selectedSports.includes(sport)) {
@@ -669,18 +640,20 @@ export default function FacilityMap({
                             onSelectedSportsChange([...selectedSports, sport]);
                           }
                         }}
-                        className={`w-full px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 flex items-center justify-between ${
+                        className={`px-2 py-3 rounded-lg text-xs font-medium transition-all duration-300 flex flex-col items-center justify-center gap-1 cursor-pointer relative ${
                           selectedSports.includes(sport)
                             ? "bg-gradient-to-r from-[#004aad] to-[#004aad]/90 text-white shadow-lg shadow-[#004aad]/20"
                             : "bg-gradient-to-r from-[#E8E9EB]/50 to-[#E8E9EB] text-gray-700 hover:from-[#E8E9EB] hover:to-[#E8E9EB]/80 border border-[#E8E9EB]"
                         }`}
                       >
-                        <span className="flex items-center gap-2">
-                          <span className="text-base">{SPORT_EMOJIS[sport] || "🏅"}</span>
-                          <span>{sport}</span>
+                        <span className="text-xl">
+                          {SPORT_EMOJIS[sport] || "🏅"}
+                        </span>
+                        <span className="text-center leading-tight">
+                          {sport}
                         </span>
                         {selectedSports.includes(sport) && (
-                          <Check className="w-3.5 h-3.5" />
+                          <Check className="w-3 h-3 absolute top-1 right-1" />
                         )}
                       </motion.button>
                     ))}
@@ -689,10 +662,9 @@ export default function FacilityMap({
                     <motion.button
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => onSelectedSportsChange([])}
-                      className="w-full mt-2 px-4 py-3 rounded-lg text-sm font-medium bg-[#c9472b]/10 text-[#c9472b] hover:bg-[#c9472b]/20 border border-[#c9472b]/20 transition-all duration-300"
+                      className="w-full mt-2 px-4 py-3 rounded-lg text-sm font-medium bg-[#c9472b]/10 text-[#c9472b] hover:bg-[#c9472b]/20 border border-[#c9472b]/20 transition-all duration-300 cursor-pointer"
                     >
                       Clear Sport Filter ({selectedSports.length})
                     </motion.button>
@@ -728,7 +700,7 @@ export default function FacilityMap({
                 animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
                 transition={{ duration: 0.2 }}
-                className="space-y-2 overflow-hidden"
+                className="grid grid-cols-2 gap-2 overflow-hidden"
               >
                 {Object.entries(ACTIVITY_CATEGORIES).map(
                   ([key, { color, label }], idx) => {
@@ -741,14 +713,15 @@ export default function FacilityMap({
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: idx * 0.05 }}
-                        whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => {
                           const categoryKey =
                             key as keyof typeof ACTIVITY_CATEGORIES;
                           if (selectedCategories.includes(categoryKey)) {
                             setSelectedCategories(
-                              selectedCategories.filter((c) => c !== categoryKey),
+                              selectedCategories.filter(
+                                (c) => c !== categoryKey,
+                              ),
                             );
                           } else {
                             setSelectedCategories([
@@ -757,46 +730,40 @@ export default function FacilityMap({
                             ]);
                           }
                         }}
-                        className={`w-full rounded-lg p-3 transition-all duration-300 ${
+                        className={`rounded-lg p-3 transition-all duration-300 cursor-pointer relative ${
                           isSelected
                             ? "bg-white border-2"
                             : "bg-gradient-to-r from-[#E8E9EB]/50 to-[#E8E9EB] hover:from-[#E8E9EB] hover:to-[#E8E9EB]/80 border border-[#E8E9EB]"
                         }`}
-                        style={
-                          isSelected
-                            ? { borderColor: color }
-                            : undefined
-                        }
+                        style={isSelected ? { borderColor: color } : undefined}
                       >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2.5">
-                            <div
-                              className="w-3.5 h-3.5 rounded-full shadow-sm"
-                              style={{ backgroundColor: color, opacity: 0.9 }}
-                            />
-                            <span
-                              className={`text-sm font-medium ${
-                                isSelected ? "text-gray-900" : "text-gray-700"
-                              }`}
-                            >
-                              {label}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span
-                              className={`text-sm font-semibold px-2.5 py-1 rounded-full ${
-                                isSelected
-                                  ? "bg-[#E8E9EB] text-gray-700"
-                                  : "bg-[#E8E9EB] text-gray-500"
-                              }`}
-                            >
-                              {categoryCounts[
-                                key as keyof typeof ACTIVITY_CATEGORIES
-                              ].toLocaleString()}
-                            </span>
-                            {isSelected && <Check className="w-3.5 h-3.5 text-gray-700" />}
-                          </div>
+                        <div className="flex flex-col items-center gap-2">
+                          <div
+                            className="w-4 h-4 rounded-full shadow-sm"
+                            style={{ backgroundColor: color, opacity: 0.9 }}
+                          />
+                          <span
+                            className={`text-xs font-medium text-center leading-tight ${
+                              isSelected ? "text-gray-900" : "text-gray-700"
+                            }`}
+                          >
+                            {label}
+                          </span>
+                          <span
+                            className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                              isSelected
+                                ? "bg-[#E8E9EB] text-gray-700"
+                                : "bg-[#E8E9EB] text-gray-500"
+                            }`}
+                          >
+                            {categoryCounts[
+                              key as keyof typeof ACTIVITY_CATEGORIES
+                            ].toLocaleString()}
+                          </span>
                         </div>
+                        {isSelected && (
+                          <Check className="w-3 h-3 text-gray-700 absolute top-1 right-1" />
+                        )}
                       </motion.button>
                     );
                   },
@@ -806,7 +773,6 @@ export default function FacilityMap({
                     <motion.button
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() =>
                         setSelectedCategories([
@@ -817,12 +783,76 @@ export default function FacilityMap({
                           "other",
                         ])
                       }
-                      className="w-full mt-2 px-4 py-3 rounded-lg text-sm font-medium bg-[#c9472b]/10 text-[#c9472b] hover:bg-[#c9472b]/20 border border-[#c9472b]/20 transition-all duration-300"
+                      className="col-span-2 px-4 py-2.5 rounded-lg text-xs font-medium bg-[#c9472b]/10 text-[#c9472b] hover:bg-[#c9472b]/20 border border-[#c9472b]/20 transition-all duration-300 cursor-pointer"
                     >
                       Clear Category Filter ({5 - selectedCategories.length}{" "}
                       hidden)
                     </motion.button>
                   )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* More Filters */}
+        <div className="mt-4">
+          <button
+            onClick={() => toggleSection("moreFilters")}
+            className="flex items-center justify-between w-full mb-3 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+          >
+            <div className="flex items-center gap-2">
+              <Filter className="w-4 h-4 text-gray-600" />
+              <h3 className="text-sm font-semibold text-gray-700 tracking-wide uppercase">
+                More Filters
+              </h3>
+            </div>
+            {expandedSections.moreFilters ? (
+              <ChevronUp className="w-4 h-4 text-gray-500" />
+            ) : (
+              <ChevronDown className="w-4 h-4 text-gray-500" />
+            )}
+          </button>
+          <AnimatePresence>
+            {expandedSections.moreFilters && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="grid grid-cols-2 gap-2 overflow-hidden"
+              >
+                <motion.button
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => onFilterOptionChange("ALL")}
+                  className={`px-2 py-3 rounded-lg text-xs font-medium transition-all duration-300 flex flex-col items-center justify-center gap-1 cursor-pointer relative ${
+                    filterOption === "ALL"
+                      ? "bg-gradient-to-r from-[#004aad] to-[#004aad]/90 text-white shadow-lg shadow-[#004aad]/20"
+                      : "bg-gradient-to-r from-[#E8E9EB]/50 to-[#E8E9EB] text-gray-700 hover:from-[#E8E9EB] hover:to-[#E8E9EB]/80 border border-[#E8E9EB]"
+                  }`}
+                >
+                  <span className="text-center leading-tight">
+                    All Facilities
+                  </span>
+                  {filterOption === "ALL" && (
+                    <Check className="w-3 h-3 absolute top-1 right-1" />
+                  )}
+                </motion.button>
+                <motion.button
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => onFilterOptionChange("CLEANED_UP_ONLY")}
+                  className={`px-2 py-3 rounded-lg text-xs font-medium transition-all duration-300 flex flex-col items-center justify-center gap-1 cursor-pointer relative ${
+                    filterOption === "CLEANED_UP_ONLY"
+                      ? "bg-gradient-to-r from-[#f97316] to-[#f97316]/90 text-white shadow-lg shadow-[#f97316]/20"
+                      : "bg-gradient-to-r from-[#fed7aa]/50 to-[#fed7aa] text-[#9a3412] hover:from-[#fed7aa] hover:to-[#fed7aa]/80 border border-[#fdba74]"
+                  }`}
+                >
+                  <span className="text-center leading-tight">
+                    Cleaned Up (Low Quality)
+                  </span>
+                  {filterOption === "CLEANED_UP_ONLY" && (
+                    <Check className="w-3 h-3 absolute top-1 right-1" />
+                  )}
+                </motion.button>
               </motion.div>
             )}
           </AnimatePresence>

@@ -24,7 +24,7 @@ DROP FUNCTION IF EXISTS get_facilities_with_coords(INTEGER, BOOLEAN, BOOLEAN);
 
 -- Create new version of get_facilities_with_coords function to exclude cleaned_up facilities by default
 CREATE OR REPLACE FUNCTION get_facilities_with_coords(
-  row_limit INTEGER DEFAULT 10000,
+  row_limit INTEGER DEFAULT 20000,
   include_hidden BOOLEAN DEFAULT false,
   include_cleaned_up BOOLEAN DEFAULT false
 )

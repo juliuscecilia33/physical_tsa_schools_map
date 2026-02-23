@@ -58,7 +58,7 @@ export default function Home() {
         while (hasMore) {
           const { data, error } = await supabase
             .rpc("get_facilities_with_coords", {
-              row_limit: 10000,
+              row_limit: 20000,
               include_hidden: true,
               include_cleaned_up: true
             })

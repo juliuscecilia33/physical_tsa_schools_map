@@ -116,7 +116,7 @@ async function filterTexasFacilitiesV2() {
     const { data: rawData, error } = await supabase.rpc(
       "get_facilities_with_coords",
       {
-        row_limit: 10000,
+        row_limit: 20000,
         include_hidden: true, // Fetch all facilities including hidden ones
       }
     );
