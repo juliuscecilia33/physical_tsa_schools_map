@@ -19,221 +19,127 @@ if (!GOOGLE_API_KEY || !supabaseUrl || !supabaseAnonKey) {
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// Additional Texas cities (ranks 51-200 by population)
-const ADDITIONAL_TEXAS_CITIES = [
-  "Longview, Texas",
-  "Pharr, Texas",
-  "Flower Mound, Texas",
-  "Cedar Park, Texas",
-  "Mansfield, Texas",
-  "Missouri City, Texas",
-  "Leander, Texas",
-  "Harlingen, Texas",
-  "San Marcos, Texas",
-  "North Richland Hills, Texas",
-  "Spring, Texas",
-  "Pflugerville, Texas",
-  "Victoria, Texas",
-  "Rowlett, Texas",
-  "Euless, Texas",
-  "Wylie, Texas",
-  "Kyle, Texas",
-  "DeSoto, Texas",
-  "Port Arthur, Texas",
-  "Texas City, Texas",
-  "Little Elm, Texas",
-  "Galveston, Texas",
-  "Burleson, Texas",
-  "Rockwall, Texas",
-  "Grapevine, Texas",
-  "Bedford, Texas",
-  "Cedar Hill, Texas",
-  "Huntsville, Texas",
-  "Sherman, Texas",
-  "Keller, Texas",
-  "Haltom City, Texas",
-  "The Colony, Texas",
-  "Waxahachie, Texas",
-  "Schertz, Texas",
-  "Channelview, Texas",
-  "Weslaco, Texas",
-  "Coppell, Texas",
-  "Friendswood, Texas",
-  "Lancaster, Texas",
-  "Rosenberg, Texas",
-  "Hurst, Texas",
-  "Duncanville, Texas",
-  "Midlothian, Texas",
-  "Copperas Cove, Texas",
-  "Prosper, Texas",
-  "Socorro, Texas",
-  "La Porte, Texas",
-  "Farmers Branch, Texas",
-  "Mission Bend, Texas",
-  "San Juan, Texas",
-  "Texarkana, Texas",
-  "Weatherford, Texas",
-  "Hutto, Texas",
-  "Timberwood Park, Texas",
-  "Cibolo, Texas",
-  "Fulshear, Texas",
-  "Del Rio, Texas",
-  "Cleburne, Texas",
-  "Celina, Texas",
-  "Lufkin, Texas",
-  "Harker Heights, Texas",
-  "Deer Park, Texas",
-  "Canyon Lake, Texas",
-  "Seguin, Texas",
-  "West Odessa, Texas",
-  "Nacogdoches, Texas",
-  "Forney, Texas",
-  "Greenville, Texas",
-  "Southlake, Texas",
-  "Sachse, Texas",
-  "Converse, Texas",
-  "Eagle Pass, Texas",
-  "Alvin, Texas",
-  "Lake Jackson, Texas",
-  "Balch Springs, Texas",
-  "Fort Hood, Texas",
-  "Colleyville, Texas",
-  "Denison, Texas",
-  "Corsicana, Texas",
-  "Princeton, Texas",
-  "Katy, Texas",
-  "University Park, Texas",
-  "Kingsville, Texas",
-  "Sienna, Texas",
-  "Saginaw, Texas",
-  "Paris, Texas",
-  "Kerrville, Texas",
-  "San Benito, Texas",
-  "Fresno, Texas",
-  "Benbrook, Texas",
-  "Belton, Texas",
-  "Anna, Texas",
-  "Pecan Grove, Texas",
-  "Cloverleaf, Texas",
-  "Big Spring, Texas",
-  "Marshall, Texas",
-  "Horizon City, Texas",
-  "Corinth, Texas",
-  "Watauga, Texas",
-  "Fate, Texas",
-  "Ennis, Texas",
-  "Dickinson, Texas",
-  "Stephenville, Texas",
-  "Murphy, Texas",
-  "Portland, Texas",
-  "Boerne, Texas",
-  "Terrell, Texas",
-  "Alamo, Texas",
-  "Alton, Texas",
-  "Universal City, Texas",
-  "Melissa, Texas",
-  "Royse City, Texas",
-  "Angleton, Texas",
-  "Plainview, Texas",
-  "Brushy Creek, Texas",
-  "Crowley, Texas",
-  "Seagoville, Texas",
-  "Lakeway, Texas",
-  "La Marque, Texas",
-  "Orange, Texas",
-  "Palestine, Texas",
-  "Brownwood, Texas",
-  "Brenham, Texas",
-  "Steiner Ranch, Texas",
-  "Cinco Ranch, Texas",
-  "Manor, Texas",
-  "Nederland, Texas",
-  "White Settlement, Texas",
-  "Glenn Heights, Texas",
-  "Gainesville, Texas",
-  "Bay City, Texas",
-  "Alice, Texas",
-  "Stafford, Texas",
-  "Addison, Texas",
-  "Bellaire, Texas",
-  "Aldine, Texas",
-  "Taylor, Texas",
-  "Red Oak, Texas",
-  "Groves, Texas",
-  "Donna, Texas",
-  "Mercedes, Texas",
-  "Pampa, Texas",
-  "Humble, Texas",
-  "Hewitt, Texas",
-  "Sulphur Springs, Texas",
-  "Gatesville, Texas",
-  "Mount Pleasant, Texas",
-  "Highland Village, Texas",
-  "South Houston, Texas",
-  "Live Oak, Texas",
-  "Palmview, Texas",
-  "Buda, Texas",
-  "Canyon, Texas",
+// ===== TARGET CITIES =====
+// Focus on top 30 Texas cities for high-quality facilities
+const TARGET_CITIES = [
+  "Houston, Texas",
+  "San Antonio, Texas",
+  "Dallas, Texas",
+  "Austin, Texas",
+  "Fort Worth, Texas",
+  "El Paso, Texas",
+  "Arlington, Texas",
+  "Corpus Christi, Texas",
+  "Plano, Texas",
+  "Laredo, Texas",
+  "Lubbock, Texas",
+  "Irving, Texas",
+  "Garland, Texas",
+  "Frisco, Texas",
+  "McKinney, Texas",
+  "Grand Prairie, Texas",
+  "Amarillo, Texas",
+  "Brownsville, Texas",
+  "Pasadena, Texas",
+  "Mesquite, Texas",
+  "Killeen, Texas",
+  "McAllen, Texas",
+  "Denton, Texas",
+  "Waco, Texas",
+  "Carrollton, Texas",
+  "Pearland, Texas",
+  "College Station, Texas",
+  "Round Rock, Texas",
+  "Richardson, Texas",
+  "League City, Texas",
 ];
 
-// Athletic facility search queries
-const FACILITY_SEARCHES = [
-  "soccer field",
-  "football field",
-  "baseball field",
-  "basketball court",
-  "sports park",
-  "athletic park",
-  "athletic complex",
-  "recreation park",
-  "tennis court",
-  "volleyball court",
+// ===== HIGH-QUALITY SEARCH QUERIES =====
+const HIGH_QUALITY_SEARCHES = [
+  // Indoor multi-sport facilities
+  "indoor sports complex",
+  "indoor athletic facility",
+  "fieldhouse",
+  "sports dome",
+  "indoor sports arena",
+
+  // Basketball/Volleyball
+  "indoor basketball facility",
+  "volleyball training center",
+  "basketball academy",
+
+  // Baseball/Softball
+  "baseball training facility",
+  "batting cage complex",
+  "indoor baseball academy",
+
+  // Athletic performance/training
+  "athletic performance center",
+  "sports performance training",
+  "speed and agility training center",
+  "athlete training facility",
+
+  // High-quality outdoor
+  "premier sports complex",
+  "championship sports fields",
+  "tournament sports facility",
+];
+
+// Specific high-quality facility chains to search for
+const FACILITY_CHAINS = [
+  "FieldhouseUSA",
+  "Game On Sports",
+  "TOCA Soccer",
+  "PIT Fitness",
+  "D-BAT",
+  "Athletic Republic",
+  "Parisi Speed School",
+  "Sports Academy",
+  "Velocity Sports Performance",
+];
+
+// ===== QUALITY THRESHOLDS =====
+const MIN_RATING = 4.0;
+const MIN_REVIEWS = 20;
+const MIN_COMPLETENESS_SCORE = 50; // Higher than standard 30
+const PROXIMITY_THRESHOLD_METERS = 50;
+
+// Quality keywords in facility names
+const QUALITY_KEYWORDS = [
+  "academy",
+  "complex",
+  "center",
+  "training",
+  "performance",
+  "indoor",
+  "fieldhouse",
+  "premier",
+  "elite",
+  "championship",
+  "professional",
+  "tournament",
 ];
 
 // ===== FACILITY VALIDATION CONSTANTS =====
 
-// Non-sport facility types to filter out
 const NON_SPORT_TYPES = [
-  "food",
-  "restaurant",
-  "cafe",
-  "bar",
-  "lodging",
-  "hotel",
-  "motel",
-  "store",
-  "clothing_store",
-  "shopping_mall",
-  "amusement_park",
-  "movie_theater",
-  "aquarium",
-  "night_club",
-  "tourist_attraction",
-  "bowling_alley",
-  "ice_skating_rink",
-  "ski_resort",
+  "food", "restaurant", "cafe", "bar",
+  "lodging", "hotel", "motel",
+  "store", "clothing_store", "shopping_mall",
+  "amusement_park", "movie_theater", "aquarium",
+  "night_club", "tourist_attraction",
   "playground",
 ];
 
-// Athletic facility types to keep
-const KEEP_TYPES = [
-  "park",
+const HIGH_QUALITY_TYPES = [
   "gym",
-  "stadium",
-  "athletic_field",
   "fitness_center",
   "sports_complex",
+  "stadium",
+  "athletic_field",
   "sports_club",
-  "swimming_pool",
-  "tennis_court",
-  "golf_course",
-  "basketball_court",
-  "baseball_field",
-  "soccer_field",
-  "football_field",
   "community_center",
   "recreation_center",
-  "school",
 ];
 
 // ===== SPORT IDENTIFICATION CONSTANTS =====
@@ -258,27 +164,15 @@ const SPORT_KEYWORDS = {
   Squash: ["squash court"],
   Badminton: ["badminton"],
   "Gym/Fitness": [
-    "gym",
-    "fitness",
-    "24 hour fitness",
-    "la fitness",
-    "anytime fitness",
-    "planet fitness",
-    "gold's gym",
-    "lifetime fitness",
+    "gym", "fitness", "training", "performance",
+    "strength", "conditioning", "athletic"
   ],
   CrossFit: ["crossfit"],
   Yoga: ["yoga"],
   Pilates: ["pilates"],
   "Martial Arts": [
-    "martial arts",
-    "karate",
-    "taekwondo",
-    "jiu jitsu",
-    "bjj",
-    "judo",
-    "kickboxing",
-    "mma",
+    "martial arts", "karate", "taekwondo", "jiu jitsu",
+    "bjj", "judo", "kickboxing", "mma"
   ],
   Boxing: ["boxing"],
   Bowling: ["bowling"],
@@ -295,66 +189,57 @@ interface SportMetadata {
   matched_text?: string;
 }
 
-interface EnhancedProgressState {
+interface ProgressState {
   processedCities: string[];
+  processedChains: string[];
   totalFacilities: number;
   statistics: {
     searched: number;
-    filteredNonSport: number;
-    filteredDuplicate: number;
     filteredLowQuality: number;
+    filteredDuplicate: number;
+    filteredNonSport: number;
     inserted: number;
   };
   lastUpdated: Date;
 }
 
-interface FilterResult {
-  passed: boolean;
-  reason?: string;
-}
-
 const PROGRESS_FILE = path.join(
   __dirname,
-  "../.additional-facilities-progress.json"
+  "../.high-quality-facilities-progress.json"
 );
-const PROXIMITY_THRESHOLD_METERS = 50; // 50 meters for duplicate detection
-const COMPLETENESS_THRESHOLD = 30; // Minimum completeness score (0-100)
 
-// Rate limiting helper
+// ===== HELPER FUNCTIONS =====
+
 const delay = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
-// ===== PROGRESS TRACKING =====
-
-function loadProgress(): EnhancedProgressState {
+function loadProgress(): ProgressState {
   if (fs.existsSync(PROGRESS_FILE)) {
     const data = fs.readFileSync(PROGRESS_FILE, "utf-8");
     return JSON.parse(data);
   }
   return {
     processedCities: [],
+    processedChains: [],
     totalFacilities: 0,
     statistics: {
       searched: 0,
-      filteredNonSport: 0,
-      filteredDuplicate: 0,
       filteredLowQuality: 0,
+      filteredDuplicate: 0,
+      filteredNonSport: 0,
       inserted: 0,
     },
     lastUpdated: new Date(),
   };
 }
 
-function saveProgress(progress: EnhancedProgressState) {
+function saveProgress(progress: ProgressState) {
   progress.lastUpdated = new Date();
   fs.writeFileSync(PROGRESS_FILE, JSON.stringify(progress, null, 2));
 }
 
 // ===== VALIDATION FUNCTIONS =====
 
-/**
- * Filter 1: Check if place_id already exists in database
- */
 async function facilityExists(placeId: string): Promise<boolean> {
   // Check if facility exists (including cleaned_up facilities)
   const { data, error } = await supabase
@@ -371,9 +256,6 @@ async function facilityExists(placeId: string): Promise<boolean> {
   return data && data.length > 0;
 }
 
-/**
- * Filter 2: Check if a facility exists within proximity threshold
- */
 async function findNearbyFacility(
   lat: number,
   lng: number
@@ -385,7 +267,6 @@ async function findNearbyFacility(
   });
 
   if (error) {
-    // If function doesn't exist, skip this check
     if (error.message.includes("does not exist")) {
       return false;
     }
@@ -396,88 +277,102 @@ async function findNearbyFacility(
   return data && data.length > 0;
 }
 
-/**
- * Filter 3: Validate if facility is an athletic facility
- */
-function isValidAthleticFacility(types: string[]): FilterResult {
-  // Check if facility has ANY athletic/sport type we want to keep
+function isHighQualityFacility(place: any): { passed: boolean; reason?: string } {
+  // Check 1: Must have minimum rating
+  if (!place.rating || place.rating < MIN_RATING) {
+    return {
+      passed: false,
+      reason: `Low rating (${place.rating || 0} < ${MIN_RATING})`,
+    };
+  }
+
+  // Check 2: Must have minimum reviews
+  if (!place.user_ratings_total || place.user_ratings_total < MIN_REVIEWS) {
+    return {
+      passed: false,
+      reason: `Few reviews (${place.user_ratings_total || 0} < ${MIN_REVIEWS})`,
+    };
+  }
+
+  // Check 3: Must have photos
+  if (!place.photos || place.photos.length === 0) {
+    return {
+      passed: false,
+      reason: "No photos",
+    };
+  }
+
+  // Check 4: Calculate completeness score
+  const completeness = calculateCompletenessScore(place);
+  if (completeness < MIN_COMPLETENESS_SCORE) {
+    return {
+      passed: false,
+      reason: `Low completeness (${completeness} < ${MIN_COMPLETENESS_SCORE})`,
+    };
+  }
+
+  // Check 5: Check for non-sport types
+  const types = place.types || [];
+  const hasNonSport = types.some((type: string) => NON_SPORT_TYPES.includes(type));
   const hasAthletic = types.some(
-    (type) =>
-      KEEP_TYPES.includes(type) ||
+    (type: string) =>
+      HIGH_QUALITY_TYPES.includes(type) ||
       type.includes("sport") ||
       type.includes("field") ||
       type.includes("court")
   );
 
-  // Check if facility has ANY non-sport type
-  const hasNonSport = types.some((type) => NON_SPORT_TYPES.includes(type));
-
-  // Keep if: has athletic types OR (no non-sport types)
-  // Filter out if: has non-sport types AND no athletic types
   if (hasNonSport && !hasAthletic) {
-    const nonSportFound = types.filter((t) => NON_SPORT_TYPES.includes(t));
     return {
       passed: false,
-      reason: `Non-sport facility (${nonSportFound.join(", ")})`,
+      reason: "Non-sport facility",
     };
   }
 
-  if (!hasAthletic) {
-    return {
-      passed: false,
-      reason: "No athletic/sport types found",
-    };
+  // Check 6: Quality boost for keywords or multiple sports
+  const nameLower = (place.name || "").toLowerCase();
+  const hasQualityKeyword = QUALITY_KEYWORDS.some((keyword) =>
+    nameLower.includes(keyword)
+  );
+  const hasMultipleSports = types.some((type: string) =>
+    ["sports_complex", "recreation_center", "athletic_field"].includes(type)
+  );
+
+  // If no quality indicators, require higher rating
+  if (!hasQualityKeyword && !hasMultipleSports) {
+    if (place.rating < 4.5 || place.user_ratings_total < 50) {
+      return {
+        passed: false,
+        reason: "No quality indicators and insufficient rating/reviews",
+      };
+    }
   }
 
   return { passed: true };
 }
 
-/**
- * Filter 4: Calculate facility completeness score
- */
 function calculateCompletenessScore(place: any): number {
   let score = 0;
 
-  // Has rating (25 points)
-  if (place.rating) {
-    score += 25;
-  }
-
-  // Has reviews (25 points, scaled by count)
+  if (place.rating) score += 25;
   if (place.user_ratings_total) {
     const reviewPoints = Math.min(25, (place.user_ratings_total / 10) * 5);
     score += reviewPoints;
   }
-
-  // Has photos (20 points)
-  if (place.photos && place.photos.length > 0) {
-    score += 20;
-  }
-
-  // Has contact info (15 points)
-  if (place.formatted_phone_number || place.website) {
-    score += 15;
-  }
-
-  // Has opening hours (15 points)
-  if (place.opening_hours) {
-    score += 15;
-  }
+  if (place.photos && place.photos.length > 0) score += 20;
+  if (place.formatted_phone_number || place.website) score += 15;
+  if (place.opening_hours) score += 15;
 
   return Math.round(score);
 }
 
 // ===== SPORT IDENTIFICATION FUNCTIONS =====
 
-/**
- * Find matching keywords in text
- */
 function findMatchingKeywords(
   sport: string,
   text: string
 ): { keywords: string[]; matchedText: string } {
-  const keywords =
-    SPORT_KEYWORDS[sport as keyof typeof SPORT_KEYWORDS] || [];
+  const keywords = SPORT_KEYWORDS[sport as keyof typeof SPORT_KEYWORDS] || [];
   const textLower = text.toLowerCase();
   const matched: string[] = [];
   let matchedText = "";
@@ -486,23 +381,19 @@ function findMatchingKeywords(
     const index = textLower.indexOf(keyword);
     if (index !== -1) {
       matched.push(keyword);
-      // Extract a snippet around the match
       const start = Math.max(0, index - 20);
       const end = Math.min(textLower.length, index + keyword.length + 30);
       matchedText = text.substring(start, end).trim();
       if (start > 0) matchedText = "..." + matchedText;
       if (end < textLower.length) matchedText = matchedText + "...";
-      break; // Use first match for context
+      break;
     }
   }
 
   return { keywords: matched, matchedText };
 }
 
-/**
- * Calculate confidence score for sport identification
- */
-function calculateScore(
+function calculateSportScore(
   sources: Array<"name" | "review" | "api">,
   keywordLength: number,
   reviewPosition?: number
@@ -510,19 +401,15 @@ function calculateScore(
   let score = 0;
 
   if (sources.includes("name")) {
-    // Name match: 85-100 based on keyword specificity
     score = 85 + Math.min(15, keywordLength);
   } else if (sources.includes("api")) {
-    // API match: 70-80
     score = 70 + Math.min(10, keywordLength);
   } else if (sources.includes("review")) {
-    // Review match: 25-50 based on position
     const positionBonus =
       reviewPosition !== undefined ? Math.max(0, 10 - reviewPosition * 2) : 0;
     score = 25 + positionBonus + Math.min(15, keywordLength);
   }
 
-  // Multiple sources bonus
   if (sources.length > 1) {
     score = Math.min(100, score + 10);
   }
@@ -530,9 +417,6 @@ function calculateScore(
   return score;
 }
 
-/**
- * Identify sports from facility name
- */
 function identifySportsFromName(name: string): {
   sports: string[];
   metadata: Record<string, SportMetadata>;
@@ -547,7 +431,7 @@ function identifySportsFromName(name: string): {
       const keywordSpecificity = Math.max(
         ...match.keywords.map((k) => k.length)
       );
-      const score = calculateScore(["name"], keywordSpecificity);
+      const score = calculateSportScore(["name"], keywordSpecificity);
 
       metadata[sport] = {
         score,
@@ -562,9 +446,6 @@ function identifySportsFromName(name: string): {
   return { sports: Array.from(sports), metadata };
 }
 
-/**
- * Identify sports from reviews
- */
 function identifySportsFromReviews(reviews: any[] | undefined): {
   sports: string[];
   metadata: Record<string, SportMetadata>;
@@ -584,7 +465,7 @@ function identifySportsFromReviews(reviews: any[] | undefined): {
 
       if (match.keywords.length > 0) {
         sports.add(sport);
-        const score = calculateScore(["review"], match.keywords.length, i);
+        const score = calculateSportScore(["review"], match.keywords.length, i);
 
         metadata[sport] = {
           score,
@@ -604,9 +485,6 @@ function identifySportsFromReviews(reviews: any[] | undefined): {
   return { sports: Array.from(sports), metadata };
 }
 
-/**
- * Merge sport metadata from multiple sources
- */
 function mergeSportMetadata(
   existing: SportMetadata | undefined,
   newMetadata: SportMetadata
@@ -618,7 +496,10 @@ function mergeSportMetadata(
   const sourcesSet = new Set([...existing.sources, ...newMetadata.sources]);
   const mergedSources = Array.from(sourcesSet) as Array<"name" | "review" | "api">;
 
-  const keywordsSet = new Set([...existing.keywords_matched, ...newMetadata.keywords_matched]);
+  const keywordsSet = new Set([
+    ...existing.keywords_matched,
+    ...newMetadata.keywords_matched,
+  ]);
   const mergedKeywords = Array.from(keywordsSet);
   const mergedScore = Math.max(existing.score, newMetadata.score);
 
@@ -644,9 +525,6 @@ function mergeSportMetadata(
   };
 }
 
-/**
- * Identify all sports for a facility
- */
 function identifyFacilitySports(
   name: string,
   reviews: any[]
@@ -657,14 +535,12 @@ function identifyFacilitySports(
   const allMetadata: Record<string, SportMetadata> = {};
   const sportsSet = new Set<string>();
 
-  // Step 1: Analyze name
   const nameResult = identifySportsFromName(name);
   nameResult.sports.forEach((sport) => sportsSet.add(sport));
   Object.entries(nameResult.metadata).forEach(([sport, metadata]) => {
     allMetadata[sport] = mergeSportMetadata(allMetadata[sport], metadata);
   });
 
-  // Step 2: Analyze reviews
   const reviewResult = identifySportsFromReviews(reviews);
   reviewResult.sports.forEach((sport) => sportsSet.add(sport));
   Object.entries(reviewResult.metadata).forEach(([sport, metadata]) => {
@@ -681,9 +557,6 @@ function identifyFacilitySports(
 
 // ===== COLLECTION FUNCTIONS =====
 
-/**
- * Search for places using text search
- */
 async function searchPlacesByText(query: string): Promise<string[]> {
   try {
     const response = await client.textSearch({
@@ -708,15 +581,12 @@ async function searchPlacesByText(query: string): Promise<string[]> {
   }
 }
 
-/**
- * Fetch place details and apply all filters
- */
 async function fetchAndValidatePlace(
   placeId: string,
-  progress: EnhancedProgressState
+  progress: ProgressState
 ): Promise<{ success: boolean; facility?: any; filterReason?: string }> {
   try {
-    await delay(500); // Rate limiting
+    await delay(500);
 
     const response = await client.placeDetails({
       params: {
@@ -746,23 +616,13 @@ async function fetchAndValidatePlace(
 
     const place = response.data.result;
 
-    // Filter 3: Validate athletic facility types
-    const validationResult = isValidAthleticFacility(place.types || []);
-    if (!validationResult.passed) {
-      progress.statistics.filteredNonSport++;
-      return {
-        success: false,
-        filterReason: validationResult.reason,
-      };
-    }
-
-    // Filter 4: Check completeness score
-    const completenessScore = calculateCompletenessScore(place);
-    if (completenessScore < COMPLETENESS_THRESHOLD) {
+    // High-quality filter
+    const qualityResult = isHighQualityFacility(place);
+    if (!qualityResult.passed) {
       progress.statistics.filteredLowQuality++;
       return {
         success: false,
-        filterReason: `Low quality (score: ${completenessScore}/${COMPLETENESS_THRESHOLD})`,
+        filterReason: qualityResult.reason,
       };
     }
 
@@ -811,9 +671,6 @@ async function fetchAndValidatePlace(
   }
 }
 
-/**
- * Insert facility into database
- */
 async function insertFacility(facilityData: any): Promise<boolean> {
   try {
     const { error } = await supabase
@@ -835,14 +692,13 @@ async function insertFacility(facilityData: any): Promise<boolean> {
   }
 }
 
-/**
- * Process a single city
- */
+// ===== PROCESSING FUNCTIONS =====
+
 async function processCity(
   city: string,
   cityIndex: number,
   totalCities: number,
-  progress: EnhancedProgressState
+  progress: ProgressState
 ): Promise<void> {
   console.log(`\n${"=".repeat(60)}`);
   console.log(`📍 [${cityIndex + 1}/${totalCities}] Processing: ${city}`);
@@ -850,13 +706,12 @@ async function processCity(
 
   const placeIds = new Set<string>();
 
-  // Search all facility types in this city
-  for (let i = 0; i < FACILITY_SEARCHES.length; i++) {
-    const facilityType = FACILITY_SEARCHES[i];
-    const query = `${facilityType} in ${city}`;
+  for (let i = 0; i < HIGH_QUALITY_SEARCHES.length; i++) {
+    const searchTerm = HIGH_QUALITY_SEARCHES[i];
+    const query = `${searchTerm} in ${city}`;
 
     console.log(
-      `  [${i + 1}/${FACILITY_SEARCHES.length}] Searching: ${facilityType}...`
+      `  [${i + 1}/${HIGH_QUALITY_SEARCHES.length}] Searching: ${searchTerm}...`
     );
 
     const ids = await searchPlacesByText(query);
@@ -864,28 +719,52 @@ async function processCity(
 
     console.log(`    Found ${ids.length} results`);
 
-    await delay(500); // Rate limiting between searches
+    await delay(500);
   }
 
   console.log(`\n  🔍 Total unique facilities found: ${placeIds.size}`);
   progress.statistics.searched += placeIds.size;
 
+  await processFacilities(Array.from(placeIds), progress);
+}
+
+async function processChain(
+  chain: string,
+  chainIndex: number,
+  totalChains: number,
+  progress: ProgressState
+): Promise<void> {
+  console.log(`\n${"=".repeat(60)}`);
+  console.log(`🏢 [${chainIndex + 1}/${totalChains}] Searching chain: ${chain}`);
+  console.log("=".repeat(60));
+
+  const query = `${chain} Texas`;
+  console.log(`  Searching: ${query}...`);
+
+  const placeIds = await searchPlacesByText(query);
+  console.log(`  Found ${placeIds.length} results`);
+
+  progress.statistics.searched += placeIds.length;
+
+  await processFacilities(placeIds, progress);
+}
+
+async function processFacilities(
+  placeIds: string[],
+  progress: ProgressState
+): Promise<void> {
   let insertedCount = 0;
   let processed = 0;
   const filterStats = {
     duplicate: 0,
-    nonSport: 0,
     lowQuality: 0,
+    nonSport: 0,
   };
 
-  // Convert Set to Array for iteration
-  const placeIdsArray = Array.from(placeIds);
-
-  // Process each facility
-  for (const placeId of placeIdsArray) {
+  for (const placeId of placeIds) {
     processed++;
 
-    // Filter 1: Check if already in database (by place_id)
+    // Check if already exists
     const exists = await facilityExists(placeId);
     if (exists) {
       filterStats.duplicate++;
@@ -897,15 +776,18 @@ async function processCity(
     const result = await fetchAndValidatePlace(placeId, progress);
 
     if (!result.success) {
-      if (result.filterReason?.includes("Non-sport")) {
-        filterStats.nonSport++;
-      } else if (result.filterReason?.includes("Low quality")) {
+      if (result.filterReason?.includes("Low rating") ||
+          result.filterReason?.includes("Few reviews") ||
+          result.filterReason?.includes("No photos") ||
+          result.filterReason?.includes("Low completeness")) {
         filterStats.lowQuality++;
+      } else if (result.filterReason?.includes("Non-sport")) {
+        filterStats.nonSport++;
       }
       continue;
     }
 
-    // Filter 2: Check proximity (optional, only if facility has location)
+    // Check proximity
     if (result.facility && result.facility.location) {
       const coords = result.facility.location
         .replace("POINT(", "")
@@ -931,7 +813,6 @@ async function processCity(
       progress.totalFacilities++;
       progress.statistics.inserted++;
 
-      // Show sports identified
       const sports = result.facility.identified_sports || [];
       const sportsDisplay =
         sports.length > 0
@@ -945,7 +826,7 @@ async function processCity(
 
       if (insertedCount % 5 === 0) {
         console.log(
-          `  ✅ [${processed}/${placeIdsArray.length}] Inserted ${insertedCount} facilities`
+          `  ✅ [${processed}/${placeIds.length}] Inserted ${insertedCount} facilities`
         );
       }
       if (sports.length > 0) {
@@ -956,97 +837,98 @@ async function processCity(
     }
   }
 
-  console.log(`\n  ✅ City Complete:`);
-  console.log(`     Searched: ${placeIdsArray.length}`);
+  console.log(`\n  ✅ Batch Complete:`);
+  console.log(`     Searched: ${placeIds.length}`);
   console.log(`     Inserted: ${insertedCount}`);
   console.log(`     Filtered:`);
   console.log(`       - Duplicate: ${filterStats.duplicate}`);
-  console.log(`       - Non-sport: ${filterStats.nonSport}`);
   console.log(`       - Low quality: ${filterStats.lowQuality}`);
+  console.log(`       - Non-sport: ${filterStats.nonSport}`);
   console.log(`     Total in database: ${progress.totalFacilities}`);
 }
 
-/**
- * Main collection function
- */
-async function collectAdditionalFacilities() {
-  console.log("🚀 Enhanced Texas Athletic Facilities Collection");
-  console.log("=" .repeat(60));
-  console.log(`📊 Cities: ${ADDITIONAL_TEXAS_CITIES.length} additional Texas cities (ranks 51-200)`);
-  console.log(`🏃 Facility Types: ${FACILITY_SEARCHES.length} types per city`);
-  console.log(`\n🔧 Robustness Features Enabled:`);
-  console.log(`   ✓ Auto-cleanup (filters non-sport facilities)`);
-  console.log(`   ✓ Proximity deduplication (${PROXIMITY_THRESHOLD_METERS}m threshold)`);
-  console.log(`   ✓ Completeness scoring (min: ${COMPLETENESS_THRESHOLD}/100)`);
-  console.log(`   ✓ Immediate sport identification with confidence scores`);
-  console.log("=" .repeat(60) + "\n");
+// ===== MAIN FUNCTION =====
+
+async function collectHighQualityFacilities() {
+  console.log("🚀 High-Quality Athletic Facilities Collection");
+  console.log("=".repeat(60));
+  console.log(`📊 Target Cities: ${TARGET_CITIES.length}`);
+  console.log(`🏢 Facility Chains: ${FACILITY_CHAINS.length}`);
+  console.log(`🔍 Search Types: ${HIGH_QUALITY_SEARCHES.length}`);
+  console.log(`\n🎯 Quality Criteria:`);
+  console.log(`   ✓ Minimum rating: ${MIN_RATING}`);
+  console.log(`   ✓ Minimum reviews: ${MIN_REVIEWS}`);
+  console.log(`   ✓ Minimum completeness: ${MIN_COMPLETENESS_SCORE}/100`);
+  console.log(`   ✓ Must have photos`);
+  console.log(`   ✓ Quality keywords or high ratings required`);
+  console.log("=".repeat(60) + "\n");
 
   const progress = loadProgress();
 
-  if (progress.processedCities.length > 0) {
-    console.log(
-      `♻️  Resuming: ${progress.processedCities.length}/${ADDITIONAL_TEXAS_CITIES.length} cities processed\n`
-    );
-    console.log(`   Total facilities: ${progress.totalFacilities}`);
-    console.log(`   Filters applied:`);
-    console.log(`     - Duplicate: ${progress.statistics.filteredDuplicate}`);
-    console.log(`     - Non-sport: ${progress.statistics.filteredNonSport}`);
-    console.log(
-      `     - Low quality: ${progress.statistics.filteredLowQuality}\n`
-    );
+  if (progress.processedCities.length > 0 || progress.processedChains.length > 0) {
+    console.log(`♻️  Resuming:`);
+    console.log(`   Cities: ${progress.processedCities.length}/${TARGET_CITIES.length}`);
+    console.log(`   Chains: ${progress.processedChains.length}/${FACILITY_CHAINS.length}`);
+    console.log(`   Total facilities: ${progress.totalFacilities}\n`);
   }
 
   const startTime = Date.now();
 
-  for (let i = 0; i < ADDITIONAL_TEXAS_CITIES.length; i++) {
-    const city = ADDITIONAL_TEXAS_CITIES[i];
+  // Process facility chains first
+  for (let i = 0; i < FACILITY_CHAINS.length; i++) {
+    const chain = FACILITY_CHAINS[i];
 
-    // Skip already processed cities
+    if (progress.processedChains.includes(chain)) {
+      continue;
+    }
+
+    try {
+      await processChain(chain, i, FACILITY_CHAINS.length, progress);
+      progress.processedChains.push(chain);
+      saveProgress(progress);
+    } catch (error: any) {
+      console.error(`\n❌ Error processing ${chain}:`, error.message);
+      saveProgress(progress);
+    }
+  }
+
+  // Process cities
+  for (let i = 0; i < TARGET_CITIES.length; i++) {
+    const city = TARGET_CITIES[i];
+
     if (progress.processedCities.includes(city)) {
       continue;
     }
 
     try {
-      await processCity(city, i, ADDITIONAL_TEXAS_CITIES.length, progress);
-
+      await processCity(city, i, TARGET_CITIES.length, progress);
       progress.processedCities.push(city);
       saveProgress(progress);
 
       // Progress summary every 5 cities
       if (progress.processedCities.length % 5 === 0) {
-        const elapsed = (Date.now() - startTime) / 1000 / 60; // minutes
-        const rate = progress.processedCities.length / elapsed;
-        const remaining =
-          ADDITIONAL_TEXAS_CITIES.length - progress.processedCities.length;
+        const elapsed = (Date.now() - startTime) / 1000 / 60;
+        const rate = (progress.processedCities.length + progress.processedChains.length) / elapsed;
+        const remaining = TARGET_CITIES.length - progress.processedCities.length;
         const eta = remaining / rate;
 
         console.log("\n" + "=".repeat(60));
         console.log("📊 Overall Progress:");
-        console.log(
-          `   Cities: ${progress.processedCities.length}/${ADDITIONAL_TEXAS_CITIES.length}`
-        );
+        console.log(`   Cities: ${progress.processedCities.length}/${TARGET_CITIES.length}`);
+        console.log(`   Chains: ${progress.processedChains.length}/${FACILITY_CHAINS.length}`);
         console.log(`   Total Facilities: ${progress.totalFacilities}`);
         console.log(`   Statistics:`);
         console.log(`     - Searched: ${progress.statistics.searched}`);
         console.log(`     - Inserted: ${progress.statistics.inserted}`);
-        console.log(
-          `     - Filtered Duplicate: ${progress.statistics.filteredDuplicate}`
-        );
-        console.log(
-          `     - Filtered Non-Sport: ${progress.statistics.filteredNonSport}`
-        );
-        console.log(
-          `     - Filtered Low Quality: ${progress.statistics.filteredLowQuality}`
-        );
+        console.log(`     - Filtered Duplicate: ${progress.statistics.filteredDuplicate}`);
+        console.log(`     - Filtered Low Quality: ${progress.statistics.filteredLowQuality}`);
+        console.log(`     - Filtered Non-Sport: ${progress.statistics.filteredNonSport}`);
         console.log(`   Elapsed: ${elapsed.toFixed(0)} minutes`);
-        console.log(
-          `   ETA: ${eta.toFixed(0)} minutes (~${(eta / 60).toFixed(1)} hours)`
-        );
+        console.log(`   ETA: ${eta.toFixed(0)} minutes (~${(eta / 60).toFixed(1)} hours)`);
         console.log("=".repeat(60) + "\n");
       }
     } catch (error: any) {
       console.error(`\n❌ Error processing ${city}:`, error.message);
-      console.log("   Saving progress and continuing...\n");
       saveProgress(progress);
     }
   }
@@ -1055,7 +937,8 @@ async function collectAdditionalFacilities() {
   console.log("🎉 Collection Complete!");
   console.log("=".repeat(60));
   console.log(`📊 Final Statistics:`);
-  console.log(`   Cities Processed: ${progress.processedCities.length}/${ADDITIONAL_TEXAS_CITIES.length}`);
+  console.log(`   Cities Processed: ${progress.processedCities.length}/${TARGET_CITIES.length}`);
+  console.log(`   Chains Processed: ${progress.processedChains.length}/${FACILITY_CHAINS.length}`);
   console.log(`   Total Facilities Added: ${progress.statistics.inserted}`);
   console.log(`   Quality Metrics:`);
   console.log(`     - Total Searched: ${progress.statistics.searched}`);
@@ -1064,28 +947,20 @@ async function collectAdditionalFacilities() {
     `     - Filter Rate: ${((progress.statistics.inserted / progress.statistics.searched) * 100).toFixed(1)}%`
   );
   console.log(`   Filters Applied:`);
-  console.log(
-    `     - Duplicate: ${progress.statistics.filteredDuplicate} (${((progress.statistics.filteredDuplicate / progress.statistics.searched) * 100).toFixed(1)}%)`
-  );
-  console.log(
-    `     - Non-Sport: ${progress.statistics.filteredNonSport} (${((progress.statistics.filteredNonSport / progress.statistics.searched) * 100).toFixed(1)}%)`
-  );
-  console.log(
-    `     - Low Quality: ${progress.statistics.filteredLowQuality} (${((progress.statistics.filteredLowQuality / progress.statistics.searched) * 100).toFixed(1)}%)`
-  );
+  console.log(`     - Duplicate: ${progress.statistics.filteredDuplicate}`);
+  console.log(`     - Low Quality: ${progress.statistics.filteredLowQuality}`);
+  console.log(`     - Non-Sport: ${progress.statistics.filteredNonSport}`);
   console.log(
     `   Runtime: ${((Date.now() - startTime) / 1000 / 60 / 60).toFixed(2)} hours`
   );
   console.log("=".repeat(60));
 
-  // Clean up progress file
   if (fs.existsSync(PROGRESS_FILE)) {
     fs.unlinkSync(PROGRESS_FILE);
   }
 }
 
-// Run the collection
-collectAdditionalFacilities().catch((error) => {
+collectHighQualityFacilities().catch((error) => {
   console.error("❌ Fatal error:", error);
   process.exit(1);
 });

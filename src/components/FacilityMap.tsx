@@ -232,11 +232,14 @@ export default function FacilityMap({
   const [expandedSections, setExpandedSections] = useState({
     displayFilter: true,
     sportFilter: true,
-    categories: false,
+    categories: true,
   });
   const [isAISearchOpen, setIsAISearchOpen] = useState(false);
   const [currentAIFilters, setCurrentAIFilters] =
     useState<AISearchFilters | null>(null);
+  const [selectedCategories, setSelectedCategories] = useState<
+    Array<keyof typeof ACTIVITY_CATEGORIES>
+  >(["parks", "fitness", "sports", "education", "other"]);
   const mapRef = useRef<MapRef>(null);
 
   const toggleSection = (section: keyof typeof expandedSections) => {
@@ -277,12 +280,16 @@ export default function FacilityMap({
       case "HIDDEN_ONLY":
         filtered = filtered.filter((f) => f.hidden === true);
         break;
+      case "CLEANED_UP_ONLY":
+        filtered = filtered.filter((f) => f.cleaned_up === true);
+        break;
       case "WITH_NOTES_ONLY":
         filtered = filtered.filter((f) => f.has_notes === true);
         break;
       case "UNHIDDEN_ONLY":
       default:
-        filtered = filtered.filter((f) => !f.hidden);
+        // Exclude both hidden AND cleaned_up facilities
+        filtered = filtered.filter((f) => !f.hidden && !f.cleaned_up);
         break;
     }
 
@@ -302,11 +309,23 @@ export default function FacilityMap({
       });
     }
 
+    // Apply category filter
+    if (
+      selectedCategories.length > 0 &&
+      selectedCategories.length < 5
+    ) {
+      // Only filter if not all categories are selected
+      filtered = filtered.filter((facility) => {
+        const category = getFacilityCategory(facility.sport_types);
+        return selectedCategories.includes(category);
+      });
+    }
+
     // Don't apply AI filters to the map - only manual filters
     // AI filters will be used by AISearchPanel to show results as cards
 
     return filtered;
-  }, [facilities, filterOption, selectedSports]);
+  }, [facilities, filterOption, selectedSports, selectedCategories]);
 
   // Calculate category counts
   const categoryCounts = useMemo(() => {
@@ -573,6 +592,21 @@ export default function FacilityMap({
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
+                  onClick={() => onFilterOptionChange("CLEANED_UP_ONLY")}
+                  className={`w-full px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 flex items-center justify-between ${
+                    filterOption === "CLEANED_UP_ONLY"
+                      ? "bg-gradient-to-r from-[#f97316] to-[#f97316]/90 text-white shadow-lg shadow-[#f97316]/20"
+                      : "bg-gradient-to-r from-[#fed7aa]/50 to-[#fed7aa] text-[#9a3412] hover:from-[#fed7aa] hover:to-[#fed7aa]/80 border border-[#fdba74]"
+                  }`}
+                >
+                  <span>Cleaned Up (Low Quality)</span>
+                  {filterOption === "CLEANED_UP_ONLY" && (
+                    <Check className="w-3.5 h-3.5" />
+                  )}
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={() => onFilterOptionChange("WITH_NOTES_ONLY")}
                   className={`w-full px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 flex items-center justify-between ${
                     filterOption === "WITH_NOTES_ONLY"
@@ -695,33 +729,98 @@ export default function FacilityMap({
                 className="space-y-2 overflow-hidden"
               >
                 {Object.entries(ACTIVITY_CATEGORIES).map(
-                  ([key, { color, label }], idx) => (
-                    <motion.div
-                      key={key}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: idx * 0.05 }}
-                      className="bg-gradient-to-br from-white to-[#E8E9EB]/20 rounded-lg p-3 border border-[#E8E9EB] hover:shadow-md transition-all duration-300"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2.5">
-                          <div
-                            className="w-3.5 h-3.5 rounded-full shadow-sm"
-                            style={{ backgroundColor: color, opacity: 0.9 }}
-                          />
-                          <span className="text-sm font-medium text-gray-700">
-                            {label}
-                          </span>
+                  ([key, { color, label }], idx) => {
+                    const isSelected = selectedCategories.includes(
+                      key as keyof typeof ACTIVITY_CATEGORIES,
+                    );
+                    return (
+                      <motion.button
+                        key={key}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: idx * 0.05 }}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => {
+                          const categoryKey =
+                            key as keyof typeof ACTIVITY_CATEGORIES;
+                          if (selectedCategories.includes(categoryKey)) {
+                            setSelectedCategories(
+                              selectedCategories.filter((c) => c !== categoryKey),
+                            );
+                          } else {
+                            setSelectedCategories([
+                              ...selectedCategories,
+                              categoryKey,
+                            ]);
+                          }
+                        }}
+                        className={`w-full rounded-lg p-3 transition-all duration-300 ${
+                          isSelected
+                            ? "bg-white border-2"
+                            : "bg-gradient-to-r from-[#E8E9EB]/50 to-[#E8E9EB] hover:from-[#E8E9EB] hover:to-[#E8E9EB]/80 border border-[#E8E9EB]"
+                        }`}
+                        style={
+                          isSelected
+                            ? { borderColor: color }
+                            : undefined
+                        }
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2.5">
+                            <div
+                              className="w-3.5 h-3.5 rounded-full shadow-sm"
+                              style={{ backgroundColor: color, opacity: 0.9 }}
+                            />
+                            <span
+                              className={`text-sm font-medium ${
+                                isSelected ? "text-gray-900" : "text-gray-700"
+                              }`}
+                            >
+                              {label}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`text-sm font-semibold px-2.5 py-1 rounded-full ${
+                                isSelected
+                                  ? "bg-[#E8E9EB] text-gray-700"
+                                  : "bg-[#E8E9EB] text-gray-500"
+                              }`}
+                            >
+                              {categoryCounts[
+                                key as keyof typeof ACTIVITY_CATEGORIES
+                              ].toLocaleString()}
+                            </span>
+                            {isSelected && <Check className="w-3.5 h-3.5 text-gray-700" />}
+                          </div>
                         </div>
-                        <span className="text-sm font-semibold text-gray-500 bg-[#E8E9EB] px-2.5 py-1 rounded-full">
-                          {categoryCounts[
-                            key as keyof typeof ACTIVITY_CATEGORIES
-                          ].toLocaleString()}
-                        </span>
-                      </div>
-                    </motion.div>
-                  ),
+                      </motion.button>
+                    );
+                  },
                 )}
+                {selectedCategories.length > 0 &&
+                  selectedCategories.length < 5 && (
+                    <motion.button
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() =>
+                        setSelectedCategories([
+                          "parks",
+                          "fitness",
+                          "sports",
+                          "education",
+                          "other",
+                        ])
+                      }
+                      className="w-full mt-2 px-4 py-3 rounded-lg text-sm font-medium bg-[#c9472b]/10 text-[#c9472b] hover:bg-[#c9472b]/20 border border-[#c9472b]/20 transition-all duration-300"
+                    >
+                      Clear Category Filter ({5 - selectedCategories.length}{" "}
+                      hidden)
+                    </motion.button>
+                  )}
               </motion.div>
             )}
           </AnimatePresence>

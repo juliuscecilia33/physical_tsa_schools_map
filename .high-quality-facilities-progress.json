@@ -1,0 +1,34 @@
+{
+  "processedCities": [
+    "Houston, Texas",
+    "San Antonio, Texas",
+    "Dallas, Texas",
+    "Austin, Texas",
+    "Fort Worth, Texas",
+    "El Paso, Texas",
+    "Arlington, Texas",
+    "Corpus Christi, Texas",
+    "Plano, Texas",
+    "Laredo, Texas"
+  ],
+  "processedChains": [
+    "FieldhouseUSA",
+    "Game On Sports",
+    "TOCA Soccer",
+    "PIT Fitness",
+    "D-BAT",
+    "Athletic Republic",
+    "Parisi Speed School",
+    "Sports Academy",
+    "Velocity Sports Performance"
+  ],
+  "totalFacilities": 236,
+  "statistics": {
+    "searched": 1643,
+    "filteredLowQuality": 631,
+    "filteredDuplicate": 776,
+    "filteredNonSport": 0,
+    "inserted": 236
+  },
+  "lastUpdated": "2026-02-23T22:40:49.440Z"
+}

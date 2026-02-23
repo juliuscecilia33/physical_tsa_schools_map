@@ -18,7 +18,7 @@ const FacilityMap = dynamic(() => import("@/components/FacilityMap"), {
   ),
 });
 
-export type FilterOption = 'UNHIDDEN_ONLY' | 'ALL' | 'HIDDEN_ONLY' | 'WITH_NOTES_ONLY';
+export type FilterOption = 'UNHIDDEN_ONLY' | 'ALL' | 'HIDDEN_ONLY' | 'WITH_NOTES_ONLY' | 'CLEANED_UP_ONLY';
 
 export default function Home() {
   const [facilities, setFacilities] = useState<Facility[]>([]);
@@ -59,7 +59,8 @@ export default function Home() {
           const { data, error } = await supabase
             .rpc("get_facilities_with_coords", {
               row_limit: 10000,
-              include_hidden: true
+              include_hidden: true,
+              include_cleaned_up: true
             })
             .range(from, from + pageSize - 1);
 
@@ -113,6 +114,7 @@ export default function Home() {
           opening_hours: row.opening_hours,
           business_status: row.business_status,
           hidden: row.hidden || false,
+          cleaned_up: row.cleaned_up || false,
           has_notes: row.has_notes || false,
         }));
 

@@ -26,6 +26,7 @@ export interface Facility {
   opening_hours?: OpeningHours;
   business_status?: string;
   hidden?: boolean;
+  cleaned_up?: boolean;
   notes?: Note[];
   has_notes?: boolean;
 }
