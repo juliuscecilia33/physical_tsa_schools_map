@@ -233,6 +233,7 @@ export default function FacilityMap({
     displayFilter: true,
     sportFilter: true,
     categories: true,
+    moreFilters: true,
   });
   const [isAISearchOpen, setIsAISearchOpen] = useState(false);
   const [currentAIFilters, setCurrentAIFilters] =
