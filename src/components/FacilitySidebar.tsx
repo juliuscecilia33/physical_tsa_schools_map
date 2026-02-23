@@ -349,8 +349,19 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
         className="fixed top-0 right-0 h-full w-full md:w-[480px] bg-white shadow-2xl z-50 flex flex-col"
       >
         {/* Header with gradient */}
-        <div className="sticky top-0 bg-gradient-to-br from-white via-white to-blue-50/30 backdrop-blur-sm border-b border-gray-100 shadow-sm z-20">
-          <div className="p-6 flex justify-between items-start">
+        <div className="sticky top-0 bg-gradient-to-br from-white via-white to-[#004aad]/5 backdrop-blur-sm border-b border-[#E8E9EB] shadow-sm z-20">
+          {/* TSA Logo */}
+          <div className="flex justify-center pt-6 pb-4">
+            <motion.img
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              src="/assets/TSA.png"
+              alt="TSA Logo"
+              className="h-12 w-auto"
+            />
+          </div>
+          <div className="px-6 pb-6 flex justify-between items-start">
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -414,7 +425,7 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
               onClick={handleToggleHidden}
               className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium text-sm shadow-sm transition-all ${
                 facility.hidden
-                  ? "bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white"
+                  ? "bg-gradient-to-r from-[#004aad] to-[#004aad]/90 hover:from-[#004aad]/90 hover:to-[#004aad]/80 text-white"
                   : "bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-gray-700"
               }`}
             >
@@ -447,8 +458,8 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                   onClick={() => handleTabChange(tab.id)}
                   className={`flex items-center gap-2 px-4 py-2.5 rounded-full font-medium text-sm transition-all whitespace-nowrap ${
                     isActive
-                      ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md"
-                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      ? "bg-gradient-to-r from-[#004aad] to-[#004aad]/90 text-white shadow-lg shadow-[#004aad]/20"
+                      : "bg-[#E8E9EB] text-gray-600 hover:bg-[#E8E9EB]/80"
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -502,7 +513,7 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: 0.1 + idx * 0.05 }}
                             whileHover={{ scale: 1.05 }}
-                            className="px-4 py-2 bg-gradient-to-r from-blue-50 to-blue-100/50 text-blue-700 rounded-full text-sm font-medium shadow-sm hover:shadow-md transition-all cursor-default"
+                            className="px-4 py-2 bg-gradient-to-r from-[#004aad]/5 to-[#004aad]/10 text-[#004aad] rounded-full text-sm font-medium shadow-sm hover:shadow-md transition-all cursor-default"
                           >
                             {formatSportType(type)}
                           </motion.span>
@@ -634,7 +645,7 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
 
                     <div className="space-y-3">
                       <div className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                        <MapPin className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                        <MapPin className="w-5 h-5 text-[#004aad] flex-shrink-0 mt-0.5" />
                         <p className="text-gray-700 text-sm leading-relaxed">{facility.address}</p>
                       </div>
 
@@ -643,10 +654,10 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                           href={`tel:${facility.phone}`}
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
-                          className="flex items-center gap-3 p-3 rounded-lg hover:bg-blue-50 transition-colors group"
+                          className="flex items-center gap-3 p-3 rounded-lg hover:bg-[#004aad]/5 transition-colors group"
                         >
-                          <Phone className="w-5 h-5 text-blue-600 group-hover:text-blue-700 transition-colors" />
-                          <span className="text-blue-600 group-hover:text-blue-700 font-medium text-sm">
+                          <Phone className="w-5 h-5 text-[#004aad] group-hover:text-[#004aad]/80 transition-colors" />
+                          <span className="text-[#004aad] group-hover:text-[#004aad]/80 font-medium text-sm">
                             {facility.phone}
                           </span>
                         </motion.a>
@@ -659,10 +670,10 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                           rel="noopener noreferrer"
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
-                          className="flex items-center gap-3 p-3 rounded-lg hover:bg-blue-50 transition-colors group"
+                          className="flex items-center gap-3 p-3 rounded-lg hover:bg-[#004aad]/5 transition-colors group"
                         >
-                          <Globe className="w-5 h-5 text-blue-600 group-hover:text-blue-700 transition-colors flex-shrink-0" />
-                          <span className="text-blue-600 group-hover:text-blue-700 font-medium text-sm truncate">
+                          <Globe className="w-5 h-5 text-[#004aad] group-hover:text-[#004aad]/80 transition-colors flex-shrink-0" />
+                          <span className="text-[#004aad] group-hover:text-[#004aad]/80 font-medium text-sm truncate">
                             {facility.website.replace(/^https?:\/\//, "")}
                           </span>
                         </motion.a>
@@ -676,7 +687,7 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.2 }}
-                      className="bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-xl p-4 shadow-sm"
+                      className="bg-gradient-to-br from-[#E8E9EB]/30 to-[#E8E9EB]/50 rounded-xl p-4 shadow-sm"
                     >
                       <div className="flex items-center justify-between mb-3">
                         <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide flex items-center gap-2">
@@ -784,7 +795,7 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                           value={newNoteText}
                           onChange={(e) => setNewNoteText(e.target.value)}
                           placeholder="Add a note..."
-                          className="flex-1 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                          className="flex-1 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 border border-[#E8E9EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004aad] resize-none"
                           rows={2}
                           disabled={addingNote}
                         />
@@ -794,7 +805,7 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                         whileTap={{ scale: 0.98 }}
                         onClick={handleAddNote}
                         disabled={!newNoteText.trim() || addingNote}
-                        className="mt-2 w-full flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg text-sm font-medium shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="mt-2 w-full flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-[#004aad] to-[#004aad]/90 hover:from-[#004aad]/90 hover:to-[#004aad]/80 text-white rounded-lg text-sm font-medium shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Plus className="w-4 h-4" />
                         <span>{addingNote ? "Adding..." : "Add Note"}</span>
@@ -804,7 +815,7 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                     {/* Notes List */}
                     {loadingNotes ? (
                       <div className="text-center py-4">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#004aad] mx-auto"></div>
                       </div>
                     ) : notes.length === 0 ? (
                       <div className="text-center py-6 bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-xl border border-gray-100">
@@ -867,7 +878,7 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                                       whileHover={{ scale: 1.1 }}
                                       whileTap={{ scale: 0.9 }}
                                       onClick={() => handleStartEdit(note)}
-                                      className="p-1 hover:bg-blue-100 rounded text-blue-600"
+                                      className="p-1 hover:bg-[#004aad]/10 rounded text-[#004aad]"
                                     >
                                       <Edit2 className="w-3.5 h-3.5" />
                                     </motion.button>
@@ -1063,7 +1074,7 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                               return (
                                 <span
                                   key={source}
-                                  className="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium border border-blue-200"
+                                  className="px-3 py-1.5 bg-[#004aad]/5 text-[#004aad] rounded-lg text-sm font-medium border border-[#004aad]/20"
                                 >
                                   {sourceLabels[source] || source}
                                 </span>
@@ -1081,7 +1092,7 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                             {metadata.keywords_matched.map((keyword) => (
                               <span
                                 key={keyword}
-                                className="px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-xs font-mono border border-purple-200"
+                                className="px-3 py-1 bg-[#c9472b]/10 text-[#c9472b] rounded-full text-xs font-mono border border-[#c9472b]/20"
                               >
                                 {keyword}
                               </span>
@@ -1138,7 +1149,7 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                       <div className="border-t border-gray-200 p-4 bg-gray-50">
                         <button
                           onClick={() => setSelectedSportDetail(null)}
-                          className="w-full py-2.5 px-4 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg font-medium shadow-sm transition-all"
+                          className="w-full py-2.5 px-4 bg-gradient-to-r from-[#004aad] to-[#004aad]/90 hover:from-[#004aad]/90 hover:to-[#004aad]/80 text-white rounded-lg font-medium shadow-sm transition-all"
                         >
                           Close
                         </button>

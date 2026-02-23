@@ -9,6 +9,18 @@ export default function ProgressBar({ progress, loadedCount, totalCount }: Progr
 
   return (
     <div className="w-full max-w-md px-4 sm:px-6">
+      {/* TSA Logo */}
+      <div className="flex justify-center mb-6">
+        <img
+          src="/assets/TSA.png"
+          alt="TSA Logo"
+          className="h-16 w-auto opacity-90"
+          style={{
+            animation: 'fadeIn 0.8s ease-in-out',
+          }}
+        />
+      </div>
+
       {/* Bouncing Sports Emojis */}
       <div className="flex justify-center gap-2 sm:gap-3 mb-4">
         {sportsEmojis.map((emoji, index) => (
@@ -35,6 +47,16 @@ export default function ProgressBar({ progress, loadedCount, totalCount }: Progr
             transform: translateY(-15px);
           }
         }
+        @keyframes fadeIn {
+          0% {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          100% {
+            opacity: 0.9;
+            transform: translateY(0);
+          }
+        }
       `}</style>
 
       <div className="mb-2 flex justify-between items-center text-xs sm:text-sm text-gray-600">
@@ -42,9 +64,9 @@ export default function ProgressBar({ progress, loadedCount, totalCount }: Progr
         <span className="font-semibold whitespace-nowrap">{Math.round(progress)}%</span>
       </div>
 
-      <div className="w-full bg-gray-200 rounded-full h-3 sm:h-4 overflow-hidden shadow-inner">
+      <div className="w-full bg-[#E8E9EB] rounded-full h-3 sm:h-4 overflow-hidden shadow-inner">
         <div
-          className="bg-blue-600 h-full rounded-full transition-all duration-300 ease-out"
+          className="bg-[#004aad] h-full rounded-full transition-all duration-300 ease-out"
           style={{ width: `${progress}%` }}
         />
       </div>

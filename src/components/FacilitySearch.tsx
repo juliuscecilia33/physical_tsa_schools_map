@@ -155,13 +155,13 @@ export default function FacilitySearch({ facilities, onSelectFacility }: Facilit
           animate={{ opacity: 1, y: 0 }}
           className={`bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl transition-all duration-300 border ${
             isFocused
-              ? "ring-2 ring-blue-500/50 shadow-blue-500/20 border-blue-200"
-              : "border-gray-200/50 hover:border-gray-300/50"
+              ? "ring-2 ring-[#004aad]/50 shadow-[#004aad]/20 border-[#004aad]/30"
+              : "border-[#E8E9EB] hover:border-gray-300/50"
           }`}
         >
           <div className="flex items-center gap-4 px-6 py-4">
             <Search className={`w-6 h-6 flex-shrink-0 transition-colors duration-300 ${
-              isFocused ? "text-blue-500" : "text-gray-400"
+              isFocused ? "text-[#004aad]" : "text-gray-400"
             }`} />
             <input
               ref={inputRef}
@@ -197,12 +197,12 @@ export default function FacilitySearch({ facilities, onSelectFacility }: Facilit
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.98 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className="absolute top-full left-0 right-0 mt-4 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/50 overflow-hidden z-50"
+            className="absolute top-full left-0 right-0 mt-4 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-[#E8E9EB] overflow-hidden z-50"
           >
             {searchResults.length > 0 ? (
               <div className="max-h-[65vh] overflow-y-auto">
                 {/* Header */}
-                <div className="px-6 py-4 bg-gradient-to-r from-blue-50/50 to-purple-50/50 border-b border-gray-200/50">
+                <div className="px-6 py-4 bg-gradient-to-r from-[#004aad]/5 to-[#004aad]/10 border-b border-[#E8E9EB]">
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-bold text-gray-700">
                       {searchResults.length} {searchResults.length === 1 ? "Result" : "Results"}
@@ -227,8 +227,8 @@ export default function FacilitySearch({ facilities, onSelectFacility }: Facilit
                       onClick={() => handleSelectFacility(facility)}
                       className={`w-full text-left p-5 mb-3 rounded-xl transition-all duration-300 ${
                         idx === selectedIndex
-                          ? "bg-gradient-to-br from-blue-50 to-blue-100/70 shadow-lg shadow-blue-500/10 border-2 border-blue-200"
-                          : "bg-gradient-to-br from-white to-gray-50/50 hover:from-gray-50 hover:to-gray-100/50 border-2 border-transparent hover:border-gray-200 shadow-sm hover:shadow-md"
+                          ? "bg-gradient-to-br from-[#004aad]/5 to-[#004aad]/10 shadow-lg shadow-[#004aad]/10 border-2 border-[#004aad]/30"
+                          : "bg-gradient-to-br from-white to-gray-50/50 hover:from-gray-50 hover:to-gray-100/50 border-2 border-transparent hover:border-[#E8E9EB] shadow-sm hover:shadow-md"
                       }`}
                     >
                       <div className="space-y-3">
@@ -239,7 +239,7 @@ export default function FacilitySearch({ facilities, onSelectFacility }: Facilit
 
                         {/* Address with City */}
                         <div className="flex items-start gap-2">
-                          <MapPin className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
+                          <MapPin className="w-4 h-4 text-[#004aad] flex-shrink-0 mt-0.5" />
                           <p className="text-sm text-gray-600 leading-relaxed">
                             {facility.address}
                           </p>
@@ -251,14 +251,14 @@ export default function FacilitySearch({ facilities, onSelectFacility }: Facilit
                             {facility.identified_sports.slice(0, 5).map((sport) => (
                               <span
                                 key={sport}
-                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-blue-50 to-blue-100/70 text-blue-700 rounded-lg text-xs font-semibold shadow-sm"
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-[#004aad]/5 to-[#004aad]/10 text-[#004aad] rounded-lg text-xs font-semibold shadow-sm"
                               >
                                 <span className="text-base">{SPORT_EMOJIS[sport] || "🏅"}</span>
                                 <span>{sport}</span>
                               </span>
                             ))}
                             {facility.identified_sports.length > 5 && (
-                              <span className="inline-flex items-center px-3 py-1.5 bg-gray-100 text-gray-600 rounded-lg text-xs font-semibold">
+                              <span className="inline-flex items-center px-3 py-1.5 bg-[#E8E9EB] text-gray-600 rounded-lg text-xs font-semibold">
                                 +{facility.identified_sports.length - 5} more
                               </span>
                             )}
@@ -312,24 +312,24 @@ export default function FacilitySearch({ facilities, onSelectFacility }: Facilit
             transition={{ delay: 0.2 }}
             className="absolute top-full left-0 right-0 mt-2"
           >
-            <div className="bg-white/95 backdrop-blur-xl rounded-xl shadow-lg border border-gray-200/50 px-4 py-3">
+            <div className="bg-white/95 backdrop-blur-xl rounded-xl shadow-lg border border-[#E8E9EB] px-4 py-3">
               <div className="flex items-center justify-center gap-4 text-xs">
                 <div className="flex items-center gap-1.5">
-                  <kbd className="px-2.5 py-1.5 bg-gradient-to-b from-gray-100 to-gray-200 rounded-lg text-gray-700 font-mono font-semibold shadow-sm border border-gray-300">
+                  <kbd className="px-2.5 py-1.5 bg-gradient-to-b from-[#E8E9EB]/70 to-[#E8E9EB] rounded-lg text-gray-700 font-mono font-semibold shadow-sm border border-[#E8E9EB]">
                     ↑↓
                   </kbd>
                   <span className="text-gray-600 font-medium">Navigate</span>
                 </div>
                 <div className="w-px h-4 bg-gray-300"></div>
                 <div className="flex items-center gap-1.5">
-                  <kbd className="px-2.5 py-1.5 bg-gradient-to-b from-gray-100 to-gray-200 rounded-lg text-gray-700 font-mono font-semibold shadow-sm border border-gray-300">
+                  <kbd className="px-2.5 py-1.5 bg-gradient-to-b from-[#E8E9EB]/70 to-[#E8E9EB] rounded-lg text-gray-700 font-mono font-semibold shadow-sm border border-[#E8E9EB]">
                     Enter
                   </kbd>
                   <span className="text-gray-600 font-medium">Select</span>
                 </div>
                 <div className="w-px h-4 bg-gray-300"></div>
                 <div className="flex items-center gap-1.5">
-                  <kbd className="px-2.5 py-1.5 bg-gradient-to-b from-gray-100 to-gray-200 rounded-lg text-gray-700 font-mono font-semibold shadow-sm border border-gray-300">
+                  <kbd className="px-2.5 py-1.5 bg-gradient-to-b from-[#E8E9EB]/70 to-[#E8E9EB] rounded-lg text-gray-700 font-mono font-semibold shadow-sm border border-[#E8E9EB]">
                     Esc
                   </kbd>
                   <span className="text-gray-600 font-medium">Close</span>

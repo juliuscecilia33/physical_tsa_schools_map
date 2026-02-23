@@ -29,6 +29,38 @@ interface FacilityMapProps {
   onUpdateFacility: (place_id: string, hidden: boolean) => void;
 }
 
+// Sport emoji mapping
+const SPORT_EMOJIS: { [key: string]: string } = {
+  "Basketball": "🏀",
+  "Soccer": "⚽",
+  "Baseball": "⚾",
+  "Football": "🏈",
+  "Tennis": "🎾",
+  "Volleyball": "🏐",
+  "Swimming": "🏊",
+  "Track & Field": "🏃",
+  "Golf": "⛳",
+  "Hockey": "🏒",
+  "Lacrosse": "🥍",
+  "Softball": "🥎",
+  "Wrestling": "🤼",
+  "Gymnastics": "🤸",
+  "Pickleball": "🏓",
+  "Racquetball": "🎾",
+  "Squash": "🎾",
+  "Badminton": "🏸",
+  "Gym/Fitness": "💪",
+  "CrossFit": "🏋️",
+  "Yoga": "🧘",
+  "Pilates": "🧘‍♀️",
+  "Martial Arts": "🥋",
+  "Boxing": "🥊",
+  "Bowling": "🎳",
+  "Skating": "⛸️",
+  "Climbing": "🧗",
+  "Water Sports": "🚣",
+};
+
 // Activity categories and their colors
 const ACTIVITY_CATEGORIES = {
   parks: { color: "#22c55e", label: "Parks & Fields" }, // bright green
@@ -429,16 +461,27 @@ export default function FacilityMap({
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setIsAISearchOpen(true)}
-          className="px-4 py-4 bg-gray-900 text-white rounded-2xl shadow-2xl hover:bg-gray-800 transition-all duration-300 font-semibold flex items-center gap-2 border border-gray-700"
+          className="px-4 py-4 bg-[#1A1B1E]/90 text-white rounded-2xl shadow-2xl hover:bg-[#1A1B1E]/90 transition-all duration-300 font-semibold flex items-center gap-2 border border-[#559fff]"
         >
-          <Sparkles className="w-5 h-5" />
+          <Sparkles className="w-5 h-5" color="#559fff" />
         </motion.button>
       </div>
 
       {/* Modern Info Panel */}
-      <div className="absolute inset-y-4 right-4 bg-white rounded-xl shadow-2xl p-6 max-w-md h-[calc(100vh-2rem)] overflow-y-auto z-10 border border-gray-100">
+      <div className="absolute inset-y-4 right-4 bg-white rounded-xl shadow-xl p-6 max-w-lg h-[calc(100vh-2rem)] overflow-y-auto z-10 border border-[#E8E9EB]">
+        {/* TSA Logo */}
+        <div className="flex justify-center pb-4 mb-4 border-b border-[#E8E9EB]">
+          <motion.img
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            src="/assets/TSA.png"
+            alt="TSA Logo"
+            className="h-10 w-auto"
+          />
+        </div>
         <div className="flex items-center gap-2 mb-3">
-          <div className="p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg">
+          <div className="p-2 bg-gradient-to-br from-[#004aad] to-[#004aad]/90 rounded-lg">
             <Layers className="w-4 h-4 text-white" />
           </div>
           <div>
@@ -453,7 +496,7 @@ export default function FacilityMap({
         </div>
 
         <p className="text-sm text-gray-500 mb-4 flex items-center gap-1.5">
-          <span className="inline-block w-2 h-2 bg-blue-500 rounded-full"></span>
+          <span className="inline-block w-2 h-2 bg-[#004aad] rounded-full"></span>
           Click any marker for details
         </p>
 
@@ -490,8 +533,8 @@ export default function FacilityMap({
                   onClick={() => onFilterOptionChange("UNHIDDEN_ONLY")}
                   className={`w-full px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 flex items-center justify-between ${
                     filterOption === "UNHIDDEN_ONLY"
-                      ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md"
-                      : "bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 hover:from-gray-100 hover:to-gray-200 border border-gray-200"
+                      ? "bg-gradient-to-r from-[#004aad] to-[#004aad]/90 text-white shadow-lg shadow-[#004aad]/20"
+                      : "bg-gradient-to-r from-[#E8E9EB]/50 to-[#E8E9EB] text-gray-700 hover:from-[#E8E9EB] hover:to-[#E8E9EB]/80 border border-[#E8E9EB]"
                   }`}
                 >
                   <span>All (Unhidden)</span>
@@ -505,8 +548,8 @@ export default function FacilityMap({
                   onClick={() => onFilterOptionChange("ALL")}
                   className={`w-full px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 flex items-center justify-between ${
                     filterOption === "ALL"
-                      ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md"
-                      : "bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 hover:from-gray-100 hover:to-gray-200 border border-gray-200"
+                      ? "bg-gradient-to-r from-[#004aad] to-[#004aad]/90 text-white shadow-lg shadow-[#004aad]/20"
+                      : "bg-gradient-to-r from-[#E8E9EB]/50 to-[#E8E9EB] text-gray-700 hover:from-[#E8E9EB] hover:to-[#E8E9EB]/80 border border-[#E8E9EB]"
                   }`}
                 >
                   <span>All Facilities</span>
@@ -518,8 +561,8 @@ export default function FacilityMap({
                   onClick={() => onFilterOptionChange("HIDDEN_ONLY")}
                   className={`w-full px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 flex items-center justify-between ${
                     filterOption === "HIDDEN_ONLY"
-                      ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md"
-                      : "bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 hover:from-gray-100 hover:to-gray-200 border border-gray-200"
+                      ? "bg-gradient-to-r from-[#004aad] to-[#004aad]/90 text-white shadow-lg shadow-[#004aad]/20"
+                      : "bg-gradient-to-r from-[#E8E9EB]/50 to-[#E8E9EB] text-gray-700 hover:from-[#E8E9EB] hover:to-[#E8E9EB]/80 border border-[#E8E9EB]"
                   }`}
                 >
                   <span>Hidden Only</span>
@@ -533,8 +576,8 @@ export default function FacilityMap({
                   onClick={() => onFilterOptionChange("WITH_NOTES_ONLY")}
                   className={`w-full px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 flex items-center justify-between ${
                     filterOption === "WITH_NOTES_ONLY"
-                      ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md"
-                      : "bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 hover:from-gray-100 hover:to-gray-200 border border-gray-200"
+                      ? "bg-gradient-to-r from-[#004aad] to-[#004aad]/90 text-white shadow-lg shadow-[#004aad]/20"
+                      : "bg-gradient-to-r from-[#E8E9EB]/50 to-[#E8E9EB] text-gray-700 hover:from-[#E8E9EB] hover:to-[#E8E9EB]/80 border border-[#E8E9EB]"
                   }`}
                 >
                   <span>With Notes Only</span>
@@ -592,11 +635,14 @@ export default function FacilityMap({
                         }}
                         className={`w-full px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 flex items-center justify-between ${
                           selectedSports.includes(sport)
-                            ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-md"
-                            : "bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 hover:from-gray-100 hover:to-gray-200 border border-gray-200"
+                            ? "bg-gradient-to-r from-[#004aad] to-[#004aad]/90 text-white shadow-lg shadow-[#004aad]/20"
+                            : "bg-gradient-to-r from-[#E8E9EB]/50 to-[#E8E9EB] text-gray-700 hover:from-[#E8E9EB] hover:to-[#E8E9EB]/80 border border-[#E8E9EB]"
                         }`}
                       >
-                        <span>{sport}</span>
+                        <span className="flex items-center gap-2">
+                          <span className="text-base">{SPORT_EMOJIS[sport] || "🏅"}</span>
+                          <span>{sport}</span>
+                        </span>
                         {selectedSports.includes(sport) && (
                           <Check className="w-3.5 h-3.5" />
                         )}
@@ -610,7 +656,7 @@ export default function FacilityMap({
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => onSelectedSportsChange([])}
-                      className="w-full mt-2 px-4 py-3 rounded-lg text-sm font-medium bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 transition-all duration-300"
+                      className="w-full mt-2 px-4 py-3 rounded-lg text-sm font-medium bg-[#c9472b]/10 text-[#c9472b] hover:bg-[#c9472b]/20 border border-[#c9472b]/20 transition-all duration-300"
                     >
                       Clear Sport Filter ({selectedSports.length})
                     </motion.button>
@@ -655,7 +701,7 @@ export default function FacilityMap({
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: idx * 0.05 }}
-                      className="bg-gradient-to-br from-white to-gray-50/50 rounded-lg p-3 border border-gray-100 hover:shadow-md transition-all duration-300"
+                      className="bg-gradient-to-br from-white to-[#E8E9EB]/20 rounded-lg p-3 border border-[#E8E9EB] hover:shadow-md transition-all duration-300"
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2.5">
@@ -667,7 +713,7 @@ export default function FacilityMap({
                             {label}
                           </span>
                         </div>
-                        <span className="text-sm font-semibold text-gray-500 bg-gray-100 px-2.5 py-1 rounded-full">
+                        <span className="text-sm font-semibold text-gray-500 bg-[#E8E9EB] px-2.5 py-1 rounded-full">
                           {categoryCounts[
                             key as keyof typeof ACTIVITY_CATEGORIES
                           ].toLocaleString()}

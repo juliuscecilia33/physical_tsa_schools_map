@@ -7,7 +7,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "filter:texas": "tsx scripts/filter-texas-facilities.ts",
+    "filter:texas:execute": "tsx scripts/filter-texas-facilities.ts --execute",
+    "filter:texas:v2": "tsx scripts/filter-texas-facilities-v2.ts",
+    "filter:texas:v2:compare": "tsx scripts/filter-texas-facilities-v2.ts --compare",
+    "filter:texas:v2:execute": "tsx scripts/filter-texas-facilities-v2.ts --execute"
   },
   "repository": {
     "type": "git",
