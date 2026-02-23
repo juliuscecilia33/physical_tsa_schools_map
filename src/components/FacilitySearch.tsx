@@ -147,18 +147,22 @@ export default function FacilitySearch({ facilities, onSelectFacility }: Facilit
   };
 
   return (
-    <div ref={searchRef} className="relative w-80">
-      {/* Search Input */}
+    <div ref={searchRef} className="relative w-[600px]">
+      {/* Search Input - Modern Sleek Design */}
       <div className="relative">
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`bg-white rounded-xl shadow-lg transition-all ${
-            isFocused ? "ring-2 ring-blue-500" : ""
+          className={`bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl transition-all duration-300 border ${
+            isFocused
+              ? "ring-2 ring-blue-500/50 shadow-blue-500/20 border-blue-200"
+              : "border-gray-200/50 hover:border-gray-300/50"
           }`}
         >
-          <div className="flex items-center gap-2 px-4 py-3">
-            <Search className="w-5 h-5 text-gray-400 flex-shrink-0" />
+          <div className="flex items-center gap-4 px-6 py-4">
+            <Search className={`w-6 h-6 flex-shrink-0 transition-colors duration-300 ${
+              isFocused ? "text-blue-500" : "text-gray-400"
+            }`} />
             <input
               ref={inputRef}
               type="text"
@@ -166,119 +170,175 @@ export default function FacilitySearch({ facilities, onSelectFacility }: Facilit
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => setIsFocused(true)}
               placeholder="Search facilities, sports, or location..."
-              className="flex-1 text-sm text-gray-900 placeholder:text-gray-400 bg-transparent focus:outline-none"
+              className="flex-1 text-base text-gray-900 placeholder:text-gray-400 bg-transparent focus:outline-none font-medium"
             />
             {searchQuery && (
-              <button
+              <motion.button
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0 }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
                 onClick={handleClearSearch}
-                className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
               >
-                <X className="w-4 h-4 text-gray-400" />
-              </button>
+                <X className="w-5 h-5 text-gray-400 hover:text-gray-600" />
+              </motion.button>
             )}
           </div>
         </motion.div>
       </div>
 
-      {/* Search Results */}
+      {/* Search Results - Modern Relaxed Design */}
       <AnimatePresence>
         {isFocused && searchQuery.trim() && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-            className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden z-50"
+            initial={{ opacity: 0, y: -10, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.98 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            className="absolute top-full left-0 right-0 mt-4 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/50 overflow-hidden z-50"
           >
             {searchResults.length > 0 ? (
-              <div className="max-h-[60vh] overflow-y-auto">
-                <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide bg-gray-50 border-b border-gray-100">
-                  {searchResults.length} {searchResults.length === 1 ? "Result" : "Results"}
-                </div>
-                {searchResults.map((facility, idx) => (
-                  <motion.button
-                    key={facility.place_id}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: idx * 0.03 }}
-                    onClick={() => handleSelectFacility(facility)}
-                    className={`w-full text-left px-4 py-3 border-b border-gray-50 last:border-b-0 transition-all ${
-                      idx === selectedIndex
-                        ? "bg-blue-50"
-                        : "hover:bg-gray-50"
-                    }`}
-                  >
-                    <div className="space-y-2">
-                      {/* Facility Name */}
-                      <h4 className="font-semibold text-gray-900 text-sm leading-tight">
-                        {facility.name}
-                      </h4>
-
-                      {/* Address with City */}
-                      <div className="flex items-start gap-1.5">
-                        <MapPin className="w-3.5 h-3.5 text-gray-400 flex-shrink-0 mt-0.5" />
-                        <p className="text-xs text-gray-600 leading-relaxed">
-                          {facility.address}
-                        </p>
-                      </div>
-
-                      {/* Sports Badges */}
-                      {facility.identified_sports && facility.identified_sports.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5">
-                          {facility.identified_sports.slice(0, 4).map((sport) => (
-                            <span
-                              key={sport}
-                              className="inline-flex items-center gap-1 px-2 py-0.5 bg-gradient-to-r from-blue-50 to-blue-100/50 text-blue-700 rounded-full text-xs font-medium"
-                            >
-                              <span className="text-sm">{SPORT_EMOJIS[sport] || "🏅"}</span>
-                              <span>{sport}</span>
-                            </span>
-                          ))}
-                          {facility.identified_sports.length > 4 && (
-                            <span className="inline-flex items-center px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">
-                              +{facility.identified_sports.length - 4} more
-                            </span>
-                          )}
-                        </div>
-                      )}
-
-                      {/* Rating if available */}
-                      {facility.rating && (
-                        <div className="flex items-center gap-1 text-xs text-gray-500">
-                          <span className="text-yellow-500">★</span>
-                          <span className="font-medium">{facility.rating.toFixed(1)}</span>
-                          <span>({facility.user_ratings_total})</span>
-                        </div>
-                      )}
+              <div className="max-h-[65vh] overflow-y-auto">
+                {/* Header */}
+                <div className="px-6 py-4 bg-gradient-to-r from-blue-50/50 to-purple-50/50 border-b border-gray-200/50">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-bold text-gray-700">
+                      {searchResults.length} {searchResults.length === 1 ? "Result" : "Results"}
+                    </p>
+                    <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                      <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                      Live search
                     </div>
-                  </motion.button>
-                ))}
+                  </div>
+                </div>
+
+                {/* Results Grid */}
+                <div className="p-3">
+                  {searchResults.map((facility, idx) => (
+                    <motion.button
+                      key={facility.place_id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.04, duration: 0.3 }}
+                      whileHover={{ scale: 1.02, y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => handleSelectFacility(facility)}
+                      className={`w-full text-left p-5 mb-3 rounded-xl transition-all duration-300 ${
+                        idx === selectedIndex
+                          ? "bg-gradient-to-br from-blue-50 to-blue-100/70 shadow-lg shadow-blue-500/10 border-2 border-blue-200"
+                          : "bg-gradient-to-br from-white to-gray-50/50 hover:from-gray-50 hover:to-gray-100/50 border-2 border-transparent hover:border-gray-200 shadow-sm hover:shadow-md"
+                      }`}
+                    >
+                      <div className="space-y-3">
+                        {/* Facility Name */}
+                        <h4 className="font-bold text-gray-900 text-base leading-tight">
+                          {facility.name}
+                        </h4>
+
+                        {/* Address with City */}
+                        <div className="flex items-start gap-2">
+                          <MapPin className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
+                          <p className="text-sm text-gray-600 leading-relaxed">
+                            {facility.address}
+                          </p>
+                        </div>
+
+                        {/* Sports Badges */}
+                        {facility.identified_sports && facility.identified_sports.length > 0 && (
+                          <div className="flex flex-wrap gap-2">
+                            {facility.identified_sports.slice(0, 5).map((sport) => (
+                              <span
+                                key={sport}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-blue-50 to-blue-100/70 text-blue-700 rounded-lg text-xs font-semibold shadow-sm"
+                              >
+                                <span className="text-base">{SPORT_EMOJIS[sport] || "🏅"}</span>
+                                <span>{sport}</span>
+                              </span>
+                            ))}
+                            {facility.identified_sports.length > 5 && (
+                              <span className="inline-flex items-center px-3 py-1.5 bg-gray-100 text-gray-600 rounded-lg text-xs font-semibold">
+                                +{facility.identified_sports.length - 5} more
+                              </span>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Rating if available */}
+                        {facility.rating && (
+                          <div className="flex items-center gap-2 text-sm">
+                            <div className="flex items-center gap-1">
+                              <span className="text-yellow-500 text-base">★</span>
+                              <span className="font-bold text-gray-900">{facility.rating.toFixed(1)}</span>
+                            </div>
+                            <span className="text-gray-400">•</span>
+                            <span className="text-gray-500">{facility.user_ratings_total} reviews</span>
+                          </div>
+                        )}
+                      </div>
+                    </motion.button>
+                  ))}
+                </div>
               </div>
             ) : (
-              <div className="px-4 py-8 text-center">
-                <Search className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-                <p className="text-sm text-gray-500">No facilities found</p>
-                <p className="text-xs text-gray-400 mt-1">
-                  Try searching by name, location, or sport
-                </p>
+              <div className="px-6 py-12 text-center">
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
+                    <Search className="w-8 h-8 text-gray-400" />
+                  </div>
+                  <p className="text-base font-semibold text-gray-700 mb-1">No facilities found</p>
+                  <p className="text-sm text-gray-500">
+                    Try searching by name, location, or sport
+                  </p>
+                </motion.div>
               </div>
             )}
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Keyboard Shortcut Hint */}
-      {isFocused && searchResults.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-1 px-2">
-          <p className="text-xs text-gray-400 bg-white/90 backdrop-blur-sm rounded px-2 py-1 shadow-sm">
-            <kbd className="px-1.5 py-0.5 bg-gray-100 rounded text-gray-600 font-mono">↑↓</kbd> navigate
-            {" "}
-            <kbd className="px-1.5 py-0.5 bg-gray-100 rounded text-gray-600 font-mono">Enter</kbd> select
-            {" "}
-            <kbd className="px-1.5 py-0.5 bg-gray-100 rounded text-gray-600 font-mono">Esc</kbd> close
-          </p>
-        </div>
-      )}
+      {/* Keyboard Shortcut Hint - Modern Style */}
+      <AnimatePresence>
+        {isFocused && searchResults.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -5 }}
+            transition={{ delay: 0.2 }}
+            className="absolute top-full left-0 right-0 mt-2"
+          >
+            <div className="bg-white/95 backdrop-blur-xl rounded-xl shadow-lg border border-gray-200/50 px-4 py-3">
+              <div className="flex items-center justify-center gap-4 text-xs">
+                <div className="flex items-center gap-1.5">
+                  <kbd className="px-2.5 py-1.5 bg-gradient-to-b from-gray-100 to-gray-200 rounded-lg text-gray-700 font-mono font-semibold shadow-sm border border-gray-300">
+                    ↑↓
+                  </kbd>
+                  <span className="text-gray-600 font-medium">Navigate</span>
+                </div>
+                <div className="w-px h-4 bg-gray-300"></div>
+                <div className="flex items-center gap-1.5">
+                  <kbd className="px-2.5 py-1.5 bg-gradient-to-b from-gray-100 to-gray-200 rounded-lg text-gray-700 font-mono font-semibold shadow-sm border border-gray-300">
+                    Enter
+                  </kbd>
+                  <span className="text-gray-600 font-medium">Select</span>
+                </div>
+                <div className="w-px h-4 bg-gray-300"></div>
+                <div className="flex items-center gap-1.5">
+                  <kbd className="px-2.5 py-1.5 bg-gradient-to-b from-gray-100 to-gray-200 rounded-lg text-gray-700 font-mono font-semibold shadow-sm border border-gray-300">
+                    Esc
+                  </kbd>
+                  <span className="text-gray-600 font-medium">Close</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

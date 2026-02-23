@@ -16,15 +16,21 @@
     "Rowlett, Texas",
     "Euless, Texas",
     "Wylie, Texas",
-    "Kyle, Texas"
+    "Kyle, Texas",
+    "DeSoto, Texas",
+    "Port Arthur, Texas",
+    "Texas City, Texas",
+    "Little Elm, Texas",
+    "Galveston, Texas",
+    "Burleson, Texas"
   ],
-  "totalFacilities": 300,
+  "totalFacilities": 459,
   "statistics": {
-    "searched": 1301,
-    "filteredNonSport": 453,
-    "filteredDuplicate": 540,
-    "filteredLowQuality": 8,
-    "inserted": 300
+    "searched": 1744,
+    "filteredNonSport": 618,
+    "filteredDuplicate": 650,
+    "filteredLowQuality": 17,
+    "inserted": 459
   },
-  "lastUpdated": "2026-02-23T18:13:11.320Z"
+  "lastUpdated": "2026-02-23T18:19:10.547Z"
 }
