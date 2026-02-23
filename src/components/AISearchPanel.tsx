@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Send, Sparkles, Loader2, MessageCircle, MapPin, Star } from "lucide-react";
+import { X, Send, Sparkles, Loader2, MessageCircle, MapPin, Star, ChevronDown } from "lucide-react";
 import { AISearchFilters, AISearchResponse } from "@/app/api/ai-search/route";
 import { Facility } from "@/types/facility";
 
@@ -138,6 +138,7 @@ export default function AISearchPanel({
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [conversationHistory, setConversationHistory] = useState<any[]>([]);
+  const [visibleResultCount, setVisibleResultCount] = useState(10);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -202,6 +203,8 @@ export default function AISearchPanel({
       // Apply filters to the map
       if (data.filters && Object.keys(data.filters).length > 0) {
         onFiltersApplied(data.filters);
+        // Reset visible count for new search
+        setVisibleResultCount(10);
       }
     } catch (error) {
       console.error("AI Search Error:", error);
@@ -226,6 +229,11 @@ export default function AISearchPanel({
     ]);
     setConversationHistory([]);
     onFiltersApplied({});
+    setVisibleResultCount(10);
+  };
+
+  const handleShowMore = () => {
+    setVisibleResultCount((prev) => prev + 15);
   };
 
   return (
@@ -308,10 +316,10 @@ export default function AISearchPanel({
                     {message.filters && Object.keys(message.filters).length > 0 && idx === messages.length - 1 && (
                       <div className="mt-4 pt-4 border-t border-gray-200">
                         <p className="text-xs font-semibold text-gray-700 mb-3">
-                          {matchingFacilities.length} {matchingFacilities.length === 1 ? "Result" : "Results"} Found:
+                          Showing {Math.min(visibleResultCount, matchingFacilities.length)} of {matchingFacilities.length} {matchingFacilities.length === 1 ? "Result" : "Results"}
                         </p>
                         <div className="space-y-2 max-h-[400px] overflow-y-auto">
-                          {matchingFacilities.slice(0, 10).map((facility) => (
+                          {matchingFacilities.slice(0, visibleResultCount).map((facility) => (
                             <motion.button
                               key={facility.place_id}
                               whileHover={{ scale: 1.02 }}
@@ -341,19 +349,20 @@ export default function AISearchPanel({
                                     )}
                                   </div>
                                 )}
-                                {facility.sport_types && facility.sport_types.length > 0 && (
+                                {facility.identified_sports && facility.identified_sports.length > 0 && (
                                   <div className="flex flex-wrap gap-1">
-                                    {facility.sport_types.slice(0, 3).map((type) => (
+                                    {facility.identified_sports.slice(0, 3).map((sport) => (
                                       <span
-                                        key={type}
-                                        className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-xs font-medium"
+                                        key={sport}
+                                        className="inline-flex items-center gap-1 px-2 py-0.5 bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 rounded text-xs font-medium"
                                       >
-                                        {type}
+                                        <span>{SPORT_EMOJIS[sport] || "🏅"}</span>
+                                        <span>{sport}</span>
                                       </span>
                                     ))}
-                                    {facility.sport_types.length > 3 && (
-                                      <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">
-                                        +{facility.sport_types.length - 3}
+                                    {facility.identified_sports.length > 3 && (
+                                      <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs font-medium">
+                                        +{facility.identified_sports.length - 3} more
                                       </span>
                                     )}
                                   </div>
@@ -361,12 +370,21 @@ export default function AISearchPanel({
                               </div>
                             </motion.button>
                           ))}
-                          {matchingFacilities.length > 10 && (
-                            <p className="text-xs text-gray-500 text-center py-2">
-                              Showing first 10 of {matchingFacilities.length} results
-                            </p>
-                          )}
                         </div>
+                        {/* Show More button */}
+                        {matchingFacilities.length > visibleResultCount && (
+                          <motion.button
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={handleShowMore}
+                            className="w-full mt-3 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-medium hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                          >
+                            <span>Show {Math.min(15, matchingFacilities.length - visibleResultCount)} More Results</span>
+                            <ChevronDown className="w-4 h-4" />
+                          </motion.button>
+                        )}
                       </div>
                     )}
                   </div>

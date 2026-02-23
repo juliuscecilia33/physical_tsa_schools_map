@@ -96,15 +96,20 @@
     "Cloverleaf, Texas",
     "Big Spring, Texas",
     "Marshall, Texas",
-    "Horizon City, Texas"
+    "Horizon City, Texas",
+    "Corinth, Texas",
+    "Watauga, Texas",
+    "Fate, Texas",
+    "Ennis, Texas",
+    "Dickinson, Texas"
   ],
-  "totalFacilities": 1794,
+  "totalFacilities": 1856,
   "statistics": {
-    "searched": 6914,
-    "filteredNonSport": 2652,
-    "filteredDuplicate": 2355,
-    "filteredLowQuality": 110,
-    "inserted": 1794
+    "searched": 7254,
+    "filteredNonSport": 2771,
+    "filteredDuplicate": 2509,
+    "filteredLowQuality": 115,
+    "inserted": 1856
   },
-  "lastUpdated": "2026-02-23T19:25:05.354Z"
+  "lastUpdated": "2026-02-23T19:28:54.130Z"
 }
