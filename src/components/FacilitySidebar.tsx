@@ -25,6 +25,7 @@ import {
   MessageSquare
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { supabase } from "@/lib/supabase";
 
 type TabId = 'overview' | 'photos' | 'notes' | 'reviews';
@@ -588,9 +589,13 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                                 )}
                               </button>
 
-                              {/* Tooltip on hover */}
-                              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block z-30">
+                              {/* Tooltip on hover - appears below badge */}
+                              <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 hidden group-hover:block z-[100] pointer-events-none">
                                 <div className="bg-gray-900 text-white text-xs rounded-lg py-2 px-3 shadow-xl max-w-xs whitespace-pre-wrap">
+                                  {/* Arrow pointing up */}
+                                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-[-1px]">
+                                    <div className="border-8 border-transparent border-b-gray-900"></div>
+                                  </div>
                                   {metadata ? (
                                     <>
                                       <div className="font-semibold mb-1">Confidence: {score}/100 ({confidence})</div>
@@ -607,9 +612,6 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                                   ) : (
                                     <div>No confidence data available - run audit script</div>
                                   )}
-                                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
-                                    <div className="border-8 border-transparent border-t-gray-900"></div>
-                                  </div>
                                 </div>
                               </div>
                             </motion.div>
@@ -941,14 +943,14 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
           </AnimatePresence>
         </div>
 
-        {/* Sport Detail Modal */}
-        <AnimatePresence>
-          {selectedSportDetail && facility.sport_metadata?.[selectedSportDetail] && (
+        {/* Sport Detail Modal - Rendered as Portal for Full-Screen Overlay */}
+        {selectedSportDetail && facility.sport_metadata?.[selectedSportDetail] && createPortal(
+          <AnimatePresence>
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-6 z-50"
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-6 z-[9999]"
               onClick={() => setSelectedSportDetail(null)}
             >
               <motion.div
@@ -1126,8 +1128,9 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                 })()}
               </motion.div>
             </motion.div>
-          )}
-        </AnimatePresence>
+          </AnimatePresence>,
+          document.body
+        )}
       </motion.div>
     </AnimatePresence>
   );
