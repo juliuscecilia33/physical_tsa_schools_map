@@ -5,8 +5,38 @@ interface ProgressBarProps {
 }
 
 export default function ProgressBar({ progress, loadedCount, totalCount }: ProgressBarProps) {
+  const sportsEmojis = ['⚽', '🏀', '🏈', '⚾', '🎾', '🏐', '🏉', '🎱', '🏓', '🏸', '🥏'];
+
   return (
     <div className="w-full max-w-md px-4 sm:px-6">
+      {/* Bouncing Sports Emojis */}
+      <div className="flex justify-center gap-2 sm:gap-3 mb-4">
+        {sportsEmojis.map((emoji, index) => (
+          <span
+            key={index}
+            className="text-2xl sm:text-3xl"
+            style={{
+              display: 'inline-block',
+              animation: 'bounce 1.5s ease-in-out infinite',
+              animationDelay: `${index * 0.1}s`,
+            }}
+          >
+            {emoji}
+          </span>
+        ))}
+      </div>
+
+      <style jsx>{`
+        @keyframes bounce {
+          0%, 100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-15px);
+          }
+        }
+      `}</style>
+
       <div className="mb-2 flex justify-between items-center text-xs sm:text-sm text-gray-600">
         <span className="truncate mr-2">Loading facilities...</span>
         <span className="font-semibold whitespace-nowrap">{Math.round(progress)}%</span>

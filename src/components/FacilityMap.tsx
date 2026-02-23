@@ -235,7 +235,7 @@ export default function FacilityMap({
       </Map>
 
       {/* Modern Info Panel */}
-      <div className="absolute top-4 right-4 bg-white rounded-xl shadow-2xl p-6 max-w-md max-h-[90vh] overflow-y-auto z-10 border border-gray-100">
+      <div className="absolute inset-y-4 right-4 bg-white rounded-xl shadow-2xl p-6 max-w-md h-[calc(100vh-2rem)] overflow-y-auto z-10 border border-gray-100">
         <div className="flex items-center gap-2 mb-3">
           <div className="p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg">
             <Layers className="w-4 h-4 text-white" />
@@ -374,7 +374,7 @@ export default function FacilityMap({
                   transition={{ duration: 0.2 }}
                   className="overflow-hidden"
                 >
-                  <div className="max-h-56 overflow-y-auto space-y-2">
+                  <div className="max-h-96 overflow-y-auto space-y-2">
               {availableSports.map((sport) => (
                 <motion.button
                   key={sport}

@@ -1,0 +1,22 @@
+{
+  "processedCities": [
+    "Longview, Texas",
+    "Pharr, Texas",
+    "Flower Mound, Texas",
+    "Cedar Park, Texas",
+    "Mansfield, Texas",
+    "Missouri City, Texas",
+    "Leander, Texas",
+    "Harlingen, Texas",
+    "San Marcos, Texas"
+  ],
+  "totalFacilities": 95,
+  "statistics": {
+    "searched": 705,
+    "filteredNonSport": 182,
+    "filteredDuplicate": 424,
+    "filteredLowQuality": 4,
+    "inserted": 95
+  },
+  "lastUpdated": "2026-02-23T18:04:40.835Z"
+}
