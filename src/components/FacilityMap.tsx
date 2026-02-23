@@ -486,7 +486,7 @@ export default function FacilityMap({
 
       {/* Modern Info Panel */}
       <div
-        className={`absolute inset-y-4 left-4 bg-white rounded-xl shadow-xl p-6 w-[400px] h-[calc(100vh-2rem)] overflow-y-auto z-10 border border-[#E8E9EB] transition-opacity duration-300 ${
+        className={`fixed top-0 left-0 h-full w-full md:w-[400px] bg-white shadow-2xl p-6 overflow-y-auto z-10 border-r border-[#E8E9EB] transition-opacity duration-300 ${
           selectedFacility ? "opacity-0 pointer-events-none" : "opacity-100"
         }`}
       >
