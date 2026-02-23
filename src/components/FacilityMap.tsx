@@ -9,7 +9,14 @@ import FacilitySidebar from "./FacilitySidebar";
 import FacilitySearch from "./FacilitySearch";
 import AISearchPanel from "./AISearchPanel";
 import { motion, AnimatePresence } from "framer-motion";
-import { Filter, Layers, Check, ChevronDown, ChevronUp, Sparkles } from "lucide-react";
+import {
+  Filter,
+  Layers,
+  Check,
+  ChevronDown,
+  ChevronUp,
+  Sparkles,
+} from "lucide-react";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { AISearchFilters } from "@/app/api/ai-search/route";
 
@@ -34,24 +41,34 @@ const ACTIVITY_CATEGORIES = {
 // Map AI sport names to Google Places types (since identified_sports is null)
 const SPORT_TO_TYPE_MAPPING: Record<string, string[]> = {
   "Gym/Fitness": ["gym", "health"],
-  "CrossFit": ["gym", "health"],
-  "Yoga": ["gym", "health"],
-  "Pilates": ["gym", "health"],
-  "Swimming": ["aquarium", "swimming_pool"],
-  "Basketball": ["stadium", "sports_complex", "recreation_center"],
-  "Soccer": ["stadium", "sports_complex", "recreation_center", "athletic_field"],
-  "Baseball": ["stadium", "sports_complex", "recreation_center", "athletic_field"],
-  "Football": ["stadium", "sports_complex", "recreation_center", "athletic_field"],
-  "Tennis": ["sports_complex", "recreation_center"],
-  "Volleyball": ["sports_complex", "recreation_center"],
+  CrossFit: ["gym", "health"],
+  Yoga: ["gym", "health"],
+  Pilates: ["gym", "health"],
+  Swimming: ["aquarium", "swimming_pool"],
+  Basketball: ["stadium", "sports_complex", "recreation_center"],
+  Soccer: ["stadium", "sports_complex", "recreation_center", "athletic_field"],
+  Baseball: [
+    "stadium",
+    "sports_complex",
+    "recreation_center",
+    "athletic_field",
+  ],
+  Football: [
+    "stadium",
+    "sports_complex",
+    "recreation_center",
+    "athletic_field",
+  ],
+  Tennis: ["sports_complex", "recreation_center"],
+  Volleyball: ["sports_complex", "recreation_center"],
   "Track & Field": ["stadium", "sports_complex", "athletic_field"],
-  "Golf": ["golf"],
-  "Bowling": ["bowling_alley"],
-  "Skating": ["skating_rink"],
-  "Climbing": ["gym"],
+  Golf: ["golf"],
+  Bowling: ["bowling_alley"],
+  Skating: ["skating_rink"],
+  Climbing: ["gym"],
   "Martial Arts": ["gym"],
-  "Boxing": ["gym"],
-  "Wrestling": ["stadium", "sports_complex"],
+  Boxing: ["gym"],
+  Wrestling: ["stadium", "sports_complex"],
 };
 
 // Categorize facility based on sport types
@@ -83,7 +100,10 @@ function extractCity(address: string): string {
 }
 
 // Helper function to apply AI filters to facilities
-function applyAIFilters(facilities: Facility[], aiFilters: AISearchFilters | null): Facility[] {
+function applyAIFilters(
+  facilities: Facility[],
+  aiFilters: AISearchFilters | null,
+): Facility[] {
   if (!aiFilters) return facilities;
 
   let filtered = facilities;
@@ -93,7 +113,9 @@ function applyAIFilters(facilities: Facility[], aiFilters: AISearchFilters | nul
     const targetCity = aiFilters.city.toLowerCase();
     filtered = filtered.filter((facility) => {
       const facilityCity = extractCity(facility.address);
-      return facilityCity.includes(targetCity) || targetCity.includes(facilityCity);
+      return (
+        facilityCity.includes(targetCity) || targetCity.includes(facilityCity)
+      );
     });
   }
 
@@ -101,8 +123,10 @@ function applyAIFilters(facilities: Facility[], aiFilters: AISearchFilters | nul
   if (aiFilters.rating) {
     filtered = filtered.filter((facility) => {
       if (!facility.rating) return false;
-      const meetsMin = !aiFilters.rating?.min || facility.rating >= aiFilters.rating.min;
-      const meetsMax = !aiFilters.rating?.max || facility.rating <= aiFilters.rating.max;
+      const meetsMin =
+        !aiFilters.rating?.min || facility.rating >= aiFilters.rating.min;
+      const meetsMax =
+        !aiFilters.rating?.max || facility.rating <= aiFilters.rating.max;
       return meetsMin && meetsMax;
     });
   }
@@ -111,8 +135,12 @@ function applyAIFilters(facilities: Facility[], aiFilters: AISearchFilters | nul
   if (aiFilters.reviewCount) {
     filtered = filtered.filter((facility) => {
       if (!facility.user_ratings_total) return false;
-      const meetsMin = !aiFilters.reviewCount?.min || facility.user_ratings_total >= aiFilters.reviewCount.min;
-      const meetsMax = !aiFilters.reviewCount?.max || facility.user_ratings_total <= aiFilters.reviewCount.max;
+      const meetsMin =
+        !aiFilters.reviewCount?.min ||
+        facility.user_ratings_total >= aiFilters.reviewCount.min;
+      const meetsMax =
+        !aiFilters.reviewCount?.max ||
+        facility.user_ratings_total <= aiFilters.reviewCount.max;
       return meetsMin && meetsMax;
     });
   }
@@ -121,21 +149,22 @@ function applyAIFilters(facilities: Facility[], aiFilters: AISearchFilters | nul
   if (aiFilters.sports && aiFilters.sports.length > 0) {
     filtered = filtered.filter((facility) => {
       const requiredTypes = aiFilters.sports!.flatMap(
-        sport => SPORT_TO_TYPE_MAPPING[sport] || []
+        (sport) => SPORT_TO_TYPE_MAPPING[sport] || [],
       );
 
       if (requiredTypes.length === 0) {
-        if (facility.identified_sports && facility.identified_sports.length > 0) {
+        if (
+          facility.identified_sports &&
+          facility.identified_sports.length > 0
+        ) {
           return aiFilters.sports!.some((sport) =>
-            facility.identified_sports!.includes(sport)
+            facility.identified_sports!.includes(sport),
           );
         }
         return false;
       }
 
-      return requiredTypes.some((type) =>
-        facility.sport_types.includes(type)
-      );
+      return requiredTypes.some((type) => facility.sport_types.includes(type));
     });
   }
 
@@ -174,7 +203,8 @@ export default function FacilityMap({
     categories: false,
   });
   const [isAISearchOpen, setIsAISearchOpen] = useState(false);
-  const [currentAIFilters, setCurrentAIFilters] = useState<AISearchFilters | null>(null);
+  const [currentAIFilters, setCurrentAIFilters] =
+    useState<AISearchFilters | null>(null);
   const mapRef = useRef<MapRef>(null);
 
   const toggleSection = (section: keyof typeof expandedSections) => {
@@ -399,10 +429,9 @@ export default function FacilityMap({
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setIsAISearchOpen(true)}
-          className="px-5 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-2xl shadow-2xl hover:shadow-purple-500/30 transition-all duration-300 font-semibold flex items-center gap-2 border border-purple-400/20"
+          className="px-4 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-2xl shadow-2xl hover:shadow-purple-500/30 transition-all duration-300 font-semibold flex items-center gap-2 border border-purple-400/20"
         >
           <Sparkles className="w-5 h-5" />
-          <span>AI Search</span>
         </motion.button>
       </div>
 
