@@ -98,6 +98,7 @@ export default function Home() {
           name: row.name,
           sport_types: row.sport_types || [],
           identified_sports: row.identified_sports || [],
+          sport_metadata: row.sport_metadata || {},
           address: row.address,
           location: {
             lat: row.lat ? parseFloat(row.lat) : 0,

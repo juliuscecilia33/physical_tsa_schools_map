@@ -1,8 +1,17 @@
+export interface SportMetadata {
+  score: number; // 0-100 confidence score
+  sources: Array<'name' | 'review' | 'api'>; // Where the sport was identified from
+  keywords_matched: string[]; // Keywords that triggered identification
+  confidence: 'high' | 'medium' | 'low'; // Confidence level
+  matched_text?: string; // The actual text that contained the match
+}
+
 export interface Facility {
   place_id: string;
   name: string;
   sport_types: string[];
   identified_sports?: string[];
+  sport_metadata?: Record<string, SportMetadata>; // Metadata for each identified sport
   address: string;
   location: {
     lat: number;

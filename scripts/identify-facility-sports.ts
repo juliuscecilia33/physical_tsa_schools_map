@@ -20,12 +20,13 @@ if (!GOOGLE_API_KEY || !supabaseUrl || !supabaseAnonKey) {
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Sport keywords organized by sport type
+// IMPROVED: Removed ambiguous keywords to reduce false positives
 const SPORT_KEYWORDS = {
   // Core Sports
   Basketball: ["basketball", "bball", "hoops"],
-  Soccer: ["soccer", "football", "futbol", "pitch"],
+  Soccer: ["soccer", "futbol"], // Removed "football" and "pitch" to avoid conflicts
   Baseball: ["baseball", "diamond"],
-  Football: ["football", "gridiron"],
+  Football: ["football", "gridiron"], // "football" still here but we handle conflicts in code
   Tennis: ["tennis"],
   Volleyball: ["volleyball", "vball"],
   Swimming: ["swimming", "pool", "aquatic", "natatorium"],
@@ -58,12 +59,21 @@ const SPORT_KEYWORDS = {
   "Water Sports": ["kayak", "canoe", "rowing", "sailing"],
 };
 
+interface SportMetadata {
+  score: number;
+  sources: Array<'name' | 'review' | 'api'>;
+  keywords_matched: string[];
+  confidence: 'high' | 'medium' | 'low';
+  matched_text?: string;
+}
+
 interface Facility {
   id: string;
   place_id: string;
   name: string;
   sport_types: string[];
   identified_sports?: string[];
+  sport_metadata?: Record<string, SportMetadata>;
   address: string;
   reviews?: any[];
 }
@@ -72,6 +82,7 @@ interface IdentificationResult {
   place_id: string;
   name: string;
   identified_sports: string[];
+  sport_metadata: Record<string, SportMetadata>;
   confidence: "high" | "medium" | "low";
   method: "name" | "places_api" | "reviews" | "web_search" | "multiple";
 }
@@ -80,32 +91,107 @@ interface IdentificationResult {
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
- * Step 1: Identify sports from facility name
+ * Helper: Find matching keywords and extract context
  */
-function identifySportsFromName(name: string): string[] {
-  const sports = new Set<string>();
-  const nameLower = name.toLowerCase();
+function findMatchingKeywords(
+  sport: string,
+  text: string
+): { keywords: string[]; matchedText: string } {
+  const keywords = SPORT_KEYWORDS[sport as keyof typeof SPORT_KEYWORDS] || [];
+  const textLower = text.toLowerCase();
+  const matched: string[] = [];
+  let matchedText = "";
 
-  // Check for specific sports
-  for (const [sport, keywords] of Object.entries(SPORT_KEYWORDS)) {
-    for (const keyword of keywords) {
-      if (nameLower.includes(keyword)) {
-        sports.add(sport);
-        break;
-      }
+  for (const keyword of keywords) {
+    const index = textLower.indexOf(keyword);
+    if (index !== -1) {
+      matched.push(keyword);
+      // Extract a snippet around the match
+      const start = Math.max(0, index - 20);
+      const end = Math.min(textLower.length, index + keyword.length + 30);
+      matchedText = text.substring(start, end).trim();
+      if (start > 0) matchedText = "..." + matchedText;
+      if (end < textLower.length) matchedText = matchedText + "...";
+      break; // Use first match for context
     }
   }
 
-  return Array.from(sports);
+  return { keywords: matched, matchedText };
 }
 
 /**
- * Step 2: Get additional details from Google Places Details API
+ * Helper: Calculate confidence score
+ */
+function calculateScore(
+  sources: Array<'name' | 'review' | 'api'>,
+  keywordLength: number,
+  reviewPosition?: number
+): number {
+  let score = 0;
+
+  if (sources.includes('name')) {
+    // Name match: 85-100 based on keyword specificity
+    score = 85 + Math.min(15, keywordLength);
+  } else if (sources.includes('api')) {
+    // API match: 70-80
+    score = 70 + Math.min(10, keywordLength);
+  } else if (sources.includes('review')) {
+    // Review match: 25-50 based on position
+    const positionBonus = reviewPosition !== undefined ? Math.max(0, 10 - reviewPosition * 2) : 0;
+    score = 25 + positionBonus + Math.min(15, keywordLength);
+  }
+
+  // Multiple sources bonus
+  if (sources.length > 1) {
+    score = Math.min(100, score + 10);
+  }
+
+  return score;
+}
+
+/**
+ * Step 1: Identify sports from facility name with metadata
+ */
+function identifySportsFromName(name: string): {
+  sports: string[];
+  metadata: Record<string, SportMetadata>;
+} {
+  const sports = new Set<string>();
+  const metadata: Record<string, SportMetadata> = {};
+
+  // Check for specific sports
+  for (const [sport, keywords] of Object.entries(SPORT_KEYWORDS)) {
+    const match = findMatchingKeywords(sport, name);
+    if (match.keywords.length > 0) {
+      sports.add(sport);
+      const keywordSpecificity = Math.max(...match.keywords.map(k => k.length));
+      const score = calculateScore(['name'], keywordSpecificity);
+
+      metadata[sport] = {
+        score,
+        sources: ['name'],
+        keywords_matched: match.keywords,
+        confidence: score >= 70 ? 'high' : 'medium',
+        matched_text: match.matchedText,
+      };
+    }
+  }
+
+  return { sports: Array.from(sports), metadata };
+}
+
+/**
+ * Step 2: Get additional details from Google Places Details API with metadata
  */
 async function identifySportsFromPlacesAPI(
-  placeId: string,
-  currentSports: string[]
-): Promise<string[]> {
+  placeId: string
+): Promise<{
+  sports: string[];
+  metadata: Record<string, SportMetadata>;
+}> {
+  const sports = new Set<string>();
+  const metadata: Record<string, SportMetadata> = {};
+
   try {
     const response = await client.placeDetails({
       params: {
@@ -116,71 +202,151 @@ async function identifySportsFromPlacesAPI(
     });
 
     if (response.data.status !== "OK") {
-      return currentSports;
+      return { sports: Array.from(sports), metadata };
     }
 
     const result = response.data.result;
-    const additionalSports = new Set(currentSports);
 
     // Check editorial summary
     if (result.editorial_summary?.overview) {
-      const overview = result.editorial_summary.overview.toLowerCase();
+      const overview = result.editorial_summary.overview;
       for (const [sport, keywords] of Object.entries(SPORT_KEYWORDS)) {
-        if (keywords.some(keyword => overview.includes(keyword))) {
-          additionalSports.add(sport);
+        const match = findMatchingKeywords(sport, overview);
+        if (match.keywords.length > 0) {
+          sports.add(sport);
+          const score = calculateScore(['api'], match.keywords.length);
+
+          metadata[sport] = {
+            score,
+            sources: ['api'],
+            keywords_matched: match.keywords,
+            confidence: score >= 70 ? 'high' : 'medium',
+            matched_text: match.matchedText,
+          };
         }
       }
     }
 
-    // Check reviews
+    // Check fresh API reviews (separate from database reviews)
     if (result.reviews) {
-      const reviewTexts = result.reviews
-        .slice(0, 5) // Only check first 5 reviews
-        .map(r => r.text.toLowerCase())
-        .join(" ");
+      for (let i = 0; i < Math.min(5, result.reviews.length); i++) {
+        const reviewText = result.reviews[i].text;
+        for (const [sport, keywords] of Object.entries(SPORT_KEYWORDS)) {
+          if (!sports.has(sport)) {
+            const match = findMatchingKeywords(sport, reviewText);
+            if (match.keywords.length > 0) {
+              sports.add(sport);
+              const score = calculateScore(['api', 'review'], match.keywords.length, i);
 
-      for (const [sport, keywords] of Object.entries(SPORT_KEYWORDS)) {
-        if (keywords.some(keyword => reviewTexts.includes(keyword))) {
-          additionalSports.add(sport);
+              metadata[sport] = {
+                score,
+                sources: ['api', 'review'],
+                keywords_matched: match.keywords,
+                confidence: score >= 70 ? 'high' : score >= 30 ? 'medium' : 'low',
+                matched_text: match.matchedText,
+              };
+              break;
+            }
+          }
         }
       }
     }
 
-    return Array.from(additionalSports);
+    return { sports: Array.from(sports), metadata };
   } catch (error: any) {
     console.error(`  ⚠️  Error fetching place details: ${error.message}`);
-    return currentSports;
+    return { sports: Array.from(sports), metadata };
   }
 }
 
 /**
- * Step 3: Analyze existing reviews in database
+ * Step 3: Analyze existing reviews in database with metadata
  */
 function identifySportsFromReviews(
-  reviews: any[] | undefined,
-  currentSports: string[]
-): string[] {
+  reviews: any[] | undefined
+): {
+  sports: string[];
+  metadata: Record<string, SportMetadata>;
+} {
+  const sports = new Set<string>();
+  const metadata: Record<string, SportMetadata> = {};
+
   if (!reviews || reviews.length === 0) {
-    return currentSports;
+    return { sports: Array.from(sports), metadata };
   }
 
-  const additionalSports = new Set(currentSports);
-  const reviewTexts = reviews
-    .slice(0, 10) // Check first 10 reviews
-    .map(r => r.text?.toLowerCase() || "")
-    .join(" ");
-
+  // Check for specific sports in reviews
   for (const [sport, keywords] of Object.entries(SPORT_KEYWORDS)) {
-    if (keywords.some(keyword => reviewTexts.includes(keyword))) {
-      additionalSports.add(sport);
+    // Find first review that matches
+    let matchFound = false;
+    for (let i = 0; i < Math.min(10, reviews.length); i++) {
+      const reviewText = reviews[i].text || "";
+      const match = findMatchingKeywords(sport, reviewText);
+
+      if (match.keywords.length > 0) {
+        sports.add(sport);
+        const score = calculateScore(['review'], match.keywords.length, i);
+
+        metadata[sport] = {
+          score,
+          sources: ['review'],
+          keywords_matched: match.keywords,
+          confidence: score >= 70 ? 'high' : score >= 30 ? 'medium' : 'low',
+          matched_text: match.matchedText,
+        };
+        matchFound = true;
+        break;
+      }
     }
+
+    if (matchFound) continue;
   }
 
-  return Array.from(additionalSports);
+  return { sports: Array.from(sports), metadata };
 }
 
 /**
- * Main identification pipeline
+ * Helper: Merge sport metadata from multiple sources
+ */
+function mergeSportMetadata(
+  existing: SportMetadata | undefined,
+  newMetadata: SportMetadata
+): SportMetadata {
+  if (!existing) {
+    return newMetadata;
+  }
+
+  // Merge sources (deduplicate)
+  const mergedSources = [...new Set([...existing.sources, ...newMetadata.sources])] as Array<'name' | 'review' | 'api'>;
+
+  // Merge keywords (deduplicate)
+  const mergedKeywords = [...new Set([...existing.keywords_matched, ...newMetadata.keywords_matched])];
+
+  // Take the higher score
+  const mergedScore = Math.max(existing.score, newMetadata.score);
+
+  // Prefer name > api > review for matched text
+  let mergedMatchedText = existing.matched_text || '';
+  if (newMetadata.sources.includes('name')) {
+    mergedMatchedText = newMetadata.matched_text || mergedMatchedText;
+  } else if (!existing.sources.includes('name') && newMetadata.sources.includes('api')) {
+    mergedMatchedText = newMetadata.matched_text || mergedMatchedText;
+  }
+
+  // Recalculate confidence
+  const confidence = mergedScore >= 70 ? 'high' : mergedScore >= 30 ? 'medium' : 'low';
+
+  return {
+    score: mergedScore,
+    sources: mergedSources,
+    keywords_matched: mergedKeywords,
+    confidence,
+    matched_text: mergedMatchedText,
+  };
+}
+
+/**
+ * Main identification pipeline with metadata tracking
  */
 async function identifyFacilitySports(
   facility: Facility,
@@ -188,49 +354,74 @@ async function identifyFacilitySports(
     usePlacesAPI?: boolean;
     useReviews?: boolean;
     existingSports?: string[];
+    existingMetadata?: Record<string, SportMetadata>;
+    confidenceThreshold?: number;
   } = {}
 ): Promise<IdentificationResult> {
   const methods: string[] = [];
-  // Start with existing sports from database (if any)
   const sportsSet = new Set<string>(options.existingSports || []);
+  const allMetadata: Record<string, SportMetadata> = { ...options.existingMetadata };
 
   // Step 1: Parse name
-  const nameSports = identifySportsFromName(facility.name);
-  if (nameSports.length > 0) {
-    nameSports.forEach(sport => sportsSet.add(sport));
+  const nameResult = identifySportsFromName(facility.name);
+  if (nameResult.sports.length > 0) {
+    nameResult.sports.forEach(sport => sportsSet.add(sport));
+    // Merge metadata
+    for (const [sport, metadata] of Object.entries(nameResult.metadata)) {
+      allMetadata[sport] = mergeSportMetadata(allMetadata[sport], metadata);
+    }
     methods.push("name");
   }
 
   // Step 2: Check reviews in database
   if (options.useReviews && facility.reviews) {
-    const reviewSports = identifySportsFromReviews(facility.reviews, []);
-    if (reviewSports.length > 0) {
-      reviewSports.forEach(sport => sportsSet.add(sport));
+    const reviewResult = identifySportsFromReviews(facility.reviews);
+    if (reviewResult.sports.length > 0) {
+      reviewResult.sports.forEach(sport => sportsSet.add(sport));
+      // Merge metadata
+      for (const [sport, metadata] of Object.entries(reviewResult.metadata)) {
+        allMetadata[sport] = mergeSportMetadata(allMetadata[sport], metadata);
+      }
       methods.push("reviews");
     }
   }
 
-  // Step 3: Use Google Places Details API (always run if enabled, not just when sports.length === 0)
+  // Step 3: Use Google Places Details API
   if (options.usePlacesAPI) {
-    const currentSports = Array.from(sportsSet);
-    const apiSports = await identifySportsFromPlacesAPI(facility.place_id, currentSports);
-    if (apiSports.length > currentSports.length) {
-      apiSports.forEach(sport => sportsSet.add(sport));
+    const apiResult = await identifySportsFromPlacesAPI(facility.place_id);
+    if (apiResult.sports.length > 0) {
+      apiResult.sports.forEach(sport => sportsSet.add(sport));
+      // Merge metadata
+      for (const [sport, metadata] of Object.entries(apiResult.metadata)) {
+        allMetadata[sport] = mergeSportMetadata(allMetadata[sport], metadata);
+      }
       methods.push("places_api");
     }
     // Rate limit: 100 requests per second max
     await delay(100);
   }
 
-  const finalSports = Array.from(sportsSet);
+  // Apply confidence threshold filtering if set
+  const confidenceThreshold = options.confidenceThreshold || 0;
+  const finalSports: string[] = [];
+  const finalMetadata: Record<string, SportMetadata> = {};
 
-  // Determine confidence level
+  for (const sport of Array.from(sportsSet)) {
+    const metadata = allMetadata[sport];
+    if (metadata && metadata.score >= confidenceThreshold) {
+      finalSports.push(sport);
+      finalMetadata[sport] = metadata;
+    } else if (!metadata) {
+      // No metadata (from previous runs), keep it but warn
+      finalSports.push(sport);
+    }
+  }
+
+  // Determine overall confidence level
   let confidence: "high" | "medium" | "low" = "low";
   if (methods.includes("name")) {
     confidence = "high";
-  } else if (methods.includes("reviews")) {
-    confidence = "medium";
-  } else if (methods.includes("places_api")) {
+  } else if (methods.includes("reviews") || methods.includes("places_api")) {
     confidence = "medium";
   }
 
@@ -238,6 +429,7 @@ async function identifyFacilitySports(
     place_id: facility.place_id,
     name: facility.name,
     identified_sports: finalSports,
+    sport_metadata: finalMetadata,
     confidence,
     method: methods.length > 1 ? "multiple" : (methods[0] as any) || "none",
   };
@@ -251,14 +443,16 @@ async function processAllFacilities(options: {
   usePlacesAPI?: boolean;
   useReviews?: boolean;
   offset?: number;
+  confidenceThreshold?: number;
 }) {
-  const { batchSize = 100, usePlacesAPI = false, useReviews = true, offset = 0 } = options;
+  const { batchSize = 100, usePlacesAPI = false, useReviews = true, offset = 0, confidenceThreshold = 0 } = options;
 
   console.log("🏃 Starting sport identification process...\n");
   console.log(`📊 Options:`);
   console.log(`   - Batch size: ${batchSize}`);
   console.log(`   - Use Places API: ${usePlacesAPI ? "✅" : "❌"}`);
   console.log(`   - Use Reviews: ${useReviews ? "✅" : "❌"}`);
+  console.log(`   - Confidence threshold: ${confidenceThreshold} (0 = no filtering)`);
   console.log(`   - Starting offset: ${offset}\n`);
 
   let processedCount = 0;
@@ -272,7 +466,7 @@ async function processAllFacilities(options: {
 
     const { data: facilities, error } = await supabase
       .from("sports_facilities")
-      .select("id, place_id, name, sport_types, identified_sports, address, reviews")
+      .select("id, place_id, name, sport_types, identified_sports, sport_metadata, address, reviews")
       .range(currentOffset, currentOffset + batchSize - 1);
 
     if (error) {
@@ -290,10 +484,13 @@ async function processAllFacilities(options: {
     // Process each facility
     for (const facility of facilities) {
       const existingSports = facility.identified_sports || [];
+      const existingMetadata = facility.sport_metadata || {};
       const result = await identifyFacilitySports(facility, {
         usePlacesAPI,
         useReviews,
         existingSports,
+        existingMetadata,
+        confidenceThreshold,
       });
 
       // Check if new sports were added
@@ -305,17 +502,28 @@ async function processAllFacilities(options: {
 
       if (result.identified_sports.length > 0) {
         totalIdentified++;
+
+        // Format sports with scores for display
+        const sportsWithScores = result.identified_sports.map(sport => {
+          const metadata = result.sport_metadata[sport];
+          return metadata ? `${sport}(${metadata.score})` : sport;
+        }).join(", ");
+
         if (hasNewSports && addedSports.length > 0) {
+          const addedWithScores = addedSports.map(sport => {
+            const metadata = result.sport_metadata[sport];
+            return metadata ? `${sport}(${metadata.score})` : sport;
+          }).join(", ");
           console.log(
-            `  ✓ [${processedCount}] ${facility.name.substring(0, 50)}... → ${result.identified_sports.join(", ")} (+${addedSports.join(", ")}) (${result.confidence})`
+            `  ✓ [${processedCount}] ${facility.name.substring(0, 50)}... → ${sportsWithScores} (+${addedWithScores}) (${result.confidence})`
           );
         } else if (existingSports.length > 0) {
           console.log(
-            `  = [${processedCount}] ${facility.name.substring(0, 50)}... → ${result.identified_sports.join(", ")} (unchanged)`
+            `  = [${processedCount}] ${facility.name.substring(0, 50)}... → ${sportsWithScores} (unchanged)`
           );
         } else {
           console.log(
-            `  ✓ [${processedCount}] ${facility.name.substring(0, 50)}... → ${result.identified_sports.join(", ")} (${result.confidence})`
+            `  ✓ [${processedCount}] ${facility.name.substring(0, 50)}... → ${sportsWithScores} (${result.confidence})`
           );
         }
       } else {
@@ -352,7 +560,7 @@ async function processAllFacilities(options: {
 }
 
 /**
- * Update database with identified sports
+ * Update database with identified sports and metadata
  */
 async function updateDatabase(results: IdentificationResult[]) {
   if (results.length === 0) return;
@@ -362,7 +570,10 @@ async function updateDatabase(results: IdentificationResult[]) {
   for (const result of results) {
     const { error } = await supabase
       .from("sports_facilities")
-      .update({ identified_sports: result.identified_sports })
+      .update({
+        identified_sports: result.identified_sports,
+        sport_metadata: result.sport_metadata,
+      })
       .eq("place_id", result.place_id);
 
     if (error) {
@@ -395,12 +606,23 @@ async function main() {
   const useReviews = !args.includes("--no-reviews");
   const batchSize = parseInt(args.find(arg => arg.startsWith("--batch-size="))?.split("=")[1] || "100");
   const offset = parseInt(args.find(arg => arg.startsWith("--offset="))?.split("=")[1] || "0");
+  const confidenceThreshold = parseInt(args.find(arg => arg.startsWith("--threshold="))?.split("=")[1] || "0");
+
+  console.log("🎯 Enhanced Sport Identification with Confidence Scoring");
+  console.log("=" .repeat(60));
+  console.log("\nNew features:");
+  console.log("  ✓ Confidence scoring for each sport (0-100)");
+  console.log("  ✓ Metadata tracking (sources, keywords, matched text)");
+  console.log("  ✓ Improved keyword dictionary (removed ambiguous terms)");
+  console.log("  ✓ Optional confidence threshold filtering");
+  console.log("");
 
   await processAllFacilities({
     batchSize,
     usePlacesAPI,
     useReviews,
     offset,
+    confidenceThreshold,
   });
 }
 

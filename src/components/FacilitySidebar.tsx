@@ -92,6 +92,7 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
   const [addingNote, setAddingNote] = useState(false);
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const [editNoteText, setEditNoteText] = useState("");
+  const [selectedSportDetail, setSelectedSportDetail] = useState<string | null>(null);
 
   // Fetch notes when facility changes
   useEffect(() => {
@@ -508,30 +509,112 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                     </div>
                   </motion.div>
 
-                  {/* Identified Sports */}
+                  {/* Identified Sports with Confidence Scores */}
                   {facility.identified_sports && facility.identified_sports.length > 0 && (
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.08 }}
                     >
-                      <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
+                      <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide flex items-center gap-2">
                         Sports Scraped
+                        <span className="text-xs font-normal text-gray-500 normal-case">(with confidence scores)</span>
                       </h3>
                       <div className="flex flex-wrap gap-2">
-                        {facility.identified_sports.map((sport, idx) => (
-                          <motion.span
-                            key={sport}
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: 0.12 + idx * 0.05 }}
-                            whileHover={{ scale: 1.05 }}
-                            className="px-4 py-2 bg-gradient-to-r from-green-50 to-green-100/50 text-green-700 rounded-full text-sm font-medium shadow-sm hover:shadow-md transition-all cursor-default flex items-center gap-2"
-                          >
-                            <span className="text-lg">{SPORT_EMOJIS[sport] || "🏅"}</span>
-                            <span>{sport}</span>
-                          </motion.span>
-                        ))}
+                        {facility.identified_sports.map((sport, idx) => {
+                          const metadata = facility.sport_metadata?.[sport];
+                          const score = metadata?.score || 0;
+                          const confidence = metadata?.confidence || 'unknown';
+
+                          // Color coding based on confidence
+                          let bgColor = 'from-gray-50 to-gray-100/50';
+                          let textColor = 'text-gray-700';
+                          let borderColor = 'border-gray-300';
+
+                          if (confidence === 'high') {
+                            bgColor = 'from-green-50 to-green-100/50';
+                            textColor = 'text-green-700';
+                            borderColor = 'border-green-300';
+                          } else if (confidence === 'medium') {
+                            bgColor = 'from-yellow-50 to-yellow-100/50';
+                            textColor = 'text-yellow-700';
+                            borderColor = 'border-yellow-300';
+                          } else if (confidence === 'low') {
+                            bgColor = 'from-red-50 to-red-100/50';
+                            textColor = 'text-red-700';
+                            borderColor = 'border-red-300';
+                          }
+
+                          // Get confidence icon
+                          let confidenceIcon = '?';
+                          if (confidence === 'high') {
+                            confidenceIcon = '✓';
+                          } else if (confidence === 'medium') {
+                            confidenceIcon = '~';
+                          } else if (confidence === 'low') {
+                            confidenceIcon = '⚠';
+                          }
+
+                          const tooltipContent = metadata ?
+                            `Score: ${score}/100 | Sources: ${metadata.sources.join(', ') || 'unknown'}\nKeywords: ${metadata.keywords_matched.join(', ')}\nMatched: "${metadata.matched_text}"` :
+                            'No confidence data available - run audit script';
+
+                          return (
+                            <motion.div
+                              key={sport}
+                              initial={{ opacity: 0, scale: 0.8 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              transition={{ delay: 0.12 + idx * 0.05 }}
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              className="group relative"
+                              title={tooltipContent}
+                            >
+                              <button
+                                onClick={() => setSelectedSportDetail(sport)}
+                                className={`px-4 py-2 bg-gradient-to-r ${bgColor} ${textColor} rounded-full text-sm font-medium shadow-sm hover:shadow-md transition-all cursor-pointer flex items-center gap-1.5 border ${borderColor}`}
+                              >
+                                <span className="text-lg">{SPORT_EMOJIS[sport] || "🏅"}</span>
+                                <span className="font-semibold">{sport}</span>
+                                {metadata ? (
+                                  <>
+                                    <span className="text-xs opacity-75">{confidenceIcon}</span>
+                                    <span className="px-1.5 py-0.5 rounded text-xs font-bold bg-white/60">
+                                      {score}
+                                    </span>
+                                  </>
+                                ) : (
+                                  <span className="text-xs opacity-75">?</span>
+                                )}
+                              </button>
+
+                              {/* Tooltip on hover */}
+                              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block z-30">
+                                <div className="bg-gray-900 text-white text-xs rounded-lg py-2 px-3 shadow-xl max-w-xs whitespace-pre-wrap">
+                                  {metadata ? (
+                                    <>
+                                      <div className="font-semibold mb-1">Confidence: {score}/100 ({confidence})</div>
+                                      <div className="text-gray-300">
+                                        <div><strong>Sources:</strong> {metadata.sources.join(', ') || 'unknown'}</div>
+                                        <div><strong>Keywords:</strong> {metadata.keywords_matched.join(', ')}</div>
+                                        {metadata.matched_text && (
+                                          <div className="mt-1 italic border-t border-gray-700 pt-1">
+                                            "{metadata.matched_text.substring(0, 100)}{metadata.matched_text.length > 100 ? '...' : ''}"
+                                          </div>
+                                        )}
+                                      </div>
+                                    </>
+                                  ) : (
+                                    <div>No confidence data available - run audit script</div>
+                                  )}
+                                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+                                    <div className="border-8 border-transparent border-t-gray-900"></div>
+                                  </div>
+                                </div>
+                              </div>
+                            </motion.div>
+                          );
+                        })}
                       </div>
                     </motion.div>
                   )}
@@ -857,6 +940,194 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
             </motion.div>
           </AnimatePresence>
         </div>
+
+        {/* Sport Detail Modal */}
+        <AnimatePresence>
+          {selectedSportDetail && facility.sport_metadata?.[selectedSportDetail] && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-6 z-50"
+              onClick={() => setSelectedSportDetail(null)}
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                transition={{ type: "spring", damping: 20 }}
+                className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[80vh] overflow-hidden"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {(() => {
+                  const sport = selectedSportDetail;
+                  const metadata = facility.sport_metadata![sport];
+                  const score = metadata.score;
+                  const confidence = metadata.confidence;
+
+                  // Color scheme based on confidence
+                  let accentColor = 'gray';
+                  let bgGradient = 'from-gray-50 to-gray-100';
+                  let textColor = 'text-gray-700';
+                  let iconColor = 'text-gray-600';
+
+                  if (confidence === 'high') {
+                    accentColor = 'green';
+                    bgGradient = 'from-green-50 to-green-100';
+                    textColor = 'text-green-800';
+                    iconColor = 'text-green-600';
+                  } else if (confidence === 'medium') {
+                    accentColor = 'yellow';
+                    bgGradient = 'from-yellow-50 to-yellow-100';
+                    textColor = 'text-yellow-800';
+                    iconColor = 'text-yellow-600';
+                  } else if (confidence === 'low') {
+                    accentColor = 'red';
+                    bgGradient = 'from-red-50 to-red-100';
+                    textColor = 'text-red-800';
+                    iconColor = 'text-red-600';
+                  }
+
+                  return (
+                    <>
+                      {/* Header */}
+                      <div className={`bg-gradient-to-br ${bgGradient} p-6 border-b border-${accentColor}-200`}>
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-center gap-3">
+                            <span className="text-4xl">{SPORT_EMOJIS[sport] || "🏅"}</span>
+                            <div>
+                              <h3 className={`text-2xl font-bold ${textColor}`}>{sport}</h3>
+                              <p className="text-sm text-gray-600 mt-1">Confidence Analysis</p>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => setSelectedSportDetail(null)}
+                            className="p-2 hover:bg-white/50 rounded-full transition-colors"
+                          >
+                            <X className="w-5 h-5 text-gray-600" />
+                          </button>
+                        </div>
+
+                        {/* Score Display */}
+                        <div className="mt-4 flex items-center gap-4">
+                          <div className="flex-1">
+                            <div className="flex items-baseline gap-2 mb-1">
+                              <span className={`text-4xl font-bold ${textColor}`}>{score}</span>
+                              <span className="text-gray-500 text-sm">/100</span>
+                            </div>
+                            <div className="w-full h-2 bg-white rounded-full overflow-hidden">
+                              <div
+                                className={`h-full bg-${accentColor}-500`}
+                                style={{ width: `${score}%` }}
+                              />
+                            </div>
+                          </div>
+                          <div className={`px-4 py-2 bg-white rounded-lg border-2 border-${accentColor}-300`}>
+                            <div className="text-xs text-gray-500 uppercase">Confidence</div>
+                            <div className={`text-lg font-bold ${textColor} capitalize`}>{confidence}</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Details */}
+                      <div className="p-6 space-y-4 overflow-y-auto max-h-[50vh]">
+                        {/* Sources */}
+                        <div>
+                          <h4 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-2">
+                            Identified From
+                          </h4>
+                          <div className="flex flex-wrap gap-2">
+                            {metadata.sources.map((source) => {
+                              const sourceLabels: Record<string, string> = {
+                                name: '📛 Facility Name',
+                                review: '💬 Reviews',
+                                api: '🔌 API Data',
+                              };
+                              return (
+                                <span
+                                  key={source}
+                                  className="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium border border-blue-200"
+                                >
+                                  {sourceLabels[source] || source}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        {/* Keywords */}
+                        <div>
+                          <h4 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-2">
+                            Matched Keywords
+                          </h4>
+                          <div className="flex flex-wrap gap-2">
+                            {metadata.keywords_matched.map((keyword) => (
+                              <span
+                                key={keyword}
+                                className="px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-xs font-mono border border-purple-200"
+                              >
+                                {keyword}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Matched Text */}
+                        {metadata.matched_text && (
+                          <div>
+                            <h4 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-2">
+                              Text Evidence
+                            </h4>
+                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                              <p className="text-sm text-gray-700 italic leading-relaxed">
+                                "{metadata.matched_text}"
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Recommendation */}
+                        <div className={`border-2 border-${accentColor}-200 rounded-lg p-4 bg-${accentColor}-50/50`}>
+                          <h4 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-2 flex items-center gap-2">
+                            <span>💡</span>
+                            Recommendation
+                          </h4>
+                          <p className={`text-sm ${textColor}`}>
+                            {confidence === 'high' && (
+                              <>
+                                <strong>Keep this sport.</strong> High confidence score indicates reliable identification from facility name or verified sources.
+                              </>
+                            )}
+                            {confidence === 'medium' && (
+                              <>
+                                <strong>Review recommended.</strong> Medium confidence suggests this sport was identified from reviews, which may contain context that doesn't reflect what's actually offered.
+                              </>
+                            )}
+                            {confidence === 'low' && (
+                              <>
+                                <strong>Consider removing.</strong> Low confidence score indicates this is likely a false positive from review mentions that don't reflect actual offerings.
+                              </>
+                            )}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Footer */}
+                      <div className="border-t border-gray-200 p-4 bg-gray-50">
+                        <button
+                          onClick={() => setSelectedSportDetail(null)}
+                          className="w-full py-2.5 px-4 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg font-medium shadow-sm transition-all"
+                        >
+                          Close
+                        </button>
+                      </div>
+                    </>
+                  );
+                })()}
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
     </AnimatePresence>
   );
