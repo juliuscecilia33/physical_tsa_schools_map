@@ -6,6 +6,7 @@ import type { MapRef, MapLayerMouseEvent } from "react-map-gl";
 import { Facility } from "@/types/facility";
 import { FilterOption } from "@/app/page";
 import FacilitySidebar from "./FacilitySidebar";
+import FacilitySearch from "./FacilitySearch";
 import { motion, AnimatePresence } from "framer-motion";
 import { Filter, Layers, Check, ChevronDown, ChevronUp } from "lucide-react";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -181,6 +182,20 @@ export default function FacilityMap({
     }
   };
 
+  // Handle facility selection from search
+  const handleSearchSelect = (facility: Facility) => {
+    // Focus map on facility location with smooth animation
+    const map = mapRef.current?.getMap();
+    map?.flyTo({
+      center: [facility.location.lng, facility.location.lat],
+      zoom: 16,
+      duration: 1500,
+    });
+
+    // Open facility sidebar
+    setSelectedFacility(facility);
+  };
+
   return (
     <div className="relative w-full h-screen">
       <Map
@@ -233,6 +248,14 @@ export default function FacilityMap({
           />
         </Source>
       </Map>
+
+      {/* Search Bar - Top Left */}
+      <div className="absolute top-20 left-4 z-10">
+        <FacilitySearch
+          facilities={filteredFacilities}
+          onSelectFacility={handleSearchSelect}
+        />
+      </div>
 
       {/* Modern Info Panel */}
       <div className="absolute inset-y-4 right-4 bg-white rounded-xl shadow-2xl p-6 max-w-md h-[calc(100vh-2rem)] overflow-y-auto z-10 border border-gray-100">
