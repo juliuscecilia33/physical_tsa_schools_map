@@ -993,7 +993,12 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                   return (
                     <>
                       {/* Header */}
-                      <div className={`bg-gradient-to-br ${bgGradient} p-6 border-b border-${accentColor}-200`}>
+                      <div className={`bg-gradient-to-br ${bgGradient} p-6 border-b ${
+                        confidence === 'high' ? 'border-green-200' :
+                        confidence === 'medium' ? 'border-yellow-200' :
+                        confidence === 'low' ? 'border-red-200' :
+                        'border-gray-200'
+                      }`}>
                         <div className="flex items-start justify-between">
                           <div className="flex items-center gap-3">
                             <span className="text-4xl">{SPORT_EMOJIS[sport] || "🏅"}</span>
@@ -1019,12 +1024,22 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                             </div>
                             <div className="w-full h-2 bg-white rounded-full overflow-hidden">
                               <div
-                                className={`h-full bg-${accentColor}-500`}
+                                className={`h-full ${
+                                  confidence === 'high' ? 'bg-green-500' :
+                                  confidence === 'medium' ? 'bg-yellow-500' :
+                                  confidence === 'low' ? 'bg-red-500' :
+                                  'bg-gray-500'
+                                }`}
                                 style={{ width: `${score}%` }}
                               />
                             </div>
                           </div>
-                          <div className={`px-4 py-2 bg-white rounded-lg border-2 border-${accentColor}-300`}>
+                          <div className={`px-4 py-2 bg-white rounded-lg border-2 ${
+                            confidence === 'high' ? 'border-green-300' :
+                            confidence === 'medium' ? 'border-yellow-300' :
+                            confidence === 'low' ? 'border-red-300' :
+                            'border-gray-300'
+                          }`}>
                             <div className="text-xs text-gray-500 uppercase">Confidence</div>
                             <div className={`text-lg font-bold ${textColor} capitalize`}>{confidence}</div>
                           </div>
@@ -1089,7 +1104,12 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                         )}
 
                         {/* Recommendation */}
-                        <div className={`border-2 border-${accentColor}-200 rounded-lg p-4 bg-${accentColor}-50/50`}>
+                        <div className={`border-2 rounded-lg p-4 ${
+                          confidence === 'high' ? 'border-green-200 bg-green-50/50' :
+                          confidence === 'medium' ? 'border-yellow-200 bg-yellow-50/50' :
+                          confidence === 'low' ? 'border-red-200 bg-red-50/50' :
+                          'border-gray-200 bg-gray-50/50'
+                        }`}>
                           <h4 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-2 flex items-center gap-2">
                             <span>💡</span>
                             Recommendation
