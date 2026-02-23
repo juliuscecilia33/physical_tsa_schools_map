@@ -6,8 +6,8 @@ import type { MapRef, MapLayerMouseEvent } from "react-map-gl";
 import { Facility } from "@/types/facility";
 import { FilterOption } from "@/app/page";
 import FacilitySidebar from "./FacilitySidebar";
-import { motion } from "framer-motion";
-import { Filter, Layers, Check } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Filter, Layers, Check, ChevronDown, ChevronUp } from "lucide-react";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 interface FacilityMapProps {
@@ -56,7 +56,19 @@ export default function FacilityMap({
   const [selectedFacility, setSelectedFacility] = useState<Facility | null>(
     null,
   );
+  const [expandedSections, setExpandedSections] = useState({
+    displayFilter: true,
+    sportFilter: true,
+    categories: false,
+  });
   const mapRef = useRef<MapRef>(null);
+
+  const toggleSection = (section: keyof typeof expandedSections) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section],
+    }));
+  };
 
   const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
 
@@ -246,18 +258,36 @@ export default function FacilityMap({
 
         {/* Modern Filter Options */}
         <div className="mb-3">
-          <div className="flex items-center gap-1.5 mb-2">
-            <Filter className="w-3 h-3 text-gray-600" />
-            <h3 className="text-xs font-semibold text-gray-700 tracking-wide uppercase">
-              Display Filter
-            </h3>
-          </div>
-          <div className="space-y-1.5">
+          <button
+            onClick={() => toggleSection('displayFilter')}
+            className="flex items-center justify-between w-full mb-2 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+          >
+            <div className="flex items-center gap-1.5">
+              <Filter className="w-3 h-3 text-gray-600" />
+              <h3 className="text-xs font-semibold text-gray-700 tracking-wide uppercase">
+                Display Filter
+              </h3>
+            </div>
+            {expandedSections.displayFilter ? (
+              <ChevronUp className="w-4 h-4 text-gray-500" />
+            ) : (
+              <ChevronDown className="w-4 h-4 text-gray-500" />
+            )}
+          </button>
+          <AnimatePresence>
+            {expandedSections.displayFilter && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="space-y-1.5 overflow-hidden"
+              >
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => onFilterOptionChange("UNHIDDEN_ONLY")}
-              className={`w-full px-3 py-2 rounded-lg text-xs font-medium transition-all duration-300 flex items-center justify-between ${
+              className={`w-full px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 flex items-center justify-between ${
                 filterOption === "UNHIDDEN_ONLY"
                   ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md"
                   : "bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 hover:from-gray-100 hover:to-gray-200 border border-gray-200"
@@ -272,7 +302,7 @@ export default function FacilityMap({
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => onFilterOptionChange("ALL")}
-              className={`w-full px-3 py-2 rounded-lg text-xs font-medium transition-all duration-300 flex items-center justify-between ${
+              className={`w-full px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 flex items-center justify-between ${
                 filterOption === "ALL"
                   ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md"
                   : "bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 hover:from-gray-100 hover:to-gray-200 border border-gray-200"
@@ -285,7 +315,7 @@ export default function FacilityMap({
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => onFilterOptionChange("HIDDEN_ONLY")}
-              className={`w-full px-3 py-2 rounded-lg text-xs font-medium transition-all duration-300 flex items-center justify-between ${
+              className={`w-full px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 flex items-center justify-between ${
                 filterOption === "HIDDEN_ONLY"
                   ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md"
                   : "bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 hover:from-gray-100 hover:to-gray-200 border border-gray-200"
@@ -300,7 +330,7 @@ export default function FacilityMap({
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => onFilterOptionChange("WITH_NOTES_ONLY")}
-              className={`w-full px-3 py-2 rounded-lg text-xs font-medium transition-all duration-300 flex items-center justify-between ${
+              className={`w-full px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 flex items-center justify-between ${
                 filterOption === "WITH_NOTES_ONLY"
                   ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md"
                   : "bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 hover:from-gray-100 hover:to-gray-200 border border-gray-200"
@@ -311,19 +341,40 @@ export default function FacilityMap({
                 <Check className="w-3.5 h-3.5" />
               )}
             </motion.button>
-          </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Sport Filter */}
         {availableSports.length > 0 && (
           <div className="mb-3">
-            <div className="flex items-center gap-1.5 mb-2">
-              <Filter className="w-3 h-3 text-gray-600" />
-              <h3 className="text-xs font-semibold text-gray-700 tracking-wide uppercase">
-                Filter by Sport
-              </h3>
-            </div>
-            <div className="max-h-48 overflow-y-auto space-y-1">
+            <button
+              onClick={() => toggleSection('sportFilter')}
+              className="flex items-center justify-between w-full mb-2 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+            >
+              <div className="flex items-center gap-1.5">
+                <Filter className="w-3 h-3 text-gray-600" />
+                <h3 className="text-xs font-semibold text-gray-700 tracking-wide uppercase">
+                  Filter by Sport
+                </h3>
+              </div>
+              {expandedSections.sportFilter ? (
+                <ChevronUp className="w-4 h-4 text-gray-500" />
+              ) : (
+                <ChevronDown className="w-4 h-4 text-gray-500" />
+              )}
+            </button>
+            <AnimatePresence>
+              {expandedSections.sportFilter && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden"
+                >
+                  <div className="max-h-48 overflow-y-auto space-y-1.5">
               {availableSports.map((sport) => (
                 <motion.button
                   key={sport}
@@ -338,7 +389,7 @@ export default function FacilityMap({
                       onSelectedSportsChange([...selectedSports, sport]);
                     }
                   }}
-                  className={`w-full px-3 py-2 rounded-lg text-xs font-medium transition-all duration-300 flex items-center justify-between ${
+                  className={`w-full px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 flex items-center justify-between ${
                     selectedSports.includes(sport)
                       ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-md"
                       : "bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 hover:from-gray-100 hover:to-gray-200 border border-gray-200"
@@ -358,20 +409,44 @@ export default function FacilityMap({
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => onSelectedSportsChange([])}
-                className="w-full mt-2 px-3 py-2 rounded-lg text-xs font-medium bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 transition-all duration-300"
+                className="w-full mt-2 px-4 py-3 rounded-lg text-sm font-medium bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 transition-all duration-300"
               >
                 Clear Sport Filter ({selectedSports.length})
               </motion.button>
             )}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         )}
 
         {/* Category Sub-Cards */}
         <div>
-          <h3 className="text-xs font-semibold text-gray-700 mb-2 tracking-wide uppercase">
-            Categories
-          </h3>
-          <div className="space-y-1.5">
+          <button
+            onClick={() => toggleSection('categories')}
+            className="flex items-center justify-between w-full mb-2 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+          >
+            <div className="flex items-center gap-1.5">
+              <Layers className="w-3 h-3 text-gray-600" />
+              <h3 className="text-xs font-semibold text-gray-700 tracking-wide uppercase">
+                Categories
+              </h3>
+            </div>
+            {expandedSections.categories ? (
+              <ChevronUp className="w-4 h-4 text-gray-500" />
+            ) : (
+              <ChevronDown className="w-4 h-4 text-gray-500" />
+            )}
+          </button>
+          <AnimatePresence>
+            {expandedSections.categories && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="space-y-1.5 overflow-hidden"
+              >
             {Object.entries(ACTIVITY_CATEGORIES).map(
               ([key, { color, label }], idx) => (
                 <motion.div
@@ -400,7 +475,9 @@ export default function FacilityMap({
                 </motion.div>
               ),
             )}
-          </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 

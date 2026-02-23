@@ -355,9 +355,32 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
               transition={{ delay: 0.1 }}
               className="flex-1 pr-4"
             >
-              <h2 className="text-2xl font-bold text-gray-900 leading-tight mb-2">
-                {facility.name}
-              </h2>
+              <div className="flex items-center gap-2 mb-2">
+                <h2 className="text-2xl font-bold text-gray-900 leading-tight">
+                  {facility.name}
+                </h2>
+                {facility.business_status && (
+                  <span
+                    className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${
+                      facility.business_status === "OPERATIONAL"
+                        ? "bg-green-100 text-green-800"
+                        : "bg-red-100 text-red-800"
+                    }`}
+                  >
+                    {facility.business_status === "OPERATIONAL" ? (
+                      <>
+                        <CheckCircle2 className="w-3 h-3" />
+                        <span>OPEN</span>
+                      </>
+                    ) : (
+                      <>
+                        <XCircle className="w-3 h-3" />
+                        <span>CLOSED</span>
+                      </>
+                    )}
+                  </span>
+                )}
+              </div>
               {facility.rating && (
                 <div className="flex items-center gap-2">
                   <div className="flex gap-0.5">{renderStars(facility.rating)}</div>
@@ -455,14 +478,14 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
             >
               {activeTab === 'overview' && (
                 <>
-                  {/* Sport Types */}
+                  {/* Facility Types */}
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.05 }}
                   >
                     <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
-                      Sport Types
+                      Facility Types
                     </h3>
                     <div className="flex flex-wrap gap-2">
                       {facility.sport_types
@@ -493,7 +516,7 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                       transition={{ delay: 0.08 }}
                     >
                       <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
-                        Available Sports
+                        Sports Scraped
                       </h3>
                       <div className="flex flex-wrap gap-2">
                         {facility.identified_sports.map((sport, idx) => (
@@ -510,30 +533,6 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                           </motion.span>
                         ))}
                       </div>
-                    </motion.div>
-                  )}
-
-                  {/* Business Status */}
-                  {facility.business_status && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.1 }}
-                    >
-                      <span
-                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium shadow-sm ${
-                          facility.business_status === "OPERATIONAL"
-                            ? "bg-gradient-to-r from-green-50 to-emerald-100/50 text-green-800"
-                            : "bg-gradient-to-r from-red-50 to-red-100/50 text-red-800"
-                        }`}
-                      >
-                        {facility.business_status === "OPERATIONAL" ? (
-                          <CheckCircle2 className="w-4 h-4" />
-                        ) : (
-                          <XCircle className="w-4 h-4" />
-                        )}
-                        {facility.business_status.replace("_", " ")}
-                      </span>
                     </motion.div>
                   )}
 
