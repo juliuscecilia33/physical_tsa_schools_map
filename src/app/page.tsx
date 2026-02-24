@@ -118,6 +118,10 @@ export default function Home() {
           cleaned_up: row.cleaned_up || false,
           has_notes: row.has_notes || false,
           tags: row.tags || [],
+          additional_photos: row.additional_photos || [],
+          additional_reviews: row.additional_reviews || [],
+          serp_scraped: row.serp_scraped || false,
+          serp_scraped_at: row.serp_scraped_at,
         }));
 
         console.log(`Loaded ${transformedFacilities.length} athletic facilities`);

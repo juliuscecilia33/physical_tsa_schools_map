@@ -30,6 +30,10 @@ export interface Facility {
   notes?: Note[];
   has_notes?: boolean;
   tags?: FacilityTag[];
+  additional_photos?: any[]; // Full photo data from SerpAPI (beyond 10 from Google Places)
+  additional_reviews?: Review[]; // Full review data from SerpAPI (beyond 5 from Google Places)
+  serp_scraped?: boolean; // Whether this facility has been enriched with SerpAPI data
+  serp_scraped_at?: string; // Timestamp of when SerpAPI enrichment was performed
 }
 
 export interface Review {
