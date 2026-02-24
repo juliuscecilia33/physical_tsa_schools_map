@@ -29,6 +29,7 @@ export default function Home() {
   const [loadedFacilityCount, setLoadedFacilityCount] = useState(0);
   const [filterOption, setFilterOption] = useState<FilterOption>('UNHIDDEN_ONLY');
   const [selectedSports, setSelectedSports] = useState<string[]>([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   const loadFacilities = async () => {
       try {
@@ -116,6 +117,7 @@ export default function Home() {
           hidden: row.hidden || false,
           cleaned_up: row.cleaned_up || false,
           has_notes: row.has_notes || false,
+          tags: row.tags || [],
         }));
 
         console.log(`Loaded ${transformedFacilities.length} athletic facilities`);
@@ -194,6 +196,8 @@ export default function Home() {
         onFilterOptionChange={setFilterOption}
         selectedSports={selectedSports}
         onSelectedSportsChange={setSelectedSports}
+        selectedTags={selectedTags}
+        onSelectedTagsChange={setSelectedTags}
         onUpdateFacility={updateFacilityHidden}
       />
     </main>

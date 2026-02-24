@@ -16,6 +16,7 @@ import {
   ChevronDown,
   ChevronUp,
   Sparkles,
+  Tag,
 } from "lucide-react";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { AISearchFilters } from "@/app/api/ai-search/route";
@@ -26,6 +27,8 @@ interface FacilityMapProps {
   onFilterOptionChange: (option: FilterOption) => void;
   selectedSports: string[];
   onSelectedSportsChange: (sports: string[]) => void;
+  selectedTags: string[];
+  onSelectedTagsChange: (tags: string[]) => void;
   onUpdateFacility: (place_id: string, hidden: boolean) => void;
 }
 
@@ -224,6 +227,8 @@ export default function FacilityMap({
   onFilterOptionChange,
   selectedSports,
   onSelectedSportsChange,
+  selectedTags,
+  onSelectedTagsChange,
   onUpdateFacility,
 }: FacilityMapProps) {
   const [selectedFacility, setSelectedFacility] = useState<Facility | null>(
@@ -232,6 +237,7 @@ export default function FacilityMap({
   const [expandedSections, setExpandedSections] = useState({
     displayFilter: true,
     sportFilter: true,
+    tagFilter: true,
     categories: true,
     moreFilters: true,
   });
@@ -270,7 +276,22 @@ export default function FacilityMap({
     return Array.from(sportsSet).sort();
   }, [facilities]);
 
-  // Client-side filtering based on filterOption, selectedSports, and AI filters
+  // Get available tags from all facilities
+  const availableTags = useMemo(() => {
+    const tagsMap = new globalThis.Map();
+    facilities.forEach((facility) => {
+      if (facility.tags) {
+        facility.tags.forEach((tag) => {
+          if (!tagsMap.has(tag.id)) {
+            tagsMap.set(tag.id, { id: tag.id, name: tag.name, color: tag.color });
+          }
+        });
+      }
+    });
+    return Array.from(tagsMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }, [facilities]);
+
+  // Client-side filtering based on filterOption, selectedSports, selectedTags, and AI filters
   const filteredFacilities = useMemo(() => {
     let filtered = facilities;
 
@@ -310,6 +331,19 @@ export default function FacilityMap({
       });
     }
 
+    // Apply tag filter (from manual selection)
+    if (selectedTags.length > 0) {
+      filtered = filtered.filter((facility) => {
+        if (!facility.tags || facility.tags.length === 0) {
+          return false;
+        }
+        // Check if facility has at least one of the selected tags
+        return selectedTags.some((tagId) =>
+          facility.tags!.some((tag) => tag.id === tagId),
+        );
+      });
+    }
+
     // Apply category filter
     if (selectedCategories.length > 0 && selectedCategories.length < 5) {
       // Only filter if not all categories are selected
@@ -323,7 +357,7 @@ export default function FacilityMap({
     // AI filters will be used by AISearchPanel to show results as cards
 
     return filtered;
-  }, [facilities, filterOption, selectedSports, selectedCategories]);
+  }, [facilities, filterOption, selectedSports, selectedTags, selectedCategories]);
 
   // Calculate category counts
   const categoryCounts = useMemo(() => {
@@ -666,6 +700,80 @@ export default function FacilityMap({
                       className="w-full mt-2 px-4 py-3 rounded-lg text-sm font-medium bg-[#c9472b]/10 text-[#c9472b] hover:bg-[#c9472b]/20 border border-[#c9472b]/20 transition-all duration-300 cursor-pointer"
                     >
                       Clear Sport Filter ({selectedSports.length})
+                    </motion.button>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        )}
+
+        {/* Tag Filter */}
+        {availableTags.length > 0 && (
+          <div className="mb-4">
+            <button
+              onClick={() => toggleSection("tagFilter")}
+              className="flex items-center justify-between w-full mb-3 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+            >
+              <div className="flex items-center gap-2">
+                <Tag className="w-4 h-4 text-gray-600" />
+                <h3 className="text-sm font-semibold text-gray-700 tracking-wide uppercase">
+                  Filter by Tag
+                </h3>
+              </div>
+              {expandedSections.tagFilter ? (
+                <ChevronUp className="w-4 h-4 text-gray-500" />
+              ) : (
+                <ChevronDown className="w-4 h-4 text-gray-500" />
+              )}
+            </button>
+            <AnimatePresence>
+              {expandedSections.tagFilter && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden"
+                >
+                  <div className="max-h-96 overflow-y-auto flex flex-wrap gap-2">
+                    {availableTags.map((tag) => (
+                      <motion.button
+                        key={tag.id}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => {
+                          if (selectedTags.includes(tag.id)) {
+                            onSelectedTagsChange(
+                              selectedTags.filter((id) => id !== tag.id),
+                            );
+                          } else {
+                            onSelectedTagsChange([...selectedTags, tag.id]);
+                          }
+                        }}
+                        className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 flex items-center gap-1.5 cursor-pointer relative ${
+                          selectedTags.includes(tag.id)
+                            ? "text-white shadow-lg ring-2 ring-white/50"
+                            : "text-white/80 hover:text-white shadow-sm hover:shadow-md opacity-70 hover:opacity-100"
+                        }`}
+                        style={{ backgroundColor: tag.color }}
+                      >
+                        <Tag className="w-3 h-3" />
+                        <span>{tag.name}</span>
+                        {selectedTags.includes(tag.id) && (
+                          <Check className="w-3 h-3" />
+                        )}
+                      </motion.button>
+                    ))}
+                  </div>
+                  {selectedTags.length > 0 && (
+                    <motion.button
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => onSelectedTagsChange([])}
+                      className="w-full mt-2 px-4 py-3 rounded-lg text-sm font-medium bg-[#c9472b]/10 text-[#c9472b] hover:bg-[#c9472b]/20 border border-[#c9472b]/20 transition-all duration-300 cursor-pointer"
+                    >
+                      Clear Tag Filter ({selectedTags.length})
                     </motion.button>
                   )}
                 </motion.div>

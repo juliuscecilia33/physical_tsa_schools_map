@@ -29,6 +29,7 @@ export interface Facility {
   cleaned_up?: boolean;
   notes?: Note[];
   has_notes?: boolean;
+  tags?: FacilityTag[];
 }
 
 export interface Review {
@@ -50,4 +51,13 @@ export interface Note {
   note_text: string;
   created_at: string;
   updated_at: string;
+}
+
+export interface FacilityTag {
+  id: string;
+  name: string;
+  color: string;
+  description?: string;
+  created_at?: string;
+  updated_at?: string;
 }
