@@ -8,23 +8,29 @@ import { FacilityLightweight } from "@/types/facility";
 
 /**
  * Update a single facility in the main facilities cache
+ * Preserves the original dataUpdatedAt timestamp to maintain cache consistency
  */
 export function updateFacilityInCache(
   queryClient: QueryClient,
   placeId: string,
   updates: Partial<FacilityLightweight>
 ) {
-  // Get the main "all facilities" query
-  const currentData = queryClient.getQueryData(['facilities', 'all']) as FacilityLightweight[] | undefined;
+  // Get the query from cache to access its state
+  const queryCache = queryClient.getQueryCache();
+  const query = queryCache.find({ queryKey: ['facilities', 'all'] });
+  const currentData = query?.state.data as FacilityLightweight[] | undefined;
 
-  if (currentData) {
+  if (currentData && query) {
     const updatedData = currentData.map((facility) =>
       facility.place_id === placeId
         ? { ...facility, ...updates }
         : facility
     );
 
-    queryClient.setQueryData(['facilities', 'all'], updatedData);
+    // Preserve the original dataUpdatedAt timestamp to prevent cache invalidation
+    queryClient.setQueryData(['facilities', 'all'], updatedData, {
+      updatedAt: query.state.dataUpdatedAt
+    });
   }
 }
 

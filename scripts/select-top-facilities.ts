@@ -59,6 +59,7 @@ interface Facility {
     lat: number;
     lng: number;
   };
+  cleaned_up?: boolean;
 }
 
 interface ScoredFacility extends Facility {
@@ -157,6 +158,7 @@ async function fetchAndScoreFacilities(): Promise<ScoredFacility[]> {
 
   const { data, error } = await supabase.rpc("get_facilities_with_coords", {
     min_rating: 4.0,
+    include_cleaned_up: false,
   });
 
   if (error) {
