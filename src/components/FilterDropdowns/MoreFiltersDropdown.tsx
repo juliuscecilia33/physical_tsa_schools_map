@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface MoreFiltersDropdownProps {
@@ -13,18 +14,38 @@ export default function MoreFiltersDropdown({
   onClose,
   buttonRef,
 }: MoreFiltersDropdownProps) {
+  const [position, setPosition] = useState({ top: 0, left: 0 });
+
+  useEffect(() => {
+    const updatePosition = () => {
+      if (buttonRef.current) {
+        const rect = buttonRef.current.getBoundingClientRect();
+        setPosition({
+          top: rect.bottom + 8,
+          left: rect.left,
+        });
+      }
+    };
+
+    if (isOpen) {
+      updatePosition();
+      window.addEventListener('resize', updatePosition);
+      window.addEventListener('scroll', updatePosition, true);
+
+      return () => {
+        window.removeEventListener('resize', updatePosition);
+        window.removeEventListener('scroll', updatePosition, true);
+      };
+    }
+  }, [isOpen, buttonRef]);
+
   if (!isOpen) return null;
 
-  const buttonRect = buttonRef.current?.getBoundingClientRect();
-
-  // Calculate position accounting for any parent scroll
-  const dropdownStyle = buttonRect
-    ? {
-        position: 'fixed' as const,
-        top: `${buttonRect.bottom + 8}px`,
-        left: `${buttonRect.left}px`,
-      }
-    : { display: 'none' as const };
+  const dropdownStyle = {
+    position: 'fixed' as const,
+    top: `${position.top}px`,
+    left: `${position.left}px`,
+  };
 
   return (
     <>
