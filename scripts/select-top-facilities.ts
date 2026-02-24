@@ -70,6 +70,7 @@ interface ScoredFacility extends Facility {
     photo_score: number;
     keyword_bonus: number;
     photo_limit_bonus: number;
+    tourist_attraction_penalty: number;
   };
 }
 
@@ -89,7 +90,7 @@ function isTexasFacility(facility: Facility): boolean {
 
 /**
  * Calculate quality score for a facility
- * Formula: (0.4 × rating) + (0.3 × log(reviews)/5) + (0.2 × log(photos)/3) + (0.1 × keyword_bonus) + (0.15 × photo_limit_bonus)
+ * Formula: ((0.4 × rating) + (0.3 × log(reviews)/5) + (0.2 × log(photos)/3) + (0.1 × keyword_bonus) + (0.15 × photo_limit_bonus)) × tourist_penalty
  */
 function calculateQualityScore(facility: Facility): {
   score: number;
@@ -99,6 +100,7 @@ function calculateQualityScore(facility: Facility): {
     photo_score: number;
     keyword_bonus: number;
     photo_limit_bonus: number;
+    tourist_attraction_penalty: number;
   };
 } {
   // Rating component (40% weight) - normalized to 0-1 scale from 0-5 rating
@@ -131,21 +133,38 @@ function calculateQualityScore(facility: Facility): {
   const photoLimitBonus = photoCount >= 10 ? 1 : 0;
 
   // Calculate weighted total
-  const totalScore =
+  const baseScore =
     0.4 * ratingScore +
     0.3 * reviewScore +
     0.2 * photoScore +
     0.1 * keywordBonus +
     0.15 * photoLimitBonus;
 
+  // Apply penalty for tourist attractions without identified sports
+  const nonSportsTypes = ["tourist_attraction", "park"];
+  const hasBadType = (facility.sport_types || []).some((type) =>
+    nonSportsTypes.includes(type)
+  );
+  const hasIdentifiedSports =
+    facility.identified_sports && facility.identified_sports.length > 0;
+
+  // Only penalize if facility has non-sports type AND no identified sports
+  let touristPenalty = 1.0; // No penalty by default
+  if (hasBadType && !hasIdentifiedSports) {
+    touristPenalty = 0.85; // 15% penalty
+  }
+
+  const finalScore = baseScore * touristPenalty;
+
   return {
-    score: totalScore,
+    score: finalScore,
     breakdown: {
       rating_score: ratingScore,
       review_score: reviewScore,
       photo_score: photoScore,
       keyword_bonus: keywordBonus,
       photo_limit_bonus: photoLimitBonus,
+      tourist_attraction_penalty: touristPenalty,
     },
   };
 }
@@ -156,27 +175,66 @@ function calculateQualityScore(facility: Facility): {
 async function fetchAndScoreFacilities(): Promise<ScoredFacility[]> {
   console.log("📊 Fetching facilities from database...\n");
 
-  const { data, error } = await supabase.rpc("get_facilities_with_coords", {
-    min_rating: 4.0,
-    include_cleaned_up: false,
-  });
+  // Fetch all facilities with pagination to bypass Supabase's 1000 row limit
+  const allFacilities: any[] = [];
+  let from = 0;
+  const pageSize = 1000;
+  let hasMore = true;
 
-  if (error) {
-    console.error("❌ Error fetching facilities:", error.message);
-    process.exit(1);
+  while (hasMore) {
+    const { data, error } = await supabase
+      .rpc("get_facilities_with_coords", {
+        row_limit: 100000,
+        include_hidden: false,
+        include_cleaned_up: false,
+      })
+      .range(from, from + pageSize - 1);
+
+    if (error) {
+      console.error("❌ Error fetching facilities:", error.message);
+      process.exit(1);
+    }
+
+    if (data && data.length > 0) {
+      allFacilities.push(...data);
+      from += pageSize;
+
+      console.log(`   Fetched ${allFacilities.length} facilities so far...`);
+
+      // If we got fewer rows than pageSize, we've reached the end
+      if (data.length < pageSize) {
+        hasMore = false;
+      }
+    } else {
+      hasMore = false;
+    }
   }
 
-  // Filter out facilities without photos
-  const facilitiesWithPhotos = data.filter(
-    (f: Facility) => f.photo_references && f.photo_references.length > 0
+  console.log(`✅ Total fetched: ${allFacilities.length} facilities\n`);
+
+  // Transform data to match Facility interface (RPC returns flat lat/lng, we need nested location)
+  const transformedData = allFacilities.map((f: any) => ({
+    ...f,
+    location: {
+      lat: f.lat,
+      lng: f.lng,
+    },
+  }));
+
+  // Filter for rating >= 3.0 and must have photos
+  const filteredFacilities = transformedData.filter(
+    (f: Facility) =>
+      f.rating >= 3.0 &&
+      f.photo_references &&
+      f.photo_references.length > 0
   );
 
   console.log(
-    `✅ Fetched ${facilitiesWithPhotos.length} facilities with rating >= 4.0 and photos\n`
+    `✅ Fetched ${filteredFacilities.length} facilities with rating >= 3.0 and photos\n`
   );
 
   // Filter for Texas facilities only
-  const texasFacilities = facilitiesWithPhotos.filter(isTexasFacility);
+  const texasFacilities = filteredFacilities.filter(isTexasFacility);
   console.log(`🌵 Filtered to ${texasFacilities.length} Texas facilities\n`);
 
   console.log("🧮 Calculating quality scores...\n");
@@ -326,7 +384,7 @@ async function selectTopFacilities() {
   console.log("🎯 Goal: Select top 2,500 Texas facilities for SerpAPI enrichment");
   console.log("\n📋 Selection Criteria:");
   console.log("   • Location: Texas only (geographic bounds)");
-  console.log("   • Rating >= 4.0");
+  console.log("   • Rating >= 3.0");
   console.log("   • Must have photos");
   console.log("   • Ranked by quality score:");
   console.log("     - 40% Rating");
@@ -334,6 +392,7 @@ async function selectTopFacilities() {
   console.log("     - 20% Photo count (logarithmic)");
   console.log("     - 10% High-quality keyword bonus");
   console.log("     - 15% Photo limit bonus (10+ photos = likely more available)");
+  console.log("     - 15% penalty for tourist attractions without identified sports");
   console.log("=".repeat(70) + "\n");
 
   // Fetch and score facilities
@@ -365,11 +424,13 @@ async function selectTopFacilities() {
       selection_criteria: {
         location: "Texas only (geographic bounds)",
         texas_bounds: TEXAS_BOUNDS,
-        min_rating: 4.0,
+        min_rating: 3.0,
         must_have_photos: true,
         ranking_formula:
-          "(0.4 × rating/5) + (0.3 × log(reviews)/5) + (0.2 × log(photos)/3) + (0.1 × keyword_bonus) + (0.15 × photo_limit_bonus)",
+          "((0.4 × rating/5) + (0.3 × log(reviews)/5) + (0.2 × log(photos)/3) + (0.1 × keyword_bonus) + (0.15 × photo_limit_bonus)) × tourist_penalty",
         photo_limit_bonus_threshold: 10,
+        tourist_attraction_penalty:
+          "15% penalty (0.85x) for tourist_attraction or park without identified_sports",
       },
       average_rating: (
         topFacilities.reduce((sum, f) => sum + f.rating, 0) /

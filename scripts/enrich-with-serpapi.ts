@@ -45,7 +45,13 @@ interface ProgressState {
 }
 
 const PROGRESS_FILE = path.join(__dirname, "../.serpapi-progress.json");
-const FACILITIES_FILE = path.join(__dirname, "../data/top-2500-high-quality-facilities.json");
+const FACILITIES_FILE = path.join(
+  __dirname,
+  "../data/top-2500-high-quality-texas-facilities.json"
+);
+
+// Test mode: Set to a number to limit processing (e.g., 5 for testing), or null to process all
+const TEST_LIMIT: number | null = 5;
 
 // Rate limiting
 const DELAY_BETWEEN_REQUESTS_MS = 2000; // 2 seconds between requests
@@ -277,22 +283,41 @@ function printProgressSummary(
 async function enrichWithSerpApi() {
   console.log("🚀 SerpAPI Enrichment Script");
   console.log("=".repeat(70));
-  console.log("📋 This script will:");
-  console.log("   • Load top 2,500 high-quality facilities");
+
+  if (TEST_LIMIT) {
+    console.log(`🧪 TEST MODE: Processing only ${TEST_LIMIT} facilities`);
+    console.log("   (Set TEST_LIMIT to null in the script to process all)");
+  }
+
+  console.log("\n📋 This script will:");
+  console.log("   • Load high-quality Texas facilities");
   console.log("   • Fetch ALL photos and reviews from SerpAPI");
   console.log("   • Update database with enriched data");
   console.log("   • Track progress for resumable operation");
   console.log("\n⚠️  Important:");
   console.log("   • SerpAPI limit: 5,000 searches/month");
   console.log("   • Rate limit: 1 request every 2 seconds");
-  console.log("   • This will use 2,500 API calls");
-  console.log("   • Estimated time: ~83 minutes");
+
+  if (TEST_LIMIT) {
+    console.log(`   • This will use ${TEST_LIMIT} API calls (test mode)`);
+    console.log(`   • Estimated time: ~${(TEST_LIMIT * 2) / 60} minutes`);
+  } else {
+    console.log("   • This will use 2,500 API calls");
+    console.log("   • Estimated time: ~83 minutes");
+  }
+
   console.log("=".repeat(70) + "\n");
 
   // Load facilities
   console.log("📂 Loading facilities...");
   const facilities = loadFacilities();
-  console.log(`✅ Loaded ${facilities.length} facilities\n`);
+  console.log(`✅ Loaded ${facilities.length} facilities`);
+
+  if (TEST_LIMIT) {
+    console.log(`🧪 Test mode: Will process only ${TEST_LIMIT} facilities\n`);
+  } else {
+    console.log(`   Will process all ${facilities.length} facilities\n`);
+  }
 
   // Load progress
   const progress = loadProgress();
@@ -306,22 +331,25 @@ async function enrichWithSerpApi() {
 
   const startTime = Date.now();
 
+  // Determine how many facilities to process
+  const totalToProcess = TEST_LIMIT ? Math.min(TEST_LIMIT, facilities.length) : facilities.length;
+
   // Process each facility
-  for (let i = progress.lastProcessedIndex + 1; i < facilities.length; i++) {
+  for (let i = progress.lastProcessedIndex + 1; i < totalToProcess; i++) {
     const facility = facilities[i];
 
-    await processFacility(facility, progress, i, facilities.length);
+    await processFacility(facility, progress, i, totalToProcess);
 
     // Save progress after each facility
     saveProgress(progress);
 
     // Print summary every 50 facilities
     if ((i + 1) % 50 === 0) {
-      printProgressSummary(progress, facilities.length, startTime);
+      printProgressSummary(progress, totalToProcess, startTime);
     }
 
     // Rate limiting delay
-    if (i < facilities.length - 1) {
+    if (i < totalToProcess - 1) {
       await delay(DELAY_BETWEEN_REQUESTS_MS);
     }
   }
