@@ -7,33 +7,33 @@ import { useState, useMemo, useRef, useEffect } from "react";
 
 // Sport emoji mapping (same as FacilitySidebar)
 const SPORT_EMOJIS: { [key: string]: string } = {
-  "Basketball": "🏀",
-  "Soccer": "⚽",
-  "Baseball": "⚾",
-  "Football": "🏈",
-  "Tennis": "🎾",
-  "Volleyball": "🏐",
-  "Swimming": "🏊",
+  Basketball: "🏀",
+  Soccer: "⚽",
+  Baseball: "⚾",
+  Football: "🏈",
+  Tennis: "🎾",
+  Volleyball: "🏐",
+  Swimming: "🏊",
   "Track & Field": "🏃",
-  "Golf": "⛳",
-  "Hockey": "🏒",
-  "Lacrosse": "🥍",
-  "Softball": "🥎",
-  "Wrestling": "🤼",
-  "Gymnastics": "🤸",
-  "Pickleball": "🏓",
-  "Racquetball": "🎾",
-  "Squash": "🎾",
-  "Badminton": "🏸",
+  Golf: "⛳",
+  Hockey: "🏒",
+  Lacrosse: "🥍",
+  Softball: "🥎",
+  Wrestling: "🤼",
+  Gymnastics: "🤸",
+  Pickleball: "🏓",
+  Racquetball: "🎾",
+  Squash: "🎾",
+  Badminton: "🏸",
   "Gym/Fitness": "💪",
-  "CrossFit": "🏋️",
-  "Yoga": "🧘",
-  "Pilates": "🧘‍♀️",
+  CrossFit: "🏋️",
+  Yoga: "🧘",
+  Pilates: "🧘‍♀️",
   "Martial Arts": "🥋",
-  "Boxing": "🥊",
-  "Bowling": "🎳",
-  "Skating": "⛸️",
-  "Climbing": "🧗",
+  Boxing: "🥊",
+  Bowling: "🎳",
+  Skating: "⛸️",
+  Climbing: "🧗",
   "Water Sports": "🚣",
 };
 
@@ -42,7 +42,10 @@ interface FacilitySearchProps {
   onSelectFacility: (facility: Facility) => void;
 }
 
-export default function FacilitySearch({ facilities, onSelectFacility }: FacilitySearchProps) {
+export default function FacilitySearch({
+  facilities,
+  onSelectFacility,
+}: FacilitySearchProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -64,7 +67,7 @@ export default function FacilitySearch({ facilities, onSelectFacility }: Facilit
 
       // Search by sports
       const sportsMatch = facility.identified_sports?.some((sport) =>
-        sport.toLowerCase().includes(query)
+        sport.toLowerCase().includes(query),
       );
 
       return nameMatch || addressMatch || sportsMatch;
@@ -93,7 +96,7 @@ export default function FacilitySearch({ facilities, onSelectFacility }: Facilit
         case "ArrowDown":
           e.preventDefault();
           setSelectedIndex((prev) =>
-            prev < searchResults.length - 1 ? prev + 1 : prev
+            prev < searchResults.length - 1 ? prev + 1 : prev,
           );
           break;
         case "ArrowUp":
@@ -126,7 +129,10 @@ export default function FacilitySearch({ facilities, onSelectFacility }: Facilit
   // Handle click outside to close results
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(event.target as Node)
+      ) {
         setIsFocused(false);
       }
     };
@@ -162,7 +168,7 @@ export default function FacilitySearch({ facilities, onSelectFacility }: Facilit
               setIsExpanded(true);
               setTimeout(() => inputRef.current?.focus(), 100);
             }}
-            className="p-4 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200 hover:bg-gray-50 transition-all"
+            className="py-3.5 px-3.5 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200 hover:bg-gray-50 transition-all"
           >
             <Search className="w-6 h-6 text-gray-600" />
           </motion.button>
@@ -184,10 +190,12 @@ export default function FacilitySearch({ facilities, onSelectFacility }: Facilit
                     : "border-[#E8E9EB] hover:border-gray-300/50"
                 }`}
               >
-                <div className="flex items-center gap-4 px-6 py-4">
-                  <Search className={`w-6 h-6 flex-shrink-0 transition-colors duration-300 ${
-                    isFocused ? "text-[#004aad]" : "text-gray-400"
-                  }`} />
+                <div className="flex items-center gap-4 px-6 py-2">
+                  <Search
+                    className={`w-6 h-6 flex-shrink-0 transition-colors duration-300 ${
+                      isFocused ? "text-[#004aad]" : "text-gray-400"
+                    }`}
+                  />
                   <input
                     ref={inputRef}
                     type="text"
@@ -245,7 +253,8 @@ export default function FacilitySearch({ facilities, onSelectFacility }: Facilit
                 <div className="px-6 py-4 bg-gradient-to-r from-[#004aad]/5 to-[#004aad]/10 border-b border-[#E8E9EB]">
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-bold text-gray-700">
-                      {searchResults.length} {searchResults.length === 1 ? "Result" : "Results"}
+                      {searchResults.length}{" "}
+                      {searchResults.length === 1 ? "Result" : "Results"}
                     </p>
                     <div className="flex items-center gap-1.5 text-xs text-gray-500">
                       <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
@@ -286,34 +295,45 @@ export default function FacilitySearch({ facilities, onSelectFacility }: Facilit
                         </div>
 
                         {/* Sports Badges */}
-                        {facility.identified_sports && facility.identified_sports.length > 0 && (
-                          <div className="flex flex-wrap gap-2">
-                            {facility.identified_sports.slice(0, 5).map((sport) => (
-                              <span
-                                key={sport}
-                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-[#004aad]/5 to-[#004aad]/10 text-[#004aad] rounded-lg text-xs font-semibold shadow-sm"
-                              >
-                                <span className="text-base">{SPORT_EMOJIS[sport] || "🏅"}</span>
-                                <span>{sport}</span>
-                              </span>
-                            ))}
-                            {facility.identified_sports.length > 5 && (
-                              <span className="inline-flex items-center px-3 py-1.5 bg-[#E8E9EB] text-gray-600 rounded-lg text-xs font-semibold">
-                                +{facility.identified_sports.length - 5} more
-                              </span>
-                            )}
-                          </div>
-                        )}
+                        {facility.identified_sports &&
+                          facility.identified_sports.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                              {facility.identified_sports
+                                .slice(0, 5)
+                                .map((sport) => (
+                                  <span
+                                    key={sport}
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-[#004aad]/5 to-[#004aad]/10 text-[#004aad] rounded-lg text-xs font-semibold shadow-sm"
+                                  >
+                                    <span className="text-base">
+                                      {SPORT_EMOJIS[sport] || "🏅"}
+                                    </span>
+                                    <span>{sport}</span>
+                                  </span>
+                                ))}
+                              {facility.identified_sports.length > 5 && (
+                                <span className="inline-flex items-center px-3 py-1.5 bg-[#E8E9EB] text-gray-600 rounded-lg text-xs font-semibold">
+                                  +{facility.identified_sports.length - 5} more
+                                </span>
+                              )}
+                            </div>
+                          )}
 
                         {/* Rating if available */}
                         {facility.rating && (
                           <div className="flex items-center gap-2 text-sm">
                             <div className="flex items-center gap-1">
-                              <span className="text-yellow-500 text-base">★</span>
-                              <span className="font-bold text-gray-900">{facility.rating.toFixed(1)}</span>
+                              <span className="text-yellow-500 text-base">
+                                ★
+                              </span>
+                              <span className="font-bold text-gray-900">
+                                {facility.rating.toFixed(1)}
+                              </span>
                             </div>
                             <span className="text-gray-400">•</span>
-                            <span className="text-gray-500">{facility.user_ratings_total} reviews</span>
+                            <span className="text-gray-500">
+                              {facility.user_ratings_total} reviews
+                            </span>
                           </div>
                         )}
                       </div>
@@ -331,7 +351,9 @@ export default function FacilitySearch({ facilities, onSelectFacility }: Facilit
                   <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
                     <Search className="w-8 h-8 text-gray-400" />
                   </div>
-                  <p className="text-base font-semibold text-gray-700 mb-1">No facilities found</p>
+                  <p className="text-base font-semibold text-gray-700 mb-1">
+                    No facilities found
+                  </p>
                   <p className="text-sm text-gray-500">
                     Try searching by name, location, or sport
                   </p>

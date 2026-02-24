@@ -20,7 +20,8 @@ if (!GOOGLE_API_KEY || !supabaseUrl || !supabaseAnonKey) {
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // ===== TARGET CITIES =====
-// Focus on top 30 Texas cities for high-quality facilities
+// Original large cities (already collected - commented out)
+/*
 const TARGET_CITIES = [
   "Houston, Texas",
   "San Antonio, Texas",
@@ -52,6 +53,168 @@ const TARGET_CITIES = [
   "Round Rock, Texas",
   "Richardson, Texas",
   "League City, Texas",
+];
+*/
+
+// ===== SMALL TEXAS CITIES =====
+// Focus on county seats and regional hubs (1,000-50,000 population)
+// Organized by region for better tracking
+const SMALL_TEXAS_CITIES = [
+  // PANHANDLE & PLAINS
+  "Dumas, Texas",
+  "Childress, Texas",
+  "Perryton, Texas",
+  "Dalhart, Texas",
+  "Hereford, Texas",
+  "Tulia, Texas",
+  "Canadian, Texas",
+  "Borger, Texas",
+  "Muleshoe, Texas",
+  "Levelland, Texas",
+  "Post, Texas",
+  "Slaton, Texas",
+  "Spur, Texas",
+  "Clarendon, Texas",
+  "Memphis, Texas",
+  "Wellington, Texas",
+  "Quanah, Texas",
+  "Snyder, Texas",
+  "Lamesa, Texas",
+  "Seminole, Texas",
+  "Kermit, Texas",
+  "Seagraves, Texas",
+  "Brownfield, Texas",
+  "Tahoka, Texas",
+  "Morton, Texas",
+  "Littlefield, Texas",
+  "Abernathy, Texas",
+  "Crosbyton, Texas",
+  "Floydada, Texas",
+  "Matador, Texas",
+  "Paducah, Texas",
+  "Crowell, Texas",
+
+  // WEST TEXAS & PERMIAN BASIN
+  "Mentone, Texas",
+  "Crane, Texas",
+  "McCamey, Texas",
+  "Rankin, Texas",
+  "Garden City, Texas",
+  "Sterling City, Texas",
+
+  // TRANS-PECOS
+  "Alpine, Texas",
+  "Marfa, Texas",
+  "Fort Davis, Texas",
+  "Van Horn, Texas",
+  "Sierra Blanca, Texas",
+  "Pecos, Texas",
+  "Fort Stockton, Texas",
+  "Sanderson, Texas",
+  "Presidio, Texas",
+
+  // NORTH CENTRAL
+  "Breckenridge, Texas",
+  "Graham, Texas",
+  "Decatur, Texas",
+  "Granbury, Texas",
+  "Hillsboro, Texas",
+  "Mineral Wells, Texas",
+  "Jacksboro, Texas",
+  "Eastland, Texas",
+  "Comanche, Texas",
+  "Hamilton, Texas",
+  "Meridian, Texas",
+  "Glen Rose, Texas",
+  "Hico, Texas",
+  "Dublin, Texas",
+  "Cisco, Texas",
+
+  // HILL COUNTRY
+  "Brady, Texas",
+  "Fredericksburg, Texas",
+  "Llano, Texas",
+  "Burnet, Texas",
+  "Marble Falls, Texas",
+  "Johnson City, Texas",
+  "Lampasas, Texas",
+  "Goldthwaite, Texas",
+  "San Saba, Texas",
+  "Mason, Texas",
+  "Junction, Texas",
+  "Rocksprings, Texas",
+  "Bandera, Texas",
+  "Comfort, Texas",
+  "Blanco, Texas",
+  "Wimberley, Texas",
+  "Dripping Springs, Texas",
+  "Uvalde, Texas",
+
+  // EAST TEXAS
+  "Crockett, Texas",
+  "Jasper, Texas",
+  "Center, Texas",
+  "Carthage, Texas",
+  "Gilmer, Texas",
+  "Henderson, Texas",
+  "Rusk, Texas",
+  "Athens, Texas",
+  "Canton, Texas",
+  "Mt. Vernon, Texas",
+  "Quitman, Texas",
+  "Pittsburg, Texas",
+  "Winnsboro, Texas",
+  "Mineola, Texas",
+  "Jefferson, Texas",
+  "San Augustine, Texas",
+  "Hemphill, Texas",
+  "Woodville, Texas",
+  "Livingston, Texas",
+
+  // SOUTHEAST TEXAS
+  "Liberty, Texas",
+  "Silsbee, Texas",
+  "Kountze, Texas",
+  "Anahuac, Texas",
+  "Dayton, Texas",
+  "Winnie, Texas",
+
+  // SOUTH TEXAS
+  "Karnes City, Texas",
+  "Falfurrias, Texas",
+  "Hebbronville, Texas",
+  "Carrizo Springs, Texas",
+  "Crystal City, Texas",
+  "Cotulla, Texas",
+  "Pleasanton, Texas",
+  "Jourdanton, Texas",
+  "Pearsall, Texas",
+  "Dilley, Texas",
+  "Beeville, Texas",
+  "Goliad, Texas",
+  "Cuero, Texas",
+  "Yorktown, Texas",
+  "Hallettsville, Texas",
+  "Yoakum, Texas",
+  "Gonzales, Texas",
+  "Kenedy, Texas",
+  "Rio Grande City, Texas",
+  "Roma, Texas",
+  "Zapata, Texas",
+  "Raymondville, Texas",
+  "Port Isabel, Texas",
+
+  // CENTRAL CORRIDOR
+  "Cameron, Texas",
+  "Groesbeck, Texas",
+  "Madisonville, Texas",
+  "Rockdale, Texas",
+  "Caldwell, Texas",
+  "Franklin, Texas",
+  "Hearne, Texas",
+  "Mexia, Texas",
+  "Marlin, Texas",
+  "Navasota, Texas",
 ];
 
 // ===== HIGH-QUALITY SEARCH QUERIES =====
@@ -108,10 +271,10 @@ const FACILITY_CHAINS = [
   "Velocity Sports Performance",
 ];
 
-// ===== QUALITY THRESHOLDS =====
-const MIN_RATING = 4.0;
-const MIN_REVIEWS = 20;
-const MIN_COMPLETENESS_SCORE = 50; // Higher than standard 30
+// ===== QUALITY THRESHOLDS FOR SMALL TOWNS =====
+const MIN_RATING = 3.5; // Lowered from 4.0 for small towns
+const MIN_REVIEWS = 5; // Lowered from 20 for small towns
+const MIN_COMPLETENESS_SCORE = 25; // Lowered from 50 for small towns
 const PROXIMITY_THRESHOLD_METERS = 50;
 
 // Quality keywords in facility names
@@ -237,7 +400,7 @@ interface ProgressState {
 
 const PROGRESS_FILE = path.join(
   __dirname,
-  "../.high-quality-facilities-progress.json",
+  "../.small-texas-cities-facilities-progress.json",
 );
 
 // ===== HELPER FUNCTIONS =====
@@ -362,7 +525,7 @@ function isHighQualityFacility(place: any): {
     };
   }
 
-  // Check 6: Quality boost for keywords or multiple sports
+  // Check 6: More lenient for small towns - accept if ANY indicator is present
   const nameLower = (place.name || "").toLowerCase();
   const hasQualityKeyword = QUALITY_KEYWORDS.some((keyword) =>
     nameLower.includes(keyword),
@@ -371,12 +534,12 @@ function isHighQualityFacility(place: any): {
     ["sports_complex", "recreation_center", "athletic_field"].includes(type),
   );
 
-  // If no quality indicators, require higher rating
-  if (!hasQualityKeyword && !hasMultipleSports) {
-    if (place.rating < 4.5 || place.user_ratings_total < 50) {
+  // For small towns: only require higher rating/reviews if NO quality indicators at all
+  if (!hasQualityKeyword && !hasMultipleSports && !hasAthletic) {
+    if (place.rating < 4.0 || place.user_ratings_total < 10) {
       return {
         passed: false,
-        reason: "No quality indicators and insufficient rating/reviews",
+        reason: "No quality indicators and low engagement",
       };
     }
   }
@@ -891,12 +1054,12 @@ async function processFacilities(
 // ===== MAIN FUNCTION =====
 
 async function collectHighQualityFacilities() {
-  console.log("🚀 High-Quality Athletic Facilities Collection");
+  console.log("🚀 Small Texas Cities Athletic Facilities Collection");
   console.log("=".repeat(60));
-  console.log(`📊 Target Cities: ${TARGET_CITIES.length}`);
+  console.log(`📊 Target Cities: ${SMALL_TEXAS_CITIES.length}`);
   console.log(`🏢 Facility Chains: ${FACILITY_CHAINS.length}`);
   console.log(`🔍 Search Types: ${HIGH_QUALITY_SEARCHES.length}`);
-  console.log(`\n🎯 Quality Criteria:`);
+  console.log(`\n🎯 Quality Criteria (Adjusted for Small Towns):`);
   console.log(`   ✓ Minimum rating: ${MIN_RATING}`);
   console.log(`   ✓ Minimum reviews: ${MIN_REVIEWS}`);
   console.log(`   ✓ Minimum completeness: ${MIN_COMPLETENESS_SCORE}/100`);
@@ -912,7 +1075,7 @@ async function collectHighQualityFacilities() {
   ) {
     console.log(`♻️  Resuming:`);
     console.log(
-      `   Cities: ${progress.processedCities.length}/${TARGET_CITIES.length}`,
+      `   Cities: ${progress.processedCities.length}/${SMALL_TEXAS_CITIES.length}`,
     );
     console.log(
       `   Chains: ${progress.processedChains.length}/${FACILITY_CHAINS.length}`,
@@ -941,15 +1104,15 @@ async function collectHighQualityFacilities() {
   }
 
   // Process cities
-  for (let i = 0; i < TARGET_CITIES.length; i++) {
-    const city = TARGET_CITIES[i];
+  for (let i = 0; i < SMALL_TEXAS_CITIES.length; i++) {
+    const city = SMALL_TEXAS_CITIES[i];
 
     if (progress.processedCities.includes(city)) {
       continue;
     }
 
     try {
-      await processCity(city, i, TARGET_CITIES.length, progress);
+      await processCity(city, i, SMALL_TEXAS_CITIES.length, progress);
       progress.processedCities.push(city);
       saveProgress(progress);
 
@@ -960,13 +1123,13 @@ async function collectHighQualityFacilities() {
           (progress.processedCities.length + progress.processedChains.length) /
           elapsed;
         const remaining =
-          TARGET_CITIES.length - progress.processedCities.length;
+          SMALL_TEXAS_CITIES.length - progress.processedCities.length;
         const eta = remaining / rate;
 
         console.log("\n" + "=".repeat(60));
         console.log("📊 Overall Progress:");
         console.log(
-          `   Cities: ${progress.processedCities.length}/${TARGET_CITIES.length}`,
+          `   Cities: ${progress.processedCities.length}/${SMALL_TEXAS_CITIES.length}`,
         );
         console.log(
           `   Chains: ${progress.processedChains.length}/${FACILITY_CHAINS.length}`,
@@ -1001,7 +1164,7 @@ async function collectHighQualityFacilities() {
   console.log("=".repeat(60));
   console.log(`📊 Final Statistics:`);
   console.log(
-    `   Cities Processed: ${progress.processedCities.length}/${TARGET_CITIES.length}`,
+    `   Cities Processed: ${progress.processedCities.length}/${SMALL_TEXAS_CITIES.length}`,
   );
   console.log(
     `   Chains Processed: ${progress.processedChains.length}/${FACILITY_CHAINS.length}`,

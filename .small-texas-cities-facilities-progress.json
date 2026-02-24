@@ -1,0 +1,35 @@
+{
+  "processedCities": [
+    "Dumas, Texas",
+    "Childress, Texas",
+    "Perryton, Texas",
+    "Dalhart, Texas",
+    "Hereford, Texas",
+    "Tulia, Texas",
+    "Canadian, Texas",
+    "Borger, Texas",
+    "Muleshoe, Texas",
+    "Levelland, Texas",
+    "Post, Texas"
+  ],
+  "processedChains": [
+    "FieldhouseUSA",
+    "Game On Sports",
+    "TOCA Soccer",
+    "PIT Fitness",
+    "D-BAT",
+    "Athletic Republic",
+    "Parisi Speed School",
+    "Sports Academy",
+    "Velocity Sports Performance"
+  ],
+  "totalFacilities": 270,
+  "statistics": {
+    "searched": 1765,
+    "filteredLowQuality": 620,
+    "filteredDuplicate": 875,
+    "filteredNonSport": 0,
+    "inserted": 270
+  },
+  "lastUpdated": "2026-02-24T18:43:12.974Z"
+}
