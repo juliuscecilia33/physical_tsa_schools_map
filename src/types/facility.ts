@@ -61,3 +61,5 @@ export interface FacilityTag {
   created_at?: string;
   updated_at?: string;
 }
+
+export type VisibilityFilter = 'UNHIDDEN_ONLY' | 'ALL' | 'HIDDEN_ONLY' | 'WITH_NOTES_ONLY' | 'CLEANED_UP_ONLY';

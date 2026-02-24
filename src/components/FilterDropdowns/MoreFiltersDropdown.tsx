@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface MoreFiltersDropdownProps {
   isOpen: boolean;
   onClose: () => void;
-  buttonRef: React.RefObject<HTMLButtonElement>;
+  buttonRef: React.RefObject<HTMLButtonElement | null>;
 }
 
 export default function MoreFiltersDropdown({

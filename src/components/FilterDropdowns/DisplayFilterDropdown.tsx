@@ -9,7 +9,7 @@ interface DisplayFilterDropdownProps {
   onClose: () => void;
   selectedFilter: VisibilityFilter;
   onFilterChange: (filter: VisibilityFilter) => void;
-  buttonRef: React.RefObject<HTMLButtonElement>;
+  buttonRef: React.RefObject<HTMLButtonElement | null>;
 }
 
 const DISPLAY_OPTIONS = [

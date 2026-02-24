@@ -17,7 +17,7 @@ interface TagFilterDropdownProps {
   selectedTagIds: string[];
   onTagToggle: (tagId: string) => void;
   onClearTags: () => void;
-  buttonRef: React.RefObject<HTMLButtonElement>;
+  buttonRef: React.RefObject<HTMLButtonElement | null>;
 }
 
 export default function TagFilterDropdown({
@@ -115,8 +115,8 @@ export default function TagFilterDropdown({
                         style={{
                           backgroundColor: isSelected ? tag.color : `${tag.color}30`,
                           color: isSelected ? 'white' : tag.color,
-                          ringColor: isSelected ? tag.color : 'transparent',
-                        }}
+                          '--tw-ring-color': isSelected ? tag.color : 'transparent',
+                        } as React.CSSProperties}
                         title={tag.description || tag.name}
                       >
                         {tag.name}

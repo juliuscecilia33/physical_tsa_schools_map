@@ -11,7 +11,7 @@ interface CategoryFilterDropdownProps {
   onClearCategories: () => void;
   categoryCounts: Record<string, number>;
   categoryColors: Record<string, string>;
-  buttonRef: React.RefObject<HTMLButtonElement>;
+  buttonRef: React.RefObject<HTMLButtonElement | null>;
 }
 
 const CATEGORIES = [

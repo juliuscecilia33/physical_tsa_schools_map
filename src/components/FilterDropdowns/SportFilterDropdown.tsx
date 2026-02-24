@@ -11,7 +11,7 @@ interface SportFilterDropdownProps {
   onSportToggle: (sport: string) => void;
   onClearSports: () => void;
   sportEmojis: Record<string, string>;
-  buttonRef: React.RefObject<HTMLButtonElement>;
+  buttonRef: React.RefObject<HTMLButtonElement | null>;
 }
 
 export default function SportFilterDropdown({
