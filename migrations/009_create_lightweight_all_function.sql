@@ -1,0 +1,93 @@
+-- Migration: Create lightweight query for ALL facilities
+-- Purpose: Fetch all facilities with lightweight payload (no heavy arrays)
+
+-- Drop function if it exists
+DROP FUNCTION IF EXISTS get_all_facilities_lightweight(INTEGER, BOOLEAN, BOOLEAN);
+
+-- Create lightweight all-facilities query function
+CREATE OR REPLACE FUNCTION get_all_facilities_lightweight(
+  row_limit INTEGER DEFAULT 20000,
+  include_hidden BOOLEAN DEFAULT true,
+  include_cleaned_up BOOLEAN DEFAULT true
+)
+RETURNS TABLE (
+  id UUID,
+  place_id TEXT,
+  name TEXT,
+  sport_types TEXT[],
+  identified_sports TEXT[],
+  sport_metadata JSONB,
+  address TEXT,
+  lat DOUBLE PRECISION,
+  lng DOUBLE PRECISION,
+  phone TEXT,
+  website TEXT,
+  rating NUMERIC,
+  user_ratings_total INTEGER,
+  photo_references TEXT[],
+  opening_hours JSONB,
+  business_status TEXT,
+  hidden BOOLEAN,
+  cleaned_up BOOLEAN,
+  created_at TIMESTAMPTZ,
+  updated_at TIMESTAMPTZ,
+  has_notes BOOLEAN,
+  tags JSONB,
+  serp_scraped BOOLEAN,
+  serp_scraped_at TIMESTAMPTZ
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT
+    f.id,
+    f.place_id,
+    f.name,
+    f.sport_types,
+    f.identified_sports,
+    f.sport_metadata,
+    f.address,
+    ST_Y(f.location::geometry) AS lat,
+    ST_X(f.location::geometry) AS lng,
+    f.phone,
+    f.website,
+    f.rating,
+    f.user_ratings_total,
+    f.photo_references,
+    f.opening_hours,
+    f.business_status,
+    f.hidden,
+    f.cleaned_up,
+    f.created_at,
+    f.updated_at,
+    EXISTS(SELECT 1 FROM facility_notes n WHERE n.place_id = f.place_id) AS has_notes,
+    COALESCE(
+      (
+        SELECT jsonb_agg(
+          jsonb_build_object(
+            'id', t.id,
+            'name', t.name,
+            'color', t.color,
+            'description', t.description
+          )
+          ORDER BY t.name
+        )
+        FROM facility_tag_assignments ta
+        JOIN facility_tags t ON ta.tag_id = t.id
+        WHERE ta.place_id = f.place_id
+      ),
+      '[]'::jsonb
+    ) AS tags,
+    f.serp_scraped,
+    f.serp_scraped_at
+  FROM sports_facilities f
+  WHERE
+    (include_hidden OR f.hidden = false)
+    AND (include_cleaned_up OR f.cleaned_up = false)
+  ORDER BY f.rating DESC NULLS LAST, f.user_ratings_total DESC NULLS LAST
+  LIMIT row_limit;
+END;
+$$ LANGUAGE plpgsql STABLE;
+
+-- Add comment explaining the function
+COMMENT ON FUNCTION get_all_facilities_lightweight IS
+'Lightweight query for ALL facilities that excludes heavy arrays (reviews, additional_reviews, additional_photos, notes) to reduce egress while maintaining all filtering capabilities.';

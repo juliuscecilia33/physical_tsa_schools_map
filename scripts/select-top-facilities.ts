@@ -34,6 +34,14 @@ const HIGH_QUALITY_KEYWORDS = [
   "sports complex",
 ];
 
+// Texas geographic bounds for filtering
+const TEXAS_BOUNDS = {
+  minLat: 25.8,
+  maxLat: 36.5,
+  minLng: -106.6,
+  maxLng: -93.5,
+};
+
 interface Facility {
   id: string;
   place_id: string;
@@ -47,6 +55,10 @@ interface Facility {
   sport_metadata: any;
   website: string | null;
   phone: string | null;
+  location: {
+    lat: number;
+    lng: number;
+  };
 }
 
 interface ScoredFacility extends Facility {
@@ -58,6 +70,20 @@ interface ScoredFacility extends Facility {
     keyword_bonus: number;
     photo_limit_bonus: number;
   };
+}
+
+/**
+ * Check if a facility is located in Texas based on geographic bounds
+ */
+function isTexasFacility(facility: Facility): boolean {
+  if (!facility.location) return false;
+  const { lat, lng } = facility.location;
+  return (
+    lat >= TEXAS_BOUNDS.minLat &&
+    lat <= TEXAS_BOUNDS.maxLat &&
+    lng >= TEXAS_BOUNDS.minLng &&
+    lng <= TEXAS_BOUNDS.maxLng
+  );
 }
 
 /**
@@ -129,31 +155,41 @@ function calculateQualityScore(facility: Facility): {
 async function fetchAndScoreFacilities(): Promise<ScoredFacility[]> {
   console.log("📊 Fetching facilities from database...\n");
 
-  const { data, error } = await supabase
-    .from("sports_facilities")
-    .select(
-      "id, place_id, name, rating, user_ratings_total, photo_references, address, sport_types, identified_sports, sport_metadata, website, phone"
-    )
-    .gte("rating", 4.0) // Minimum rating filter
-    .not("photo_references", "is", null); // Must have photos
+  const { data, error } = await supabase.rpc("get_facilities_with_coords", {
+    min_rating: 4.0,
+  });
 
   if (error) {
     console.error("❌ Error fetching facilities:", error.message);
     process.exit(1);
   }
 
-  console.log(`✅ Fetched ${data.length} facilities with rating >= 4.0\n`);
+  // Filter out facilities without photos
+  const facilitiesWithPhotos = data.filter(
+    (f: Facility) => f.photo_references && f.photo_references.length > 0
+  );
+
+  console.log(
+    `✅ Fetched ${facilitiesWithPhotos.length} facilities with rating >= 4.0 and photos\n`
+  );
+
+  // Filter for Texas facilities only
+  const texasFacilities = facilitiesWithPhotos.filter(isTexasFacility);
+  console.log(`🌵 Filtered to ${texasFacilities.length} Texas facilities\n`);
+
   console.log("🧮 Calculating quality scores...\n");
 
   // Calculate scores for all facilities
-  const scoredFacilities: ScoredFacility[] = data.map((facility) => {
-    const { score, breakdown } = calculateQualityScore(facility);
-    return {
-      ...facility,
-      quality_score: score,
-      score_breakdown: breakdown,
-    };
-  });
+  const scoredFacilities: ScoredFacility[] = texasFacilities.map(
+    (facility: Facility) => {
+      const { score, breakdown } = calculateQualityScore(facility);
+      return {
+        ...facility,
+        quality_score: score,
+        score_breakdown: breakdown,
+      };
+    }
+  );
 
   // Sort by quality score (descending)
   scoredFacilities.sort((a, b) => b.quality_score - a.quality_score);
@@ -283,10 +319,11 @@ function generateStatistics(facilities: ScoredFacility[]): void {
  * Main function
  */
 async function selectTopFacilities() {
-  console.log("🚀 High-Quality Facility Selection");
+  console.log("🚀 High-Quality Texas Facility Selection");
   console.log("=".repeat(70));
-  console.log("🎯 Goal: Select top 2,500 facilities for SerpAPI enrichment");
+  console.log("🎯 Goal: Select top 2,500 Texas facilities for SerpAPI enrichment");
   console.log("\n📋 Selection Criteria:");
+  console.log("   • Location: Texas only (geographic bounds)");
   console.log("   • Rating >= 4.0");
   console.log("   • Must have photos");
   console.log("   • Ranked by quality score:");
@@ -303,7 +340,7 @@ async function selectTopFacilities() {
   // Select top 2,500
   const topFacilities = allFacilities.slice(0, 2500);
 
-  console.log(`✅ Selected top ${topFacilities.length} facilities\n`);
+  console.log(`✅ Selected top ${topFacilities.length} Texas facilities\n`);
 
   // Generate statistics
   generateStatistics(topFacilities);
@@ -314,13 +351,18 @@ async function selectTopFacilities() {
     fs.mkdirSync(outputDir, { recursive: true });
   }
 
-  const outputPath = path.join(outputDir, "top-2500-high-quality-facilities.json");
+  const outputPath = path.join(
+    outputDir,
+    "top-2500-high-quality-texas-facilities.json"
+  );
 
   const exportData = {
     metadata: {
       total_facilities: topFacilities.length,
       generated_at: new Date().toISOString(),
       selection_criteria: {
+        location: "Texas only (geographic bounds)",
+        texas_bounds: TEXAS_BOUNDS,
         min_rating: 4.0,
         must_have_photos: true,
         ranking_formula:

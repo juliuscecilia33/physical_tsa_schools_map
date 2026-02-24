@@ -34,6 +34,11 @@ import {
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { supabase } from "@/lib/supabase";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  updateFacilityNotesFlag,
+  updateFacilityTags,
+} from "@/utils/facilityCache";
 
 interface FacilitySidebarProps {
   facility: Facility | null;
@@ -136,6 +141,7 @@ export default function FacilitySidebar({
   onClose,
   onUpdateFacility,
 }: FacilitySidebarProps) {
+  const queryClient = useQueryClient();
   const contentRef = useRef<HTMLDivElement>(null);
   const [loadingImages, setLoadingImages] = useState<{
     [key: number]: boolean;
@@ -255,6 +261,9 @@ export default function FacilitySidebar({
       // Replace temp note with real note from database
       setNotes((prev) => prev.map((n) => (n.id === tempNote.id ? data : n)));
 
+      // Update cache to reflect that this facility now has notes
+      updateFacilityNotesFlag(queryClient, facility.place_id, true);
+
       // Close the form after successful add
       setShowAddNoteForm(false);
     } catch (error) {
@@ -320,10 +329,16 @@ export default function FacilitySidebar({
     if (!confirm("Are you sure you want to delete this note?")) return;
 
     const deletedNote = notes.find((n) => n.id === noteId);
-    if (!deletedNote) return;
+    if (!deletedNote || !facility) return;
 
     // Optimistic update
-    setNotes((prev) => prev.filter((n) => n.id !== noteId));
+    const remainingNotes = notes.filter((n) => n.id !== noteId);
+    setNotes(remainingNotes);
+
+    // Update cache if this was the last note
+    if (remainingNotes.length === 0) {
+      updateFacilityNotesFlag(queryClient, facility.place_id, false);
+    }
 
     try {
       const { error } = await supabase
@@ -341,6 +356,8 @@ export default function FacilitySidebar({
             new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
         ),
       );
+      // Revert cache update
+      updateFacilityNotesFlag(queryClient, facility.place_id, true);
       alert("Failed to delete note. Please try again.");
     }
   };
@@ -518,11 +535,15 @@ export default function FacilitySidebar({
       if (error) throw error;
 
       // Update facility tags optimistically
+      const updatedTags = facility.tags ? [...facility.tags, tag] : [tag];
       if (facility.tags) {
         facility.tags.push(tag);
       } else {
         facility.tags = [tag];
       }
+
+      // Update cache with new tags
+      updateFacilityTags(queryClient, facility.place_id, updatedTags);
 
       setShowTagDropdown(false);
     } catch (error) {
@@ -541,9 +562,13 @@ export default function FacilitySidebar({
     if (!tag) return;
 
     // Optimistic update
+    const updatedTags = facility.tags ? facility.tags.filter((t) => t.id !== tagId) : [];
     if (facility.tags) {
       facility.tags = facility.tags.filter((t) => t.id !== tagId);
     }
+
+    // Update cache with updated tags
+    updateFacilityTags(queryClient, facility.place_id, updatedTags);
 
     try {
       const { error } = await supabase
@@ -556,9 +581,12 @@ export default function FacilitySidebar({
     } catch (error) {
       console.error("Error removing tag:", error);
       // Revert optimistic update
+      const revertedTags = updatedTags.concat(tag);
       if (facility.tags && tag) {
         facility.tags.push(tag);
       }
+      // Revert cache update
+      updateFacilityTags(queryClient, facility.place_id, revertedTags);
       alert("Failed to remove tag. Please try again.");
     }
   };

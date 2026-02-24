@@ -67,3 +67,20 @@ export interface FacilityTag {
 }
 
 export type VisibilityFilter = 'UNHIDDEN_ONLY' | 'ALL' | 'HIDDEN_ONLY' | 'WITH_NOTES_ONLY' | 'CLEANED_UP_ONLY';
+
+// Lightweight version of Facility for viewport-based loading
+// Excludes heavy arrays (reviews, additional_reviews, additional_photos, notes)
+// Keeps counts and metadata for popups and filtering
+export type FacilityLightweight = Omit<
+  Facility,
+  'reviews' | 'additional_reviews' | 'additional_photos' | 'notes'
+>;
+
+// Map bounds for viewport queries
+export interface MapBounds {
+  minLat: number;
+  maxLat: number;
+  minLng: number;
+  maxLng: number;
+  zoom: number;
+}
