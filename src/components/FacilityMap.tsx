@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useMemo } from "react";
-import Map, { Source, Layer, NavigationControl } from "react-map-gl";
+import Map, { Source, Layer, NavigationControl, Popup } from "react-map-gl";
 import type { MapRef, MapLayerMouseEvent } from "react-map-gl";
 import { Facility } from "@/types/facility";
 import { FilterOption } from "@/app/page";
@@ -138,6 +138,12 @@ function extractCity(address: string): string {
   return address.toLowerCase();
 }
 
+// Helper function to format numbers with commas
+function formatNumber(num: number | undefined): string {
+  if (num === undefined || num === null) return "0";
+  return num.toLocaleString();
+}
+
 // Helper function to apply AI filters to facilities
 function applyAIFilters(
   facilities: Facility[],
@@ -238,6 +244,8 @@ export default function FacilityMap({
   const [selectedFacility, setSelectedFacility] = useState<Facility | null>(
     null,
   );
+  const [hoveredFacility, setHoveredFacility] = useState<Facility | null>(null);
+  const [clickedFacility, setClickedFacility] = useState<Facility | null>(null);
   const [sidebarVisible, setSidebarVisible] = useState(false);
   const [expandedSections, setExpandedSections] = useState({
     displayFilter: true,
@@ -485,7 +493,17 @@ export default function FacilityMap({
     const facilityData = feature.properties?.facilityData;
     if (facilityData) {
       const facility: Facility = JSON.parse(facilityData);
+
+      // Zoom to facility location
+      const map = mapRef.current?.getMap();
+      map?.flyTo({
+        center: [facility.location.lng, facility.location.lat],
+        zoom: 16,
+        duration: 1500,
+      });
+
       setSelectedFacility(facility);
+      setClickedFacility(facility);
     }
   };
 
@@ -539,8 +557,150 @@ export default function FacilityMap({
             onMarkerClick(e);
           }
         }}
+        onMouseMove={(e) => {
+          // Show hover popup if no facility is currently selected
+          if (!selectedFacility && e.features && e.features.length > 0) {
+            const feature = e.features[0];
+            const facilityData = feature.properties?.facilityData;
+            if (facilityData) {
+              const facility: Facility = JSON.parse(facilityData);
+              setHoveredFacility(facility);
+            }
+          }
+        }}
+        onMouseLeave={() => {
+          setHoveredFacility(null);
+        }}
       >
         <NavigationControl position="top-right" />
+
+        {/* Unified Dark Mode Stats Popup - Shows on both hover and click */}
+        {(hoveredFacility || clickedFacility) && (
+          <Popup
+            longitude={(hoveredFacility || clickedFacility)!.location.lng}
+            latitude={(hoveredFacility || clickedFacility)!.location.lat}
+            anchor="bottom"
+            closeButton={false}
+            closeOnClick={false}
+            offset={20}
+            className="stats-popup"
+          >
+            <div className="bg-gray-800 rounded-xl shadow-2xl border border-gray-700 overflow-hidden">
+              {/* Facility Name Header */}
+              <div className="px-4 py-3 border-b border-gray-700">
+                <h3 className="text-sm font-semibold text-white text-center truncate">
+                  {(hoveredFacility || clickedFacility)!.name}
+                </h3>
+              </div>
+
+              {/* Stats Grid - 2 rows x 3 columns */}
+              <div className="grid grid-cols-3">
+                {/* Row 1 - Photos */}
+                <div className="px-5 py-3 flex flex-col items-center justify-center border-r border-b border-gray-700">
+                  <div className="flex items-center gap-2 mb-2">
+                    <svg
+                      className="w-4 h-4 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                    <span className="text-[10px] font-medium text-gray-400">Photos</span>
+                  </div>
+                  <span className="text-base font-bold text-white mt-1">
+                    {formatNumber((hoveredFacility || clickedFacility)?.photo_references?.length || 0)}
+                  </span>
+                </div>
+
+                {/* Row 1 - Reviews */}
+                <div className="px-5 py-3 flex flex-col items-center justify-center border-r border-b border-gray-700">
+                  <div className="flex items-center gap-2 mb-2">
+                    <svg
+                      className="w-4 h-4 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+                      />
+                    </svg>
+                    <span className="text-[10px] font-medium text-gray-400">Reviews</span>
+                  </div>
+                  <span className="text-base font-bold text-white mt-1">
+                    {formatNumber((hoveredFacility || clickedFacility)?.user_ratings_total || 0)}
+                  </span>
+                </div>
+
+                {/* Row 1 - Rating */}
+                <div className="px-5 py-3 flex flex-col items-center justify-center border-b border-gray-700">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-yellow-400 text-base">★</span>
+                    <span className="text-[10px] font-medium text-gray-400">Rating</span>
+                  </div>
+                  <span className="text-base font-bold text-white mt-1">
+                    {(hoveredFacility || clickedFacility)?.rating?.toFixed(1) || "N/A"}
+                  </span>
+                </div>
+
+                {/* Row 2 - Tags */}
+                <div className="px-5 py-3 flex flex-col items-center justify-center border-r border-gray-700">
+                  <div className="flex items-center gap-2 mb-2">
+                    <svg
+                      className="w-4 h-4 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+                      />
+                    </svg>
+                    <span className="text-[10px] font-medium text-gray-400">Tags</span>
+                  </div>
+                  <span className="text-base font-bold text-white mt-1">
+                    {formatNumber((hoveredFacility || clickedFacility)?.tags?.length || 0)}
+                  </span>
+                </div>
+
+                {/* Row 2 - Notes */}
+                <div className="px-5 py-3 flex flex-col items-center justify-center border-r border-gray-700 col-span-2">
+                  <div className="flex items-center gap-2 mb-2">
+                    <svg
+                      className="w-4 h-4 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                      />
+                    </svg>
+                    <span className="text-[10px] font-medium text-gray-400">Notes</span>
+                  </div>
+                  <span className="text-base font-bold text-white mt-1">
+                    {(hoveredFacility || clickedFacility)?.has_notes ? "1" : "0"}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </Popup>
+        )}
 
         <Source id="facilities" type="geojson" data={geojsonData}>
           {/* Modern flat colored dots at low zoom (zoom < 10) */}
@@ -1094,7 +1254,10 @@ export default function FacilityMap({
       {/* Sidebar */}
       <FacilitySidebar
         facility={selectedFacility}
-        onClose={() => setSelectedFacility(null)}
+        onClose={() => {
+          setSelectedFacility(null);
+          setClickedFacility(null);
+        }}
         onUpdateFacility={onUpdateFacility}
       />
 

@@ -36,3 +36,15 @@ body {
     display: none;
   }
 }
+
+/* Override Mapbox popup default styles to remove white backing */
+.mapboxgl-popup-content {
+  background: transparent !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+.mapboxgl-popup-tip {
+  display: none !important;
+}

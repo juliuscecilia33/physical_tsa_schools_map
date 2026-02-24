@@ -21,7 +21,25 @@
     "Lamesa, Texas",
     "Seminole, Texas",
     "Kermit, Texas",
-    "Seagraves, Texas"
+    "Seagraves, Texas",
+    "Brownfield, Texas",
+    "Tahoka, Texas",
+    "Morton, Texas",
+    "Littlefield, Texas",
+    "Abernathy, Texas",
+    "Crosbyton, Texas",
+    "Floydada, Texas",
+    "Matador, Texas",
+    "Paducah, Texas",
+    "Crowell, Texas",
+    "Mentone, Texas",
+    "Crane, Texas",
+    "McCamey, Texas",
+    "Rankin, Texas",
+    "Garden City, Texas",
+    "Sterling City, Texas",
+    "Alpine, Texas",
+    "Marfa, Texas"
   ],
   "processedChains": [
     "FieldhouseUSA",
@@ -34,13 +52,13 @@
     "Sports Academy",
     "Velocity Sports Performance"
   ],
-  "totalFacilities": 471,
+  "totalFacilities": 656,
   "statistics": {
-    "searched": 3269,
-    "filteredLowQuality": 1093,
-    "filteredDuplicate": 1705,
+    "searched": 5722,
+    "filteredLowQuality": 1863,
+    "filteredDuplicate": 3203,
     "filteredNonSport": 0,
-    "inserted": 471
+    "inserted": 656
   },
-  "lastUpdated": "2026-02-24T19:00:23.129Z"
+  "lastUpdated": "2026-02-24T19:26:31.886Z"
 }
