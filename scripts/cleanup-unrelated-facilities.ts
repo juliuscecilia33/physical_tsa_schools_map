@@ -121,13 +121,8 @@ function hasIdentifiedSports(facility: Facility): boolean {
 function hasUnrelatedTypes(facility: Facility): boolean {
   const types = facility.sport_types || [];
 
-  const hasAthletic = types.some(
-    (type) =>
-      KEEP_TYPES.includes(type) ||
-      type.includes("sport") ||
-      type.includes("field") ||
-      type.includes("court")
-  );
+  // Only use explicit KEEP_TYPES list (no substring matching to avoid false positives like "courthouse")
+  const hasAthletic = types.some((type) => KEEP_TYPES.includes(type));
 
   const hasUnrelated = types.some((type) => UNRELATED_TYPES.includes(type));
 
@@ -211,8 +206,10 @@ function analyzeFacilities(facilities: Facility[]): {
       continue;
     }
 
-    // PROTECTION CHECK: Skip if facility has identified sports
-    if (hasIdentifiedSports(facility)) {
+    // PROTECTION CHECK: Skip if facility has identified sports AND doesn't have unrelated types
+    // This ensures courthouses, government offices, restaurants etc. are ALWAYS removed
+    const hasUnrelatedTypesCheck = hasUnrelatedTypes(facility);
+    if (hasIdentifiedSports(facility) && !hasUnrelatedTypesCheck) {
       stats.protectedBySports++;
       continue;
     }

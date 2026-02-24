@@ -578,7 +578,7 @@ export default function FacilityMap({
       {/* Left: Sidebar Toggle */}
       <button
         onClick={() => setSidebarVisible(!sidebarVisible)}
-        className="absolute top-7 left-4 z-10 flex-shrink-0 flex items-center gap-2 px-4 py-4 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200 hover:bg-gray-50 transition-all text-sm font-medium text-gray-700"
+        className="absolute top-7 left-4 z-15 flex-shrink-0 flex items-center gap-2 px-4 py-4 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200 hover:bg-gray-50 transition-all text-sm font-medium text-gray-700"
         title={sidebarVisible ? 'Hide filters sidebar' : 'Show filters sidebar'}
       >
         {sidebarVisible ? (
@@ -636,7 +636,7 @@ export default function FacilityMap({
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: -400, opacity: 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="fixed top-[1vh] left-4 h-[98vh] w-full md:w-[340px] bg-white shadow-2xl rounded-2xl p-6 overflow-y-auto z-10"
+            className="fixed top-[1vh] left-4 h-[98vh] w-full md:w-[340px] bg-white shadow-2xl rounded-2xl p-6 overflow-y-auto z-20"
           >
         {/* Close Button */}
         <button
