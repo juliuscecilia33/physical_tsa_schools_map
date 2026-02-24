@@ -34,18 +34,37 @@ export function ReactQueryProvider({ children }: { children: React.ReactNode }) 
       const cache = queryClient.getQueryCache();
       const queries = cache.getAll();
 
-      const serializedCache = queries.map((query) => ({
-        queryKey: query.queryKey,
-        state: query.state,
-      }));
+      // Only persist the main facilities query (not notes, tags, or other queries)
+      const facilitiesQuery = queries.find(
+        (query) =>
+          Array.isArray(query.queryKey) &&
+          query.queryKey[0] === "facilities" &&
+          query.queryKey[1] === "all"
+      );
 
-      try {
-        sessionStorage.setItem(
-          "react-query-cache",
-          JSON.stringify(serializedCache)
-        );
-      } catch (error) {
-        console.warn("Failed to persist React Query cache:", error);
+      if (facilitiesQuery && facilitiesQuery.state.data) {
+        try {
+          const serializedCache = {
+            queryKey: facilitiesQuery.queryKey,
+            data: facilitiesQuery.state.data,
+            dataUpdatedAt: facilitiesQuery.state.dataUpdatedAt,
+          };
+
+          const cacheString = JSON.stringify(serializedCache);
+
+          // Check size (sessionStorage limit is typically 5-10MB)
+          const sizeInMB = new Blob([cacheString]).size / (1024 * 1024);
+
+          if (sizeInMB > 8) {
+            console.warn(`React Query cache is large (${sizeInMB.toFixed(2)}MB), skipping persistence`);
+            return;
+          }
+
+          sessionStorage.setItem("react-query-cache", cacheString);
+          console.log(`Persisted facilities cache (${sizeInMB.toFixed(2)}MB)`);
+        } catch (error) {
+          console.warn("Failed to persist React Query cache:", error);
+        }
       }
     };
 
@@ -60,12 +79,16 @@ export function ReactQueryProvider({ children }: { children: React.ReactNode }) 
       if (cachedData) {
         const parsed = JSON.parse(cachedData);
 
-        parsed.forEach((item: any) => {
-          queryClient.setQueryData(item.queryKey, item.state.data);
-        });
+        // Restore the main facilities query
+        if (parsed.queryKey && parsed.data) {
+          queryClient.setQueryData(parsed.queryKey, parsed.data);
+          console.log("Restored facilities cache from sessionStorage");
+        }
       }
     } catch (error) {
       console.warn("Failed to restore React Query cache:", error);
+      // Clear corrupted cache
+      sessionStorage.removeItem("react-query-cache");
     }
   }, [queryClient]);
 
