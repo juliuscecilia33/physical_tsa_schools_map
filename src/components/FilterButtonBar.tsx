@@ -91,6 +91,12 @@ export default function FilterButtonBar({
   const tagFilterCount = selectedTagIds.length;
   const categoryFilterCount = selectedCategories.length;
 
+  // Check if all filters are selected (for outline-only styling)
+  const TOTAL_CATEGORIES = 5;
+  const allCategoriesSelected = selectedCategories.length === TOTAL_CATEGORIES;
+  const allSportsSelected = availableSports.length > 0 && selectedSports.length === availableSports.length;
+  const allTagsSelected = availableTags.length > 0 && selectedTagIds.length === availableTags.length;
+
   return (
     <>
       <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
@@ -121,7 +127,11 @@ export default function FilterButtonBar({
           ref={sportButtonRef}
           onClick={() => handleDropdownToggle('sport')}
           className={`flex-shrink-0 flex items-center justify-between gap-3 px-5 py-4 min-w-[130px] rounded-2xl shadow-2xl border transition-all text-sm font-medium ${
-            sportFilterCount > 0 || openDropdown === 'sport'
+            openDropdown === 'sport'
+              ? 'bg-[#004aad] text-white border-[#004aad]'
+              : allSportsSelected
+              ? 'bg-white/95 backdrop-blur-xl text-[#004aad] border-2 border-[#004aad] hover:bg-gray-50'
+              : sportFilterCount > 0
               ? 'bg-[#004aad] text-white border-[#004aad]'
               : 'bg-white/95 backdrop-blur-xl text-gray-700 border-gray-200 hover:bg-gray-50'
           }`}
@@ -143,7 +153,11 @@ export default function FilterButtonBar({
           ref={tagButtonRef}
           onClick={() => handleDropdownToggle('tag')}
           className={`flex-shrink-0 flex items-center justify-between gap-3 px-5 py-4 min-w-[120px] rounded-2xl shadow-2xl border transition-all text-sm font-medium ${
-            tagFilterCount > 0 || openDropdown === 'tag'
+            openDropdown === 'tag'
+              ? 'bg-[#004aad] text-white border-[#004aad]'
+              : allTagsSelected
+              ? 'bg-white/95 backdrop-blur-xl text-[#004aad] border-2 border-[#004aad] hover:bg-gray-50'
+              : tagFilterCount > 0
               ? 'bg-[#004aad] text-white border-[#004aad]'
               : 'bg-white/95 backdrop-blur-xl text-gray-700 border-gray-200 hover:bg-gray-50'
           }`}
@@ -165,7 +179,11 @@ export default function FilterButtonBar({
           ref={categoryButtonRef}
           onClick={() => handleDropdownToggle('category')}
           className={`flex-shrink-0 flex items-center justify-between gap-3 px-5 py-4 min-w-[160px] rounded-2xl shadow-2xl border transition-all text-sm font-medium ${
-            categoryFilterCount > 0 || openDropdown === 'category'
+            openDropdown === 'category'
+              ? 'bg-[#004aad] text-white border-[#004aad]'
+              : allCategoriesSelected
+              ? 'bg-white/95 backdrop-blur-xl text-[#004aad] border-2 border-[#004aad] hover:bg-gray-50'
+              : categoryFilterCount > 0
               ? 'bg-[#004aad] text-white border-[#004aad]'
               : 'bg-white/95 backdrop-blur-xl text-gray-700 border-gray-200 hover:bg-gray-50'
           }`}
