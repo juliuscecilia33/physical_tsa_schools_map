@@ -94,19 +94,6 @@ export default function FilterButtonBar({
   return (
     <>
       <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
-        {/* Sidebar Toggle Button */}
-        <button
-          onClick={onToggleSidebar}
-          className="flex-shrink-0 flex items-center gap-2 px-4 py-4 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200 hover:bg-gray-50 transition-all text-sm font-medium text-gray-700"
-          title={sidebarVisible ? 'Hide filters sidebar' : 'Show filters sidebar'}
-        >
-          {sidebarVisible ? (
-            <PanelLeftOpen className="w-5 h-5" />
-          ) : (
-            <PanelLeft className="w-5 h-5" />
-          )}
-        </button>
-
         {/* Display Filter Button */}
         <button
           ref={displayButtonRef}

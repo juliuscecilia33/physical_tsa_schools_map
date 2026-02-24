@@ -18,6 +18,9 @@ import {
   ChevronUp,
   Sparkles,
   Tag,
+  PanelLeft,
+  PanelLeftOpen,
+  X,
 } from "lucide-react";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { AISearchFilters } from "@/app/api/ai-search/route";
@@ -572,8 +575,21 @@ export default function FacilityMap({
         </Source>
       </Map>
 
-      {/* Search Bar and Filter Buttons - Single Row */}
-      <div className="absolute top-7 z-10 flex items-center gap-3 w-full justify-center px-4">
+      {/* Left: Sidebar Toggle */}
+      <button
+        onClick={() => setSidebarVisible(!sidebarVisible)}
+        className="absolute top-7 left-4 z-10 flex-shrink-0 flex items-center gap-2 px-4 py-4 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200 hover:bg-gray-50 transition-all text-sm font-medium text-gray-700"
+        title={sidebarVisible ? 'Hide filters sidebar' : 'Show filters sidebar'}
+      >
+        {sidebarVisible ? (
+          <PanelLeftOpen className="w-5 h-5" />
+        ) : (
+          <PanelLeft className="w-5 h-5" />
+        )}
+      </button>
+
+      {/* Center: Search and Filters */}
+      <div className="absolute top-7 left-1/2 -translate-x-1/2 z-10 flex items-center gap-3">
         <FacilitySearch
           facilities={filteredFacilities}
           onSelectFacility={handleSearchSelect}
@@ -600,17 +616,17 @@ export default function FacilityMap({
           categoryCounts={categoryCountsByLabel}
           categoryColors={categoryColors}
         />
-
-        {/* AI Search Toggle Button */}
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => setIsAISearchOpen(true)}
-          className="px-4 py-4 bg-[#1A1B1E]/90 text-white rounded-2xl shadow-2xl hover:bg-[#1A1B1E]/90 transition-all duration-300 font-semibold flex items-center gap-2 border border-[#559fff]"
-        >
-          <Sparkles className="w-5 h-5" color="#559fff" />
-        </motion.button>
       </div>
+
+      {/* Right: AI Assistant Button (Hidden) */}
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => setIsAISearchOpen(true)}
+        className="hidden absolute top-7 right-4 z-10 px-4 py-4 bg-[#1A1B1E]/90 text-white rounded-2xl shadow-2xl hover:bg-[#1A1B1E]/90 transition-all duration-300 font-semibold items-center gap-2 border border-[#559fff]"
+      >
+        <Sparkles className="w-5 h-5" color="#559fff" />
+      </motion.button>
 
       {/* Modern Info Panel */}
       <AnimatePresence>
@@ -622,6 +638,15 @@ export default function FacilityMap({
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className="fixed top-[1vh] left-4 h-[98vh] w-full md:w-[340px] bg-white shadow-2xl rounded-2xl p-6 overflow-y-auto z-10"
           >
+        {/* Close Button */}
+        <button
+          onClick={() => setSidebarVisible(false)}
+          className="absolute top-4 right-4 p-2 rounded-lg hover:bg-gray-100 transition-colors z-20"
+          title="Close sidebar"
+        >
+          <X className="w-5 h-5 text-gray-600" />
+        </button>
+
         {/* TSA Logo */}
         <div className="flex justify-center pb-4 mb-4 border-b border-[#E8E9EB]">
           <motion.img
