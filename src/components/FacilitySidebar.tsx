@@ -77,6 +77,43 @@ const SPORT_EMOJIS: { [key: string]: string } = {
   "Water Sports": "🚣",
 };
 
+// Facility type emoji mapping
+const FACILITY_TYPE_EMOJIS: { [key: string]: string } = {
+  // Facilities
+  "gym": "💪",
+  "stadium": "🏟️",
+  "park": "🏞️",
+  "sports_complex": "🏢",
+  "recreation_center": "🎯",
+  "swimming_pool": "🏊",
+  "aquatic_center": "🌊",
+
+  // Courts
+  "basketball_court": "🏀",
+  "tennis_court": "🎾",
+  "volleyball_court": "🏐",
+  "racquetball_court": "🎾",
+  "squash_court": "🎾",
+
+  // Fields
+  "soccer_field": "⚽",
+  "baseball_field": "⚾",
+  "football_field": "🏈",
+  "athletic_field": "🏃",
+  "track": "🏃",
+
+  // Other
+  "bowling_alley": "🎳",
+  "golf_course": "⛳",
+  "skating_rink": "⛸️",
+  "ice_rink": "⛸️",
+  "climbing_gym": "🧗",
+  "fitness_center": "🏋️",
+  "health_club": "🏋️",
+  "school": "🏫",
+  "university": "🎓",
+};
+
 export default function FacilitySidebar({ facility, onClose, onUpdateFacility }: FacilitySidebarProps) {
   const contentRef = useRef<HTMLDivElement>(null);
   const [loadingImages, setLoadingImages] = useState<{ [key: number]: boolean }>({});
@@ -95,6 +132,7 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
   const [isReviewsModalOpen, setIsReviewsModalOpen] = useState(false);
   const [isPhotoViewerOpen, setIsPhotoViewerOpen] = useState(false);
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
+  const [showAddNoteForm, setShowAddNoteForm] = useState(false);
 
   // Fetch notes when facility changes
   useEffect(() => {
@@ -152,6 +190,9 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
 
       // Replace temp note with real note from database
       setNotes(prev => prev.map(n => n.id === tempNote.id ? data : n));
+
+      // Close the form after successful add
+      setShowAddNoteForm(false);
     } catch (error) {
       console.error("Error adding note:", error);
       // Revert optimistic update
@@ -258,6 +299,26 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
       .split("_")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
+  };
+
+  const getCityState = (address: string): string => {
+    // Typical Google Places format: "Street, City, State ZIP, Country"
+    // Example: "123 Main St, Tyler, TX 75701, USA"
+    const parts = address.split(", ");
+
+    if (parts.length >= 3) {
+      const city = parts[parts.length - 3];
+      const stateZip = parts[parts.length - 2];
+
+      // Extract state abbreviation (first two letters before the ZIP)
+      const stateMatch = stateZip.match(/^([A-Z]{2})/);
+
+      if (stateMatch) {
+        return `${city}, ${stateMatch[1]}`;
+      }
+    }
+
+    return "";
   };
 
   const renderStars = (rating: number) => {
@@ -417,6 +478,14 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                   </span>
                 )}
               </div>
+              {getCityState(facility.address) && (
+                <div className="flex items-center gap-1.5 mb-2">
+                  <MapPin className="w-3.5 h-3.5 text-gray-400" />
+                  <span className="text-sm text-gray-500">
+                    {getCityState(facility.address)}
+                  </span>
+                </div>
+              )}
               {facility.rating && (
                 <div className="flex items-center gap-2">
                   <div className="flex gap-0.5">{renderStars(facility.rating)}</div>
@@ -451,15 +520,15 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                       transition={{ delay: 0.05 }}
                     >
                       <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                        <h3 className="text-sm font-semibold text-gray-700 tracking-wide">
                           Photos ({facility.photo_references.length})
                         </h3>
                         <button
                           onClick={() => setIsPhotosModalOpen(true)}
-                          className="flex items-center gap-1 text-xs font-medium text-[#004aad] hover:text-[#004aad]/80 transition-colors"
+                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#004aad] bg-white border border-[#004aad]/30 hover:border-[#004aad] hover:bg-[#004aad]/5 rounded-lg transition-all"
                         >
+                          <Maximize2 className="w-3.5 h-3.5" />
                           Expand
-                          <Maximize2 className="w-3 h-3" />
                         </button>
                       </div>
                       <div className="relative group/photos">
@@ -535,44 +604,72 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                     transition={{ delay: 0.08 }}
                   >
                     <div className="flex items-center justify-between mb-3">
-                      <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide flex items-center gap-2">
+                      <h3 className="text-sm font-semibold text-gray-700 tracking-wide flex items-center gap-2">
                         <StickyNote className="w-4 h-4" />
                         Notes ({notes.length})
                       </h3>
-                      {notes.length > 3 && (
-                        <button
-                          onClick={() => setShowAllNotes(!showAllNotes)}
-                          className="flex items-center gap-1 text-xs font-medium text-[#004aad] hover:text-[#004aad]/80 transition-colors"
-                        >
-                          {showAllNotes ? 'Show Less' : 'See All'}
-                          <ExternalLink className="w-3 h-3" />
-                        </button>
-                      )}
+                      <div className="flex gap-2">
+                        {!showAddNoteForm && (
+                          <button
+                            onClick={() => setShowAddNoteForm(true)}
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#004aad] bg-white border border-[#004aad]/30 hover:border-[#004aad] hover:bg-[#004aad]/5 rounded-lg transition-all"
+                          >
+                            <Plus className="w-3.5 h-3.5" />
+                            Add Note
+                          </button>
+                        )}
+                        {notes.length > 3 && (
+                          <button
+                            onClick={() => setShowAllNotes(!showAllNotes)}
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#004aad] bg-white border border-[#004aad]/30 hover:border-[#004aad] hover:bg-[#004aad]/5 rounded-lg transition-all"
+                          >
+                            <ExternalLink className="w-3.5 h-3.5" />
+                            {showAllNotes ? 'Show Less' : 'See All'}
+                          </button>
+                        )}
+                      </div>
                     </div>
 
                     {/* Add New Note Form */}
-                    <div className="mb-4">
-                      <div className="flex gap-2">
-                        <textarea
-                          value={newNoteText}
-                          onChange={(e) => setNewNoteText(e.target.value)}
-                          placeholder="Add a note..."
-                          className="flex-1 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 border border-[#E8E9EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004aad] resize-none"
-                          rows={2}
-                          disabled={addingNote}
-                        />
+                    {showAddNoteForm && (
+                      <div className="mb-4">
+                        <div className="flex gap-2">
+                          <textarea
+                            value={newNoteText}
+                            onChange={(e) => setNewNoteText(e.target.value)}
+                            placeholder="Add a note..."
+                            className="flex-1 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 border border-[#E8E9EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004aad] resize-none"
+                            rows={2}
+                            disabled={addingNote}
+                            autoFocus
+                          />
+                        </div>
+                        <div className="mt-2 flex gap-2">
+                          <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={handleAddNote}
+                            disabled={!newNoteText.trim() || addingNote}
+                            className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-[#004aad] to-[#004aad]/90 hover:from-[#004aad]/90 hover:to-[#004aad]/80 text-white rounded-lg text-sm font-medium shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <Plus className="w-4 h-4" />
+                            <span>{addingNote ? "Adding..." : "Add Note"}</span>
+                          </motion.button>
+                          <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() => {
+                              setShowAddNoteForm(false);
+                              setNewNoteText("");
+                            }}
+                            disabled={addingNote}
+                            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            Cancel
+                          </motion.button>
+                        </div>
                       </div>
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={handleAddNote}
-                        disabled={!newNoteText.trim() || addingNote}
-                        className="mt-2 w-full flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-[#004aad] to-[#004aad]/90 hover:from-[#004aad]/90 hover:to-[#004aad]/80 text-white rounded-lg text-sm font-medium shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        <Plus className="w-4 h-4" />
-                        <span>{addingNote ? "Adding..." : "Add Note"}</span>
-                      </motion.button>
-                    </div>
+                    )}
 
                     {/* Notes List */}
                     {loadingNotes ? (
@@ -671,7 +768,7 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.12 }}
                   >
-                    <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
+                    <h3 className="text-sm font-semibold text-gray-700 mb-3 tracking-wide">
                       Facility Types
                     </h3>
                     <div className="flex flex-wrap gap-2">
@@ -687,9 +784,10 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: 0.1 + idx * 0.05 }}
                             whileHover={{ scale: 1.05 }}
-                            className="px-4 py-2 bg-gradient-to-r from-[#004aad]/5 to-[#004aad]/10 text-[#004aad] rounded-full text-sm font-medium shadow-sm hover:shadow-md transition-all cursor-default"
+                            className="px-4 py-2 bg-white text-[#004aad] border border-[#004aad] rounded-full text-sm font-medium transition-all cursor-default flex items-center gap-1.5"
                           >
-                            {formatSportType(type)}
+                            <span className="text-base">{FACILITY_TYPE_EMOJIS[type] || "🏢"}</span>
+                            <span>{formatSportType(type)}</span>
                           </motion.span>
                         ))}
                     </div>
@@ -705,9 +803,9 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.15 }}
                     >
-                      <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide flex items-center gap-2">
+                      <h3 className="text-sm font-semibold text-gray-700 mb-3 tracking-wide flex items-center gap-2">
                         Sports Scraped
-                        <span className="text-xs font-normal text-gray-500 normal-case">(with confidence scores)</span>
+                        <span className="text-xs font-normal text-gray-500">(with confidence scores)</span>
                       </h3>
                       <div className="flex flex-wrap gap-2">
                         {facility.identified_sports.map((sport, idx) => {
@@ -716,22 +814,18 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                           const confidence = metadata?.confidence || 'unknown';
 
                           // Color coding based on confidence
-                          let bgColor = 'from-gray-50 to-gray-100/50';
                           let textColor = 'text-gray-700';
                           let borderColor = 'border-gray-300';
 
                           if (confidence === 'high') {
-                            bgColor = 'from-green-50 to-green-100/50';
                             textColor = 'text-green-700';
-                            borderColor = 'border-green-300';
+                            borderColor = 'border-green-400';
                           } else if (confidence === 'medium') {
-                            bgColor = 'from-yellow-50 to-yellow-100/50';
                             textColor = 'text-yellow-700';
-                            borderColor = 'border-yellow-300';
+                            borderColor = 'border-yellow-400';
                           } else if (confidence === 'low') {
-                            bgColor = 'from-red-50 to-red-100/50';
                             textColor = 'text-red-700';
-                            borderColor = 'border-red-300';
+                            borderColor = 'border-red-400';
                           }
 
                           // Get confidence icon
@@ -761,14 +855,14 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                             >
                               <button
                                 onClick={() => setSelectedSportDetail(sport)}
-                                className={`px-4 py-2 bg-gradient-to-r ${bgColor} ${textColor} rounded-full text-sm font-medium shadow-sm hover:shadow-md transition-all cursor-pointer flex items-center gap-1.5 border ${borderColor}`}
+                                className={`px-4 py-2 bg-white ${textColor} rounded-full text-sm font-medium transition-all cursor-pointer flex items-center gap-1.5 border-2 ${borderColor}`}
                               >
                                 <span className="text-lg">{SPORT_EMOJIS[sport] || "🏅"}</span>
                                 <span className="font-semibold">{sport}</span>
                                 {metadata ? (
                                   <>
                                     <span className="text-xs opacity-75">{confidenceIcon}</span>
-                                    <span className="px-1.5 py-0.5 rounded text-xs font-bold bg-white/60">
+                                    <span className="px-1.5 py-0.5 rounded text-xs font-bold bg-gray-100">
                                       {score}
                                     </span>
                                   </>
@@ -819,7 +913,7 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                     transition={{ delay: 0.18 }}
                     className="space-y-4"
                   >
-                    <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                    <h3 className="text-sm font-semibold text-gray-700 tracking-wide">
                       Contact Information
                     </h3>
 
@@ -872,15 +966,15 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                       transition={{ delay: 0.2 }}
                     >
                       <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                        <h3 className="text-sm font-semibold text-gray-700 tracking-wide">
                           Reviews ({facility.reviews.length})
                         </h3>
                         <button
                           onClick={() => setIsReviewsModalOpen(true)}
-                          className="flex items-center gap-1 text-xs font-medium text-[#004aad] hover:text-[#004aad]/80 transition-colors"
+                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#004aad] bg-white border border-[#004aad]/30 hover:border-[#004aad] hover:bg-[#004aad]/5 rounded-lg transition-all"
                         >
+                          <Maximize2 className="w-3.5 h-3.5" />
                           Expand
-                          <Maximize2 className="w-3 h-3" />
                         </button>
                       </div>
                       <div className="space-y-4">
@@ -930,7 +1024,7 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                       className="bg-gradient-to-br from-[#E8E9EB]/30 to-[#E8E9EB]/50 rounded-xl p-4 shadow-sm"
                     >
                       <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide flex items-center gap-2">
+                        <h3 className="text-sm font-semibold text-gray-700 tracking-wide flex items-center gap-2">
                           <Clock className="w-4 h-4" />
                           Hours
                         </h3>
