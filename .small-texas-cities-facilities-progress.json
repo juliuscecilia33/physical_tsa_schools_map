@@ -10,7 +10,18 @@
     "Borger, Texas",
     "Muleshoe, Texas",
     "Levelland, Texas",
-    "Post, Texas"
+    "Post, Texas",
+    "Slaton, Texas",
+    "Spur, Texas",
+    "Clarendon, Texas",
+    "Memphis, Texas",
+    "Wellington, Texas",
+    "Quanah, Texas",
+    "Snyder, Texas",
+    "Lamesa, Texas",
+    "Seminole, Texas",
+    "Kermit, Texas",
+    "Seagraves, Texas"
   ],
   "processedChains": [
     "FieldhouseUSA",
@@ -23,13 +34,13 @@
     "Sports Academy",
     "Velocity Sports Performance"
   ],
-  "totalFacilities": 270,
+  "totalFacilities": 471,
   "statistics": {
-    "searched": 1765,
-    "filteredLowQuality": 620,
-    "filteredDuplicate": 875,
+    "searched": 3269,
+    "filteredLowQuality": 1093,
+    "filteredDuplicate": 1705,
     "filteredNonSport": 0,
-    "inserted": 270
+    "inserted": 471
   },
-  "lastUpdated": "2026-02-24T18:43:12.974Z"
+  "lastUpdated": "2026-02-24T19:00:23.129Z"
 }

@@ -734,18 +734,24 @@ export default function FacilitySidebar({
       >
         {/* Header with gradient */}
         <div className="sticky top-0 bg-gradient-to-br from-white via-white to-[#004aad]/5 backdrop-blur-sm border-b border-[#E8E9EB] shadow-sm z-20">
-          {/* TSA Logo */}
-          <div className="flex justify-center pt-6 pb-4">
-            <motion.img
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              src="/assets/TSA.png"
-              alt="TSA Logo"
-              className="h-12 w-auto"
-            />
-          </div>
-          <div className="px-6 pb-6 flex justify-between items-start">
+          {/* Cover Photo */}
+          {facility.photo_references && facility.photo_references.length > 0 && (
+            <div className="relative w-full h-48 overflow-hidden">
+              {loadingImages[0] !== false && (
+                <div className="absolute inset-0 bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200 animate-pulse" />
+              )}
+              <img
+                src={getPhotoUrl(facility.photo_references[0])}
+                alt={`${facility.name} cover`}
+                className="w-full h-full object-cover"
+                onLoadStart={() => handleImageLoadStart(0)}
+                onLoad={() => handleImageLoad(0)}
+                onError={() => handleImageLoad(0)}
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/30" />
+            </div>
+          )}
+          <div className="px-6 pb-6 pt-4 flex justify-between items-start">
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -827,7 +833,7 @@ export default function FacilitySidebar({
                 </h3>
                 <button
                   onClick={() => setIsPhotosModalOpen(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#004aad] bg-white border border-[#004aad]/30 hover:border-[#004aad] hover:bg-[#004aad]/5 rounded-lg transition-all"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-lg transition-all"
                 >
                   <Maximize2 className="w-3.5 h-3.5" />
                   Expand
@@ -914,7 +920,7 @@ export default function FacilitySidebar({
                 {!showAddNoteForm && (
                   <button
                     onClick={() => setShowAddNoteForm(true)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#004aad] bg-white border border-[#004aad]/30 hover:border-[#004aad] hover:bg-[#004aad]/5 rounded-lg transition-all"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-lg transition-all"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     Add Note
@@ -923,7 +929,7 @@ export default function FacilitySidebar({
                 {notes.length > 3 && (
                   <button
                     onClick={() => setShowAllNotes(!showAllNotes)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#004aad] bg-white border border-[#004aad]/30 hover:border-[#004aad] hover:bg-[#004aad]/5 rounded-lg transition-all"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-lg transition-all"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
                     {showAllNotes ? "Show Less" : "See All"}
@@ -1084,7 +1090,7 @@ export default function FacilitySidebar({
                     ref={tagDropdownButtonRef}
                     onClick={() => setShowTagDropdown(!showTagDropdown)}
                     disabled={assigningTag}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#004aad] bg-white border border-[#004aad]/30 hover:border-[#004aad] hover:bg-[#004aad]/5 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     aria-expanded={showTagDropdown}
                   >
                     <Plus className="w-3.5 h-3.5" />
@@ -1150,7 +1156,7 @@ export default function FacilitySidebar({
                 </div>
                 <button
                   onClick={() => setIsTagManagementModalOpen(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 hover:border-gray-400 hover:bg-gray-50 rounded-lg transition-all"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-gray-900 hover:bg-gray-800 rounded-lg transition-all"
                 >
                   Manage Tags
                 </button>
@@ -1433,7 +1439,7 @@ export default function FacilitySidebar({
                 </h3>
                 <button
                   onClick={() => setIsReviewsModalOpen(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#004aad] bg-white border border-[#004aad]/30 hover:border-[#004aad] hover:bg-[#004aad]/5 rounded-lg transition-all"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-lg transition-all"
                 >
                   <Maximize2 className="w-3.5 h-3.5" />
                   Expand
