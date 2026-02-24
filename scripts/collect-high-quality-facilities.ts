@@ -83,6 +83,16 @@ const HIGH_QUALITY_SEARCHES = [
   "premier sports complex",
   "championship sports fields",
   "tournament sports facility",
+  "soccer field",
+  "football field",
+  "baseball field",
+  "basketball court",
+  "sports park",
+  "athletic park",
+  "athletic complex",
+  "recreation park",
+  "tennis court",
+  "volleyball court",
 ];
 
 // Specific high-quality facility chains to search for
@@ -113,6 +123,7 @@ const QUALITY_KEYWORDS = [
   "performance",
   "indoor",
   "fieldhouse",
+  "field",
   "premier",
   "elite",
   "championship",
@@ -123,11 +134,21 @@ const QUALITY_KEYWORDS = [
 // ===== FACILITY VALIDATION CONSTANTS =====
 
 const NON_SPORT_TYPES = [
-  "food", "restaurant", "cafe", "bar",
-  "lodging", "hotel", "motel",
-  "store", "clothing_store", "shopping_mall",
-  "amusement_park", "movie_theater", "aquarium",
-  "night_club", "tourist_attraction",
+  "food",
+  "restaurant",
+  "cafe",
+  "bar",
+  "lodging",
+  "hotel",
+  "motel",
+  "store",
+  "clothing_store",
+  "shopping_mall",
+  "amusement_park",
+  "movie_theater",
+  "aquarium",
+  "night_club",
+  "tourist_attraction",
   "playground",
 ];
 
@@ -164,15 +185,26 @@ const SPORT_KEYWORDS = {
   Squash: ["squash court"],
   Badminton: ["badminton"],
   "Gym/Fitness": [
-    "gym", "fitness", "training", "performance",
-    "strength", "conditioning", "athletic"
+    "gym",
+    "fitness",
+    "training",
+    "performance",
+    "strength",
+    "conditioning",
+    "athletic",
   ],
   CrossFit: ["crossfit"],
   Yoga: ["yoga"],
   Pilates: ["pilates"],
   "Martial Arts": [
-    "martial arts", "karate", "taekwondo", "jiu jitsu",
-    "bjj", "judo", "kickboxing", "mma"
+    "martial arts",
+    "karate",
+    "taekwondo",
+    "jiu jitsu",
+    "bjj",
+    "judo",
+    "kickboxing",
+    "mma",
   ],
   Boxing: ["boxing"],
   Bowling: ["bowling"],
@@ -205,13 +237,12 @@ interface ProgressState {
 
 const PROGRESS_FILE = path.join(
   __dirname,
-  "../.high-quality-facilities-progress.json"
+  "../.high-quality-facilities-progress.json",
 );
 
 // ===== HELPER FUNCTIONS =====
 
-const delay = (ms: number) =>
-  new Promise((resolve) => setTimeout(resolve, ms));
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 function loadProgress(): ProgressState {
   if (fs.existsSync(PROGRESS_FILE)) {
@@ -256,10 +287,7 @@ async function facilityExists(placeId: string): Promise<boolean> {
   return data && data.length > 0;
 }
 
-async function findNearbyFacility(
-  lat: number,
-  lng: number
-): Promise<boolean> {
+async function findNearbyFacility(lat: number, lng: number): Promise<boolean> {
   const { data, error } = await supabase.rpc("find_nearby_facilities", {
     lat,
     lng,
@@ -277,7 +305,10 @@ async function findNearbyFacility(
   return data && data.length > 0;
 }
 
-function isHighQualityFacility(place: any): { passed: boolean; reason?: string } {
+function isHighQualityFacility(place: any): {
+  passed: boolean;
+  reason?: string;
+} {
   // Check 1: Must have minimum rating
   if (!place.rating || place.rating < MIN_RATING) {
     return {
@@ -313,13 +344,15 @@ function isHighQualityFacility(place: any): { passed: boolean; reason?: string }
 
   // Check 5: Check for non-sport types
   const types = place.types || [];
-  const hasNonSport = types.some((type: string) => NON_SPORT_TYPES.includes(type));
+  const hasNonSport = types.some((type: string) =>
+    NON_SPORT_TYPES.includes(type),
+  );
   const hasAthletic = types.some(
     (type: string) =>
       HIGH_QUALITY_TYPES.includes(type) ||
       type.includes("sport") ||
       type.includes("field") ||
-      type.includes("court")
+      type.includes("court"),
   );
 
   if (hasNonSport && !hasAthletic) {
@@ -332,10 +365,10 @@ function isHighQualityFacility(place: any): { passed: boolean; reason?: string }
   // Check 6: Quality boost for keywords or multiple sports
   const nameLower = (place.name || "").toLowerCase();
   const hasQualityKeyword = QUALITY_KEYWORDS.some((keyword) =>
-    nameLower.includes(keyword)
+    nameLower.includes(keyword),
   );
   const hasMultipleSports = types.some((type: string) =>
-    ["sports_complex", "recreation_center", "athletic_field"].includes(type)
+    ["sports_complex", "recreation_center", "athletic_field"].includes(type),
   );
 
   // If no quality indicators, require higher rating
@@ -370,7 +403,7 @@ function calculateCompletenessScore(place: any): number {
 
 function findMatchingKeywords(
   sport: string,
-  text: string
+  text: string,
 ): { keywords: string[]; matchedText: string } {
   const keywords = SPORT_KEYWORDS[sport as keyof typeof SPORT_KEYWORDS] || [];
   const textLower = text.toLowerCase();
@@ -396,7 +429,7 @@ function findMatchingKeywords(
 function calculateSportScore(
   sources: Array<"name" | "review" | "api">,
   keywordLength: number,
-  reviewPosition?: number
+  reviewPosition?: number,
 ): number {
   let score = 0;
 
@@ -429,7 +462,7 @@ function identifySportsFromName(name: string): {
     if (match.keywords.length > 0) {
       sports.add(sport);
       const keywordSpecificity = Math.max(
-        ...match.keywords.map((k) => k.length)
+        ...match.keywords.map((k) => k.length),
       );
       const score = calculateSportScore(["name"], keywordSpecificity);
 
@@ -487,14 +520,16 @@ function identifySportsFromReviews(reviews: any[] | undefined): {
 
 function mergeSportMetadata(
   existing: SportMetadata | undefined,
-  newMetadata: SportMetadata
+  newMetadata: SportMetadata,
 ): SportMetadata {
   if (!existing) {
     return newMetadata;
   }
 
   const sourcesSet = new Set([...existing.sources, ...newMetadata.sources]);
-  const mergedSources = Array.from(sourcesSet) as Array<"name" | "review" | "api">;
+  const mergedSources = Array.from(sourcesSet) as Array<
+    "name" | "review" | "api"
+  >;
 
   const keywordsSet = new Set([
     ...existing.keywords_matched,
@@ -527,7 +562,7 @@ function mergeSportMetadata(
 
 function identifyFacilitySports(
   name: string,
-  reviews: any[]
+  reviews: any[],
 ): {
   identified_sports: string[];
   sport_metadata: Record<string, SportMetadata>;
@@ -574,7 +609,9 @@ async function searchPlacesByText(query: string): Promise<string[]> {
       return [];
     }
 
-    return response.data.results.map((place) => place.place_id!).filter(Boolean);
+    return response.data.results
+      .map((place) => place.place_id!)
+      .filter(Boolean);
   } catch (error: any) {
     console.error(`  ⚠️  Error searching:`, error.message);
     return [];
@@ -583,7 +620,7 @@ async function searchPlacesByText(query: string): Promise<string[]> {
 
 async function fetchAndValidatePlace(
   placeId: string,
-  progress: ProgressState
+  progress: ProgressState,
 ): Promise<{ success: boolean; facility?: any; filterReason?: string }> {
   try {
     await delay(500);
@@ -629,7 +666,7 @@ async function fetchAndValidatePlace(
     // Identify sports
     const sportIdentification = identifyFacilitySports(
       place.name || "",
-      place.reviews || []
+      place.reviews || [],
     );
 
     // Build facility data
@@ -680,7 +717,7 @@ async function insertFacility(facilityData: any): Promise<boolean> {
     if (error) {
       console.error(
         `  ⚠️  Error inserting ${facilityData.name}:`,
-        error.message
+        error.message,
       );
       return false;
     }
@@ -698,7 +735,7 @@ async function processCity(
   city: string,
   cityIndex: number,
   totalCities: number,
-  progress: ProgressState
+  progress: ProgressState,
 ): Promise<void> {
   console.log(`\n${"=".repeat(60)}`);
   console.log(`📍 [${cityIndex + 1}/${totalCities}] Processing: ${city}`);
@@ -711,7 +748,7 @@ async function processCity(
     const query = `${searchTerm} in ${city}`;
 
     console.log(
-      `  [${i + 1}/${HIGH_QUALITY_SEARCHES.length}] Searching: ${searchTerm}...`
+      `  [${i + 1}/${HIGH_QUALITY_SEARCHES.length}] Searching: ${searchTerm}...`,
     );
 
     const ids = await searchPlacesByText(query);
@@ -732,10 +769,12 @@ async function processChain(
   chain: string,
   chainIndex: number,
   totalChains: number,
-  progress: ProgressState
+  progress: ProgressState,
 ): Promise<void> {
   console.log(`\n${"=".repeat(60)}`);
-  console.log(`🏢 [${chainIndex + 1}/${totalChains}] Searching chain: ${chain}`);
+  console.log(
+    `🏢 [${chainIndex + 1}/${totalChains}] Searching chain: ${chain}`,
+  );
   console.log("=".repeat(60));
 
   const query = `${chain} Texas`;
@@ -751,7 +790,7 @@ async function processChain(
 
 async function processFacilities(
   placeIds: string[],
-  progress: ProgressState
+  progress: ProgressState,
 ): Promise<void> {
   let insertedCount = 0;
   let processed = 0;
@@ -776,10 +815,12 @@ async function processFacilities(
     const result = await fetchAndValidatePlace(placeId, progress);
 
     if (!result.success) {
-      if (result.filterReason?.includes("Low rating") ||
-          result.filterReason?.includes("Few reviews") ||
-          result.filterReason?.includes("No photos") ||
-          result.filterReason?.includes("Low completeness")) {
+      if (
+        result.filterReason?.includes("Low rating") ||
+        result.filterReason?.includes("Few reviews") ||
+        result.filterReason?.includes("No photos") ||
+        result.filterReason?.includes("Low completeness")
+      ) {
         filterStats.lowQuality++;
       } else if (result.filterReason?.includes("Non-sport")) {
         filterStats.nonSport++;
@@ -826,12 +867,12 @@ async function processFacilities(
 
       if (insertedCount % 5 === 0) {
         console.log(
-          `  ✅ [${processed}/${placeIds.length}] Inserted ${insertedCount} facilities`
+          `  ✅ [${processed}/${placeIds.length}] Inserted ${insertedCount} facilities`,
         );
       }
       if (sports.length > 0) {
         console.log(
-          `     Latest: ${result.facility.name.substring(0, 40)}... → ${sportsDisplay}`
+          `     Latest: ${result.facility.name.substring(0, 40)}... → ${sportsDisplay}`,
         );
       }
     }
@@ -865,10 +906,17 @@ async function collectHighQualityFacilities() {
 
   const progress = loadProgress();
 
-  if (progress.processedCities.length > 0 || progress.processedChains.length > 0) {
+  if (
+    progress.processedCities.length > 0 ||
+    progress.processedChains.length > 0
+  ) {
     console.log(`♻️  Resuming:`);
-    console.log(`   Cities: ${progress.processedCities.length}/${TARGET_CITIES.length}`);
-    console.log(`   Chains: ${progress.processedChains.length}/${FACILITY_CHAINS.length}`);
+    console.log(
+      `   Cities: ${progress.processedCities.length}/${TARGET_CITIES.length}`,
+    );
+    console.log(
+      `   Chains: ${progress.processedChains.length}/${FACILITY_CHAINS.length}`,
+    );
     console.log(`   Total facilities: ${progress.totalFacilities}\n`);
   }
 
@@ -908,23 +956,38 @@ async function collectHighQualityFacilities() {
       // Progress summary every 5 cities
       if (progress.processedCities.length % 5 === 0) {
         const elapsed = (Date.now() - startTime) / 1000 / 60;
-        const rate = (progress.processedCities.length + progress.processedChains.length) / elapsed;
-        const remaining = TARGET_CITIES.length - progress.processedCities.length;
+        const rate =
+          (progress.processedCities.length + progress.processedChains.length) /
+          elapsed;
+        const remaining =
+          TARGET_CITIES.length - progress.processedCities.length;
         const eta = remaining / rate;
 
         console.log("\n" + "=".repeat(60));
         console.log("📊 Overall Progress:");
-        console.log(`   Cities: ${progress.processedCities.length}/${TARGET_CITIES.length}`);
-        console.log(`   Chains: ${progress.processedChains.length}/${FACILITY_CHAINS.length}`);
+        console.log(
+          `   Cities: ${progress.processedCities.length}/${TARGET_CITIES.length}`,
+        );
+        console.log(
+          `   Chains: ${progress.processedChains.length}/${FACILITY_CHAINS.length}`,
+        );
         console.log(`   Total Facilities: ${progress.totalFacilities}`);
         console.log(`   Statistics:`);
         console.log(`     - Searched: ${progress.statistics.searched}`);
         console.log(`     - Inserted: ${progress.statistics.inserted}`);
-        console.log(`     - Filtered Duplicate: ${progress.statistics.filteredDuplicate}`);
-        console.log(`     - Filtered Low Quality: ${progress.statistics.filteredLowQuality}`);
-        console.log(`     - Filtered Non-Sport: ${progress.statistics.filteredNonSport}`);
+        console.log(
+          `     - Filtered Duplicate: ${progress.statistics.filteredDuplicate}`,
+        );
+        console.log(
+          `     - Filtered Low Quality: ${progress.statistics.filteredLowQuality}`,
+        );
+        console.log(
+          `     - Filtered Non-Sport: ${progress.statistics.filteredNonSport}`,
+        );
         console.log(`   Elapsed: ${elapsed.toFixed(0)} minutes`);
-        console.log(`   ETA: ${eta.toFixed(0)} minutes (~${(eta / 60).toFixed(1)} hours)`);
+        console.log(
+          `   ETA: ${eta.toFixed(0)} minutes (~${(eta / 60).toFixed(1)} hours)`,
+        );
         console.log("=".repeat(60) + "\n");
       }
     } catch (error: any) {
@@ -937,21 +1000,25 @@ async function collectHighQualityFacilities() {
   console.log("🎉 Collection Complete!");
   console.log("=".repeat(60));
   console.log(`📊 Final Statistics:`);
-  console.log(`   Cities Processed: ${progress.processedCities.length}/${TARGET_CITIES.length}`);
-  console.log(`   Chains Processed: ${progress.processedChains.length}/${FACILITY_CHAINS.length}`);
+  console.log(
+    `   Cities Processed: ${progress.processedCities.length}/${TARGET_CITIES.length}`,
+  );
+  console.log(
+    `   Chains Processed: ${progress.processedChains.length}/${FACILITY_CHAINS.length}`,
+  );
   console.log(`   Total Facilities Added: ${progress.statistics.inserted}`);
   console.log(`   Quality Metrics:`);
   console.log(`     - Total Searched: ${progress.statistics.searched}`);
   console.log(`     - Passed All Filters: ${progress.statistics.inserted}`);
   console.log(
-    `     - Filter Rate: ${((progress.statistics.inserted / progress.statistics.searched) * 100).toFixed(1)}%`
+    `     - Filter Rate: ${((progress.statistics.inserted / progress.statistics.searched) * 100).toFixed(1)}%`,
   );
   console.log(`   Filters Applied:`);
   console.log(`     - Duplicate: ${progress.statistics.filteredDuplicate}`);
   console.log(`     - Low Quality: ${progress.statistics.filteredLowQuality}`);
   console.log(`     - Non-Sport: ${progress.statistics.filteredNonSport}`);
   console.log(
-    `   Runtime: ${((Date.now() - startTime) / 1000 / 60 / 60).toFixed(2)} hours`
+    `   Runtime: ${((Date.now() - startTime) / 1000 / 60 / 60).toFixed(2)} hours`,
   );
   console.log("=".repeat(60));
 

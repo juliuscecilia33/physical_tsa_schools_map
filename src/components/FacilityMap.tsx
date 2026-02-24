@@ -486,7 +486,7 @@ export default function FacilityMap({
 
       {/* Modern Info Panel */}
       <div
-        className={`fixed top-0 left-0 h-full w-full md:w-[400px] bg-white shadow-2xl p-6 overflow-y-auto z-10 border-r border-[#E8E9EB] transition-opacity duration-300 ${
+        className={`fixed top-0 left-0 h-full w-full md:w-[340px] bg-white shadow-2xl p-6 overflow-y-auto z-10 border-r border-[#E8E9EB] transition-opacity duration-300 ${
           selectedFacility ? "opacity-0 pointer-events-none" : "opacity-100"
         }`}
       >
@@ -557,14 +557,12 @@ export default function FacilityMap({
                       : "bg-gradient-to-r from-[#E8E9EB]/50 to-[#E8E9EB] text-gray-700 hover:from-[#E8E9EB] hover:to-[#E8E9EB]/80 border border-[#E8E9EB]"
                   }`}
                 >
-                  <span className="text-center leading-tight">
-                    All (Unhidden)
-                  </span>
+                  <span className="text-center leading-tight">All</span>
                   {filterOption === "UNHIDDEN_ONLY" && (
                     <Check className="w-3 h-3 absolute top-1 right-1" />
                   )}
                 </motion.button>
-                <motion.button
+                {/* <motion.button
                   whileTap={{ scale: 0.98 }}
                   onClick={() => onFilterOptionChange("HIDDEN_ONLY")}
                   className={`px-2 py-3 rounded-lg text-xs font-medium transition-all duration-300 flex flex-col items-center justify-center gap-1 cursor-pointer relative ${
@@ -577,11 +575,11 @@ export default function FacilityMap({
                   {filterOption === "HIDDEN_ONLY" && (
                     <Check className="w-3 h-3 absolute top-1 right-1" />
                   )}
-                </motion.button>
+                </motion.button> */}
                 <motion.button
                   whileTap={{ scale: 0.98 }}
                   onClick={() => onFilterOptionChange("WITH_NOTES_ONLY")}
-                  className={`px-2 py-3 rounded-lg text-xs font-medium transition-all duration-300 flex flex-col items-center justify-center gap-1 cursor-pointer relative col-span-2 ${
+                  className={`px-2 py-3 rounded-lg text-xs font-medium transition-all duration-300 flex flex-col items-center justify-center gap-1 cursor-pointer relative ${
                     filterOption === "WITH_NOTES_ONLY"
                       ? "bg-gradient-to-r from-[#004aad] to-[#004aad]/90 text-white shadow-lg shadow-[#004aad]/20"
                       : "bg-gradient-to-r from-[#E8E9EB]/50 to-[#E8E9EB] text-gray-700 hover:from-[#E8E9EB] hover:to-[#E8E9EB]/80 border border-[#E8E9EB]"

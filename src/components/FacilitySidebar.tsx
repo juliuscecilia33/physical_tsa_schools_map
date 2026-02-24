@@ -22,20 +22,15 @@ import {
   XCircle as XIcon,
   Home,
   Camera,
-  MessageSquare
+  MessageSquare,
+  ChevronLeft,
+  ChevronRight,
+  ExternalLink,
+  Maximize2
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { supabase } from "@/lib/supabase";
-
-type TabId = 'overview' | 'photos' | 'notes' | 'reviews';
-
-interface Tab {
-  id: TabId;
-  label: string;
-  icon: any;
-  badge?: number;
-}
 
 interface FacilitySidebarProps {
   facility: Facility | null;
@@ -83,8 +78,6 @@ const SPORT_EMOJIS: { [key: string]: string } = {
 };
 
 export default function FacilitySidebar({ facility, onClose, onUpdateFacility }: FacilitySidebarProps) {
-  const [activeTab, setActiveTab] = useState<TabId>('overview');
-  const [direction, setDirection] = useState(0);
   const contentRef = useRef<HTMLDivElement>(null);
   const [loadingImages, setLoadingImages] = useState<{ [key: number]: boolean }>({});
   const [notes, setNotes] = useState<Note[]>([]);
@@ -94,6 +87,14 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const [editNoteText, setEditNoteText] = useState("");
   const [selectedSportDetail, setSelectedSportDetail] = useState<string | null>(null);
+  const photoScrollRef = useRef<HTMLDivElement>(null);
+  const [showLeftArrow, setShowLeftArrow] = useState(false);
+  const [showRightArrow, setShowRightArrow] = useState(false);
+  const [showAllNotes, setShowAllNotes] = useState(false);
+  const [isPhotosModalOpen, setIsPhotosModalOpen] = useState(false);
+  const [isReviewsModalOpen, setIsReviewsModalOpen] = useState(false);
+  const [isPhotoViewerOpen, setIsPhotoViewerOpen] = useState(false);
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
 
   // Fetch notes when facility changes
   useEffect(() => {
@@ -246,54 +247,9 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
     return date.toLocaleDateString();
   };
 
-  // Tab configuration
-  const tabs: Tab[] = [
-    { id: 'overview', label: 'Overview', icon: Home },
-    { id: 'photos', label: 'Photos', icon: Camera },
-    { id: 'notes', label: 'Notes', icon: StickyNote, badge: notes.length },
-    { id: 'reviews', label: 'Reviews', icon: MessageSquare },
-  ];
 
-  const tabOrder: TabId[] = ['overview', 'photos', 'notes', 'reviews'];
-
-  // Handle tab change with direction for animation
-  const handleTabChange = (tabId: TabId) => {
-    const currentIndex = tabOrder.indexOf(activeTab);
-    const newIndex = tabOrder.indexOf(tabId);
-    setDirection(newIndex > currentIndex ? 1 : -1);
-    setActiveTab(tabId);
-    // Scroll content to top
-    contentRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleToggleHidden = () => {
-    if (!facility) return;
-    const newHiddenValue = !facility.hidden;
-    const placeId = facility.place_id;
-
-    // Optimistically update local state immediately
-    onUpdateFacility(placeId, newHiddenValue);
-
-    // Close sidebar immediately
-    onClose();
-
-    // Sync to database in background (no await needed)
-    supabase
-      .from("sports_facilities")
-      .update({ hidden: newHiddenValue })
-      .eq("place_id", placeId)
-      .then(({ error }) => {
-        if (error) {
-          console.error("Error updating facility hidden status:", error);
-          // Revert optimistic update on error
-          onUpdateFacility(placeId, !newHiddenValue);
-          alert("Failed to update facility. The change has been reverted.");
-        }
-      });
-  };
-
-  const getPhotoUrl = (photoReference: string) => {
-    const maxWidth = 400;
+  const getPhotoUrl = (photoReference: string, highRes: boolean = false) => {
+    const maxWidth = highRes ? 1600 : 400;
     return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=${maxWidth}&photo_reference=${photoReference}&key=${process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY}`;
   };
 
@@ -335,6 +291,73 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
   const handleImageLoadStart = (idx: number) => {
     setLoadingImages(prev => ({ ...prev, [idx]: true }));
   };
+
+  // Handle photo scroll
+  const scrollPhotos = (direction: 'left' | 'right') => {
+    if (!photoScrollRef.current) return;
+    const scrollAmount = 300; // Approximate width of one photo
+    const newScrollLeft = photoScrollRef.current.scrollLeft + (direction === 'right' ? scrollAmount : -scrollAmount);
+    photoScrollRef.current.scrollTo({ left: newScrollLeft, behavior: 'smooth' });
+  };
+
+  // Update arrow visibility based on scroll position
+  const updatePhotoArrows = () => {
+    if (!photoScrollRef.current) return;
+    const { scrollLeft, scrollWidth, clientWidth } = photoScrollRef.current;
+    setShowLeftArrow(scrollLeft > 0);
+    setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 1);
+  };
+
+  // Update arrows when photos are loaded or facility changes
+  useEffect(() => {
+    updatePhotoArrows();
+    const scrollContainer = photoScrollRef.current;
+    if (scrollContainer) {
+      scrollContainer.addEventListener('scroll', updatePhotoArrows);
+      // Also update on window resize
+      window.addEventListener('resize', updatePhotoArrows);
+      return () => {
+        scrollContainer.removeEventListener('scroll', updatePhotoArrows);
+        window.removeEventListener('resize', updatePhotoArrows);
+      };
+    }
+  }, [facility]);
+
+  // Photo viewer handlers
+  const openPhotoViewer = (index: number) => {
+    setSelectedPhotoIndex(index);
+    setIsPhotoViewerOpen(true);
+  };
+
+  const closePhotoViewer = () => {
+    setIsPhotoViewerOpen(false);
+  };
+
+  const goToNextPhoto = () => {
+    if (!facility?.photo_references) return;
+    const totalPhotos = facility.photo_references.length;
+    setSelectedPhotoIndex((prev) =>
+      prev < totalPhotos - 1 ? prev + 1 : prev
+    );
+  };
+
+  const goToPrevPhoto = () => {
+    setSelectedPhotoIndex((prev) => (prev > 0 ? prev - 1 : prev));
+  };
+
+  // Keyboard navigation for photo viewer
+  useEffect(() => {
+    if (!isPhotoViewerOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closePhotoViewer();
+      if (e.key === 'ArrowRight') goToNextPhoto();
+      if (e.key === 'ArrowLeft') goToPrevPhoto();
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isPhotoViewerOpen, selectedPhotoIndex, facility]);
 
   // Early return after all hooks are declared (Rules of Hooks)
   if (!facility) return null;
@@ -416,86 +439,237 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
               <X className="w-5 h-5" />
             </motion.button>
           </div>
-
-          {/* Hide/Unhide Button */}
-          <div className="px-6 pb-4">
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={handleToggleHidden}
-              className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium text-sm shadow-sm transition-all ${
-                facility.hidden
-                  ? "bg-gradient-to-r from-[#004aad] to-[#004aad]/90 hover:from-[#004aad]/90 hover:to-[#004aad]/80 text-white"
-                  : "bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-gray-700"
-              }`}
-            >
-              {facility.hidden ? (
-                <>
-                  <Eye className="w-4 h-4" />
-                  <span>Unhide Facility</span>
-                </>
-              ) : (
-                <>
-                  <EyeOff className="w-4 h-4" />
-                  <span>Hide from Map</span>
-                </>
-              )}
-            </motion.button>
-          </div>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="sticky top-[165px] bg-white border-b border-gray-200 z-10 overflow-x-auto scrollbar-hide">
-          <div className="flex gap-2 px-6 py-3">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <motion.button
-                  key={tab.id}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => handleTabChange(tab.id)}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-full font-medium text-sm transition-all whitespace-nowrap ${
-                    isActive
-                      ? "bg-gradient-to-r from-[#004aad] to-[#004aad]/90 text-white shadow-lg shadow-[#004aad]/20"
-                      : "bg-[#E8E9EB] text-gray-600 hover:bg-[#E8E9EB]/80"
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  <span>{tab.label}</span>
-                  {tab.badge !== undefined && tab.badge > 0 && (
-                    <span className={`ml-1 px-2 py-0.5 rounded-full text-xs font-semibold ${
-                      isActive ? "bg-white/20" : "bg-gray-200"
-                    }`}>
-                      {tab.badge}
-                    </span>
+        {/* Content */}
+        <div ref={contentRef} className="flex-1 overflow-y-auto p-6 space-y-6">
+                  {/* Photos */}
+                  {facility.photo_references && facility.photo_references.length > 0 ? (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.05 }}
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                          Photos ({facility.photo_references.length})
+                        </h3>
+                        <button
+                          onClick={() => setIsPhotosModalOpen(true)}
+                          className="flex items-center gap-1 text-xs font-medium text-[#004aad] hover:text-[#004aad]/80 transition-colors"
+                        >
+                          Expand
+                          <Maximize2 className="w-3 h-3" />
+                        </button>
+                      </div>
+                      <div className="relative group/photos">
+                        {/* Left Arrow */}
+                        {showLeftArrow && (
+                          <button
+                            onClick={() => scrollPhotos('left')}
+                            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-lg flex items-center justify-center transition-all opacity-0 group-hover/photos:opacity-100"
+                            aria-label="Scroll left"
+                          >
+                            <ChevronLeft className="w-6 h-6 text-gray-700" />
+                          </button>
+                        )}
+
+                        {/* Right Arrow */}
+                        {showRightArrow && (
+                          <button
+                            onClick={() => scrollPhotos('right')}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-lg flex items-center justify-center transition-all opacity-0 group-hover/photos:opacity-100"
+                            aria-label="Scroll right"
+                          >
+                            <ChevronRight className="w-6 h-6 text-gray-700" />
+                          </button>
+                        )}
+
+                        {/* Scrollable Photo Container */}
+                        <div
+                          ref={photoScrollRef}
+                          className="flex gap-3 overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory"
+                          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                        >
+                          {facility.photo_references.map((photoRef, idx) => (
+                            <motion.div
+                              key={idx}
+                              initial={{ opacity: 0, scale: 0.9 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              transition={{ delay: 0.1 + Math.min(idx * 0.05, 0.5) }}
+                              onClick={() => openPhotoViewer(idx)}
+                              className="relative overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-all cursor-pointer flex-shrink-0 snap-start"
+                              style={{ width: '280px', height: '180px' }}
+                            >
+                              {loadingImages[idx] !== false && (
+                                <div className="absolute inset-0 bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200 animate-pulse" />
+                              )}
+                              <img
+                                src={getPhotoUrl(photoRef)}
+                                alt={`${facility.name} photo ${idx + 1}`}
+                                className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                                onLoadStart={() => handleImageLoadStart(idx)}
+                                onLoad={() => handleImageLoad(idx)}
+                                onError={() => handleImageLoad(idx)}
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity" />
+                            </motion.div>
+                          ))}
+                        </div>
+                      </div>
+                    </motion.div>
+                  ) : (
+                    <div className="text-center py-12">
+                      <Camera className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                      <p className="text-sm text-gray-500">No photos available</p>
+                    </div>
                   )}
-                </motion.button>
-              );
-            })}
-          </div>
-        </div>
 
-        {/* Tab Content with Animations */}
-        <div ref={contentRef} className="flex-1 overflow-y-auto">
-          <AnimatePresence mode="wait" custom={direction}>
-            <motion.div
-              key={activeTab}
-              custom={direction}
-              initial={{ x: direction > 0 ? 100 : -100, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: direction > 0 ? -100 : 100, opacity: 0 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="p-6 space-y-6"
-            >
-              {activeTab === 'overview' && (
-                <>
+                  {/* Divider */}
+                  <div className="border-t border-gray-200"></div>
+
+                  {/* Notes Section */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.08 }}
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide flex items-center gap-2">
+                        <StickyNote className="w-4 h-4" />
+                        Notes ({notes.length})
+                      </h3>
+                      {notes.length > 3 && (
+                        <button
+                          onClick={() => setShowAllNotes(!showAllNotes)}
+                          className="flex items-center gap-1 text-xs font-medium text-[#004aad] hover:text-[#004aad]/80 transition-colors"
+                        >
+                          {showAllNotes ? 'Show Less' : 'See All'}
+                          <ExternalLink className="w-3 h-3" />
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Add New Note Form */}
+                    <div className="mb-4">
+                      <div className="flex gap-2">
+                        <textarea
+                          value={newNoteText}
+                          onChange={(e) => setNewNoteText(e.target.value)}
+                          placeholder="Add a note..."
+                          className="flex-1 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 border border-[#E8E9EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004aad] resize-none"
+                          rows={2}
+                          disabled={addingNote}
+                        />
+                      </div>
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={handleAddNote}
+                        disabled={!newNoteText.trim() || addingNote}
+                        className="mt-2 w-full flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-[#004aad] to-[#004aad]/90 hover:from-[#004aad]/90 hover:to-[#004aad]/80 text-white rounded-lg text-sm font-medium shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <Plus className="w-4 h-4" />
+                        <span>{addingNote ? "Adding..." : "Add Note"}</span>
+                      </motion.button>
+                    </div>
+
+                    {/* Notes List */}
+                    {loadingNotes ? (
+                      <div className="text-center py-4">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#004aad] mx-auto"></div>
+                      </div>
+                    ) : notes.length === 0 ? (
+                      <div className="text-center py-6 bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-xl border border-gray-100">
+                        <StickyNote className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                        <p className="text-sm text-gray-500">No notes yet</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {notes.slice(0, showAllNotes ? notes.length : 3).map((note, idx) => (
+                          <motion.div
+                            key={note.id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.1 + idx * 0.05 }}
+                            className="bg-gradient-to-br from-white to-gray-50/50 rounded-xl p-3 shadow-sm border border-gray-100"
+                          >
+                            {editingNoteId === note.id ? (
+                              // Edit Mode
+                              <div className="space-y-2">
+                                <textarea
+                                  value={editNoteText}
+                                  onChange={(e) => setEditNoteText(e.target.value)}
+                                  className="w-full px-3 py-2 text-sm text-gray-900 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                                  rows={3}
+                                />
+                                <div className="flex gap-2">
+                                  <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => handleSaveEdit(note.id)}
+                                    className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-lg text-xs font-medium"
+                                  >
+                                    <Save className="w-3 h-3" />
+                                    Save
+                                  </motion.button>
+                                  <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={handleCancelEdit}
+                                    className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-xs font-medium"
+                                  >
+                                    <XIcon className="w-3 h-3" />
+                                    Cancel
+                                  </motion.button>
+                                </div>
+                              </div>
+                            ) : (
+                              // View Mode
+                              <>
+                                <p className="text-sm text-gray-700 leading-relaxed mb-2">
+                                  {note.note_text}
+                                </p>
+                                <div className="flex items-center justify-between">
+                                  <span className="text-xs text-gray-500">
+                                    {formatRelativeTime(note.created_at)}
+                                    {note.updated_at !== note.created_at && " (edited)"}
+                                  </span>
+                                  <div className="flex gap-2">
+                                    <motion.button
+                                      whileHover={{ scale: 1.1 }}
+                                      whileTap={{ scale: 0.9 }}
+                                      onClick={() => handleStartEdit(note)}
+                                      className="p-1 hover:bg-[#004aad]/10 rounded text-[#004aad]"
+                                    >
+                                      <Edit2 className="w-3.5 h-3.5" />
+                                    </motion.button>
+                                    <motion.button
+                                      whileHover={{ scale: 1.1 }}
+                                      whileTap={{ scale: 0.9 }}
+                                      onClick={() => handleDeleteNote(note.id)}
+                                      className="p-1 hover:bg-red-100 rounded text-red-600"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </motion.button>
+                                  </div>
+                                </div>
+                              </>
+                            )}
+                          </motion.div>
+                        ))}
+                      </div>
+                    )}
+                  </motion.div>
+
+                  {/* Divider */}
+                  <div className="border-t border-gray-200"></div>
+
                   {/* Facility Types */}
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.05 }}
+                    transition={{ delay: 0.12 }}
                   >
                     <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
                       Facility Types
@@ -521,12 +695,15 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                     </div>
                   </motion.div>
 
+                  {/* Divider */}
+                  <div className="border-t border-gray-200"></div>
+
                   {/* Identified Sports with Confidence Scores */}
                   {facility.identified_sports && facility.identified_sports.length > 0 && (
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.08 }}
+                      transition={{ delay: 0.15 }}
                     >
                       <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide flex items-center gap-2">
                         Sports Scraped
@@ -632,11 +809,14 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                     </motion.div>
                   )}
 
+                  {/* Divider */}
+                  <div className="border-t border-gray-200"></div>
+
                   {/* Contact Information */}
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.15 }}
+                    transition={{ delay: 0.18 }}
                     className="space-y-4"
                   >
                     <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
@@ -681,12 +861,72 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                     </div>
                   </motion.div>
 
+                  {/* Divider */}
+                  <div className="border-t border-gray-200"></div>
+
+                  {/* Reviews */}
+                  {facility.reviews && facility.reviews.length > 0 ? (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                    >
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                          Reviews ({facility.reviews.length})
+                        </h3>
+                        <button
+                          onClick={() => setIsReviewsModalOpen(true)}
+                          className="flex items-center gap-1 text-xs font-medium text-[#004aad] hover:text-[#004aad]/80 transition-colors"
+                        >
+                          Expand
+                          <Maximize2 className="w-3 h-3" />
+                        </button>
+                      </div>
+                      <div className="space-y-4">
+                        {facility.reviews.map((review, idx) => (
+                          <motion.div
+                            key={idx}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.1 + idx * 0.05 }}
+                            whileHover={{ scale: 1.01 }}
+                            className="bg-gradient-to-br from-white to-gray-50/50 rounded-xl p-4 shadow-sm hover:shadow-md transition-all border border-gray-100"
+                          >
+                            <div className="flex items-center justify-between mb-3">
+                              <span className="font-semibold text-gray-900 text-sm">
+                                {review.author_name}
+                              </span>
+                              <div className="flex gap-0.5">
+                                {renderStars(review.rating)}
+                              </div>
+                            </div>
+                            <p className="text-sm text-gray-700 leading-relaxed mb-2">
+                              {review.text}
+                            </p>
+                            <span className="text-xs text-gray-500 font-medium">
+                              {review.relative_time_description}
+                            </span>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  ) : (
+                    <div className="text-center py-12">
+                      <MessageSquare className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                      <p className="text-sm text-gray-500">No reviews available</p>
+                    </div>
+                  )}
+
+                  {/* Divider */}
+                  <div className="border-t border-gray-200"></div>
+
                   {/* Opening Hours */}
                   {facility.opening_hours && (
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2 }}
+                      transition={{ delay: 0.22 }}
                       className="bg-gradient-to-br from-[#E8E9EB]/30 to-[#E8E9EB]/50 rounded-xl p-4 shadow-sm"
                     >
                       <div className="flex items-center justify-between mb-3">
@@ -723,236 +963,203 @@ export default function FacilitySidebar({ facility, onClose, onUpdateFacility }:
                       )}
                     </motion.div>
                   )}
-                </>
-              )}
-
-              {activeTab === 'photos' && (
-                <>
-                  {/* Photos */}
-                  {facility.photo_references && facility.photo_references.length > 0 ? (
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.05 }}
-                    >
-                      <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
-                        Photos ({facility.photo_references.length})
-                      </h3>
-                      <div className="grid grid-cols-2 gap-3">
-                        {facility.photo_references.slice(0, 10).map((photoRef, idx) => (
-                          <motion.div
-                            key={idx}
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: 0.1 + idx * 0.05 }}
-                            whileHover={{ scale: 1.05 }}
-                            className="relative overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-all cursor-pointer group"
-                          >
-                            {loadingImages[idx] !== false && (
-                              <div className="absolute inset-0 bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200 animate-pulse" />
-                            )}
-                            <img
-                              src={getPhotoUrl(photoRef)}
-                              alt={`${facility.name} photo ${idx + 1}`}
-                              className="w-full h-32 object-cover transition-transform duration-300 group-hover:scale-110"
-                              onLoadStart={() => handleImageLoadStart(idx)}
-                              onLoad={() => handleImageLoad(idx)}
-                              onError={() => handleImageLoad(idx)}
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                          </motion.div>
-                        ))}
-                      </div>
-                    </motion.div>
-                  ) : (
-                    <div className="text-center py-12">
-                      <Camera className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                      <p className="text-sm text-gray-500">No photos available</p>
-                    </div>
-                  )}
-                </>
-              )}
-
-              {activeTab === 'notes' && (
-                <>
-                  {/* Notes Section */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.05 }}
-                  >
-                    <div className="flex items-center justify-between mb-3">
-                      <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide flex items-center gap-2">
-                        <StickyNote className="w-4 h-4" />
-                        Notes ({notes.length})
-                      </h3>
-                    </div>
-
-                    {/* Add New Note Form */}
-                    <div className="mb-4">
-                      <div className="flex gap-2">
-                        <textarea
-                          value={newNoteText}
-                          onChange={(e) => setNewNoteText(e.target.value)}
-                          placeholder="Add a note..."
-                          className="flex-1 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 border border-[#E8E9EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004aad] resize-none"
-                          rows={2}
-                          disabled={addingNote}
-                        />
-                      </div>
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={handleAddNote}
-                        disabled={!newNoteText.trim() || addingNote}
-                        className="mt-2 w-full flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-[#004aad] to-[#004aad]/90 hover:from-[#004aad]/90 hover:to-[#004aad]/80 text-white rounded-lg text-sm font-medium shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        <Plus className="w-4 h-4" />
-                        <span>{addingNote ? "Adding..." : "Add Note"}</span>
-                      </motion.button>
-                    </div>
-
-                    {/* Notes List */}
-                    {loadingNotes ? (
-                      <div className="text-center py-4">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#004aad] mx-auto"></div>
-                      </div>
-                    ) : notes.length === 0 ? (
-                      <div className="text-center py-6 bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-xl border border-gray-100">
-                        <StickyNote className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                        <p className="text-sm text-gray-500">No notes yet</p>
-                      </div>
-                    ) : (
-                      <div className="space-y-3">
-                        {notes.map((note, idx) => (
-                          <motion.div
-                            key={note.id}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.1 + idx * 0.05 }}
-                            className="bg-gradient-to-br from-white to-gray-50/50 rounded-xl p-3 shadow-sm border border-gray-100"
-                          >
-                            {editingNoteId === note.id ? (
-                              // Edit Mode
-                              <div className="space-y-2">
-                                <textarea
-                                  value={editNoteText}
-                                  onChange={(e) => setEditNoteText(e.target.value)}
-                                  className="w-full px-3 py-2 text-sm text-gray-900 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                                  rows={3}
-                                />
-                                <div className="flex gap-2">
-                                  <motion.button
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    onClick={() => handleSaveEdit(note.id)}
-                                    className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-lg text-xs font-medium"
-                                  >
-                                    <Save className="w-3 h-3" />
-                                    Save
-                                  </motion.button>
-                                  <motion.button
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    onClick={handleCancelEdit}
-                                    className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-xs font-medium"
-                                  >
-                                    <XIcon className="w-3 h-3" />
-                                    Cancel
-                                  </motion.button>
-                                </div>
-                              </div>
-                            ) : (
-                              // View Mode
-                              <>
-                                <p className="text-sm text-gray-700 leading-relaxed mb-2">
-                                  {note.note_text}
-                                </p>
-                                <div className="flex items-center justify-between">
-                                  <span className="text-xs text-gray-500">
-                                    {formatRelativeTime(note.created_at)}
-                                    {note.updated_at !== note.created_at && " (edited)"}
-                                  </span>
-                                  <div className="flex gap-2">
-                                    <motion.button
-                                      whileHover={{ scale: 1.1 }}
-                                      whileTap={{ scale: 0.9 }}
-                                      onClick={() => handleStartEdit(note)}
-                                      className="p-1 hover:bg-[#004aad]/10 rounded text-[#004aad]"
-                                    >
-                                      <Edit2 className="w-3.5 h-3.5" />
-                                    </motion.button>
-                                    <motion.button
-                                      whileHover={{ scale: 1.1 }}
-                                      whileTap={{ scale: 0.9 }}
-                                      onClick={() => handleDeleteNote(note.id)}
-                                      className="p-1 hover:bg-red-100 rounded text-red-600"
-                                    >
-                                      <Trash2 className="w-3.5 h-3.5" />
-                                    </motion.button>
-                                  </div>
-                                </div>
-                              </>
-                            )}
-                          </motion.div>
-                        ))}
-                      </div>
-                    )}
-                  </motion.div>
-                </>
-              )}
-
-              {activeTab === 'reviews' && (
-                <>
-                  {/* Reviews */}
-                  {facility.reviews && facility.reviews.length > 0 ? (
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.05 }}
-                    >
-                      <h3 className="text-sm font-semibold text-gray-700 mb-4 uppercase tracking-wide">
-                        Reviews ({facility.reviews.length})
-                      </h3>
-                      <div className="space-y-4">
-                        {facility.reviews.map((review, idx) => (
-                          <motion.div
-                            key={idx}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.1 + idx * 0.05 }}
-                            whileHover={{ scale: 1.01 }}
-                            className="bg-gradient-to-br from-white to-gray-50/50 rounded-xl p-4 shadow-sm hover:shadow-md transition-all border border-gray-100"
-                          >
-                            <div className="flex items-center justify-between mb-3">
-                              <span className="font-semibold text-gray-900 text-sm">
-                                {review.author_name}
-                              </span>
-                              <div className="flex gap-0.5">
-                                {renderStars(review.rating)}
-                              </div>
-                            </div>
-                            <p className="text-sm text-gray-700 leading-relaxed mb-2">
-                              {review.text}
-                            </p>
-                            <span className="text-xs text-gray-500 font-medium">
-                              {review.relative_time_description}
-                            </span>
-                          </motion.div>
-                        ))}
-                      </div>
-                    </motion.div>
-                  ) : (
-                    <div className="text-center py-12">
-                      <MessageSquare className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                      <p className="text-sm text-gray-500">No reviews available</p>
-                    </div>
-                  )}
-                </>
-              )}
-            </motion.div>
-          </AnimatePresence>
         </div>
+
+        {/* Photos Grid Modal */}
+        {isPhotosModalOpen && createPortal(
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-6 z-[9999]"
+            onClick={() => setIsPhotosModalOpen(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ type: "spring", damping: 25 }}
+              className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[85vh] overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-white to-gray-50">
+                <h2 className="text-xl font-bold text-gray-900">
+                  Photos ({facility?.photo_references?.length || 0})
+                </h2>
+                <button
+                  onClick={() => setIsPhotosModalOpen(false)}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-600" />
+                </button>
+              </div>
+
+              {/* Photos Grid */}
+              <div className="p-6 overflow-y-auto max-h-[calc(85vh-80px)]">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {facility?.photo_references?.map((photoRef, idx) => (
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: idx * 0.03 }}
+                      onClick={() => openPhotoViewer(idx)}
+                      className="relative overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-all cursor-pointer aspect-square group"
+                    >
+                      {loadingImages[idx] !== false && (
+                        <div className="absolute inset-0 bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200 animate-pulse" />
+                      )}
+                      <img
+                        src={getPhotoUrl(photoRef)}
+                        alt={`${facility.name} photo ${idx + 1}`}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                        onLoadStart={() => handleImageLoadStart(idx)}
+                        onLoad={() => handleImageLoad(idx)}
+                        onError={() => handleImageLoad(idx)}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-2">
+                        <span className="text-white text-xs font-medium">Click to view</span>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>,
+          document.body
+        )}
+
+        {/* Reviews Modal */}
+        {isReviewsModalOpen && createPortal(
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-6 z-[9999]"
+            onClick={() => setIsReviewsModalOpen(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ type: "spring", damping: 25 }}
+              className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[85vh] overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-white to-gray-50">
+                <h2 className="text-xl font-bold text-gray-900">
+                  Reviews ({facility?.reviews?.length || 0})
+                </h2>
+                <button
+                  onClick={() => setIsReviewsModalOpen(false)}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-600" />
+                </button>
+              </div>
+
+              {/* Reviews List */}
+              <div className="p-6 overflow-y-auto max-h-[calc(85vh-80px)]">
+                <div className="space-y-4">
+                  {facility?.reviews?.map((review, idx) => (
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.05 }}
+                      className="bg-gradient-to-br from-white to-gray-50/50 rounded-xl p-5 shadow-sm hover:shadow-md transition-all border border-gray-100"
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="font-semibold text-gray-900 text-base">
+                          {review.author_name}
+                        </span>
+                        <div className="flex gap-0.5">
+                          {renderStars(review.rating)}
+                        </div>
+                      </div>
+                      <p className="text-sm text-gray-700 leading-relaxed mb-3">
+                        {review.text}
+                      </p>
+                      <span className="text-xs text-gray-500 font-medium">
+                        {review.relative_time_description}
+                      </span>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>,
+          document.body
+        )}
+
+        {/* Photo Lightbox Viewer */}
+        {isPhotoViewerOpen && facility?.photo_references && createPortal(
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/95 backdrop-blur-sm flex items-center justify-center z-[10000]"
+            onClick={closePhotoViewer}
+          >
+            {/* Close Button */}
+            <button
+              onClick={closePhotoViewer}
+              className="absolute top-6 right-6 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors z-10"
+            >
+              <X className="w-6 h-6 text-white" />
+            </button>
+
+            {/* Photo Counter */}
+            <div className="absolute top-6 left-6 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full text-white text-sm font-medium">
+              {selectedPhotoIndex + 1} / {facility.photo_references.length}
+            </div>
+
+            {/* Previous Button */}
+            {selectedPhotoIndex > 0 && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  goToPrevPhoto();
+                }}
+                className="absolute left-6 top-1/2 -translate-y-1/2 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
+              >
+                <ChevronLeft className="w-8 h-8 text-white" />
+              </button>
+            )}
+
+            {/* Next Button */}
+            {selectedPhotoIndex < facility.photo_references.length - 1 && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  goToNextPhoto();
+                }}
+                className="absolute right-6 top-1/2 -translate-y-1/2 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
+              >
+                <ChevronRight className="w-8 h-8 text-white" />
+              </button>
+            )}
+
+            {/* Main Photo */}
+            <motion.div
+              key={selectedPhotoIndex}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.2 }}
+              className="w-full h-full flex items-center justify-center px-24 py-20"
+            >
+              <img
+                src={getPhotoUrl(facility.photo_references[selectedPhotoIndex], true)}
+                alt={`${facility.name} photo ${selectedPhotoIndex + 1}`}
+                className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
+              />
+            </motion.div>
+          </motion.div>,
+          document.body
+        )}
 
         {/* Sport Detail Modal - Rendered as Portal for Full-Screen Overlay */}
         {selectedSportDetail && facility.sport_metadata?.[selectedSportDetail] && createPortal(
