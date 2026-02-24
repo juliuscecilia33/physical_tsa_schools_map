@@ -8,6 +8,7 @@ import { FilterOption } from "@/app/page";
 import FacilitySidebar from "./FacilitySidebar";
 import FacilitySearch from "./FacilitySearch";
 import AISearchPanel from "./AISearchPanel";
+import FilterButtonBar from "./FilterButtonBar";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Filter,
@@ -234,6 +235,7 @@ export default function FacilityMap({
   const [selectedFacility, setSelectedFacility] = useState<Facility | null>(
     null,
   );
+  const [sidebarVisible, setSidebarVisible] = useState(false);
   const [expandedSections, setExpandedSections] = useState({
     displayFilter: true,
     sportFilter: true,
@@ -375,6 +377,76 @@ export default function FacilityMap({
     return counts;
   }, [filteredFacilities]);
 
+  // Category colors mapping for filter dropdowns
+  const categoryColors = useMemo(() => {
+    return {
+      "Parks & Fields": ACTIVITY_CATEGORIES.parks.color,
+      "Fitness & Wellness": ACTIVITY_CATEGORIES.fitness.color,
+      "Sports Venues": ACTIVITY_CATEGORIES.sports.color,
+      "Educational": ACTIVITY_CATEGORIES.education.color,
+      "Other": ACTIVITY_CATEGORIES.other.color,
+    };
+  }, []);
+
+  // Category counts by label for filter dropdowns
+  const categoryCountsByLabel = useMemo(() => {
+    return {
+      "Parks & Fields": categoryCounts.parks,
+      "Fitness & Wellness": categoryCounts.fitness,
+      "Sports Venues": categoryCounts.sports,
+      "Educational": categoryCounts.education,
+      "Other": categoryCounts.other,
+    };
+  }, [categoryCounts]);
+
+  // Category label to key mapping
+  const categoryLabelToKey: Record<string, keyof typeof ACTIVITY_CATEGORIES> = {
+    "Parks & Fields": "parks",
+    "Fitness & Wellness": "fitness",
+    "Sports Venues": "sports",
+    "Educational": "education",
+    "Other": "other",
+  };
+
+  // Helper functions for filter bar
+  const handleCategoryToggle = (categoryLabel: string) => {
+    const categoryKey = categoryLabelToKey[categoryLabel];
+    setSelectedCategories((prev) => {
+      if (prev.includes(categoryKey)) {
+        return prev.filter((c) => c !== categoryKey);
+      }
+      return [...prev, categoryKey];
+    });
+  };
+
+  const handleClearCategories = () => {
+    setSelectedCategories(["parks", "fitness", "sports", "education", "other"]);
+  };
+
+  const handleSportToggle = (sport: string) => {
+    onSelectedSportsChange(
+      selectedSports.includes(sport)
+        ? selectedSports.filter((s) => s !== sport)
+        : [...selectedSports, sport]
+    );
+  };
+
+  const handleClearSports = () => {
+    onSelectedSportsChange([]);
+  };
+
+  const handleTagToggle = (tagId: string) => {
+    onSelectedTagsChange(
+      selectedTags.includes(tagId)
+        ? selectedTags.filter((t) => t !== tagId)
+        : [...selectedTags, tagId]
+    );
+  };
+
+  const handleClearTags = () => {
+    onSelectedTagsChange([]);
+  };
+
   // Convert filtered facilities to GeoJSON format with color coding
   const geojsonData = useMemo(() => {
     return {
@@ -500,11 +572,33 @@ export default function FacilityMap({
         </Source>
       </Map>
 
-      {/* Search Bar - Centered */}
+      {/* Search Bar and Filter Buttons - Single Row */}
       <div className="absolute top-7 left-1/2 -translate-x-1/2 z-10 flex items-center gap-3">
         <FacilitySearch
           facilities={filteredFacilities}
           onSelectFacility={handleSearchSelect}
+        />
+
+        {/* Filter Button Bar - Inline */}
+        <FilterButtonBar
+          sidebarVisible={sidebarVisible}
+          onToggleSidebar={() => setSidebarVisible(!sidebarVisible)}
+          visibilityFilter={filterOption}
+          onVisibilityFilterChange={onFilterOptionChange}
+          availableSports={availableSports}
+          selectedSports={selectedSports}
+          onSportToggle={handleSportToggle}
+          onClearSports={handleClearSports}
+          sportEmojis={SPORT_EMOJIS}
+          availableTags={availableTags}
+          selectedTagIds={selectedTags}
+          onTagToggle={handleTagToggle}
+          onClearTags={handleClearTags}
+          selectedCategories={selectedCategories.map((key) => ACTIVITY_CATEGORIES[key].label)}
+          onCategoryToggle={handleCategoryToggle}
+          onClearCategories={handleClearCategories}
+          categoryCounts={categoryCountsByLabel}
+          categoryColors={categoryColors}
         />
 
         {/* AI Search Toggle Button */}
@@ -519,11 +613,15 @@ export default function FacilityMap({
       </div>
 
       {/* Modern Info Panel */}
-      <div
-        className={`fixed top-[1vh] left-4 h-[98vh] w-full md:w-[340px] bg-white shadow-2xl rounded-2xl p-6 overflow-y-auto z-10 transition-opacity duration-300 ${
-          selectedFacility ? "opacity-0 pointer-events-none" : "opacity-100"
-        }`}
-      >
+      <AnimatePresence>
+        {sidebarVisible && !selectedFacility && (
+          <motion.div
+            initial={{ x: -400, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -400, opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="fixed top-[1vh] left-4 h-[98vh] w-full md:w-[340px] bg-white shadow-2xl rounded-2xl p-6 overflow-y-auto z-10"
+          >
         {/* TSA Logo */}
         <div className="flex justify-center pb-4 mb-4 border-b border-[#E8E9EB]">
           <motion.img
@@ -964,7 +1062,9 @@ export default function FacilityMap({
             )}
           </AnimatePresence>
         </div>
-      </div>
+      </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Sidebar */}
       <FacilitySidebar

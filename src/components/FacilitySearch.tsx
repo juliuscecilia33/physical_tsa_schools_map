@@ -45,6 +45,7 @@ interface FacilitySearchProps {
 export default function FacilitySearch({ facilities, onSelectFacility }: FacilitySearchProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [isFocused, setIsFocused] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -147,51 +148,90 @@ export default function FacilitySearch({ facilities, onSelectFacility }: Facilit
   };
 
   return (
-    <div ref={searchRef} className="relative w-[600px]">
-      {/* Search Input - Modern Sleek Design */}
-      <div className="relative">
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className={`bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl transition-all duration-300 border ${
-            isFocused
-              ? "ring-2 ring-[#004aad]/50 shadow-[#004aad]/20 border-[#004aad]/30"
-              : "border-[#E8E9EB] hover:border-gray-300/50"
-          }`}
-        >
-          <div className="flex items-center gap-4 px-6 py-4">
-            <Search className={`w-6 h-6 flex-shrink-0 transition-colors duration-300 ${
-              isFocused ? "text-[#004aad]" : "text-gray-400"
-            }`} />
-            <input
-              ref={inputRef}
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onFocus={() => setIsFocused(true)}
-              placeholder="Search facilities, sports, or location..."
-              className="flex-1 text-base text-gray-900 placeholder:text-gray-400 bg-transparent focus:outline-none font-medium"
-            />
-            {searchQuery && (
-              <motion.button
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                exit={{ scale: 0 }}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={handleClearSearch}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+    <div ref={searchRef} className="relative">
+      <AnimatePresence mode="wait">
+        {!isExpanded ? (
+          // Collapsed: Icon Button
+          <motion.button
+            key="collapsed"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => {
+              setIsExpanded(true);
+              setTimeout(() => inputRef.current?.focus(), 100);
+            }}
+            className="p-4 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200 hover:bg-gray-50 transition-all"
+          >
+            <Search className="w-6 h-6 text-gray-600" />
+          </motion.button>
+        ) : (
+          // Expanded: Full Search Bar
+          <motion.div
+            key="expanded"
+            initial={{ opacity: 0, width: 60 }}
+            animate={{ opacity: 1, width: 400 }}
+            exit={{ opacity: 0, width: 60 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="relative"
+          >
+            <div className="relative">
+              <motion.div
+                className={`bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl transition-all duration-300 border ${
+                  isFocused
+                    ? "ring-2 ring-[#004aad]/50 shadow-[#004aad]/20 border-[#004aad]/30"
+                    : "border-[#E8E9EB] hover:border-gray-300/50"
+                }`}
               >
-                <X className="w-5 h-5 text-gray-400 hover:text-gray-600" />
-              </motion.button>
-            )}
-          </div>
-        </motion.div>
-      </div>
+                <div className="flex items-center gap-4 px-6 py-4">
+                  <Search className={`w-6 h-6 flex-shrink-0 transition-colors duration-300 ${
+                    isFocused ? "text-[#004aad]" : "text-gray-400"
+                  }`} />
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onFocus={() => setIsFocused(true)}
+                    placeholder="Search facilities, sports, or location..."
+                    className="flex-1 text-base text-gray-900 placeholder:text-gray-400 bg-transparent focus:outline-none font-medium"
+                  />
+                  {searchQuery ? (
+                    <motion.button
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      exit={{ scale: 0 }}
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={handleClearSearch}
+                      className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                    >
+                      <X className="w-5 h-5 text-gray-400 hover:text-gray-600" />
+                    </motion.button>
+                  ) : (
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => {
+                        setIsExpanded(false);
+                        setIsFocused(false);
+                      }}
+                      className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                    >
+                      <X className="w-5 h-5 text-gray-400 hover:text-gray-600" />
+                    </motion.button>
+                  )}
+                </div>
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Search Results - Modern Relaxed Design */}
       <AnimatePresence>
-        {isFocused && searchQuery.trim() && (
+        {isExpanded && isFocused && searchQuery.trim() && (
           <motion.div
             initial={{ opacity: 0, y: -10, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -304,7 +344,7 @@ export default function FacilitySearch({ facilities, onSelectFacility }: Facilit
 
       {/* Keyboard Shortcut Hint - Modern Style */}
       <AnimatePresence>
-        {isFocused && searchResults.length > 0 && (
+        {isExpanded && isFocused && searchResults.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: -5 }}
             animate={{ opacity: 1, y: 0 }}
