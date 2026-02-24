@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { Facility } from "@/types/facility";
 import { useQuery } from "@tanstack/react-query";
+import ProgressBar from "@/components/ProgressBar";
 
 const FacilityMap = dynamic(() => import("@/components/FacilityMap"), {
   ssr: false,
@@ -35,6 +36,7 @@ export default function Home() {
   const [filterOption, setFilterOption] = useState<FilterOption>('UNHIDDEN_ONLY');
   const [selectedSports, setSelectedSports] = useState<string[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [progress, setProgress] = useState(0);
 
   // Fetch all facilities with React Query
   const { data: facilities = [], isLoading, isError, error } = useQuery({
@@ -44,6 +46,26 @@ export default function Home() {
     gcTime: Infinity,
   });
 
+  // Simulate progress while loading
+  useEffect(() => {
+    if (isLoading) {
+      setProgress(0);
+      const interval = setInterval(() => {
+        setProgress((prev) => {
+          if (prev >= 90) {
+            clearInterval(interval);
+            return 90;
+          }
+          return prev + 2;
+        });
+      }, 50);
+      return () => clearInterval(interval);
+    } else {
+      // When loading completes, jump to 100%
+      setProgress(100);
+    }
+  }, [isLoading]);
+
   // Optimistic update for facility hidden status
   // This will be handled by cache invalidation later
   const updateFacilityHidden = (place_id: string, hidden: boolean) => {
@@ -51,15 +73,17 @@ export default function Home() {
     console.log(`Facility ${place_id} hidden status changed to ${hidden}`);
   };
 
-  // Show loading state
-  if (isLoading) {
+  // Show loading state with progress bar
+  if (isLoading || progress < 100) {
+    const totalCount = facilities.length > 0 ? facilities.length : null;
+    const loadedCount = totalCount ? Math.floor(totalCount * (progress / 100)) : 0;
+
     return (
-      <div className="w-full h-screen flex items-center justify-center bg-gray-100">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#004aad] mx-auto mb-4"></div>
-          <p className="text-gray-600 font-medium">Loading facilities...</p>
-        </div>
-      </div>
+      <ProgressBar
+        progress={progress}
+        loadedCount={loadedCount}
+        totalCount={totalCount}
+      />
     );
   }
 

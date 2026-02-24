@@ -72,6 +72,65 @@ export function ReactQueryProvider({ children }: { children: React.ReactNode }) 
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [queryClient]);
 
+  // Also save cache when page loses focus (more reliable for navigation events)
+  useEffect(() => {
+    let debounceTimer: NodeJS.Timeout;
+
+    const handleVisibilityChange = () => {
+      // Clear any pending debounce to avoid multiple saves
+      clearTimeout(debounceTimer);
+
+      // Debounce for 100ms to prevent spurious events from popups/overlays
+      debounceTimer = setTimeout(() => {
+        // Double-check that document is truly hidden (not just a spurious event)
+        if (document.visibilityState === "hidden" && document.hidden) {
+          const cache = queryClient.getQueryCache();
+          const queries = cache.getAll();
+
+          const facilitiesQuery = queries.find(
+            (query) =>
+              Array.isArray(query.queryKey) &&
+              query.queryKey[0] === "facilities" &&
+              query.queryKey[1] === "all"
+          );
+
+          if (facilitiesQuery && facilitiesQuery.state.data) {
+            try {
+              const serializedCache = {
+                queryKey: facilitiesQuery.queryKey,
+                data: facilitiesQuery.state.data,
+                dataUpdatedAt: facilitiesQuery.state.dataUpdatedAt,
+              };
+
+              const cacheString = JSON.stringify(serializedCache);
+              const sizeInMB = new Blob([cacheString]).size / (1024 * 1024);
+
+              if (sizeInMB > 8) {
+                console.warn(
+                  `React Query cache is large (${sizeInMB.toFixed(2)}MB), skipping persistence`
+                );
+                return;
+              }
+
+              sessionStorage.setItem("react-query-cache", cacheString);
+              console.log(
+                `Persisted facilities cache on visibility change (${sizeInMB.toFixed(2)}MB)`
+              );
+            } catch (error) {
+              console.warn("Failed to persist React Query cache:", error);
+            }
+          }
+        }
+      }, 100);
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      clearTimeout(debounceTimer);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [queryClient]);
+
   // Restore cache from sessionStorage on mount
   useEffect(() => {
     try {
@@ -79,10 +138,12 @@ export function ReactQueryProvider({ children }: { children: React.ReactNode }) 
       if (cachedData) {
         const parsed = JSON.parse(cachedData);
 
-        // Restore the main facilities query
+        // Restore the main facilities query with preserved timestamp
         if (parsed.queryKey && parsed.data) {
-          queryClient.setQueryData(parsed.queryKey, parsed.data);
-          console.log("Restored facilities cache from sessionStorage");
+          queryClient.setQueryData(parsed.queryKey, parsed.data, {
+            updatedAt: parsed.dataUpdatedAt || Date.now(),
+          });
+          console.log("Restored facilities cache from sessionStorage with timestamp:", new Date(parsed.dataUpdatedAt || Date.now()).toLocaleTimeString());
         }
       }
     } catch (error) {
