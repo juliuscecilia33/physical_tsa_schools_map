@@ -573,7 +573,7 @@ export default function FacilityMap({
       </Map>
 
       {/* Search Bar and Filter Buttons - Single Row */}
-      <div className="absolute top-7 left-1/2 -translate-x-1/2 z-10 flex items-center gap-3">
+      <div className="absolute top-7 z-10 flex items-center gap-3 w-full justify-center px-4">
         <FacilitySearch
           facilities={filteredFacilities}
           onSelectFacility={handleSearchSelect}
