@@ -3,6 +3,7 @@ import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
 import { ReactQueryProvider } from "@/providers/ReactQueryProvider";
 import NavigationSidebar from "@/components/NavigationSidebar";
+import ViewManager from "@/components/ViewManager";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -36,7 +37,10 @@ export default function RootLayout({
       >
         <ReactQueryProvider>
           <NavigationSidebar />
-          <div className="ml-20">{children}</div>
+          <div className="ml-20">
+            <ViewManager />
+            {children}
+          </div>
         </ReactQueryProvider>
       </body>
     </html>
