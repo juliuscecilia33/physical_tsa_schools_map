@@ -455,6 +455,7 @@ async function selectTopFacilities() {
       user_ratings_total: f.user_ratings_total,
       photo_count: f.photo_references?.length || 0,
       address: f.address,
+      location: f.location,
       sport_types: f.sport_types,
       identified_sports: f.identified_sports,
       website: f.website,

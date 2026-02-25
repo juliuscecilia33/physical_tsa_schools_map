@@ -13,7 +13,9 @@ const serpApiKey = process.env.SERPAPI_API_KEY!;
 
 if (!supabaseUrl || !supabaseAnonKey || !serpApiKey) {
   console.error("❌ Error: Missing required environment variables");
-  console.error("   Required: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SERPAPI_API_KEY");
+  console.error(
+    "   Required: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SERPAPI_API_KEY",
+  );
   process.exit(1);
 }
 
@@ -25,6 +27,9 @@ interface FacilityToEnrich {
   name: string;
   rating: number;
   user_ratings_total: number;
+  address: string;
+  lat: number;
+  lng: number;
 }
 
 interface ProgressState {
@@ -47,11 +52,11 @@ interface ProgressState {
 const PROGRESS_FILE = path.join(__dirname, "../.serpapi-progress.json");
 const FACILITIES_FILE = path.join(
   __dirname,
-  "../data/top-2500-high-quality-texas-facilities.json"
+  "../data/top-2500-high-quality-texas-facilities.json",
 );
 
-// Test mode: Set to a number to limit processing (e.g., 5 for testing), or null to process all
-const TEST_LIMIT: number | null = 5;
+// Test mode: Set to a number to limit processing (e.g., 3 for testing), or null to process all
+const TEST_LIMIT: number | null = 3;
 
 // Rate limiting
 const DELAY_BETWEEN_REQUESTS_MS = 2000; // 2 seconds between requests
@@ -98,51 +103,200 @@ function loadFacilities(): FacilityToEnrich[] {
     name: f.name,
     rating: f.rating,
     user_ratings_total: f.user_ratings_total,
+    address: f.address,
+    lat: f.location.lat,
+    lng: f.location.lng,
   }));
 }
 
 /**
+ * Fetch data_id from Google Maps search using place details
+ */
+async function getDataIdFromPlaceId(
+  placeId: string,
+  facilityName: string,
+  facilityAddress: string,
+  lat: number,
+  lng: number,
+): Promise<{ success: boolean; dataId?: string; error?: string }> {
+  try {
+    // Search for the facility using name and address
+    const searchQuery = `${facilityName} ${facilityAddress}`;
+    const locationParam = `@${lat},${lng},15z`;
+
+    console.log(`     🔍 Search Query: "${searchQuery}"`);
+    console.log(`     📍 Location: ${locationParam}`);
+    console.log(`     🎯 Target place_id: ${placeId}`);
+
+    const response = await getJson({
+      engine: "google_maps",
+      q: searchQuery,
+      ll: locationParam,
+      api_key: serpApiKey,
+    });
+
+    // Try to find the matching place by place_id
+    const localResults = response.local_results || [];
+
+    console.log(`     📊 Search returned ${localResults.length} results`);
+
+    if (localResults.length > 0) {
+      console.log(`     📍 Results breakdown:`);
+      localResults.forEach((place: any, index: number) => {
+        console.log(`        ${index + 1}. "${place.title || place.name || 'Unknown'}"`);
+        console.log(`           place_id: ${place.place_id || 'N/A'}`);
+        console.log(`           data_id: ${place.data_id || 'N/A'}`);
+        console.log(`           address: ${place.address || 'N/A'}`);
+      });
+    } else {
+      console.log(`     ⚠️  No local_results returned from search!`);
+    }
+
+    const matchingPlace = localResults.find(
+      (place: any) => place.place_id === placeId,
+    );
+
+    if (matchingPlace && matchingPlace.data_id) {
+      console.log(`     ✅ Found exact match by place_id!`);
+      return {
+        success: true,
+        dataId: matchingPlace.data_id,
+      };
+    }
+
+    // If no exact match, use first result (might be close enough)
+    if (localResults.length > 0 && localResults[0].data_id) {
+      console.log(`     ⚠️  Using first search result (no exact place_id match)`);
+      console.log(`        First result place_id: ${localResults[0].place_id}`);
+      console.log(`        First result data_id: ${localResults[0].data_id}`);
+      return {
+        success: true,
+        dataId: localResults[0].data_id,
+      };
+    }
+
+    console.log(`     ❌ No usable data_id found in any result`);
+    return {
+      success: false,
+      error: "No data_id found in search results",
+    };
+  } catch (error: any) {
+    console.log(`     ❌ Exception during search: ${error.message}`);
+    return {
+      success: false,
+      error: error.message || "Failed to fetch data_id",
+    };
+  }
+}
+
+/**
  * Fetch photos and reviews from SerpAPI for a given place_id
+ * Note: Makes 3 API calls - one for data_id lookup, one for photos, one for reviews
  */
 async function fetchSerpApiData(
   placeId: string,
-  retryCount = 0
+  facilityName: string,
+  facilityAddress: string,
+  lat: number,
+  lng: number,
+  retryCount = 0,
 ): Promise<{
   success: boolean;
   photos?: any[];
   reviews?: any[];
+  dataId?: string;
   error?: string;
+  apiCallsUsed: number;
 }> {
+  let photos: any[] = [];
+  let reviews: any[] = [];
+  let dataId: string | undefined;
+  let apiCallsUsed = 0;
+
   try {
-    const response = await getJson({
-      engine: "google_maps",
-      type: "place",
-      place_id: placeId,
-      api_key: serpApiKey,
-    });
+    // Step 1: Get data_id from Google Maps search
+    console.log(`     → Getting data_id...`);
+    const dataIdResult = await getDataIdFromPlaceId(
+      placeId,
+      facilityName,
+      facilityAddress,
+      lat,
+      lng,
+    );
+    apiCallsUsed++;
 
-    // Extract photos
-    const photos = response.photos || [];
+    if (!dataIdResult.success) {
+      console.log(`     ⚠️  Could not get data_id: ${dataIdResult.error}`);
+      console.log(`     ⏭️  Skipping photos, will only fetch reviews`);
+    } else {
+      dataId = dataIdResult.dataId;
+      console.log(`     ✓ Got data_id: ${dataId}`);
+    }
 
-    // Extract reviews
-    const reviews = response.reviews || [];
+    // Step 2: Fetch photos using google_maps_photos engine (only if we have data_id)
+    if (dataId) {
+      console.log(`     → Fetching photos...`);
+      try {
+        const photosResponse = await getJson({
+          engine: "google_maps_photos",
+          data_id: dataId,
+          api_key: serpApiKey,
+        });
+        apiCallsUsed++;
+        photos = photosResponse.photos || [];
+        console.log(`     ✓ Photos API returned ${photos.length} photos`);
+      } catch (photoError: any) {
+        console.log(`     ⚠️  Photos API error:`);
+        console.log(`        Message: ${photoError.message || "No message"}`);
+        console.log(`        Error object:`, JSON.stringify(photoError, null, 2));
+        if (photoError.response) {
+          console.log(`        Response status: ${photoError.response.status}`);
+          console.log(
+            `        Response data:`,
+            JSON.stringify(photoError.response.data, null, 2),
+          );
+        }
+      }
+
+      // Small delay between API calls
+      await delay(500);
+    }
+
+    // Step 3: Fetch reviews using google_maps_reviews engine
+    console.log(`     → Fetching reviews...`);
+    try {
+      const reviewsResponse = await getJson({
+        engine: "google_maps_reviews",
+        place_id: placeId,
+        api_key: serpApiKey,
+      });
+      apiCallsUsed++;
+      reviews = reviewsResponse.reviews || [];
+    } catch (reviewError: any) {
+      console.log(`     ⚠️  Reviews API error: ${reviewError.message}`);
+    }
 
     return {
       success: true,
       photos,
       reviews,
+      dataId,
+      apiCallsUsed,
     };
   } catch (error: any) {
     // Retry logic
     if (retryCount < MAX_RETRIES) {
-      console.log(`  ⚠️  Error, retrying (${retryCount + 1}/${MAX_RETRIES})...`);
+      console.log(
+        `  ⚠️  Error, retrying (${retryCount + 1}/${MAX_RETRIES})...`,
+      );
       await delay(RETRY_DELAY_MS);
-      return fetchSerpApiData(placeId, retryCount + 1);
+      return fetchSerpApiData(placeId, facilityName, facilityAddress, lat, lng, retryCount + 1);
     }
 
     return {
       success: false,
       error: error.message || "Unknown error",
+      apiCallsUsed,
     };
   }
 }
@@ -153,17 +307,25 @@ async function fetchSerpApiData(
 async function updateFacilityWithSerpData(
   facilityId: string,
   photos: any[],
-  reviews: any[]
+  reviews: any[],
+  dataId?: string,
 ): Promise<boolean> {
   try {
+    const updateData: any = {
+      additional_photos: photos,
+      additional_reviews: reviews,
+      serp_scraped: true,
+      serp_scraped_at: new Date().toISOString(),
+    };
+
+    // Only update serp_data_id if we successfully got one
+    if (dataId) {
+      updateData.serp_data_id = dataId;
+    }
+
     const { error } = await supabase
       .from("sports_facilities")
-      .update({
-        additional_photos: photos,
-        additional_reviews: reviews,
-        serp_scraped: true,
-        serp_scraped_at: new Date().toISOString(),
-      })
+      .update(updateData)
       .eq("id", facilityId);
 
     if (error) {
@@ -185,9 +347,9 @@ async function processFacility(
   facility: FacilityToEnrich,
   progress: ProgressState,
   index: number,
-  total: number
+  total: number,
 ): Promise<void> {
-  console.log(`\n[${ index + 1}/${total}] Processing: ${facility.name}`);
+  console.log(`\n[${index + 1}/${total}] Processing: ${facility.name}`);
   console.log(`   Place ID: ${facility.place_id}`);
 
   // Check if already processed
@@ -199,8 +361,14 @@ async function processFacility(
 
   // Fetch data from SerpAPI
   console.log(`   🔍 Fetching data from SerpAPI...`);
-  const serpData = await fetchSerpApiData(facility.place_id);
-  progress.apiCallsUsed++;
+  const serpData = await fetchSerpApiData(
+    facility.place_id,
+    facility.name,
+    facility.address,
+    facility.lat,
+    facility.lng,
+  );
+  progress.apiCallsUsed += serpData.apiCallsUsed;
 
   if (!serpData.success) {
     console.log(`   ❌ Failed: ${serpData.error}`);
@@ -225,7 +393,8 @@ async function processFacility(
   const updated = await updateFacilityWithSerpData(
     facility.id,
     serpData.photos || [],
-    serpData.reviews || []
+    serpData.reviews || [],
+    serpData.dataId,
   );
 
   if (updated) {
@@ -253,7 +422,7 @@ async function processFacility(
 function printProgressSummary(
   progress: ProgressState,
   total: number,
-  startTime: number
+  startTime: number,
 ): void {
   const elapsed = (Date.now() - startTime) / 1000 / 60; // minutes
   const remaining = total - progress.processedCount;
@@ -270,9 +439,13 @@ function printProgressSummary(
   console.log(`   Skipped: ${progress.skippedCount}`);
   console.log(`   Remaining: ${remaining}`);
   console.log(`   API Calls Used: ${progress.apiCallsUsed}`);
-  console.log(`   Success Rate: ${((progress.successCount / (progress.processedCount || 1)) * 100).toFixed(1)}%`);
+  console.log(
+    `   Success Rate: ${((progress.successCount / (progress.processedCount || 1)) * 100).toFixed(1)}%`,
+  );
   console.log(`   Elapsed Time: ${elapsed.toFixed(1)} minutes`);
-  console.log(`   ETA: ${eta.toFixed(1)} minutes (~${(eta / 60).toFixed(1)} hours)`);
+  console.log(
+    `   ETA: ${eta.toFixed(1)} minutes (~${(eta / 60).toFixed(1)} hours)`,
+  );
   console.log(`   Rate: ${rate.toFixed(2)} facilities/minute`);
   console.log("=".repeat(70));
 }
@@ -297,13 +470,21 @@ async function enrichWithSerpApi() {
   console.log("\n⚠️  Important:");
   console.log("   • SerpAPI limit: 5,000 searches/month");
   console.log("   • Rate limit: 1 request every 2 seconds");
+  console.log(
+    "   • Note: Each facility requires 3 API calls (data_id lookup + photos + reviews)",
+  );
 
   if (TEST_LIMIT) {
-    console.log(`   • This will use ${TEST_LIMIT} API calls (test mode)`);
-    console.log(`   • Estimated time: ~${(TEST_LIMIT * 2) / 60} minutes`);
+    console.log(`   • This will use ~${TEST_LIMIT * 3} API calls (test mode)`);
+    console.log(
+      `   • Estimated time: ~${((TEST_LIMIT * 3 * 2.5) / 60).toFixed(1)} minutes`,
+    );
   } else {
-    console.log("   • This will use 2,500 API calls");
-    console.log("   • Estimated time: ~83 minutes");
+    console.log("   • This will use ~7,500 API calls (2,500 facilities × 3)");
+    console.log("   • Estimated time: ~312 minutes (~5.2 hours)");
+    console.log(
+      "   • ⚠️  WARNING: Exceeds 5,000/month limit - consider running in batches!",
+    );
   }
 
   console.log("=".repeat(70) + "\n");
@@ -325,14 +506,18 @@ async function enrichWithSerpApi() {
   if (progress.processedCount > 0) {
     console.log("♻️  Resuming from previous session:");
     console.log(`   Last processed index: ${progress.lastProcessedIndex}`);
-    console.log(`   Processed: ${progress.processedCount}/${facilities.length}`);
+    console.log(
+      `   Processed: ${progress.processedCount}/${facilities.length}`,
+    );
     console.log(`   API calls used: ${progress.apiCallsUsed}\n`);
   }
 
   const startTime = Date.now();
 
   // Determine how many facilities to process
-  const totalToProcess = TEST_LIMIT ? Math.min(TEST_LIMIT, facilities.length) : facilities.length;
+  const totalToProcess = TEST_LIMIT
+    ? Math.min(TEST_LIMIT, facilities.length)
+    : facilities.length;
 
   // Process each facility
   for (let i = progress.lastProcessedIndex + 1; i < totalToProcess; i++) {
@@ -363,16 +548,18 @@ async function enrichWithSerpApi() {
   console.log(`   Failed: ${progress.failedCount}`);
   console.log(`   Skipped: ${progress.skippedCount}`);
   console.log(`   API Calls Used: ${progress.apiCallsUsed}`);
-  console.log(`   Success Rate: ${((progress.successCount / progress.processedCount) * 100).toFixed(1)}%`);
   console.log(
-    `   Total Time: ${((Date.now() - startTime) / 1000 / 60).toFixed(1)} minutes`
+    `   Success Rate: ${((progress.successCount / progress.processedCount) * 100).toFixed(1)}%`,
+  );
+  console.log(
+    `   Total Time: ${((Date.now() - startTime) / 1000 / 60).toFixed(1)} minutes`,
   );
 
   if (progress.errors.length > 0) {
     console.log(`\n⚠️  Errors (${progress.errors.length}):`);
     progress.errors.slice(0, 10).forEach((error, index) => {
       console.log(
-        `   ${index + 1}. ${error.name} (${error.place_id}): ${error.error}`
+        `   ${index + 1}. ${error.name} (${error.place_id}): ${error.error}`,
       );
     });
     if (progress.errors.length > 10) {

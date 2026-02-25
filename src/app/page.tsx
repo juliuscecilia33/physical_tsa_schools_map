@@ -79,11 +79,13 @@ export default function Home() {
     const loadedCount = totalCount ? Math.floor(totalCount * (progress / 100)) : 0;
 
     return (
-      <ProgressBar
-        progress={progress}
-        loadedCount={loadedCount}
-        totalCount={totalCount}
-      />
+      <div className="w-full h-screen flex items-center justify-center bg-gray-100">
+        <ProgressBar
+          progress={progress}
+          loadedCount={loadedCount}
+          totalCount={totalCount}
+        />
+      </div>
     );
   }
 

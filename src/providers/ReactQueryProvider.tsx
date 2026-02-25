@@ -80,8 +80,16 @@ export function ReactQueryProvider({ children }: { children: React.ReactNode }) 
       // Clear any pending debounce to avoid multiple saves
       clearTimeout(debounceTimer);
 
-      // Debounce for 100ms to prevent spurious events from popups/overlays
+      // Debounce for 500ms to prevent spurious events and allow animations to complete
       debounceTimer = setTimeout(() => {
+        // Skip if map animation is in progress
+        if (typeof window !== "undefined" && (window as any).__mapAnimating) {
+          console.log(
+            "Skipping cache save - map animation in progress"
+          );
+          return;
+        }
+
         // Double-check that document is truly hidden (not just a spurious event)
         if (document.visibilityState === "hidden" && document.hidden) {
           const cache = queryClient.getQueryCache();
@@ -121,7 +129,7 @@ export function ReactQueryProvider({ children }: { children: React.ReactNode }) 
             }
           }
         }
-      }, 100);
+      }, 500);
     };
 
     document.addEventListener("visibilitychange", handleVisibilityChange);

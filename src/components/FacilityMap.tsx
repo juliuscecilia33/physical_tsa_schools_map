@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useMemo } from "react";
+import { useRef, useState, useMemo, useEffect } from "react";
 import Map, { Source, Layer, NavigationControl, Popup } from "react-map-gl";
 import type { MapRef, MapLayerMouseEvent } from "react-map-gl";
 import { Facility } from "@/types/facility";
@@ -260,7 +260,15 @@ export default function FacilityMap({
   const [selectedCategories, setSelectedCategories] = useState<
     Array<keyof typeof ACTIVITY_CATEGORIES>
   >(["parks", "fitness", "sports", "education", "other"]);
+  const [isAnimating, setIsAnimating] = useState(false);
   const mapRef = useRef<MapRef>(null);
+
+  // Expose animation state globally for cache persistence logic
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      (window as any).__mapAnimating = isAnimating;
+    }
+  }, [isAnimating]);
 
   const toggleSection = (section: keyof typeof expandedSections) => {
     setExpandedSections((prev) => ({
@@ -496,11 +504,14 @@ export default function FacilityMap({
 
       // Zoom to facility location
       const map = mapRef.current?.getMap();
+      setIsAnimating(true);
       map?.flyTo({
         center: [facility.location.lng, facility.location.lat],
         zoom: 16,
         duration: 1500,
       });
+      // Clear animation flag after animation completes
+      setTimeout(() => setIsAnimating(false), 1600);
 
       setSelectedFacility(facility);
       setClickedFacility(facility);
@@ -511,11 +522,14 @@ export default function FacilityMap({
   const handleSearchSelect = (facility: Facility) => {
     // Focus map on facility location with smooth animation
     const map = mapRef.current?.getMap();
+    setIsAnimating(true);
     map?.flyTo({
       center: [facility.location.lng, facility.location.lat],
       zoom: 16,
       duration: 1500,
     });
+    // Clear animation flag after animation completes
+    setTimeout(() => setIsAnimating(false), 1600);
 
     // Open facility sidebar
     setSelectedFacility(facility);
@@ -530,11 +544,14 @@ export default function FacilityMap({
   const handleAIFacilitySelect = (facility: Facility) => {
     // Zoom to facility on map
     const map = mapRef.current?.getMap();
+    setIsAnimating(true);
     map?.flyTo({
       center: [facility.location.lng, facility.location.lat],
       zoom: 16,
       duration: 1500,
     });
+    // Clear animation flag after animation completes
+    setTimeout(() => setIsAnimating(false), 1600);
 
     // Open facility sidebar
     setSelectedFacility(facility);
