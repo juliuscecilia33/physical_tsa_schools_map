@@ -183,6 +183,8 @@ export default function FacilitySidebar({
     useState(false);
   const [isAdditionalReviewsModalOpen, setIsAdditionalReviewsModalOpen] =
     useState(false);
+  const [showAllAdditionalReviews, setShowAllAdditionalReviews] =
+    useState(false);
 
   // Tag-related state
   const [allTags, setAllTags] = useState<FacilityTag[]>([]);
@@ -1797,7 +1799,14 @@ export default function FacilitySidebar({
                     </button>
                   </div>
                   <div className="space-y-4">
-                    {displayFacility.additional_reviews.map((review, idx) => {
+                    {displayFacility.additional_reviews
+                      .slice(
+                        0,
+                        showAllAdditionalReviews
+                          ? displayFacility.additional_reviews.length
+                          : 10,
+                      )
+                      .map((review, idx) => {
                       const authorName =
                         review.user?.name || review.author_name || "Anonymous";
                       const reviewText = review.snippet || review.text || "";
@@ -1875,6 +1884,21 @@ export default function FacilitySidebar({
                       );
                     })}
                   </div>
+                  {displayFacility.additional_reviews.length > 10 && (
+                    <motion.button
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                      onClick={() =>
+                        setShowAllAdditionalReviews(!showAllAdditionalReviews)
+                      }
+                      className="w-full mt-4 py-3 text-sm font-medium text-[#004aad] hover:bg-gray-50 rounded-lg transition-colors border border-gray-200 hover:border-[#004aad]"
+                    >
+                      {showAllAdditionalReviews
+                        ? "Show Less"
+                        : `Show More (${displayFacility.additional_reviews.length - 10} more reviews)`}
+                    </motion.button>
+                  )}
                 </motion.div>
               </>
             )}
@@ -2102,7 +2126,7 @@ export default function FacilitySidebar({
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-white to-gray-50">
                   <h2 className="text-xl font-medium text-gray-900">
-                    Reviews ({facility?.reviews?.length || 0})
+                    Reviews ({displayFacility?.reviews?.length || 0})
                   </h2>
                   <button
                     onClick={() => setIsReviewsModalOpen(false)}
@@ -2115,7 +2139,7 @@ export default function FacilitySidebar({
                 {/* Reviews List */}
                 <div className="p-6 overflow-y-auto max-h-[calc(85vh-80px)]">
                   <div className="space-y-4">
-                    {facility?.reviews?.map((review, idx) => (
+                    {displayFacility?.reviews?.map((review, idx) => (
                       <motion.div
                         key={idx}
                         initial={{ opacity: 0, y: 10 }}
@@ -2148,7 +2172,7 @@ export default function FacilitySidebar({
 
         {/* Additional Reviews Modal */}
         {isAdditionalReviewsModalOpen &&
-          facility?.additional_reviews &&
+          displayFacility?.additional_reviews &&
           createPortal(
             <motion.div
               initial={{ opacity: 0 }}
