@@ -565,6 +565,9 @@ export default function FacilitySidebar({
       // Update cache with new tags
       updateFacilityTags(queryClient, facility.place_id, updatedTags);
 
+      // Invalidate full facility details query to refetch updated data
+      queryClient.invalidateQueries({ queryKey: ['facility', facility.place_id] });
+
       setShowTagDropdown(false);
     } catch (error) {
       console.error("Error assigning tag:", error);
@@ -591,6 +594,9 @@ export default function FacilitySidebar({
 
     // Update cache with updated tags
     updateFacilityTags(queryClient, facility.place_id, updatedTags);
+
+    // Invalidate full facility details query to refetch updated data
+    queryClient.invalidateQueries({ queryKey: ['facility', facility.place_id] });
 
     try {
       const { error } = await supabase

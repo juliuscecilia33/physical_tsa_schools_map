@@ -1,19 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import postgres from "postgres";
 import { Facility } from "@/types/facility";
 
-// Type for the raw data returned by the RPC function
-// The RPC function returns lat/lng as flat properties, not nested in location
-type FacilityRPCResponse = Omit<Facility, 'location'> & {
-  lat: number;
-  lng: number;
-};
-
-// Initialize Supabase client
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+// Initialize direct Postgres connection (bypasses REST API)
+const sql = postgres(process.env.DATABASE_URL!, {
+  prepare: false,
+  ssl: { rejectUnauthorized: false },
+  max: 10, // Connection pool size for serverless
+});
 
 export async function GET(
   request: NextRequest,
@@ -29,27 +23,21 @@ export async function GET(
       );
     }
 
-    // Call the RPC function to get full facility data
-    const { data, error } = await supabase
-      .rpc("get_facility_full_by_place_id", {
-        p_place_id: placeId,
-      })
-      .single<FacilityRPCResponse>();
+    // Call RPC function directly via SQL
+    const result = await sql`
+      SELECT * FROM get_facility_full_by_place_id(
+        p_place_id := ${placeId}
+      )
+    `;
 
-    if (error) {
-      console.error("Supabase RPC error:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch facility", details: error.message },
-        { status: 500 }
-      );
-    }
-
-    if (!data) {
+    if (!result || result.length === 0) {
       return NextResponse.json(
         { error: "Facility not found" },
         { status: 404 }
       );
     }
+
+    const data = result[0];
 
     // Transform the data to match Facility type
     const facility: Facility = {
@@ -65,8 +53,8 @@ export async function GET(
       },
       phone: data.phone,
       website: data.website,
-      rating: data.rating,
-      user_ratings_total: data.user_ratings_total,
+      rating: data.rating ? parseFloat(data.rating) : undefined,
+      user_ratings_total: data.user_ratings_total ? parseInt(data.user_ratings_total) : undefined,
       reviews: data.reviews || [],
       photo_references: data.photo_references || [],
       opening_hours: data.opening_hours,
