@@ -79,7 +79,7 @@ export default function Home() {
     const loadedCount = totalCount ? Math.floor(totalCount * (progress / 100)) : 0;
 
     return (
-      <div className="w-full h-screen flex items-center justify-center bg-gray-100">
+      <div className="fixed inset-0 flex items-center justify-center bg-gray-100 z-[100]">
         <ProgressBar
           progress={progress}
           loadedCount={loadedCount}
@@ -92,7 +92,7 @@ export default function Home() {
   // Show error state if there's an error
   if (isError) {
     return (
-      <div className="w-full h-screen flex items-center justify-center bg-gray-100">
+      <div className="fixed inset-0 flex items-center justify-center bg-gray-100 z-[100]">
         <div className="text-center">
           <div className="text-red-600 text-xl mb-4">❌ Error loading facilities</div>
           <p className="text-gray-600">{error?.message || 'Unknown error'}</p>

@@ -63,7 +63,7 @@ const FACILITIES_FILE = path.join(
 const STORAGE_BUCKET = "facility-photos";
 
 // Test mode: Set to a number to limit processing (e.g., 3 for testing), or null to process all
-const TEST_LIMIT: number | null = 100;
+const TEST_LIMIT: number | null = 300;
 
 // Rate limiting
 const DELAY_BETWEEN_REQUESTS_MS = 2000; // 2 seconds between requests
