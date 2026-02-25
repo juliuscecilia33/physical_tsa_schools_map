@@ -314,6 +314,7 @@ export default function FacilitySidebar({
   // Save edited note
   const handleSaveEdit = async (noteId: string) => {
     if (!editNoteText.trim()) return;
+    if (!facility) return;
 
     const oldNote = notes.find((n) => n.id === noteId);
     if (!oldNote) return;
