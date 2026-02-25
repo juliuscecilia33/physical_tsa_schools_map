@@ -63,6 +63,10 @@ const DELAY_BETWEEN_REQUESTS_MS = 2000; // 2 seconds between requests
 const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 5000; // 5 seconds
 
+// Pagination limits
+const MAX_PHOTOS = 50; // Stop after collecting 50 photos
+const MAX_REVIEWS = 50; // Stop after collecting 50 reviews
+
 // Helper functions
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -193,18 +197,44 @@ async function fetchSerpApiData(
       console.log(`     ✓ Got data_id: ${dataId}`);
     }
 
-    // Step 2: Fetch photos using google_maps_photos engine (only if we have data_id)
+    // Step 2: Fetch photos using google_maps_photos engine with pagination (only if we have data_id)
     if (dataId) {
-      console.log(`     → Fetching photos...`);
+      console.log(`     → Fetching photos (up to ${MAX_PHOTOS})...`);
       try {
-        const photosResponse = await getJson({
-          engine: "google_maps_photos",
-          data_id: dataId,
-          api_key: serpApiKey,
-        });
-        apiCallsUsed++;
-        photos = photosResponse.photos || [];
-        console.log(`     ✓ Photos API returned ${photos.length} photos`);
+        let nextPageToken: string | undefined = undefined;
+        let pageCount = 0;
+
+        while (photos.length < MAX_PHOTOS) {
+          const photosResponse = await getJson({
+            engine: "google_maps_photos",
+            data_id: dataId,
+            ...(nextPageToken && { next_page_token: nextPageToken }),
+            api_key: serpApiKey,
+          });
+          apiCallsUsed++;
+          pageCount++;
+
+          const pagePhotos = photosResponse.photos || [];
+          photos.push(...pagePhotos);
+
+          console.log(`     ✓ Page ${pageCount}: ${pagePhotos.length} photos (total: ${photos.length})`);
+
+          // Check if there are more pages and we haven't hit the limit
+          nextPageToken = photosResponse.serpapi_pagination?.next_page_token;
+          if (!nextPageToken || photos.length >= MAX_PHOTOS) {
+            break;
+          }
+
+          // Small delay between pagination requests
+          await delay(500);
+        }
+
+        // Trim to MAX_PHOTOS if we went over
+        if (photos.length > MAX_PHOTOS) {
+          photos = photos.slice(0, MAX_PHOTOS);
+        }
+
+        console.log(`     ✓ Photos collection complete: ${photos.length} photos from ${pageCount} page(s)`);
       } catch (photoError: any) {
         console.log(`     ⚠️  Photos API error:`);
         console.log(`        Message: ${photoError.message || "No message"}`);
@@ -222,16 +252,43 @@ async function fetchSerpApiData(
       await delay(500);
     }
 
-    // Step 3: Fetch reviews using google_maps_reviews engine
-    console.log(`     → Fetching reviews...`);
+    // Step 3: Fetch reviews using google_maps_reviews engine with pagination
+    console.log(`     → Fetching reviews (up to ${MAX_REVIEWS})...`);
     try {
-      const reviewsResponse = await getJson({
-        engine: "google_maps_reviews",
-        place_id: placeId,
-        api_key: serpApiKey,
-      });
-      apiCallsUsed++;
-      reviews = reviewsResponse.reviews || [];
+      let nextPageToken: string | undefined = undefined;
+      let pageCount = 0;
+
+      while (reviews.length < MAX_REVIEWS) {
+        const reviewsResponse = await getJson({
+          engine: "google_maps_reviews",
+          place_id: placeId,
+          ...(nextPageToken && { next_page_token: nextPageToken }),
+          api_key: serpApiKey,
+        });
+        apiCallsUsed++;
+        pageCount++;
+
+        const pageReviews = reviewsResponse.reviews || [];
+        reviews.push(...pageReviews);
+
+        console.log(`     ✓ Page ${pageCount}: ${pageReviews.length} reviews (total: ${reviews.length})`);
+
+        // Check if there are more pages and we haven't hit the limit
+        nextPageToken = reviewsResponse.serpapi_pagination?.next_page_token;
+        if (!nextPageToken || reviews.length >= MAX_REVIEWS) {
+          break;
+        }
+
+        // Small delay between pagination requests
+        await delay(500);
+      }
+
+      // Trim to MAX_REVIEWS if we went over
+      if (reviews.length > MAX_REVIEWS) {
+        reviews = reviews.slice(0, MAX_REVIEWS);
+      }
+
+      console.log(`     ✓ Reviews collection complete: ${reviews.length} reviews from ${pageCount} page(s)`);
     } catch (reviewError: any) {
       console.log(`     ⚠️  Reviews API error: ${reviewError.message}`);
     }
@@ -431,22 +488,28 @@ async function enrichWithSerpApi() {
   console.log("   • SerpAPI limit: 5,000 searches/month");
   console.log("   • Rate limit: 1 request every 2 seconds");
   console.log(
-    "   • Note: Each facility requires 3 API calls (direct place_id lookup + photos + reviews)",
+    `   • Pagination limits: ${MAX_PHOTOS} photos max, ${MAX_REVIEWS} reviews max per facility`,
   );
   console.log(
-    "   • Improved: Now uses direct place_id query instead of search (more reliable)",
+    "   • Note: Each facility requires ~10 API calls (1 place_id + ~3 photos pages + ~6 reviews pages)",
+  );
+  console.log(
+    "   • Improved: Direct place_id query + pagination for complete data",
   );
 
   if (TEST_LIMIT) {
-    console.log(`   • This will use ~${TEST_LIMIT * 3} API calls (test mode)`);
+    console.log(`   • This will use ~${TEST_LIMIT * 10} API calls (test mode)`);
     console.log(
-      `   • Estimated time: ~${((TEST_LIMIT * 3 * 2.5) / 60).toFixed(1)} minutes`,
+      `   • Estimated time: ~${((TEST_LIMIT * 10 * 2.5) / 60).toFixed(1)} minutes`,
     );
   } else {
-    console.log("   • This will use ~7,500 API calls (2,500 facilities × 3)");
-    console.log("   • Estimated time: ~312 minutes (~5.2 hours)");
+    console.log("   • This will use ~25,000 API calls (2,500 facilities × ~10)");
+    console.log("   • Estimated time: ~1,042 minutes (~17.4 hours)");
     console.log(
-      "   • ⚠️  WARNING: Exceeds 5,000/month limit - consider running in batches!",
+      "   • ⚠️  WARNING: Significantly exceeds 5,000/month limit - MUST run in batches!",
+    );
+    console.log(
+      "   • Recommendation: Process 500 facilities at a time (5 batches)",
     );
   }
 

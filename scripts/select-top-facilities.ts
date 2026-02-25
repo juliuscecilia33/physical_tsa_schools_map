@@ -71,6 +71,8 @@ interface ScoredFacility extends Facility {
     keyword_bonus: number;
     photo_limit_bonus: number;
     tourist_attraction_penalty: number;
+    professional_stadium_penalty: number;
+    sport_priority_penalty: number;
   };
 }
 
@@ -90,7 +92,7 @@ function isTexasFacility(facility: Facility): boolean {
 
 /**
  * Calculate quality score for a facility
- * Formula: ((0.4 × rating) + (0.3 × log(reviews)/5) + (0.2 × log(photos)/3) + (0.1 × keyword_bonus) + (0.15 × photo_limit_bonus)) × tourist_penalty
+ * Formula: ((0.4 × rating) + (0.3 × log(reviews)/5) + (0.2 × log(photos)/3) + (0.1 × keyword_bonus) + (0.15 × photo_limit_bonus)) × tourist_penalty × professional_stadium_penalty × sport_priority_penalty
  */
 function calculateQualityScore(facility: Facility): {
   score: number;
@@ -101,6 +103,8 @@ function calculateQualityScore(facility: Facility): {
     keyword_bonus: number;
     photo_limit_bonus: number;
     tourist_attraction_penalty: number;
+    professional_stadium_penalty: number;
+    sport_priority_penalty: number;
   };
 } {
   // Rating component (40% weight) - normalized to 0-1 scale from 0-5 rating
@@ -154,7 +158,29 @@ function calculateQualityScore(facility: Facility): {
     touristPenalty = 0.85; // 15% penalty
   }
 
-  const finalScore = baseScore * touristPenalty;
+  // Apply penalty for large professional stadiums
+  // These are likely major venues (NFL, MLB, etc.) not training facilities
+  const hasStadiumType = (facility.sport_types || []).includes("stadium");
+  const isLargeProfessionalStadium = hasStadiumType && reviewCount > 10000;
+
+  let professionalStadiumPenalty = 1.0; // No penalty by default
+  if (isLargeProfessionalStadium) {
+    professionalStadiumPenalty = 0.6; // 40% penalty
+  }
+
+  // Apply penalty for non-priority sports (lacrosse)
+  // Priority sports: basketball, football, soccer, baseball, volleyball, track & field
+  const identifiedSports = (facility.identified_sports || []).map(s => s.toLowerCase());
+  const hasLacrosse = identifiedSports.some(sport =>
+    sport.includes("lacrosse")
+  );
+
+  let sportPriorityPenalty = 1.0; // No penalty by default
+  if (hasLacrosse) {
+    sportPriorityPenalty = 0.7; // 30% penalty for lacrosse facilities
+  }
+
+  const finalScore = baseScore * touristPenalty * professionalStadiumPenalty * sportPriorityPenalty;
 
   return {
     score: finalScore,
@@ -165,6 +191,8 @@ function calculateQualityScore(facility: Facility): {
       keyword_bonus: keywordBonus,
       photo_limit_bonus: photoLimitBonus,
       tourist_attraction_penalty: touristPenalty,
+      professional_stadium_penalty: professionalStadiumPenalty,
+      sport_priority_penalty: sportPriorityPenalty,
     },
   };
 }
@@ -393,6 +421,9 @@ async function selectTopFacilities() {
   console.log("     - 10% High-quality keyword bonus");
   console.log("     - 15% Photo limit bonus (10+ photos = likely more available)");
   console.log("     - 15% penalty for tourist attractions without identified sports");
+  console.log("     - 40% penalty for large professional stadiums (>10k reviews)");
+  console.log("     - 30% penalty for lacrosse facilities (prioritize core sports)");
+  console.log("   • Priority sports: basketball, football, soccer, baseball, volleyball, track & field");
   console.log("=".repeat(70) + "\n");
 
   // Fetch and score facilities
@@ -427,10 +458,14 @@ async function selectTopFacilities() {
         min_rating: 3.0,
         must_have_photos: true,
         ranking_formula:
-          "((0.4 × rating/5) + (0.3 × log(reviews)/5) + (0.2 × log(photos)/3) + (0.1 × keyword_bonus) + (0.15 × photo_limit_bonus)) × tourist_penalty",
+          "((0.4 × rating/5) + (0.3 × log(reviews)/5) + (0.2 × log(photos)/3) + (0.1 × keyword_bonus) + (0.15 × photo_limit_bonus)) × tourist_penalty × professional_stadium_penalty × sport_priority_penalty",
         photo_limit_bonus_threshold: 10,
         tourist_attraction_penalty:
           "15% penalty (0.85x) for tourist_attraction or park without identified_sports",
+        professional_stadium_penalty:
+          "40% penalty (0.6x) for stadiums with >10,000 reviews (likely professional venues)",
+        sport_priority_penalty:
+          "30% penalty (0.7x) for facilities with lacrosse. Priority sports: basketball, football, soccer, baseball, volleyball, track & field",
       },
       average_rating: (
         topFacilities.reduce((sum, f) => sum + f.rating, 0) /
