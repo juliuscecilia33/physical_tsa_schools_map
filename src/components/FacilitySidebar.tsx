@@ -284,6 +284,9 @@ export default function FacilitySidebar({
       // Update cache to reflect that this facility now has notes
       updateFacilityNotesFlag(queryClient, facility.place_id, true);
 
+      // Invalidate full facility details query to refetch updated data
+      queryClient.invalidateQueries({ queryKey: ['facility', 'full', facility.place_id] });
+
       // Close the form after successful add
       setShowAddNoteForm(false);
     } catch (error) {
@@ -336,6 +339,9 @@ export default function FacilitySidebar({
         .eq("id", noteId);
 
       if (error) throw error;
+
+      // Invalidate full facility details query to refetch updated data
+      queryClient.invalidateQueries({ queryKey: ['facility', 'full', facility.place_id] });
     } catch (error) {
       console.error("Error updating note:", error);
       // Revert optimistic update
@@ -367,6 +373,9 @@ export default function FacilitySidebar({
         .eq("id", noteId);
 
       if (error) throw error;
+
+      // Invalidate full facility details query to refetch updated data
+      queryClient.invalidateQueries({ queryKey: ['facility', 'full', facility.place_id] });
     } catch (error) {
       console.error("Error deleting note:", error);
       // Revert optimistic update
