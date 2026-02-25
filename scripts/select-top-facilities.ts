@@ -71,8 +71,8 @@ interface ScoredFacility extends Facility {
     keyword_bonus: number;
     photo_limit_bonus: number;
     tourist_attraction_penalty: number;
-    professional_stadium_penalty: number;
     sport_priority_penalty: number;
+    core_sport_bonus: number;
   };
 }
 
@@ -92,7 +92,7 @@ function isTexasFacility(facility: Facility): boolean {
 
 /**
  * Calculate quality score for a facility
- * Formula: ((0.4 × rating) + (0.3 × log(reviews)/5) + (0.2 × log(photos)/3) + (0.1 × keyword_bonus) + (0.15 × photo_limit_bonus)) × tourist_penalty × professional_stadium_penalty × sport_priority_penalty
+ * Formula: ((0.4 × rating) + (0.2 × log(reviews)/5) + (0.2 × log(photos)/3) + (0.2 × keyword_bonus) + (0.15 × photo_limit_bonus)) × tourist_penalty × sport_priority_penalty × core_sport_bonus
  */
 function calculateQualityScore(facility: Facility): {
   score: number;
@@ -103,14 +103,14 @@ function calculateQualityScore(facility: Facility): {
     keyword_bonus: number;
     photo_limit_bonus: number;
     tourist_attraction_penalty: number;
-    professional_stadium_penalty: number;
     sport_priority_penalty: number;
+    core_sport_bonus: number;
   };
 } {
   // Rating component (40% weight) - normalized to 0-1 scale from 0-5 rating
   const ratingScore = (facility.rating || 0) / 5;
 
-  // Review count component (30% weight) - logarithmic scale
+  // Review count component (20% weight) - logarithmic scale
   const reviewCount = facility.user_ratings_total || 0;
   const reviewScore = Math.log(reviewCount + 1) / 5;
 
@@ -118,7 +118,7 @@ function calculateQualityScore(facility: Facility): {
   const photoCount = facility.photo_references?.length || 0;
   const photoScore = Math.log(photoCount + 1) / 3;
 
-  // Keyword bonus component (10% weight)
+  // Keyword bonus component (20% weight)
   const nameLower = facility.name.toLowerCase();
   const sportTypesStr = (facility.sport_types || []).join(" ").toLowerCase();
 
@@ -139,9 +139,9 @@ function calculateQualityScore(facility: Facility): {
   // Calculate weighted total
   const baseScore =
     0.4 * ratingScore +
-    0.3 * reviewScore +
+    0.2 * reviewScore +
     0.2 * photoScore +
-    0.1 * keywordBonus +
+    0.2 * keywordBonus +
     0.15 * photoLimitBonus;
 
   // Apply penalty for tourist attractions without identified sports
@@ -158,16 +158,6 @@ function calculateQualityScore(facility: Facility): {
     touristPenalty = 0.85; // 15% penalty
   }
 
-  // Apply penalty for large professional stadiums
-  // These are likely major venues (NFL, MLB, etc.) not training facilities
-  const hasStadiumType = (facility.sport_types || []).includes("stadium");
-  const isLargeProfessionalStadium = hasStadiumType && reviewCount > 10000;
-
-  let professionalStadiumPenalty = 1.0; // No penalty by default
-  if (isLargeProfessionalStadium) {
-    professionalStadiumPenalty = 0.6; // 40% penalty
-  }
-
   // Apply penalty for non-priority sports (lacrosse)
   // Priority sports: basketball, football, soccer, baseball, volleyball, track & field
   const identifiedSports = (facility.identified_sports || []).map(s => s.toLowerCase());
@@ -180,7 +170,18 @@ function calculateQualityScore(facility: Facility): {
     sportPriorityPenalty = 0.7; // 30% penalty for lacrosse facilities
   }
 
-  const finalScore = baseScore * touristPenalty * professionalStadiumPenalty * sportPriorityPenalty;
+  // Apply bonus for core sports
+  const coreSports = ["basketball", "baseball", "football", "soccer", "volleyball", "track & field", "track and field"];
+  const hasCoreSport = identifiedSports.some(sport =>
+    coreSports.some(coreSport => sport.includes(coreSport.toLowerCase()))
+  );
+
+  let coreSportBonus = 1.0; // No bonus by default
+  if (hasCoreSport) {
+    coreSportBonus = 1.15; // 15% bonus for core sports
+  }
+
+  const finalScore = baseScore * touristPenalty * sportPriorityPenalty * coreSportBonus;
 
   return {
     score: finalScore,
@@ -191,8 +192,8 @@ function calculateQualityScore(facility: Facility): {
       keyword_bonus: keywordBonus,
       photo_limit_bonus: photoLimitBonus,
       tourist_attraction_penalty: touristPenalty,
-      professional_stadium_penalty: professionalStadiumPenalty,
       sport_priority_penalty: sportPriorityPenalty,
+      core_sport_bonus: coreSportBonus,
     },
   };
 }
@@ -249,16 +250,17 @@ async function fetchAndScoreFacilities(): Promise<ScoredFacility[]> {
     },
   }));
 
-  // Filter for rating >= 3.0 and must have photos
+  // Filter for rating >= 4.0, must have photos, and max 3000 reviews (exclude major stadiums/tourist attractions)
   const filteredFacilities = transformedData.filter(
     (f: Facility) =>
-      f.rating >= 3.0 &&
+      f.rating >= 4.0 &&
       f.photo_references &&
-      f.photo_references.length > 0
+      f.photo_references.length > 0 &&
+      f.user_ratings_total <= 3000
   );
 
   console.log(
-    `✅ Fetched ${filteredFacilities.length} facilities with rating >= 3.0 and photos\n`
+    `✅ Filtered to ${filteredFacilities.length} facilities (rating >= 4.0, has photos, reviews <= 3000)\n`
   );
 
   // Filter for Texas facilities only
@@ -412,18 +414,19 @@ async function selectTopFacilities() {
   console.log("🎯 Goal: Select top 2,500 Texas facilities for SerpAPI enrichment");
   console.log("\n📋 Selection Criteria:");
   console.log("   • Location: Texas only (geographic bounds)");
-  console.log("   • Rating >= 3.0");
+  console.log("   • Rating >= 4.0");
+  console.log("   • Review count <= 3,000 (excludes major stadiums/tourist attractions)");
   console.log("   • Must have photos");
   console.log("   • Ranked by quality score:");
   console.log("     - 40% Rating");
-  console.log("     - 30% Review count (logarithmic)");
+  console.log("     - 20% Review count (logarithmic)");
   console.log("     - 20% Photo count (logarithmic)");
-  console.log("     - 10% High-quality keyword bonus");
+  console.log("     - 20% High-quality keyword bonus");
   console.log("     - 15% Photo limit bonus (10+ photos = likely more available)");
   console.log("     - 15% penalty for tourist attractions without identified sports");
-  console.log("     - 40% penalty for large professional stadiums (>10k reviews)");
-  console.log("     - 30% penalty for lacrosse facilities (prioritize core sports)");
-  console.log("   • Priority sports: basketball, football, soccer, baseball, volleyball, track & field");
+  console.log("     - 30% penalty for lacrosse facilities");
+  console.log("     - 15% BONUS for core sports facilities");
+  console.log("   • Core sports: basketball, baseball, football, soccer, volleyball, track & field");
   console.log("=".repeat(70) + "\n");
 
   // Fetch and score facilities
@@ -455,17 +458,18 @@ async function selectTopFacilities() {
       selection_criteria: {
         location: "Texas only (geographic bounds)",
         texas_bounds: TEXAS_BOUNDS,
-        min_rating: 3.0,
+        min_rating: 4.0,
+        max_reviews: 3000,
         must_have_photos: true,
         ranking_formula:
-          "((0.4 × rating/5) + (0.3 × log(reviews)/5) + (0.2 × log(photos)/3) + (0.1 × keyword_bonus) + (0.15 × photo_limit_bonus)) × tourist_penalty × professional_stadium_penalty × sport_priority_penalty",
+          "((0.4 × rating/5) + (0.2 × log(reviews)/5) + (0.2 × log(photos)/3) + (0.2 × keyword_bonus) + (0.15 × photo_limit_bonus)) × tourist_penalty × sport_priority_penalty × core_sport_bonus",
         photo_limit_bonus_threshold: 10,
         tourist_attraction_penalty:
           "15% penalty (0.85x) for tourist_attraction or park without identified_sports",
-        professional_stadium_penalty:
-          "40% penalty (0.6x) for stadiums with >10,000 reviews (likely professional venues)",
         sport_priority_penalty:
-          "30% penalty (0.7x) for facilities with lacrosse. Priority sports: basketball, football, soccer, baseball, volleyball, track & field",
+          "30% penalty (0.7x) for facilities with lacrosse",
+        core_sport_bonus:
+          "15% bonus (1.15x) for facilities with core sports: basketball, baseball, football, soccer, volleyball, track & field",
       },
       average_rating: (
         topFacilities.reduce((sum, f) => sum + f.rating, 0) /

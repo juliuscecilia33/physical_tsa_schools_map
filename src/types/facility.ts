@@ -6,6 +6,13 @@ export interface SportMetadata {
   matched_text?: string; // The actual text that contained the match
 }
 
+export interface PhotoData {
+  image: string; // Full resolution image URL
+  thumbnail: string; // Thumbnail URL
+  video?: string; // Optional video URL
+  photo_meta_serpapi_link: string; // SerpAPI metadata link
+}
+
 export interface Facility {
   place_id: string;
   name: string;
@@ -30,18 +37,34 @@ export interface Facility {
   notes?: Note[];
   has_notes?: boolean;
   tags?: FacilityTag[];
-  additional_photos?: any[]; // Full photo data from SerpAPI (beyond 10 from Google Places)
+  additional_photos?: PhotoData[]; // Full photo data from SerpAPI (beyond 10 from Google Places)
   additional_reviews?: Review[]; // Full review data from SerpAPI (beyond 5 from Google Places)
   serp_scraped?: boolean; // Whether this facility has been enriched with SerpAPI data
   serp_scraped_at?: string; // Timestamp of when SerpAPI enrichment was performed
 }
 
 export interface Review {
-  author_name: string;
+  // Google Places API fields
+  author_name?: string;
   rating: number;
-  text: string;
-  time: string;
-  relative_time_description: string;
+  text?: string;
+  time?: string;
+  relative_time_description?: string;
+
+  // SerpAPI fields
+  date?: string; // Human-readable date (e.g., "2 months ago")
+  link?: string; // URL to full review
+  snippet?: string; // Review text from SerpAPI
+  iso_date?: string; // ISO format timestamp
+  user?: {
+    name: string;
+    thumbnail?: string;
+    reviews?: number;
+    photos?: number;
+    link?: string;
+    local_guide?: boolean;
+    contributor_id?: string;
+  };
 }
 
 export interface OpeningHours {

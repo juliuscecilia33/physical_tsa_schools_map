@@ -39,6 +39,7 @@ import {
   updateFacilityNotesFlag,
   updateFacilityTags,
 } from "@/utils/facilityCache";
+import { useFacilityDetails } from "@/hooks/useFacilityDetails";
 
 interface FacilitySidebarProps {
   facility: Facility | null;
@@ -143,8 +144,17 @@ export default function FacilitySidebar({
 }: FacilitySidebarProps) {
   const queryClient = useQueryClient();
   const contentRef = useRef<HTMLDivElement>(null);
+
+  // Fetch full facility details including reviews and additional data
+  const { data: fullFacility, isLoading: isLoadingDetails } = useFacilityDetails(
+    facility?.place_id || null,
+    !!facility
+  );
+
+  // Use full facility data if available, otherwise fall back to lightweight data
+  const displayFacility = fullFacility || facility;
   const [loadingImages, setLoadingImages] = useState<{
-    [key: number]: boolean;
+    [key: string]: boolean;
   }>({});
   const [notes, setNotes] = useState<Note[]>([]);
   const [loadingNotes, setLoadingNotes] = useState(false);
@@ -158,12 +168,18 @@ export default function FacilitySidebar({
   const photoScrollRef = useRef<HTMLDivElement>(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
+  const additionalPhotoScrollRef = useRef<HTMLDivElement>(null);
+  const [showAdditionalLeftArrow, setShowAdditionalLeftArrow] = useState(false);
+  const [showAdditionalRightArrow, setShowAdditionalRightArrow] = useState(false);
   const [showAllNotes, setShowAllNotes] = useState(false);
   const [isPhotosModalOpen, setIsPhotosModalOpen] = useState(false);
   const [isReviewsModalOpen, setIsReviewsModalOpen] = useState(false);
   const [isPhotoViewerOpen, setIsPhotoViewerOpen] = useState(false);
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
+  const [photoViewerSource, setPhotoViewerSource] = useState<'regular' | 'additional'>('regular');
   const [showAddNoteForm, setShowAddNoteForm] = useState(false);
+  const [isAdditionalPhotosModalOpen, setIsAdditionalPhotosModalOpen] = useState(false);
+  const [isAdditionalReviewsModalOpen, setIsAdditionalReviewsModalOpen] = useState(false);
 
   // Tag-related state
   const [allTags, setAllTags] = useState<FacilityTag[]>([]);
@@ -185,14 +201,14 @@ export default function FacilitySidebar({
   // Fetch notes when facility changes
   useEffect(() => {
     const fetchNotes = async () => {
-      if (!facility) return;
+      if (!displayFacility) return;
 
       setLoadingNotes(true);
       try {
         const { data, error } = await supabase
           .from("facility_notes")
           .select("*")
-          .eq("place_id", facility.place_id)
+          .eq("place_id", displayFacility.place_id)
           .order("created_at", { ascending: false });
 
         if (error) throw error;
@@ -205,7 +221,7 @@ export default function FacilitySidebar({
     };
 
     fetchNotes();
-  }, [facility]);
+  }, [displayFacility?.place_id]);
 
   // Fetch all tags on component mount
   useEffect(() => {
@@ -231,7 +247,7 @@ export default function FacilitySidebar({
 
   // Add new note
   const handleAddNote = async () => {
-    if (!newNoteText.trim() || !facility) return;
+    if (!newNoteText.trim() || !displayFacility || !facility) return;
 
     setAddingNote(true);
     const tempNote: Note = {
@@ -520,7 +536,7 @@ export default function FacilitySidebar({
 
   // Assign tag to facility
   const handleAssignTag = async (tagId: string) => {
-    if (!facility) return;
+    if (!facility || !displayFacility) return;
 
     setAssigningTag(true);
     const tag = allTags.find((t) => t.id === tagId);
@@ -556,7 +572,7 @@ export default function FacilitySidebar({
 
   // Remove tag from facility
   const handleRemoveTag = async (tagId: string) => {
-    if (!facility) return;
+    if (!facility || !displayFacility) return;
 
     const tag = facility.tags?.find((t) => t.id === tagId);
     if (!tag) return;
@@ -594,6 +610,10 @@ export default function FacilitySidebar({
   const getPhotoUrl = (photoReference: string, highRes: boolean = false) => {
     const maxWidth = highRes ? 1600 : 400;
     return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=${maxWidth}&photo_reference=${photoReference}&key=${process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY}`;
+  };
+
+  const getPhotoDataUrl = (photoData: { image: string; thumbnail: string; video?: string }, highRes: boolean = false) => {
+    return highRes ? photoData.image : photoData.thumbnail;
   };
 
   const formatSportType = (type: string) => {
@@ -651,11 +671,11 @@ export default function FacilitySidebar({
     return stars;
   };
 
-  const handleImageLoad = (idx: number) => {
+  const handleImageLoad = (idx: number | string) => {
     setLoadingImages((prev) => ({ ...prev, [idx]: false }));
   };
 
-  const handleImageLoadStart = (idx: number) => {
+  const handleImageLoadStart = (idx: number | string) => {
     setLoadingImages((prev) => ({ ...prev, [idx]: true }));
   };
 
@@ -680,6 +700,27 @@ export default function FacilitySidebar({
     setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 1);
   };
 
+  // Handle additional photo scroll
+  const scrollAdditionalPhotos = (direction: "left" | "right") => {
+    if (!additionalPhotoScrollRef.current) return;
+    const scrollAmount = 300;
+    const newScrollLeft =
+      additionalPhotoScrollRef.current.scrollLeft +
+      (direction === "right" ? scrollAmount : -scrollAmount);
+    additionalPhotoScrollRef.current.scrollTo({
+      left: newScrollLeft,
+      behavior: "smooth",
+    });
+  };
+
+  // Update additional photo arrow visibility based on scroll position
+  const updateAdditionalPhotoArrows = () => {
+    if (!additionalPhotoScrollRef.current) return;
+    const { scrollLeft, scrollWidth, clientWidth } = additionalPhotoScrollRef.current;
+    setShowAdditionalLeftArrow(scrollLeft > 0);
+    setShowAdditionalRightArrow(scrollLeft < scrollWidth - clientWidth - 1);
+  };
+
   // Update arrows when photos are loaded or facility changes
   useEffect(() => {
     updatePhotoArrows();
@@ -693,11 +734,26 @@ export default function FacilitySidebar({
         window.removeEventListener("resize", updatePhotoArrows);
       };
     }
-  }, [facility]);
+  }, [displayFacility]);
+
+  // Update arrows for additional photos when loaded or facility changes
+  useEffect(() => {
+    updateAdditionalPhotoArrows();
+    const scrollContainer = additionalPhotoScrollRef.current;
+    if (scrollContainer) {
+      scrollContainer.addEventListener("scroll", updateAdditionalPhotoArrows);
+      window.addEventListener("resize", updateAdditionalPhotoArrows);
+      return () => {
+        scrollContainer.removeEventListener("scroll", updateAdditionalPhotoArrows);
+        window.removeEventListener("resize", updateAdditionalPhotoArrows);
+      };
+    }
+  }, [displayFacility]);
 
   // Photo viewer handlers
-  const openPhotoViewer = (index: number) => {
+  const openPhotoViewer = (index: number, source: 'regular' | 'additional' = 'regular') => {
     setSelectedPhotoIndex(index);
+    setPhotoViewerSource(source);
     setIsPhotoViewerOpen(true);
   };
 
@@ -706,8 +762,9 @@ export default function FacilitySidebar({
   };
 
   const goToNextPhoto = () => {
-    if (!facility?.photo_references) return;
-    const totalPhotos = facility.photo_references.length;
+    const photos = photoViewerSource === 'regular' ? displayFacility?.photo_references : displayFacility?.additional_photos;
+    if (!photos) return;
+    const totalPhotos = photos.length;
     setSelectedPhotoIndex((prev) => (prev < totalPhotos - 1 ? prev + 1 : prev));
   };
 
@@ -727,7 +784,7 @@ export default function FacilitySidebar({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isPhotoViewerOpen, selectedPhotoIndex, facility]);
+  }, [isPhotoViewerOpen, selectedPhotoIndex, displayFacility]);
 
   // Click-outside handler for tag dropdown
   useEffect(() => {
@@ -749,7 +806,7 @@ export default function FacilitySidebar({
   }, [showTagDropdown]);
 
   // Early return after all hooks are declared (Rules of Hooks)
-  if (!facility) return null;
+  if (!displayFacility) return null;
 
   return (
     <AnimatePresence>
@@ -763,14 +820,14 @@ export default function FacilitySidebar({
         {/* Header with gradient */}
         <div className="sticky top-0 bg-gradient-to-br from-white via-white to-[#004aad]/5 backdrop-blur-sm border-b border-[#E8E9EB] shadow-sm z-20">
           {/* Cover Photo */}
-          {facility.photo_references && facility.photo_references.length > 0 && (
+          {displayFacility.photo_references && displayFacility.photo_references.length > 0 && (
             <div className="relative w-full h-48 overflow-hidden">
               {loadingImages[0] !== false && (
                 <div className="absolute inset-0 bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200 animate-pulse" />
               )}
               <img
-                src={getPhotoUrl(facility.photo_references[0])}
-                alt={`${facility.name} cover`}
+                src={getPhotoUrl(displayFacility.photo_references[0])}
+                alt={`${displayFacility.name} cover`}
                 className="w-full h-full object-cover"
                 onLoadStart={() => handleImageLoadStart(0)}
                 onLoad={() => handleImageLoad(0)}
@@ -788,17 +845,17 @@ export default function FacilitySidebar({
             >
               <div className="flex items-center gap-2 mb-2">
                 <h2 className="text-2xl font-semibold text-gray-900 leading-tight">
-                  {facility.name}
+                  {displayFacility.name}
                 </h2>
-                {facility.business_status && (
+                {displayFacility.business_status && (
                   <span
                     className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${
-                      facility.business_status === "OPERATIONAL"
+                      displayFacility.business_status === "OPERATIONAL"
                         ? "bg-green-100 text-green-800"
                         : "bg-red-100 text-red-800"
                     }`}
                   >
-                    {facility.business_status === "OPERATIONAL" ? (
+                    {displayFacility.business_status === "OPERATIONAL" ? (
                       <>
                         <CheckCircle2 className="w-3 h-3" />
                         <span>OPEN</span>
@@ -812,24 +869,24 @@ export default function FacilitySidebar({
                   </span>
                 )}
               </div>
-              {getCityState(facility.address) && (
+              {getCityState(displayFacility.address) && (
                 <div className="flex items-center gap-1.5 mb-2">
                   <MapPin className="w-3.5 h-3.5 text-gray-400" />
                   <span className="text-sm text-gray-500">
-                    {getCityState(facility.address)}
+                    {getCityState(displayFacility.address)}
                   </span>
                 </div>
               )}
-              {facility.rating && (
+              {displayFacility.rating && (
                 <div className="flex items-center gap-2">
                   <div className="flex gap-0.5">
-                    {renderStars(facility.rating)}
+                    {renderStars(displayFacility.rating)}
                   </div>
                   <span className="text-sm font-medium text-gray-700">
-                    {facility.rating.toFixed(1)}
+                    {displayFacility.rating.toFixed(1)}
                   </span>
                   <span className="text-sm text-gray-500">
-                    ({facility.user_ratings_total} reviews)
+                    ({displayFacility.user_ratings_total} reviews)
                   </span>
                 </div>
               )}
@@ -849,7 +906,7 @@ export default function FacilitySidebar({
         {/* Content */}
         <div ref={contentRef} className="flex-1 overflow-y-auto p-6 space-y-6">
           {/* Photos */}
-          {facility.photo_references && facility.photo_references.length > 0 ? (
+          {displayFacility.photo_references && displayFacility.photo_references.length > 0 ? (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -857,7 +914,7 @@ export default function FacilitySidebar({
             >
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-medium text-gray-700 tracking-wide">
-                  Photos ({facility.photo_references.length})
+                  Photos ({displayFacility.photo_references.length})
                 </h3>
                 <button
                   onClick={() => setIsPhotosModalOpen(true)}
@@ -896,7 +953,7 @@ export default function FacilitySidebar({
                   className="flex gap-3 overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory"
                   style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                 >
-                  {facility.photo_references.map((photoRef, idx) => (
+                  {displayFacility.photo_references.map((photoRef, idx) => (
                     <motion.div
                       key={idx}
                       initial={{ opacity: 0, scale: 0.9 }}
@@ -911,7 +968,7 @@ export default function FacilitySidebar({
                       )}
                       <img
                         src={getPhotoUrl(photoRef)}
-                        alt={`${facility.name} photo ${idx + 1}`}
+                        alt={`${displayFacility.name} photo ${idx + 1}`}
                         className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
                         onLoadStart={() => handleImageLoadStart(idx)}
                         onLoad={() => handleImageLoad(idx)}
@@ -928,6 +985,94 @@ export default function FacilitySidebar({
               <Camera className="w-12 h-12 text-gray-400 mx-auto mb-3" />
               <p className="text-sm text-gray-500">No photos available</p>
             </div>
+          )}
+
+          {/* Additional Photos from SerpAPI */}
+          {displayFacility.serp_scraped && displayFacility.additional_photos && displayFacility.additional_photos.length > 0 && (
+            <>
+              {/* Divider */}
+              <div className="border-t border-gray-200"></div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.06 }}
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-medium text-gray-700 tracking-wide flex items-center gap-2">
+                    Additional Photos ({displayFacility.additional_photos.length})
+                    <span className="text-xs font-normal text-gray-500">from SerpAPI</span>
+                  </h3>
+                  <button
+                    onClick={() => setIsAdditionalPhotosModalOpen(true)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-lg transition-all"
+                  >
+                    <Maximize2 className="w-3.5 h-3.5" />
+                    Expand
+                  </button>
+                </div>
+                <div className="relative group/additional-photos">
+                  {/* Left Arrow */}
+                  {showAdditionalLeftArrow && (
+                    <button
+                      onClick={() => scrollAdditionalPhotos("left")}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-lg flex items-center justify-center transition-all opacity-0 group-hover/additional-photos:opacity-100"
+                      aria-label="Scroll left"
+                    >
+                      <ChevronLeft className="w-6 h-6 text-gray-700" />
+                    </button>
+                  )}
+
+                  {/* Right Arrow */}
+                  {showAdditionalRightArrow && (
+                    <button
+                      onClick={() => scrollAdditionalPhotos("right")}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-lg flex items-center justify-center transition-all opacity-0 group-hover/additional-photos:opacity-100"
+                      aria-label="Scroll right"
+                    >
+                      <ChevronRight className="w-6 h-6 text-gray-700" />
+                    </button>
+                  )}
+
+                  {/* Scrollable Photo Container */}
+                  <div
+                    ref={additionalPhotoScrollRef}
+                    className="flex gap-3 overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory"
+                    style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+                  >
+                    {displayFacility.additional_photos.map((photoData, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.1 + Math.min(idx * 0.05, 0.5) }}
+                        onClick={() => openPhotoViewer(idx, 'additional')}
+                        className="relative overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-all cursor-pointer flex-shrink-0 snap-start"
+                        style={{ width: "280px", height: "180px" }}
+                      >
+                        {loadingImages[`additional-${idx}`] !== false && (
+                          <div className="absolute inset-0 bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200 animate-pulse" />
+                        )}
+                        <img
+                          src={getPhotoDataUrl(photoData)}
+                          alt={`${displayFacility.name} additional photo ${idx + 1}`}
+                          className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                          onLoadStart={() => handleImageLoadStart(`additional-${idx}`)}
+                          onLoad={() => handleImageLoad(`additional-${idx}`)}
+                          onError={() => handleImageLoad(`additional-${idx}`)}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity" />
+                        {photoData.video && (
+                          <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm rounded-full p-1.5">
+                            <Camera className="w-4 h-4 text-white" />
+                          </div>
+                        )}
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            </>
           )}
 
           {/* Divider */}
@@ -1110,7 +1255,7 @@ export default function FacilitySidebar({
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-medium text-gray-700 tracking-wide flex items-center gap-2">
                 <Tag className="w-4 h-4" />
-                Tags ({facility.tags?.length || 0})
+                Tags ({displayFacility.tags?.length || 0})
               </h3>
               <div className="flex gap-2">
                 <div className="relative">
@@ -1144,7 +1289,7 @@ export default function FacilitySidebar({
                         <div className="p-2">
                           {allTags
                             .filter(
-                              (tag) => !facility.tags?.some((ft) => ft.id === tag.id),
+                              (tag) => !displayFacility.tags?.some((ft) => ft.id === tag.id),
                             )
                             .map((tag) => (
                               <button
@@ -1171,7 +1316,7 @@ export default function FacilitySidebar({
                               </button>
                             ))}
                           {allTags.filter(
-                            (tag) => !facility.tags?.some((ft) => ft.id === tag.id),
+                            (tag) => !displayFacility.tags?.some((ft) => ft.id === tag.id),
                           ).length === 0 && (
                             <div className="p-4 text-sm text-gray-500 text-center">
                               All tags already assigned
@@ -1192,9 +1337,9 @@ export default function FacilitySidebar({
             </div>
 
             {/* Assigned Tags Display */}
-            {facility.tags && facility.tags.length > 0 ? (
+            {displayFacility.tags && displayFacility.tags.length > 0 ? (
               <div className="flex flex-wrap gap-2 mb-3">
-                {facility.tags.map((tag, idx) => (
+                {displayFacility.tags.map((tag, idx) => (
                   <motion.div
                     key={tag.id}
                     initial={{ opacity: 0, scale: 0.8 }}
@@ -1236,7 +1381,7 @@ export default function FacilitySidebar({
               Facility Types
             </h3>
             <div className="flex flex-wrap gap-2">
-              {facility.sport_types
+              {displayFacility.sport_types
                 .filter(
                   (type) =>
                     ![
@@ -1270,8 +1415,8 @@ export default function FacilitySidebar({
           <div className="border-t border-gray-200"></div>
 
           {/* Identified Sports with Confidence Scores */}
-          {facility.identified_sports &&
-            facility.identified_sports.length > 0 && (
+          {displayFacility.identified_sports &&
+            displayFacility.identified_sports.length > 0 && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -1284,8 +1429,8 @@ export default function FacilitySidebar({
                   </span>
                 </h3>
                 <div className="flex flex-wrap gap-2">
-                  {facility.identified_sports.map((sport, idx) => {
-                    const metadata = facility.sport_metadata?.[sport];
+                  {displayFacility.identified_sports.map((sport, idx) => {
+                    const metadata = displayFacility.sport_metadata?.[sport];
                     const score = metadata?.score || 0;
                     const confidence = metadata?.confidence || "unknown";
 
@@ -1415,27 +1560,27 @@ export default function FacilitySidebar({
               <div className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
                 <MapPin className="w-5 h-5 text-[#004aad] flex-shrink-0 mt-0.5" />
                 <p className="text-gray-700 text-sm leading-relaxed">
-                  {facility.address}
+                  {displayFacility.address}
                 </p>
               </div>
 
-              {facility.phone && (
+              {displayFacility.phone && (
                 <motion.a
-                  href={`tel:${facility.phone}`}
+                  href={`tel:${displayFacility.phone}`}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   className="flex items-center gap-3 p-3 rounded-lg hover:bg-[#004aad]/5 transition-colors group"
                 >
                   <Phone className="w-5 h-5 text-[#004aad] group-hover:text-[#004aad]/80 transition-colors" />
                   <span className="text-[#004aad] group-hover:text-[#004aad]/80 font-medium text-sm">
-                    {facility.phone}
+                    {displayFacility.phone}
                   </span>
                 </motion.a>
               )}
 
-              {facility.website && (
+              {displayFacility.website && (
                 <motion.a
-                  href={facility.website}
+                  href={displayFacility.website}
                   target="_blank"
                   rel="noopener noreferrer"
                   whileHover={{ scale: 1.02 }}
@@ -1444,7 +1589,7 @@ export default function FacilitySidebar({
                 >
                   <Globe className="w-5 h-5 text-[#004aad] group-hover:text-[#004aad]/80 transition-colors flex-shrink-0" />
                   <span className="text-[#004aad] group-hover:text-[#004aad]/80 font-medium text-sm truncate">
-                    {facility.website.replace(/^https?:\/\//, "")}
+                    {displayFacility.website.replace(/^https?:\/\//, "")}
                   </span>
                 </motion.a>
               )}
@@ -1455,7 +1600,33 @@ export default function FacilitySidebar({
           <div className="border-t border-gray-200"></div>
 
           {/* Reviews */}
-          {facility.reviews && facility.reviews.length > 0 ? (
+          {isLoadingDetails ? (
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium text-gray-700 tracking-wide">
+                Reviews
+              </h3>
+              {/* Loading skeleton */}
+              {[1, 2].map((i) => (
+                <div
+                  key={i}
+                  className="bg-gradient-to-br from-gray-100 to-gray-50 rounded-xl p-4 animate-pulse"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="h-4 w-24 bg-gray-300 rounded"></div>
+                    <div className="flex gap-0.5">
+                      {[1, 2, 3, 4, 5].map((j) => (
+                        <div key={j} className="w-4 h-4 bg-gray-300 rounded"></div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="h-3 bg-gray-300 rounded w-full"></div>
+                    <div className="h-3 bg-gray-300 rounded w-5/6"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : displayFacility.reviews && displayFacility.reviews.length > 0 ? (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -1463,7 +1634,7 @@ export default function FacilitySidebar({
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-medium text-gray-700 tracking-wide">
-                  Reviews ({facility.reviews.length})
+                  Reviews ({displayFacility.reviews.length})
                 </h3>
                 <button
                   onClick={() => setIsReviewsModalOpen(true)}
@@ -1474,7 +1645,7 @@ export default function FacilitySidebar({
                 </button>
               </div>
               <div className="space-y-4">
-                {facility.reviews.map((review, idx) => (
+                {displayFacility.reviews.map((review, idx) => (
                   <motion.div
                     key={idx}
                     initial={{ opacity: 0, y: 10 }}
@@ -1508,11 +1679,110 @@ export default function FacilitySidebar({
             </div>
           )}
 
+          {/* Additional Reviews from SerpAPI */}
+          {displayFacility.serp_scraped && displayFacility.additional_reviews && displayFacility.additional_reviews.length > 0 && (
+            <>
+              {/* Divider */}
+              <div className="border-t border-gray-200"></div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.21 }}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-medium text-gray-700 tracking-wide flex items-center gap-2">
+                    Additional Reviews ({displayFacility.additional_reviews.length})
+                    <span className="text-xs font-normal text-gray-500">from SerpAPI</span>
+                  </h3>
+                  <button
+                    onClick={() => setIsAdditionalReviewsModalOpen(true)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-lg transition-all"
+                  >
+                    <Maximize2 className="w-3.5 h-3.5" />
+                    Expand
+                  </button>
+                </div>
+                <div className="space-y-4">
+                  {displayFacility.additional_reviews.map((review, idx) => {
+                    const authorName = review.user?.name || review.author_name || "Anonymous";
+                    const reviewText = review.snippet || review.text || "";
+                    const timeDescription = review.date || review.relative_time_description || "";
+
+                    return (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1 + idx * 0.05 }}
+                        whileHover={{ scale: 1.01 }}
+                        className="bg-gradient-to-br from-white to-gray-50/50 rounded-xl p-4 shadow-sm hover:shadow-md transition-all border border-gray-100"
+                      >
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            {review.user?.thumbnail && (
+                              <img
+                                src={review.user.thumbnail}
+                                alt={authorName}
+                                className="w-8 h-8 rounded-full object-cover"
+                              />
+                            )}
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="font-semibold text-gray-900 text-sm">
+                                  {authorName}
+                                </span>
+                                {review.user?.local_guide && (
+                                  <span className="text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">
+                                    Local Guide
+                                  </span>
+                                )}
+                              </div>
+                              {review.user && (review.user.reviews || review.user.photos) && (
+                                <span className="text-xs text-gray-500">
+                                  {review.user.reviews && `${review.user.reviews} reviews`}
+                                  {review.user.reviews && review.user.photos && " • "}
+                                  {review.user.photos && `${review.user.photos} photos`}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex gap-0.5">
+                            {renderStars(review.rating)}
+                          </div>
+                        </div>
+                        <p className="text-sm text-gray-700 leading-relaxed mb-2">
+                          {reviewText}
+                        </p>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-gray-500 font-medium">
+                            {timeDescription}
+                          </span>
+                          {review.link && (
+                            <a
+                              href={review.link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1 text-xs text-[#004aad] hover:text-[#004aad]/80 font-medium transition-colors"
+                            >
+                              <ExternalLink className="w-3 h-3" />
+                              View Full
+                            </a>
+                          )}
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            </>
+          )}
+
           {/* Divider */}
           <div className="border-t border-gray-200"></div>
 
           {/* Opening Hours */}
-          {facility.opening_hours && (
+          {displayFacility.opening_hours && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -1524,21 +1794,21 @@ export default function FacilitySidebar({
                   <Clock className="w-4 h-4" />
                   Hours
                 </h3>
-                {facility.opening_hours.open_now !== undefined && (
+                {displayFacility.opening_hours.open_now !== undefined && (
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                      facility.opening_hours.open_now
+                      displayFacility.opening_hours.open_now
                         ? "bg-green-100 text-green-800"
                         : "bg-red-100 text-red-800"
                     }`}
                   >
-                    {facility.opening_hours.open_now ? "Open Now" : "Closed"}
+                    {displayFacility.opening_hours.open_now ? "Open Now" : "Closed"}
                   </span>
                 )}
               </div>
-              {facility.opening_hours.weekday_text && (
+              {displayFacility.opening_hours.weekday_text && (
                 <ul className="space-y-2">
-                  {facility.opening_hours.weekday_text.map((day, idx) => (
+                  {displayFacility.opening_hours.weekday_text.map((day, idx) => (
                     <motion.li
                       key={idx}
                       initial={{ opacity: 0, x: -10 }}
@@ -1603,7 +1873,7 @@ export default function FacilitySidebar({
                         )}
                         <img
                           src={getPhotoUrl(photoRef)}
-                          alt={`${facility.name} photo ${idx + 1}`}
+                          alt={`${displayFacility.name} photo ${idx + 1}`}
                           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                           onLoadStart={() => handleImageLoadStart(idx)}
                           onLoad={() => handleImageLoad(idx)}
@@ -1614,6 +1884,83 @@ export default function FacilitySidebar({
                             Click to view
                           </span>
                         </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>,
+            document.body,
+          )}
+
+        {/* Additional Photos Grid Modal */}
+        {isAdditionalPhotosModalOpen &&
+          facility?.additional_photos &&
+          createPortal(
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-6 z-[9999]"
+              onClick={() => setIsAdditionalPhotosModalOpen(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                transition={{ type: "spring", damping: 25 }}
+                className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[85vh] overflow-hidden"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Header */}
+                <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-white to-gray-50">
+                  <div>
+                    <h2 className="text-xl font-medium text-gray-900">
+                      Additional Photos ({displayFacility.additional_photos?.length || 0})
+                    </h2>
+                    <p className="text-sm text-gray-500 mt-1">from SerpAPI</p>
+                  </div>
+                  <button
+                    onClick={() => setIsAdditionalPhotosModalOpen(false)}
+                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  >
+                    <X className="w-5 h-5 text-gray-600" />
+                  </button>
+                </div>
+
+                {/* Photos Grid */}
+                <div className="p-6 overflow-y-auto max-h-[calc(85vh-80px)]">
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {displayFacility.additional_photos?.map((photoData, idx) => (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: idx * 0.03 }}
+                        onClick={() => openPhotoViewer(idx, 'additional')}
+                        className="relative overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-all cursor-pointer aspect-square group"
+                      >
+                        {loadingImages[`additional-${idx}`] !== false && (
+                          <div className="absolute inset-0 bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200 animate-pulse" />
+                        )}
+                        <img
+                          src={getPhotoDataUrl(photoData)}
+                          alt={`${displayFacility.name} additional photo ${idx + 1}`}
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                          onLoadStart={() => handleImageLoadStart(`additional-${idx}`)}
+                          onLoad={() => handleImageLoad(`additional-${idx}`)}
+                          onError={() => handleImageLoad(`additional-${idx}`)}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-2">
+                          <span className="text-white text-xs font-medium">
+                            Click to view
+                          </span>
+                        </div>
+                        {photoData.video && (
+                          <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm rounded-full p-1.5">
+                            <Camera className="w-4 h-4 text-white" />
+                          </div>
+                        )}
                       </motion.div>
                     ))}
                   </div>
@@ -1688,9 +2035,123 @@ export default function FacilitySidebar({
             document.body,
           )}
 
+        {/* Additional Reviews Modal */}
+        {isAdditionalReviewsModalOpen &&
+          facility?.additional_reviews &&
+          createPortal(
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-6 z-[9999]"
+              onClick={() => setIsAdditionalReviewsModalOpen(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                transition={{ type: "spring", damping: 25 }}
+                className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[85vh] overflow-hidden"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Header */}
+                <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-white to-gray-50">
+                  <div>
+                    <h2 className="text-xl font-medium text-gray-900">
+                      Additional Reviews ({displayFacility.additional_reviews?.length || 0})
+                    </h2>
+                    <p className="text-sm text-gray-500 mt-1">from SerpAPI</p>
+                  </div>
+                  <button
+                    onClick={() => setIsAdditionalReviewsModalOpen(false)}
+                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  >
+                    <X className="w-5 h-5 text-gray-600" />
+                  </button>
+                </div>
+
+                {/* Reviews List */}
+                <div className="p-6 overflow-y-auto max-h-[calc(85vh-80px)]">
+                  <div className="space-y-4">
+                    {displayFacility.additional_reviews?.map((review, idx) => {
+                      const authorName = review.user?.name || review.author_name || "Anonymous";
+                      const reviewText = review.snippet || review.text || "";
+                      const timeDescription = review.date || review.relative_time_description || "";
+
+                      return (
+                        <motion.div
+                          key={idx}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: idx * 0.05 }}
+                          className="bg-gradient-to-br from-white to-gray-50/50 rounded-xl p-5 shadow-sm hover:shadow-md transition-all border border-gray-100"
+                        >
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex items-center gap-3">
+                              {review.user?.thumbnail && (
+                                <img
+                                  src={review.user.thumbnail}
+                                  alt={authorName}
+                                  className="w-10 h-10 rounded-full object-cover"
+                                />
+                              )}
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-semibold text-gray-900 text-base">
+                                    {authorName}
+                                  </span>
+                                  {review.user?.local_guide && (
+                                    <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded">
+                                      Local Guide
+                                    </span>
+                                  )}
+                                </div>
+                                {review.user && (review.user.reviews || review.user.photos) && (
+                                  <span className="text-xs text-gray-500">
+                                    {review.user.reviews && `${review.user.reviews} reviews`}
+                                    {review.user.reviews && review.user.photos && " • "}
+                                    {review.user.photos && `${review.user.photos} photos`}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex gap-0.5">
+                              {renderStars(review.rating)}
+                            </div>
+                          </div>
+                          <p className="text-sm text-gray-700 leading-relaxed mb-3">
+                            {reviewText}
+                          </p>
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-gray-500 font-medium">
+                              {timeDescription}
+                            </span>
+                            {review.link && (
+                              <a
+                                href={review.link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-1 text-xs text-[#004aad] hover:text-[#004aad]/80 font-medium transition-colors"
+                              >
+                                <ExternalLink className="w-3 h-3" />
+                                View Full Review
+                              </a>
+                            )}
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>,
+            document.body,
+          )}
+
         {/* Photo Lightbox Viewer */}
         {isPhotoViewerOpen &&
-          facility?.photo_references &&
+          ((photoViewerSource === 'regular' && facility?.photo_references) ||
+           (photoViewerSource === 'additional' && facility?.additional_photos)) &&
           createPortal(
             <motion.div
               initial={{ opacity: 0 }}
@@ -1699,70 +2160,85 @@ export default function FacilitySidebar({
               className="fixed inset-0 bg-black/95 backdrop-blur-sm flex items-center justify-center z-[10000]"
               onClick={closePhotoViewer}
             >
-              {/* Close Button */}
-              <button
-                onClick={closePhotoViewer}
-                className="absolute top-6 right-6 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors z-10"
-              >
-                <X className="w-6 h-6 text-white" />
-              </button>
+              {(() => {
+                const photos = photoViewerSource === 'regular' ? facility?.photo_references : facility?.additional_photos;
+                if (!photos) return null;
+                const totalPhotos = photos.length;
+                const currentPhoto = photos[selectedPhotoIndex];
 
-              {/* Photo Counter */}
-              <div className="absolute top-6 left-6 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full text-white text-sm font-medium">
-                {selectedPhotoIndex + 1} / {facility.photo_references.length}
-              </div>
+                return (
+                  <>
+                    {/* Close Button */}
+                    <button
+                      onClick={closePhotoViewer}
+                      className="absolute top-6 right-6 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors z-10"
+                    >
+                      <X className="w-6 h-6 text-white" />
+                    </button>
 
-              {/* Previous Button */}
-              {selectedPhotoIndex > 0 && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    goToPrevPhoto();
-                  }}
-                  className="absolute left-6 top-1/2 -translate-y-1/2 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
-                >
-                  <ChevronLeft className="w-8 h-8 text-white" />
-                </button>
-              )}
+                    {/* Photo Counter */}
+                    <div className="absolute top-6 left-6 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full text-white text-sm font-medium">
+                      {selectedPhotoIndex + 1} / {totalPhotos}
+                      {photoViewerSource === 'additional' && (
+                        <span className="ml-2 text-xs opacity-75">(SerpAPI)</span>
+                      )}
+                    </div>
 
-              {/* Next Button */}
-              {selectedPhotoIndex < facility.photo_references.length - 1 && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    goToNextPhoto();
-                  }}
-                  className="absolute right-6 top-1/2 -translate-y-1/2 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
-                >
-                  <ChevronRight className="w-8 h-8 text-white" />
-                </button>
-              )}
+                    {/* Previous Button */}
+                    {selectedPhotoIndex > 0 && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          goToPrevPhoto();
+                        }}
+                        className="absolute left-6 top-1/2 -translate-y-1/2 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
+                      >
+                        <ChevronLeft className="w-8 h-8 text-white" />
+                      </button>
+                    )}
 
-              {/* Main Photo */}
-              <motion.div
-                key={selectedPhotoIndex}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.2 }}
-                className="w-full h-full flex items-center justify-center px-24 py-20"
-              >
-                <img
-                  src={getPhotoUrl(
-                    facility.photo_references[selectedPhotoIndex],
-                    true,
-                  )}
-                  alt={`${facility.name} photo ${selectedPhotoIndex + 1}`}
-                  className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
-                />
-              </motion.div>
+                    {/* Next Button */}
+                    {selectedPhotoIndex < totalPhotos - 1 && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          goToNextPhoto();
+                        }}
+                        className="absolute right-6 top-1/2 -translate-y-1/2 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
+                      >
+                        <ChevronRight className="w-8 h-8 text-white" />
+                      </button>
+                    )}
+
+                    {/* Main Photo */}
+                    <motion.div
+                      key={selectedPhotoIndex}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      transition={{ duration: 0.2 }}
+                      className="w-full h-full flex items-center justify-center px-24 py-20"
+                    >
+                      <img
+                        src={
+                          photoViewerSource === 'regular'
+                            ? getPhotoUrl(currentPhoto as string, true)
+                            : getPhotoDataUrl(currentPhoto as { image: string; thumbnail: string }, true)
+                        }
+                        alt={`${displayFacility.name} photo ${selectedPhotoIndex + 1}`}
+                        className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
+                      />
+                    </motion.div>
+                  </>
+                );
+              })()}
             </motion.div>,
             document.body,
           )}
 
         {/* Sport Detail Modal - Rendered as Portal for Full-Screen Overlay */}
         {selectedSportDetail &&
-          facility.sport_metadata?.[selectedSportDetail] &&
+          displayFacility.sport_metadata?.[selectedSportDetail] &&
           createPortal(
             <AnimatePresence>
               <motion.div
@@ -1782,7 +2258,7 @@ export default function FacilitySidebar({
                 >
                   {(() => {
                     const sport = selectedSportDetail;
-                    const metadata = facility.sport_metadata![sport];
+                    const metadata = displayFacility.sport_metadata![sport];
                     const score = metadata.score;
                     const confidence = metadata.confidence;
 
