@@ -151,21 +151,6 @@ export default function FacilitySidebar({
 
   // Use full facility data if available, otherwise fall back to lightweight data
   const displayFacility = fullFacility || facility;
-
-  // Debug log when displayFacility changes
-  useEffect(() => {
-    if (displayFacility) {
-      console.log('[TAG DEBUG] displayFacility updated', {
-        place_id: displayFacility.place_id,
-        tags: displayFacility.tags,
-        tagCount: displayFacility.tags?.length,
-        source: fullFacility ? 'fullFacility' : 'facility'
-      });
-    } else {
-      console.log('[TAG DEBUG] displayFacility is null (sidebar closed)');
-    }
-  }, [displayFacility, fullFacility]);
-
   const [loadingImages, setLoadingImages] = useState<{
     [key: string]: boolean;
   }>({});
@@ -245,12 +230,6 @@ export default function FacilitySidebar({
 
   // Sync facility tags from displayFacility when it changes
   useEffect(() => {
-    console.log('[TAG DEBUG] useEffect fired', {
-      place_id: displayFacility?.place_id,
-      hasDisplayFacility: !!displayFacility,
-      tags: displayFacility?.tags,
-      tagCount: displayFacility?.tags?.length
-    });
     if (displayFacility) {
       setFacilityTags(displayFacility.tags || []);
     }
@@ -586,7 +565,6 @@ export default function FacilitySidebar({
     if (!tag) return;
 
     // Optimistic update to local state
-    console.log('[TAG DEBUG] Assigning tag optimistically', { tag, currentTags: facilityTags });
     setFacilityTags((prev) => [...prev, tag]);
 
     try {
@@ -613,7 +591,6 @@ export default function FacilitySidebar({
         queryKey: ['facility', 'full', facility.place_id],
         exact: true
       });
-      console.log('[TAG DEBUG] Refetch completed for place_id:', facility.place_id);
 
       setShowTagDropdown(false);
     } catch (error) {
