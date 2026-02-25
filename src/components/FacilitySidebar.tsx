@@ -151,6 +151,21 @@ export default function FacilitySidebar({
 
   // Use full facility data if available, otherwise fall back to lightweight data
   const displayFacility = fullFacility || facility;
+
+  // Debug log when displayFacility changes
+  useEffect(() => {
+    if (displayFacility) {
+      console.log('[TAG DEBUG] displayFacility updated', {
+        place_id: displayFacility.place_id,
+        tags: displayFacility.tags,
+        tagCount: displayFacility.tags?.length,
+        source: fullFacility ? 'fullFacility' : 'facility'
+      });
+    } else {
+      console.log('[TAG DEBUG] displayFacility is null (sidebar closed)');
+    }
+  }, [displayFacility, fullFacility]);
+
   const [loadingImages, setLoadingImages] = useState<{
     [key: string]: boolean;
   }>({});
@@ -201,6 +216,7 @@ export default function FacilitySidebar({
   const [assigningTag, setAssigningTag] = useState(false);
   const tagDropdownRef = useRef<HTMLDivElement>(null);
   const tagDropdownButtonRef = useRef<HTMLButtonElement>(null);
+  const [facilityTags, setFacilityTags] = useState<FacilityTag[]>([]);
 
   // Fetch notes when facility changes
   useEffect(() => {
@@ -226,6 +242,19 @@ export default function FacilitySidebar({
 
     fetchNotes();
   }, [displayFacility?.place_id]);
+
+  // Sync facility tags from displayFacility when it changes
+  useEffect(() => {
+    console.log('[TAG DEBUG] useEffect fired', {
+      place_id: displayFacility?.place_id,
+      hasDisplayFacility: !!displayFacility,
+      tags: displayFacility?.tags,
+      tagCount: displayFacility?.tags?.length
+    });
+    if (displayFacility) {
+      setFacilityTags(displayFacility.tags || []);
+    }
+  }, [displayFacility?.place_id, !!displayFacility]);
 
   // Fetch all tags on component mount
   useEffect(() => {
@@ -556,6 +585,10 @@ export default function FacilitySidebar({
     const tag = allTags.find((t) => t.id === tagId);
     if (!tag) return;
 
+    // Optimistic update to local state
+    console.log('[TAG DEBUG] Assigning tag optimistically', { tag, currentTags: facilityTags });
+    setFacilityTags((prev) => [...prev, tag]);
+
     try {
       const { error } = await supabase.from("facility_tag_assignments").insert({
         place_id: facility.place_id,
@@ -564,7 +597,7 @@ export default function FacilitySidebar({
 
       if (error) throw error;
 
-      // Update facility tags optimistically
+      // Update facility tags in the facility object
       const updatedTags = facility.tags ? [...facility.tags, tag] : [tag];
       if (facility.tags) {
         facility.tags.push(tag);
@@ -575,12 +608,18 @@ export default function FacilitySidebar({
       // Update cache with new tags
       updateFacilityTags(queryClient, facility.place_id, updatedTags);
 
-      // Invalidate full facility details query to refetch updated data
-      queryClient.invalidateQueries({ queryKey: ['facility', facility.place_id] });
+      // Refetch full facility details query to get fresh data immediately
+      await queryClient.refetchQueries({
+        queryKey: ['facility', 'full', facility.place_id],
+        exact: true
+      });
+      console.log('[TAG DEBUG] Refetch completed for place_id:', facility.place_id);
 
       setShowTagDropdown(false);
     } catch (error) {
       console.error("Error assigning tag:", error);
+      // Revert optimistic update on error
+      setFacilityTags((prev) => prev.filter((t) => t.id !== tagId));
       alert("Failed to assign tag. Please try again.");
     } finally {
       setAssigningTag(false);
@@ -591,22 +630,26 @@ export default function FacilitySidebar({
   const handleRemoveTag = async (tagId: string) => {
     if (!facility || !displayFacility) return;
 
-    const tag = facility.tags?.find((t) => t.id === tagId);
+    const tag = facilityTags.find((t) => t.id === tagId);
     if (!tag) return;
 
-    // Optimistic update
+    // Optimistic update to local state
+    setFacilityTags((prev) => prev.filter((t) => t.id !== tagId));
+
+    // Update cache optimistically
     const updatedTags = facility.tags
       ? facility.tags.filter((t) => t.id !== tagId)
       : [];
     if (facility.tags) {
       facility.tags = facility.tags.filter((t) => t.id !== tagId);
     }
-
-    // Update cache with updated tags
     updateFacilityTags(queryClient, facility.place_id, updatedTags);
 
-    // Invalidate full facility details query to refetch updated data
-    queryClient.invalidateQueries({ queryKey: ['facility', facility.place_id] });
+    // Refetch full facility details query to get fresh data immediately
+    await queryClient.refetchQueries({
+      queryKey: ['facility', 'full', facility.place_id],
+      exact: true
+    });
 
     try {
       const { error } = await supabase
@@ -618,12 +661,13 @@ export default function FacilitySidebar({
       if (error) throw error;
     } catch (error) {
       console.error("Error removing tag:", error);
-      // Revert optimistic update
+      // Revert optimistic update to local state
+      setFacilityTags((prev) => [...prev, tag].sort((a, b) => a.name.localeCompare(b.name)));
+      // Revert cache update
       const revertedTags = updatedTags.concat(tag);
       if (facility.tags && tag) {
         facility.tags.push(tag);
       }
-      // Revert cache update
       updateFacilityTags(queryClient, facility.place_id, revertedTags);
       alert("Failed to remove tag. Please try again.");
     }
@@ -1312,7 +1356,7 @@ export default function FacilitySidebar({
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-medium text-gray-700 tracking-wide flex items-center gap-2">
                 <Tag className="w-4 h-4" />
-                Tags ({displayFacility.tags?.length || 0})
+                Tags ({facilityTags.length})
               </h3>
               <div className="flex gap-2">
                 <div className="relative">
@@ -1347,7 +1391,7 @@ export default function FacilitySidebar({
                           {allTags
                             .filter(
                               (tag) =>
-                                !displayFacility.tags?.some(
+                                !facilityTags.some(
                                   (ft) => ft.id === tag.id,
                                 ),
                             )
@@ -1377,7 +1421,7 @@ export default function FacilitySidebar({
                             ))}
                           {allTags.filter(
                             (tag) =>
-                              !displayFacility.tags?.some(
+                              !facilityTags.some(
                                 (ft) => ft.id === tag.id,
                               ),
                           ).length === 0 && (
@@ -1400,9 +1444,9 @@ export default function FacilitySidebar({
             </div>
 
             {/* Assigned Tags Display */}
-            {displayFacility.tags && displayFacility.tags.length > 0 ? (
+            {facilityTags.length > 0 ? (
               <div className="flex flex-wrap gap-2 mb-3">
-                {displayFacility.tags.map((tag, idx) => (
+                {facilityTags.map((tag, idx) => (
                   <motion.div
                     key={tag.id}
                     initial={{ opacity: 0, scale: 0.8 }}

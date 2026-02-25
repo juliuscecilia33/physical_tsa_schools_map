@@ -12,7 +12,9 @@ export function useFacilityDetails(placeId: string | null, enabled: boolean = tr
     queryFn: async () => {
       if (!placeId) return null;
 
-      const response = await fetch(`/api/facilities/${encodeURIComponent(placeId)}`);
+      const response = await fetch(`/api/facilities/${encodeURIComponent(placeId)}`, {
+        cache: 'no-store' // Bypass browser cache to always get fresh data
+      });
 
       if (!response.ok) {
         if (response.status === 404) {
