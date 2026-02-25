@@ -3,23 +3,27 @@ import { getJson } from "serpapi";
 import * as fs from "fs";
 import * as path from "path";
 import * as dotenv from "dotenv";
+import axios from "axios";
 
 // Load environment variables
 dotenv.config({ path: path.join(__dirname, "../.env.local") });
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const serpApiKey = process.env.SERPAPI_API_KEY!;
 
-if (!supabaseUrl || !supabaseAnonKey || !serpApiKey) {
+if (!supabaseUrl || !supabaseAnonKey || !supabaseServiceKey || !serpApiKey) {
   console.error("❌ Error: Missing required environment variables");
   console.error(
-    "   Required: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SERPAPI_API_KEY",
+    "   Required: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, SERPAPI_API_KEY",
   );
   process.exit(1);
 }
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Service role client for storage operations (bypasses RLS)
+const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
 interface FacilityToEnrich {
   id: string;
@@ -40,6 +44,8 @@ interface ProgressState {
   processedPlaceIds: string[];
   lastProcessedIndex: number;
   apiCallsUsed: number;
+  imagesUploaded: number;
+  imageUploadsFailed: number;
   lastUpdated: string;
   errors: Array<{
     place_id: string;
@@ -54,9 +60,10 @@ const FACILITIES_FILE = path.join(
   __dirname,
   "../data/top-2500-high-quality-texas-facilities.json",
 );
+const STORAGE_BUCKET = "facility-photos";
 
 // Test mode: Set to a number to limit processing (e.g., 3 for testing), or null to process all
-const TEST_LIMIT: number | null = 3;
+const TEST_LIMIT: number | null = 100;
 
 // Rate limiting
 const DELAY_BETWEEN_REQUESTS_MS = 2000; // 2 seconds between requests
@@ -64,7 +71,7 @@ const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 5000; // 5 seconds
 
 // Pagination limits
-const MAX_PHOTOS = 50; // Stop after collecting 50 photos
+const MAX_PHOTOS = 40; // Stop after collecting 50 photos
 const MAX_REVIEWS = 50; // Stop after collecting 50 reviews
 
 // Helper functions
@@ -73,7 +80,12 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 function loadProgress(): ProgressState {
   if (fs.existsSync(PROGRESS_FILE)) {
     const data = fs.readFileSync(PROGRESS_FILE, "utf-8");
-    return JSON.parse(data);
+    const progress = JSON.parse(data);
+    // Add new fields if they don't exist (for backwards compatibility)
+    if (progress.imagesUploaded === undefined) progress.imagesUploaded = 0;
+    if (progress.imageUploadsFailed === undefined)
+      progress.imageUploadsFailed = 0;
+    return progress;
   }
   return {
     processedCount: 0,
@@ -83,6 +95,8 @@ function loadProgress(): ProgressState {
     processedPlaceIds: [],
     lastProcessedIndex: -1,
     apiCallsUsed: 0,
+    imagesUploaded: 0,
+    imageUploadsFailed: 0,
     lastUpdated: new Date().toISOString(),
     errors: [],
   };
@@ -111,6 +125,117 @@ function loadFacilities(): FacilityToEnrich[] {
     lat: f.location.lat,
     lng: f.location.lng,
   }));
+}
+
+/**
+ * Download image from URL and return as Buffer
+ */
+async function downloadImage(url: string): Promise<Buffer | null> {
+  try {
+    const response = await axios.get(url, {
+      responseType: "arraybuffer",
+      timeout: 30000, // 30 second timeout
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; SerpAPI Image Downloader)",
+      },
+    });
+    return Buffer.from(response.data);
+  } catch (error: any) {
+    console.log(`     ⚠️  Failed to download image: ${error.message}`);
+    return null;
+  }
+}
+
+/**
+ * Upload image to Supabase Storage
+ * Returns the public URL if successful, null otherwise
+ */
+async function uploadImageToStorage(
+  facilityId: string,
+  imageBuffer: Buffer,
+  index: number,
+  originalUrl: string,
+): Promise<string | null> {
+  try {
+    // Extract file extension from URL or default to jpg
+    const urlExtension = originalUrl.match(/\.(jpg|jpeg|png|webp)(\?|$)/i);
+    const extension = urlExtension ? urlExtension[1].toLowerCase() : "jpg";
+
+    // Generate unique filename: {facility_id}/{timestamp}_{index}.{ext}
+    const timestamp = Date.now();
+    const filename = `${facilityId}/${timestamp}_${index}.${extension}`;
+
+    // Determine content type
+    const contentTypeMap: { [key: string]: string } = {
+      jpg: "image/jpeg",
+      jpeg: "image/jpeg",
+      png: "image/png",
+      webp: "image/webp",
+    };
+    const contentType = contentTypeMap[extension] || "image/jpeg";
+
+    // Upload to Supabase Storage
+    const { data, error } = await supabaseAdmin.storage
+      .from(STORAGE_BUCKET)
+      .upload(filename, imageBuffer, {
+        contentType,
+        upsert: false, // Don't overwrite existing files
+      });
+
+    if (error) {
+      console.log(`     ⚠️  Upload error: ${error.message}`);
+      return null;
+    }
+
+    // Get public URL
+    const { data: urlData } = supabaseAdmin.storage
+      .from(STORAGE_BUCKET)
+      .getPublicUrl(filename);
+
+    return urlData.publicUrl;
+  } catch (error: any) {
+    console.log(`     ⚠️  Exception during upload: ${error.message}`);
+    return null;
+  }
+}
+
+/**
+ * Download and upload a single photo, returning both the Supabase URL and original URL
+ */
+async function processAndUploadPhoto(
+  facilityId: string,
+  photo: any,
+  index: number,
+): Promise<{
+  supabaseUrl: string | null;
+  originalData: any;
+  success: boolean;
+}> {
+  const originalUrl = photo.image || photo.thumbnail;
+
+  if (!originalUrl) {
+    return { supabaseUrl: null, originalData: photo, success: false };
+  }
+
+  // Download image
+  const imageBuffer = await downloadImage(originalUrl);
+  if (!imageBuffer) {
+    return { supabaseUrl: null, originalData: photo, success: false };
+  }
+
+  // Upload to Supabase
+  const supabaseUrl = await uploadImageToStorage(
+    facilityId,
+    imageBuffer,
+    index,
+    originalUrl,
+  );
+
+  return {
+    supabaseUrl,
+    originalData: photo,
+    success: supabaseUrl !== null,
+  };
 }
 
 /**
@@ -143,7 +268,10 @@ async function getDataIdFromPlaceId(
     console.log(`     ❌ No data_id found in response`);
     console.log(`     Response keys:`, Object.keys(response));
     if (response.place_results) {
-      console.log(`     place_results keys:`, Object.keys(response.place_results));
+      console.log(
+        `     place_results keys:`,
+        Object.keys(response.place_results),
+      );
     }
     return {
       success: false,
@@ -160,11 +288,13 @@ async function getDataIdFromPlaceId(
 
 /**
  * Fetch photos and reviews from SerpAPI for a given place_id
+ * Downloads photos and uploads them to Supabase Storage
  * Note: Makes 3 API calls - one for data_id lookup via direct place_id query, one for photos, one for reviews
  * (Previously made 3 calls via search, now makes 3 calls via direct lookup - more reliable)
  */
 async function fetchSerpApiData(
   placeId: string,
+  facilityId: string,
   facilityName: string,
   facilityAddress: string,
   lat: number,
@@ -173,15 +303,21 @@ async function fetchSerpApiData(
 ): Promise<{
   success: boolean;
   photos?: any[];
+  originalPhotos?: any[];
   reviews?: any[];
   dataId?: string;
   error?: string;
   apiCallsUsed: number;
+  imagesUploaded: number;
+  imageUploadsFailed: number;
 }> {
-  let photos: any[] = [];
+  let originalPhotos: any[] = [];
+  let processedPhotos: any[] = [];
   let reviews: any[] = [];
   let dataId: string | undefined;
   let apiCallsUsed = 0;
+  let imagesUploaded = 0;
+  let imageUploadsFailed = 0;
 
   try {
     // Step 1: Get data_id from direct place_id query
@@ -204,7 +340,7 @@ async function fetchSerpApiData(
         let nextPageToken: string | undefined = undefined;
         let pageCount = 0;
 
-        while (photos.length < MAX_PHOTOS) {
+        while (originalPhotos.length < MAX_PHOTOS) {
           const photosResponse = await getJson({
             engine: "google_maps_photos",
             data_id: dataId,
@@ -215,13 +351,15 @@ async function fetchSerpApiData(
           pageCount++;
 
           const pagePhotos = photosResponse.photos || [];
-          photos.push(...pagePhotos);
+          originalPhotos.push(...pagePhotos);
 
-          console.log(`     ✓ Page ${pageCount}: ${pagePhotos.length} photos (total: ${photos.length})`);
+          console.log(
+            `     ✓ Page ${pageCount}: ${pagePhotos.length} photos (total: ${originalPhotos.length})`,
+          );
 
           // Check if there are more pages and we haven't hit the limit
           nextPageToken = photosResponse.serpapi_pagination?.next_page_token;
-          if (!nextPageToken || photos.length >= MAX_PHOTOS) {
+          if (!nextPageToken || originalPhotos.length >= MAX_PHOTOS) {
             break;
           }
 
@@ -230,15 +368,56 @@ async function fetchSerpApiData(
         }
 
         // Trim to MAX_PHOTOS if we went over
-        if (photos.length > MAX_PHOTOS) {
-          photos = photos.slice(0, MAX_PHOTOS);
+        if (originalPhotos.length > MAX_PHOTOS) {
+          originalPhotos = originalPhotos.slice(0, MAX_PHOTOS);
         }
 
-        console.log(`     ✓ Photos collection complete: ${photos.length} photos from ${pageCount} page(s)`);
+        console.log(
+          `     ✓ Photos collection complete: ${originalPhotos.length} photos from ${pageCount} page(s)`,
+        );
+
+        // Step 2b: Download and upload photos to Supabase Storage
+        if (originalPhotos.length > 0) {
+          console.log(
+            `     → Processing and uploading ${originalPhotos.length} photos to Supabase Storage...`,
+          );
+
+          for (let i = 0; i < originalPhotos.length; i++) {
+            const photo = originalPhotos[i];
+            console.log(
+              `        [${i + 1}/${originalPhotos.length}] Downloading and uploading...`,
+            );
+
+            const result = await processAndUploadPhoto(facilityId, photo, i);
+
+            if (result.success && result.supabaseUrl) {
+              // Store the Supabase URL with metadata
+              processedPhotos.push({
+                url: result.supabaseUrl,
+                thumbnail: result.supabaseUrl, // Use same URL for thumbnail since we're not generating them
+              });
+              imagesUploaded++;
+              console.log(`        ✓ Uploaded successfully`);
+            } else {
+              imageUploadsFailed++;
+              console.log(`        ⚠️  Upload failed`);
+            }
+
+            // Small delay between uploads
+            await delay(300);
+          }
+
+          console.log(
+            `     ✓ Upload complete: ${imagesUploaded} uploaded, ${imageUploadsFailed} failed`,
+          );
+        }
       } catch (photoError: any) {
         console.log(`     ⚠️  Photos API error:`);
         console.log(`        Message: ${photoError.message || "No message"}`);
-        console.log(`        Error object:`, JSON.stringify(photoError, null, 2));
+        console.log(
+          `        Error object:`,
+          JSON.stringify(photoError, null, 2),
+        );
         if (photoError.response) {
           console.log(`        Response status: ${photoError.response.status}`);
           console.log(
@@ -271,7 +450,9 @@ async function fetchSerpApiData(
         const pageReviews = reviewsResponse.reviews || [];
         reviews.push(...pageReviews);
 
-        console.log(`     ✓ Page ${pageCount}: ${pageReviews.length} reviews (total: ${reviews.length})`);
+        console.log(
+          `     ✓ Page ${pageCount}: ${pageReviews.length} reviews (total: ${reviews.length})`,
+        );
 
         // Check if there are more pages and we haven't hit the limit
         nextPageToken = reviewsResponse.serpapi_pagination?.next_page_token;
@@ -288,17 +469,22 @@ async function fetchSerpApiData(
         reviews = reviews.slice(0, MAX_REVIEWS);
       }
 
-      console.log(`     ✓ Reviews collection complete: ${reviews.length} reviews from ${pageCount} page(s)`);
+      console.log(
+        `     ✓ Reviews collection complete: ${reviews.length} reviews from ${pageCount} page(s)`,
+      );
     } catch (reviewError: any) {
       console.log(`     ⚠️  Reviews API error: ${reviewError.message}`);
     }
 
     return {
       success: true,
-      photos,
+      photos: processedPhotos,
+      originalPhotos,
       reviews,
       dataId,
       apiCallsUsed,
+      imagesUploaded,
+      imageUploadsFailed,
     };
   } catch (error: any) {
     // Retry logic
@@ -307,29 +493,42 @@ async function fetchSerpApiData(
         `  ⚠️  Error, retrying (${retryCount + 1}/${MAX_RETRIES})...`,
       );
       await delay(RETRY_DELAY_MS);
-      return fetchSerpApiData(placeId, facilityName, facilityAddress, lat, lng, retryCount + 1);
+      return fetchSerpApiData(
+        placeId,
+        facilityId,
+        facilityName,
+        facilityAddress,
+        lat,
+        lng,
+        retryCount + 1,
+      );
     }
 
     return {
       success: false,
       error: error.message || "Unknown error",
       apiCallsUsed,
+      imagesUploaded,
+      imageUploadsFailed,
     };
   }
 }
 
 /**
  * Update facility in database with SerpAPI data
+ * Stores Supabase storage URLs in additional_photos and original URLs in additional_photos_original
  */
 async function updateFacilityWithSerpData(
   facilityId: string,
   photos: any[],
+  originalPhotos: any[],
   reviews: any[],
   dataId?: string,
 ): Promise<boolean> {
   try {
     const updateData: any = {
-      additional_photos: photos,
+      additional_photos: photos, // Supabase storage URLs
+      additional_photos_original: originalPhotos, // Original SerpAPI URLs as backup
       additional_reviews: reviews,
       serp_scraped: true,
       serp_scraped_at: new Date().toISOString(),
@@ -380,12 +579,15 @@ async function processFacility(
   console.log(`   🔍 Fetching data from SerpAPI...`);
   const serpData = await fetchSerpApiData(
     facility.place_id,
+    facility.id,
     facility.name,
     facility.address,
     facility.lat,
     facility.lng,
   );
   progress.apiCallsUsed += serpData.apiCallsUsed;
+  progress.imagesUploaded += serpData.imagesUploaded;
+  progress.imageUploadsFailed += serpData.imageUploadsFailed;
 
   if (!serpData.success) {
     console.log(`   ❌ Failed: ${serpData.error}`);
@@ -400,9 +602,10 @@ async function processFacility(
   }
 
   const photoCount = serpData.photos?.length || 0;
+  const originalPhotoCount = serpData.originalPhotos?.length || 0;
   const reviewCount = serpData.reviews?.length || 0;
 
-  console.log(`   📸 Photos: ${photoCount}`);
+  console.log(`   📸 Photos uploaded: ${photoCount}/${originalPhotoCount}`);
   console.log(`   ⭐ Reviews: ${reviewCount}`);
 
   // Update database
@@ -410,6 +613,7 @@ async function processFacility(
   const updated = await updateFacilityWithSerpData(
     facility.id,
     serpData.photos || [],
+    serpData.originalPhotos || [],
     serpData.reviews || [],
     serpData.dataId,
   );
@@ -456,6 +660,8 @@ function printProgressSummary(
   console.log(`   Skipped: ${progress.skippedCount}`);
   console.log(`   Remaining: ${remaining}`);
   console.log(`   API Calls Used: ${progress.apiCallsUsed}`);
+  console.log(`   Images Uploaded: ${progress.imagesUploaded}`);
+  console.log(`   Image Upload Failures: ${progress.imageUploadsFailed}`);
   console.log(
     `   Success Rate: ${((progress.successCount / (progress.processedCount || 1)) * 100).toFixed(1)}%`,
   );
@@ -482,6 +688,11 @@ async function enrichWithSerpApi() {
   console.log("\n📋 This script will:");
   console.log("   • Load high-quality Texas facilities");
   console.log("   • Fetch ALL photos and reviews from SerpAPI");
+  console.log("   • Download and upload photos to Supabase Storage");
+  console.log("   • Store Supabase URLs in additional_photos");
+  console.log(
+    "   • Store original URLs in additional_photos_original (backup)",
+  );
   console.log("   • Update database with enriched data");
   console.log("   • Track progress for resumable operation");
   console.log("\n⚠️  Important:");
@@ -503,7 +714,9 @@ async function enrichWithSerpApi() {
       `   • Estimated time: ~${((TEST_LIMIT * 10 * 2.5) / 60).toFixed(1)} minutes`,
     );
   } else {
-    console.log("   • This will use ~25,000 API calls (2,500 facilities × ~10)");
+    console.log(
+      "   • This will use ~25,000 API calls (2,500 facilities × ~10)",
+    );
     console.log("   • Estimated time: ~1,042 minutes (~17.4 hours)");
     console.log(
       "   • ⚠️  WARNING: Significantly exceeds 5,000/month limit - MUST run in batches!",
@@ -574,6 +787,8 @@ async function enrichWithSerpApi() {
   console.log(`   Failed: ${progress.failedCount}`);
   console.log(`   Skipped: ${progress.skippedCount}`);
   console.log(`   API Calls Used: ${progress.apiCallsUsed}`);
+  console.log(`   Images Uploaded: ${progress.imagesUploaded}`);
+  console.log(`   Image Upload Failures: ${progress.imageUploadsFailed}`);
   console.log(
     `   Success Rate: ${((progress.successCount / progress.processedCount) * 100).toFixed(1)}%`,
   );
