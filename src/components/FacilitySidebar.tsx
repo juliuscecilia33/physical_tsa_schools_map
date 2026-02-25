@@ -656,10 +656,11 @@ export default function FacilitySidebar({
   };
 
   const getPhotoDataUrl = (
-    photoData: { image: string; thumbnail: string; video?: string },
+    photoData: { image?: string; url?: string; thumbnail: string; video?: string },
     highRes: boolean = false,
   ) => {
-    return highRes ? photoData.image : photoData.thumbnail;
+    const fullResUrl = photoData.image || photoData.url || photoData.thumbnail;
+    return highRes ? fullResUrl : photoData.thumbnail;
   };
 
   const formatSportType = (type: string) => {
@@ -1999,7 +2000,7 @@ export default function FacilitySidebar({
 
         {/* Additional Photos Grid Modal */}
         {isAdditionalPhotosModalOpen &&
-          facility?.additional_photos &&
+          displayFacility.additional_photos &&
           createPortal(
             <motion.div
               initial={{ opacity: 0 }}
@@ -2269,9 +2270,9 @@ export default function FacilitySidebar({
 
         {/* Photo Lightbox Viewer */}
         {isPhotoViewerOpen &&
-          ((photoViewerSource === "regular" && facility?.photo_references) ||
+          ((photoViewerSource === "regular" && displayFacility.photo_references) ||
             (photoViewerSource === "additional" &&
-              facility?.additional_photos)) &&
+              displayFacility.additional_photos)) &&
           createPortal(
             <motion.div
               initial={{ opacity: 0 }}
@@ -2283,8 +2284,8 @@ export default function FacilitySidebar({
               {(() => {
                 const photos =
                   photoViewerSource === "regular"
-                    ? facility?.photo_references
-                    : facility?.additional_photos;
+                    ? displayFacility.photo_references
+                    : displayFacility.additional_photos;
                 if (!photos) return null;
                 const totalPhotos = photos.length;
                 const currentPhoto = photos[selectedPhotoIndex];
