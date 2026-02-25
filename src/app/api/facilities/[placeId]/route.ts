@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { Facility } from "@/types/facility";
 
+// Type for the raw data returned by the RPC function
+// The RPC function returns lat/lng as flat properties, not nested in location
+type FacilityRPCResponse = Omit<Facility, 'location'> & {
+  lat: number;
+  lng: number;
+};
+
 // Initialize Supabase client
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -27,7 +34,7 @@ export async function GET(
       .rpc("get_facility_full_by_place_id", {
         p_place_id: placeId,
       })
-      .single();
+      .single<FacilityRPCResponse>();
 
     if (error) {
       console.error("Supabase RPC error:", error);
