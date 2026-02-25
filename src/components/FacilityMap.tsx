@@ -614,9 +614,9 @@ export default function FacilityMap({
             offset={20}
             className="stats-popup"
           >
-            <div className="bg-gray-800 rounded-xl shadow-2xl border border-gray-700 overflow-hidden">
+            <div className="bg-slate-800 rounded-2xl shadow-2xl border border-slate-700 overflow-hidden">
               {/* Facility Name Header */}
-              <div className="px-4 py-3 border-b border-gray-700">
+              <div className="px-4 py-3 border-b border-slate-700">
                 <h3 className="text-sm font-semibold text-white text-center truncate">
                   {(hoveredFacility || clickedFacility)!.name}
                 </h3>
@@ -625,7 +625,7 @@ export default function FacilityMap({
               {/* Stats Grid - 2 rows x 3 columns */}
               <div className="grid grid-cols-3">
                 {/* Row 1 - Photos */}
-                <div className="px-5 py-3 flex flex-col items-center justify-center border-r border-b border-gray-700">
+                <div className="px-5 py-3 flex flex-col items-center justify-center border-r border-b border-slate-700">
                   <div className="flex items-center gap-2 mb-2">
                     <svg
                       className="w-4 h-4 text-white"
@@ -640,7 +640,7 @@ export default function FacilityMap({
                         d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
                       />
                     </svg>
-                    <span className="text-[10px] font-medium text-gray-400">
+                    <span className="text-[10px] font-medium text-slate-400">
                       Photos
                     </span>
                   </div>
@@ -653,7 +653,7 @@ export default function FacilityMap({
                 </div>
 
                 {/* Row 1 - Reviews */}
-                <div className="px-5 py-3 flex flex-col items-center justify-center border-r border-b border-gray-700">
+                <div className="px-5 py-3 flex flex-col items-center justify-center border-r border-b border-slate-700">
                   <div className="flex items-center gap-2 mb-2">
                     <svg
                       className="w-4 h-4 text-white"
@@ -668,7 +668,7 @@ export default function FacilityMap({
                         d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
                       />
                     </svg>
-                    <span className="text-[10px] font-medium text-gray-400">
+                    <span className="text-[10px] font-medium text-slate-400">
                       Reviews
                     </span>
                   </div>
@@ -681,10 +681,10 @@ export default function FacilityMap({
                 </div>
 
                 {/* Row 1 - Rating */}
-                <div className="px-5 py-3 flex flex-col items-center justify-center border-b border-gray-700">
+                <div className="px-5 py-3 flex flex-col items-center justify-center border-b border-slate-700">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-yellow-400 text-base">★</span>
-                    <span className="text-[10px] font-medium text-gray-400">
+                    <span className="text-[10px] font-medium text-slate-400">
                       Rating
                     </span>
                   </div>
@@ -698,7 +698,7 @@ export default function FacilityMap({
                 </div>
 
                 {/* Row 2 - Tags */}
-                <div className="px-5 py-3 flex flex-col items-center justify-center border-r border-gray-700">
+                <div className="px-5 py-3 flex flex-col items-center justify-center border-r border-slate-700">
                   <div className="flex items-center gap-2 mb-2">
                     <svg
                       className="w-4 h-4 text-white"
@@ -713,7 +713,7 @@ export default function FacilityMap({
                         d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
                       />
                     </svg>
-                    <span className="text-[10px] font-medium text-gray-400">
+                    <span className="text-[10px] font-medium text-slate-400">
                       Tags
                     </span>
                   </div>
@@ -725,7 +725,7 @@ export default function FacilityMap({
                 </div>
 
                 {/* Row 2 - Notes */}
-                <div className="px-5 py-3 flex flex-col items-center justify-center border-r border-gray-700 col-span-2">
+                <div className="px-5 py-3 flex flex-col items-center justify-center border-r border-slate-700 col-span-2">
                   <div className="flex items-center gap-2 mb-2">
                     <svg
                       className="w-4 h-4 text-white"
@@ -740,7 +740,7 @@ export default function FacilityMap({
                         d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
                       />
                     </svg>
-                    <span className="text-[10px] font-medium text-gray-400">
+                    <span className="text-[10px] font-medium text-slate-400">
                       Notes
                     </span>
                   </div>
@@ -791,7 +791,7 @@ export default function FacilityMap({
       {/* Left: Sidebar Toggle */}
       <button
         onClick={() => setSidebarVisible(!sidebarVisible)}
-        className="absolute top-7 left-4 z-15 flex-shrink-0 flex items-center gap-2 px-4 py-4 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200 hover:bg-gray-50 transition-all text-sm font-medium text-gray-700"
+        className="absolute top-7 left-4 z-15 flex-shrink-0 flex items-center gap-2 px-4 py-4 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200 hover:bg-slate-50 transition-all text-sm font-medium text-slate-700"
         title={sidebarVisible ? "Hide filters sidebar" : "Show filters sidebar"}
       >
         {sidebarVisible ? (
@@ -856,10 +856,10 @@ export default function FacilityMap({
             {/* Close Button */}
             <button
               onClick={() => setSidebarVisible(false)}
-              className="absolute top-4 right-4 p-2 rounded-lg hover:bg-gray-100 transition-colors z-20"
+              className="absolute top-4 right-4 p-2 rounded-xl hover:bg-slate-100 transition-colors z-20"
               title="Close sidebar"
             >
-              <X className="w-5 h-5 text-gray-600" />
+              <X className="w-5 h-5 text-slate-600" />
             </button>
 
             {/* TSA Logo */}
@@ -874,21 +874,21 @@ export default function FacilityMap({
               />
             </div>
             <div className="flex items-center gap-2 mb-3">
-              <div className="p-2 bg-gradient-to-br from-[#004aad] to-[#004aad]/90 rounded-lg">
+              <div className="p-2 bg-gradient-to-br from-[#004aad] to-[#004aad]/90 rounded-xl">
                 <Layers className="w-4 h-4 text-white" />
               </div>
               <div>
-                <h2 className="text-base font-bold text-gray-900">
+                <h2 className="text-base font-bold text-slate-900">
                   Texas Sports Facilities
                 </h2>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-slate-500">
                   {filteredFacilities.length.toLocaleString()} of{" "}
                   {facilities.length.toLocaleString()} shown
                 </p>
               </div>
             </div>
 
-            <p className="text-sm text-gray-500 mb-4 flex items-center gap-1.5">
+            <p className="text-sm text-slate-500 mb-4 flex items-center gap-1.5">
               <span className="inline-block w-2 h-2 bg-[#004aad] rounded-full"></span>
               Click any marker for details
             </p>
@@ -897,18 +897,18 @@ export default function FacilityMap({
             <div className="mb-4">
               <button
                 onClick={() => toggleSection("displayFilter")}
-                className="flex items-center justify-between w-full mb-3 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                className="flex items-center justify-between w-full mb-3 p-2 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer"
               >
                 <div className="flex items-center gap-2">
-                  <Filter className="w-4 h-4 text-gray-600" />
-                  <h3 className="text-sm font-semibold text-gray-700 tracking-wide uppercase">
+                  <Filter className="w-4 h-4 text-slate-600" />
+                  <h3 className="text-sm font-semibold text-slate-700 tracking-wide uppercase">
                     Display Filter
                   </h3>
                 </div>
                 {expandedSections.displayFilter ? (
-                  <ChevronUp className="w-4 h-4 text-gray-500" />
+                  <ChevronUp className="w-4 h-4 text-slate-500" />
                 ) : (
-                  <ChevronDown className="w-4 h-4 text-gray-500" />
+                  <ChevronDown className="w-4 h-4 text-slate-500" />
                 )}
               </button>
               <AnimatePresence>
@@ -923,10 +923,10 @@ export default function FacilityMap({
                     <motion.button
                       whileTap={{ scale: 0.98 }}
                       onClick={() => onFilterOptionChange("UNHIDDEN_ONLY")}
-                      className={`px-2 py-3 rounded-lg text-xs font-medium transition-all duration-300 flex flex-col items-center justify-center gap-1 cursor-pointer relative ${
+                      className={`px-2 py-3 rounded-xl text-xs font-medium transition-all duration-300 flex flex-col items-center justify-center gap-1 cursor-pointer relative ${
                         filterOption === "UNHIDDEN_ONLY"
-                          ? "bg-gradient-to-r from-[#004aad] to-[#004aad]/90 text-white shadow-lg shadow-[#004aad]/20"
-                          : "bg-gradient-to-r from-[#E8E9EB]/50 to-[#E8E9EB] text-gray-700 hover:from-[#E8E9EB] hover:to-[#E8E9EB]/80 border border-[#E8E9EB]"
+                          ? "bg-gradient-to-r from-[#004aad] to-[#004aad]/90 text-white shadow-md shadow-[#004aad]/20"
+                          : "bg-gradient-to-r from-[#E8E9EB]/50 to-[#E8E9EB] text-slate-700 hover:from-[#E8E9EB] hover:to-[#E8E9EB]/80 border border-[#E8E9EB]"
                       }`}
                     >
                       <span className="text-center leading-tight">All</span>
@@ -937,10 +937,10 @@ export default function FacilityMap({
                     {/* <motion.button
                   whileTap={{ scale: 0.98 }}
                   onClick={() => onFilterOptionChange("HIDDEN_ONLY")}
-                  className={`px-2 py-3 rounded-lg text-xs font-medium transition-all duration-300 flex flex-col items-center justify-center gap-1 cursor-pointer relative ${
+                  className={`px-2 py-3 rounded-xl text-xs font-medium transition-all duration-300 flex flex-col items-center justify-center gap-1 cursor-pointer relative ${
                     filterOption === "HIDDEN_ONLY"
-                      ? "bg-gradient-to-r from-[#004aad] to-[#004aad]/90 text-white shadow-lg shadow-[#004aad]/20"
-                      : "bg-gradient-to-r from-[#E8E9EB]/50 to-[#E8E9EB] text-gray-700 hover:from-[#E8E9EB] hover:to-[#E8E9EB]/80 border border-[#E8E9EB]"
+                      ? "bg-gradient-to-r from-[#004aad] to-[#004aad]/90 text-white shadow-md shadow-[#004aad]/20"
+                      : "bg-gradient-to-r from-[#E8E9EB]/50 to-[#E8E9EB] text-slate-700 hover:from-[#E8E9EB] hover:to-[#E8E9EB]/80 border border-[#E8E9EB]"
                   }`}
                 >
                   <span className="text-center leading-tight">Hidden Only</span>
@@ -951,10 +951,10 @@ export default function FacilityMap({
                     <motion.button
                       whileTap={{ scale: 0.98 }}
                       onClick={() => onFilterOptionChange("WITH_NOTES_ONLY")}
-                      className={`px-2 py-3 rounded-lg text-xs font-medium transition-all duration-300 flex flex-col items-center justify-center gap-1 cursor-pointer relative ${
+                      className={`px-2 py-3 rounded-xl text-xs font-medium transition-all duration-300 flex flex-col items-center justify-center gap-1 cursor-pointer relative ${
                         filterOption === "WITH_NOTES_ONLY"
-                          ? "bg-gradient-to-r from-[#004aad] to-[#004aad]/90 text-white shadow-lg shadow-[#004aad]/20"
-                          : "bg-gradient-to-r from-[#E8E9EB]/50 to-[#E8E9EB] text-gray-700 hover:from-[#E8E9EB] hover:to-[#E8E9EB]/80 border border-[#E8E9EB]"
+                          ? "bg-gradient-to-r from-[#004aad] to-[#004aad]/90 text-white shadow-md shadow-[#004aad]/20"
+                          : "bg-gradient-to-r from-[#E8E9EB]/50 to-[#E8E9EB] text-slate-700 hover:from-[#E8E9EB] hover:to-[#E8E9EB]/80 border border-[#E8E9EB]"
                       }`}
                     >
                       <span className="text-center leading-tight">
@@ -974,18 +974,18 @@ export default function FacilityMap({
               <div className="mb-4">
                 <button
                   onClick={() => toggleSection("sportFilter")}
-                  className="flex items-center justify-between w-full mb-3 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                  className="flex items-center justify-between w-full mb-3 p-2 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer"
                 >
                   <div className="flex items-center gap-2">
-                    <Filter className="w-4 h-4 text-gray-600" />
-                    <h3 className="text-sm font-semibold text-gray-700 tracking-wide uppercase">
+                    <Filter className="w-4 h-4 text-slate-600" />
+                    <h3 className="text-sm font-semibold text-slate-700 tracking-wide uppercase">
                       Filter by Sport
                     </h3>
                   </div>
                   {expandedSections.sportFilter ? (
-                    <ChevronUp className="w-4 h-4 text-gray-500" />
+                    <ChevronUp className="w-4 h-4 text-slate-500" />
                   ) : (
-                    <ChevronDown className="w-4 h-4 text-gray-500" />
+                    <ChevronDown className="w-4 h-4 text-slate-500" />
                   )}
                 </button>
                 <AnimatePresence>
@@ -1014,10 +1014,10 @@ export default function FacilityMap({
                                 ]);
                               }
                             }}
-                            className={`px-2 py-3 rounded-lg text-xs font-medium transition-all duration-300 flex flex-col items-center justify-center gap-1 cursor-pointer relative ${
+                            className={`px-2 py-3 rounded-xl text-xs font-medium transition-all duration-300 flex flex-col items-center justify-center gap-1 cursor-pointer relative ${
                               selectedSports.includes(sport)
-                                ? "bg-gradient-to-r from-[#004aad] to-[#004aad]/90 text-white shadow-lg shadow-[#004aad]/20"
-                                : "bg-gradient-to-r from-[#E8E9EB]/50 to-[#E8E9EB] text-gray-700 hover:from-[#E8E9EB] hover:to-[#E8E9EB]/80 border border-[#E8E9EB]"
+                                ? "bg-gradient-to-r from-[#004aad] to-[#004aad]/90 text-white shadow-md shadow-[#004aad]/20"
+                                : "bg-gradient-to-r from-[#E8E9EB]/50 to-[#E8E9EB] text-slate-700 hover:from-[#E8E9EB] hover:to-[#E8E9EB]/80 border border-[#E8E9EB]"
                             }`}
                           >
                             <span className="text-xl">
@@ -1038,7 +1038,7 @@ export default function FacilityMap({
                           animate={{ opacity: 1, y: 0 }}
                           whileTap={{ scale: 0.98 }}
                           onClick={() => onSelectedSportsChange([])}
-                          className="w-full mt-2 px-4 py-3 rounded-lg text-sm font-medium bg-[#c9472b]/10 text-[#c9472b] hover:bg-[#c9472b]/20 border border-[#c9472b]/20 transition-all duration-300 cursor-pointer"
+                          className="w-full mt-2 px-4 py-3 rounded-xl text-sm font-medium bg-[#c9472b]/10 text-[#c9472b] hover:bg-[#c9472b]/20 border border-[#c9472b]/20 transition-all duration-300 cursor-pointer"
                         >
                           Clear Sport Filter ({selectedSports.length})
                         </motion.button>
@@ -1054,18 +1054,18 @@ export default function FacilityMap({
               <div className="mb-4">
                 <button
                   onClick={() => toggleSection("tagFilter")}
-                  className="flex items-center justify-between w-full mb-3 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                  className="flex items-center justify-between w-full mb-3 p-2 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer"
                 >
                   <div className="flex items-center gap-2">
-                    <Tag className="w-4 h-4 text-gray-600" />
-                    <h3 className="text-sm font-semibold text-gray-700 tracking-wide uppercase">
+                    <Tag className="w-4 h-4 text-slate-600" />
+                    <h3 className="text-sm font-semibold text-slate-700 tracking-wide uppercase">
                       Filter by Tag
                     </h3>
                   </div>
                   {expandedSections.tagFilter ? (
-                    <ChevronUp className="w-4 h-4 text-gray-500" />
+                    <ChevronUp className="w-4 h-4 text-slate-500" />
                   ) : (
-                    <ChevronDown className="w-4 h-4 text-gray-500" />
+                    <ChevronDown className="w-4 h-4 text-slate-500" />
                   )}
                 </button>
                 <AnimatePresence>
@@ -1093,8 +1093,8 @@ export default function FacilityMap({
                             }}
                             className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 flex items-center gap-1.5 cursor-pointer relative ${
                               selectedTags.includes(tag.id)
-                                ? "text-white shadow-lg ring-2 ring-white/50"
-                                : "text-white/80 hover:text-white shadow-sm hover:shadow-md opacity-70 hover:opacity-100"
+                                ? "text-white shadow-md ring-2 ring-white/50"
+                                : "text-white/80 hover:text-white shadow-sm hover:shadow-sm opacity-70 hover:opacity-100"
                             }`}
                             style={{ backgroundColor: tag.color }}
                           >
@@ -1112,7 +1112,7 @@ export default function FacilityMap({
                           animate={{ opacity: 1, y: 0 }}
                           whileTap={{ scale: 0.98 }}
                           onClick={() => onSelectedTagsChange([])}
-                          className="w-full mt-2 px-4 py-3 rounded-lg text-sm font-medium bg-[#c9472b]/10 text-[#c9472b] hover:bg-[#c9472b]/20 border border-[#c9472b]/20 transition-all duration-300 cursor-pointer"
+                          className="w-full mt-2 px-4 py-3 rounded-xl text-sm font-medium bg-[#c9472b]/10 text-[#c9472b] hover:bg-[#c9472b]/20 border border-[#c9472b]/20 transition-all duration-300 cursor-pointer"
                         >
                           Clear Tag Filter ({selectedTags.length})
                         </motion.button>
@@ -1127,18 +1127,18 @@ export default function FacilityMap({
             <div>
               <button
                 onClick={() => toggleSection("categories")}
-                className="flex items-center justify-between w-full mb-3 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                className="flex items-center justify-between w-full mb-3 p-2 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer"
               >
                 <div className="flex items-center gap-2">
-                  <Layers className="w-4 h-4 text-gray-600" />
-                  <h3 className="text-sm font-semibold text-gray-700 tracking-wide uppercase">
+                  <Layers className="w-4 h-4 text-slate-600" />
+                  <h3 className="text-sm font-semibold text-slate-700 tracking-wide uppercase">
                     Categories
                   </h3>
                 </div>
                 {expandedSections.categories ? (
-                  <ChevronUp className="w-4 h-4 text-gray-500" />
+                  <ChevronUp className="w-4 h-4 text-slate-500" />
                 ) : (
-                  <ChevronDown className="w-4 h-4 text-gray-500" />
+                  <ChevronDown className="w-4 h-4 text-slate-500" />
                 )}
               </button>
               <AnimatePresence>
@@ -1178,7 +1178,7 @@ export default function FacilityMap({
                                 ]);
                               }
                             }}
-                            className={`rounded-lg p-3 transition-all duration-300 cursor-pointer relative ${
+                            className={`rounded-xl p-3 transition-all duration-300 cursor-pointer relative ${
                               isSelected
                                 ? "bg-white border-2"
                                 : "bg-gradient-to-r from-[#E8E9EB]/50 to-[#E8E9EB] hover:from-[#E8E9EB] hover:to-[#E8E9EB]/80 border border-[#E8E9EB]"
@@ -1194,7 +1194,7 @@ export default function FacilityMap({
                               />
                               <span
                                 className={`text-xs font-medium text-center leading-tight ${
-                                  isSelected ? "text-gray-900" : "text-gray-700"
+                                  isSelected ? "text-slate-900" : "text-slate-700"
                                 }`}
                               >
                                 {label}
@@ -1202,8 +1202,8 @@ export default function FacilityMap({
                               <span
                                 className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
                                   isSelected
-                                    ? "bg-[#E8E9EB] text-gray-700"
-                                    : "bg-[#E8E9EB] text-gray-500"
+                                    ? "bg-[#E8E9EB] text-slate-700"
+                                    : "bg-[#E8E9EB] text-slate-500"
                                 }`}
                               >
                                 {categoryCounts[
@@ -1212,7 +1212,7 @@ export default function FacilityMap({
                               </span>
                             </div>
                             {isSelected && (
-                              <Check className="w-3 h-3 text-gray-700 absolute top-1 right-1" />
+                              <Check className="w-3 h-3 text-slate-700 absolute top-1 right-1" />
                             )}
                           </motion.button>
                         );
@@ -1233,7 +1233,7 @@ export default function FacilityMap({
                               "other",
                             ])
                           }
-                          className="col-span-2 px-4 py-2.5 rounded-lg text-xs font-medium bg-[#c9472b]/10 text-[#c9472b] hover:bg-[#c9472b]/20 border border-[#c9472b]/20 transition-all duration-300 cursor-pointer"
+                          className="col-span-2 px-4 py-2.5 rounded-xl text-xs font-medium bg-[#c9472b]/10 text-[#c9472b] hover:bg-[#c9472b]/20 border border-[#c9472b]/20 transition-all duration-300 cursor-pointer"
                         >
                           Clear Category Filter ({5 - selectedCategories.length}{" "}
                           hidden)
@@ -1248,18 +1248,18 @@ export default function FacilityMap({
             <div className="mt-4">
               <button
                 onClick={() => toggleSection("moreFilters")}
-                className="flex items-center justify-between w-full mb-3 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                className="flex items-center justify-between w-full mb-3 p-2 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer"
               >
                 <div className="flex items-center gap-2">
-                  <Filter className="w-4 h-4 text-gray-600" />
-                  <h3 className="text-sm font-semibold text-gray-700 tracking-wide uppercase">
+                  <Filter className="w-4 h-4 text-slate-600" />
+                  <h3 className="text-sm font-semibold text-slate-700 tracking-wide uppercase">
                     More Filters
                   </h3>
                 </div>
                 {expandedSections.moreFilters ? (
-                  <ChevronUp className="w-4 h-4 text-gray-500" />
+                  <ChevronUp className="w-4 h-4 text-slate-500" />
                 ) : (
-                  <ChevronDown className="w-4 h-4 text-gray-500" />
+                  <ChevronDown className="w-4 h-4 text-slate-500" />
                 )}
               </button>
               <AnimatePresence>
@@ -1274,10 +1274,10 @@ export default function FacilityMap({
                     <motion.button
                       whileTap={{ scale: 0.98 }}
                       onClick={() => onFilterOptionChange("ALL")}
-                      className={`px-2 py-3 rounded-lg text-xs font-medium transition-all duration-300 flex flex-col items-center justify-center gap-1 cursor-pointer relative ${
+                      className={`px-2 py-3 rounded-xl text-xs font-medium transition-all duration-300 flex flex-col items-center justify-center gap-1 cursor-pointer relative ${
                         filterOption === "ALL"
-                          ? "bg-gradient-to-r from-[#004aad] to-[#004aad]/90 text-white shadow-lg shadow-[#004aad]/20"
-                          : "bg-gradient-to-r from-[#E8E9EB]/50 to-[#E8E9EB] text-gray-700 hover:from-[#E8E9EB] hover:to-[#E8E9EB]/80 border border-[#E8E9EB]"
+                          ? "bg-gradient-to-r from-[#004aad] to-[#004aad]/90 text-white shadow-md shadow-[#004aad]/20"
+                          : "bg-gradient-to-r from-[#E8E9EB]/50 to-[#E8E9EB] text-slate-700 hover:from-[#E8E9EB] hover:to-[#E8E9EB]/80 border border-[#E8E9EB]"
                       }`}
                     >
                       <span className="text-center leading-tight">
@@ -1290,9 +1290,9 @@ export default function FacilityMap({
                     <motion.button
                       whileTap={{ scale: 0.98 }}
                       onClick={() => onFilterOptionChange("CLEANED_UP_ONLY")}
-                      className={`px-2 py-3 rounded-lg text-xs font-medium transition-all duration-300 flex flex-col items-center justify-center gap-1 cursor-pointer relative ${
+                      className={`px-2 py-3 rounded-xl text-xs font-medium transition-all duration-300 flex flex-col items-center justify-center gap-1 cursor-pointer relative ${
                         filterOption === "CLEANED_UP_ONLY"
-                          ? "bg-gradient-to-r from-[#f97316] to-[#f97316]/90 text-white shadow-lg shadow-[#f97316]/20"
+                          ? "bg-gradient-to-r from-[#f97316] to-[#f97316]/90 text-white shadow-md shadow-[#f97316]/20"
                           : "bg-gradient-to-r from-[#fed7aa]/50 to-[#fed7aa] text-[#9a3412] hover:from-[#fed7aa] hover:to-[#fed7aa]/80 border border-[#fdba74]"
                       }`}
                     >

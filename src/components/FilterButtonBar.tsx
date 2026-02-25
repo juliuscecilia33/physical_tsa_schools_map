@@ -107,7 +107,7 @@ export default function FilterButtonBar({
           className={`flex-shrink-0 flex items-center justify-between gap-3 px-5 py-4 min-w-[140px] rounded-2xl shadow-2xl border transition-all text-sm font-medium ${
             displayFilterActive || openDropdown === 'display'
               ? 'bg-[#004aad] text-white border-[#004aad]'
-              : 'bg-white/95 backdrop-blur-xl text-gray-700 border-gray-200 hover:bg-gray-50'
+              : 'bg-white/95 backdrop-blur-xl text-slate-700 border-slate-200 hover:bg-slate-50'
           }`}
         >
           <div className="flex items-center gap-2">
@@ -130,10 +130,10 @@ export default function FilterButtonBar({
             openDropdown === 'sport'
               ? 'bg-[#004aad] text-white border-[#004aad]'
               : allSportsSelected
-              ? 'bg-white/95 backdrop-blur-xl text-[#004aad] border-2 border-[#004aad] hover:bg-gray-50'
+              ? 'bg-white/95 backdrop-blur-xl text-[#004aad] border-2 border-[#004aad] hover:bg-slate-50'
               : sportFilterCount > 0
               ? 'bg-[#004aad] text-white border-[#004aad]'
-              : 'bg-white/95 backdrop-blur-xl text-gray-700 border-gray-200 hover:bg-gray-50'
+              : 'bg-white/95 backdrop-blur-xl text-slate-700 border-slate-200 hover:bg-slate-50'
           }`}
         >
           <div className="flex items-center gap-2">
@@ -156,10 +156,10 @@ export default function FilterButtonBar({
             openDropdown === 'tag'
               ? 'bg-[#004aad] text-white border-[#004aad]'
               : allTagsSelected
-              ? 'bg-white/95 backdrop-blur-xl text-[#004aad] border-2 border-[#004aad] hover:bg-gray-50'
+              ? 'bg-white/95 backdrop-blur-xl text-[#004aad] border-2 border-[#004aad] hover:bg-slate-50'
               : tagFilterCount > 0
               ? 'bg-[#004aad] text-white border-[#004aad]'
-              : 'bg-white/95 backdrop-blur-xl text-gray-700 border-gray-200 hover:bg-gray-50'
+              : 'bg-white/95 backdrop-blur-xl text-slate-700 border-slate-200 hover:bg-slate-50'
           }`}
         >
           <div className="flex items-center gap-2">
@@ -182,10 +182,10 @@ export default function FilterButtonBar({
             openDropdown === 'category'
               ? 'bg-[#004aad] text-white border-[#004aad]'
               : allCategoriesSelected
-              ? 'bg-white/95 backdrop-blur-xl text-[#004aad] border-2 border-[#004aad] hover:bg-gray-50'
+              ? 'bg-white/95 backdrop-blur-xl text-[#004aad] border-2 border-[#004aad] hover:bg-slate-50'
               : categoryFilterCount > 0
               ? 'bg-[#004aad] text-white border-[#004aad]'
-              : 'bg-white/95 backdrop-blur-xl text-gray-700 border-gray-200 hover:bg-gray-50'
+              : 'bg-white/95 backdrop-blur-xl text-slate-700 border-slate-200 hover:bg-slate-50'
           }`}
         >
           <div className="flex items-center gap-2">
@@ -207,7 +207,7 @@ export default function FilterButtonBar({
           className={`flex-shrink-0 flex items-center justify-between gap-3 px-5 py-4 min-w-[120px] rounded-2xl shadow-2xl border transition-all text-sm font-medium ${
             openDropdown === 'more'
               ? 'bg-[#004aad] text-white border-[#004aad]'
-              : 'bg-white/95 backdrop-blur-xl text-gray-700 border-gray-200 hover:bg-gray-50'
+              : 'bg-white/95 backdrop-blur-xl text-slate-700 border-slate-200 hover:bg-slate-50'
           }`}
         >
           <div className="flex items-center gap-2">

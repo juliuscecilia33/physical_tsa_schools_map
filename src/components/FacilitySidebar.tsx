@@ -295,7 +295,9 @@ export default function FacilitySidebar({
       updateFacilityNotesFlag(queryClient, facility.place_id, true);
 
       // Invalidate full facility details query to refetch updated data
-      queryClient.invalidateQueries({ queryKey: ['facility', 'full', facility.place_id] });
+      queryClient.invalidateQueries({
+        queryKey: ["facility", "full", facility.place_id],
+      });
 
       // Close the form after successful add
       setShowAddNoteForm(false);
@@ -352,7 +354,9 @@ export default function FacilitySidebar({
       if (error) throw error;
 
       // Invalidate full facility details query to refetch updated data
-      queryClient.invalidateQueries({ queryKey: ['facility', 'full', facility.place_id] });
+      queryClient.invalidateQueries({
+        queryKey: ["facility", "full", facility.place_id],
+      });
     } catch (error) {
       console.error("Error updating note:", error);
       // Revert optimistic update
@@ -386,7 +390,9 @@ export default function FacilitySidebar({
       if (error) throw error;
 
       // Invalidate full facility details query to refetch updated data
-      queryClient.invalidateQueries({ queryKey: ['facility', 'full', facility.place_id] });
+      queryClient.invalidateQueries({
+        queryKey: ["facility", "full", facility.place_id],
+      });
     } catch (error) {
       console.error("Error deleting note:", error);
       // Revert optimistic update
@@ -590,8 +596,8 @@ export default function FacilitySidebar({
 
       // Refetch full facility details query to get fresh data immediately
       await queryClient.refetchQueries({
-        queryKey: ['facility', 'full', facility.place_id],
-        exact: true
+        queryKey: ["facility", "full", facility.place_id],
+        exact: true,
       });
 
       setShowTagDropdown(false);
@@ -626,8 +632,8 @@ export default function FacilitySidebar({
 
     // Refetch full facility details query to get fresh data immediately
     await queryClient.refetchQueries({
-      queryKey: ['facility', 'full', facility.place_id],
-      exact: true
+      queryKey: ["facility", "full", facility.place_id],
+      exact: true,
     });
 
     try {
@@ -641,7 +647,9 @@ export default function FacilitySidebar({
     } catch (error) {
       console.error("Error removing tag:", error);
       // Revert optimistic update to local state
-      setFacilityTags((prev) => [...prev, tag].sort((a, b) => a.name.localeCompare(b.name)));
+      setFacilityTags((prev) =>
+        [...prev, tag].sort((a, b) => a.name.localeCompare(b.name)),
+      );
       // Revert cache update
       const revertedTags = updatedTags.concat(tag);
       if (facility.tags && tag) {
@@ -658,7 +666,12 @@ export default function FacilitySidebar({
   };
 
   const getPhotoDataUrl = (
-    photoData: { image?: string; url?: string; thumbnail: string; video?: string },
+    photoData: {
+      image?: string;
+      url?: string;
+      thumbnail: string;
+      video?: string;
+    },
     highRes: boolean = false,
   ) => {
     const fullResUrl = photoData.image || photoData.url || photoData.thumbnail;
@@ -715,7 +728,9 @@ export default function FacilitySidebar({
     }
     const remainingStars = 5 - Math.ceil(rating);
     for (let i = 0; i < remainingStars; i++) {
-      stars.push(<Star key={`empty-${i}`} className="w-4 h-4 text-gray-300" />);
+      stars.push(
+        <Star key={`empty-${i}`} className="w-4 h-4 text-slate-300" />,
+      );
     }
     return stars;
   };
@@ -875,7 +890,7 @@ export default function FacilitySidebar({
         animate={{ x: 0 }}
         exit={{ x: "-100%" }}
         transition={{ type: "spring", damping: 25, stiffness: 200 }}
-        className="fixed top-[1vh] left-4 h-[98vh] w-full md:w-[480px] bg-white shadow-2xl rounded-2xl z-50 flex flex-col overflow-hidden"
+        className="fixed top-[1vh] left-4 h-[98vh] w-full md:w-[480px] bg-white shadow-xl border border-slate-200/60 rounded-2xl z-50 flex flex-col overflow-hidden"
       >
         {/* Header with gradient */}
         <div className="sticky top-0 bg-gradient-to-br from-white via-white to-[#004aad]/5 backdrop-blur-sm border-b border-[#E8E9EB] shadow-sm z-20">
@@ -884,7 +899,7 @@ export default function FacilitySidebar({
             displayFacility.photo_references.length > 0 && (
               <div className="relative w-full h-48 overflow-hidden">
                 {loadingImages[0] !== false && (
-                  <div className="absolute inset-0 bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200 animate-pulse" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />
                 )}
                 <img
                   src={getPhotoUrl(displayFacility.photo_references[0])}
@@ -905,7 +920,7 @@ export default function FacilitySidebar({
               className="flex-1 pr-4"
             >
               <div className="flex items-center gap-2 mb-2">
-                <h2 className="text-2xl font-semibold text-gray-900 leading-tight">
+                <h2 className="text-2xl font-semibold text-slate-900 leading-tight">
                   {displayFacility.name}
                 </h2>
                 {displayFacility.business_status && (
@@ -932,8 +947,8 @@ export default function FacilitySidebar({
               </div>
               {getCityState(displayFacility.address) && (
                 <div className="flex items-center gap-1.5 mb-2">
-                  <MapPin className="w-3.5 h-3.5 text-gray-400" />
-                  <span className="text-sm text-gray-500">
+                  <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                  <span className="text-sm text-slate-500">
                     {getCityState(displayFacility.address)}
                   </span>
                 </div>
@@ -943,10 +958,10 @@ export default function FacilitySidebar({
                   <div className="flex gap-0.5">
                     {renderStars(displayFacility.rating)}
                   </div>
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-sm font-semibold text-slate-800 tabular-nums">
                     {displayFacility.rating.toFixed(1)}
                   </span>
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-slate-500 tabular-nums">
                     ({displayFacility.user_ratings_total} reviews)
                   </span>
                 </div>
@@ -956,7 +971,7 @@ export default function FacilitySidebar({
               whileHover={{ scale: 1.1, rotate: 90 }}
               whileTap={{ scale: 0.9 }}
               onClick={onClose}
-              className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900 transition-colors"
+              className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 transition-colors"
               aria-label="Close"
             >
               <X className="w-5 h-5" />
@@ -975,12 +990,15 @@ export default function FacilitySidebar({
               transition={{ delay: 0.05 }}
             >
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-medium text-gray-700 tracking-wide">
-                  Photos ({displayFacility.photo_references.length})
+                <h3 className="text-sm font-semibold text-slate-700 tracking-wide">
+                  Photos{" "}
+                  <span className="text-slate-500 tabular-nums">
+                    ({displayFacility.photo_references.length})
+                  </span>
                 </h3>
                 <button
                   onClick={() => setIsPhotosModalOpen(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-lg transition-all"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-xl transition-all"
                 >
                   <Maximize2 className="w-3.5 h-3.5" />
                   Expand
@@ -991,10 +1009,10 @@ export default function FacilitySidebar({
                 {showLeftArrow && (
                   <button
                     onClick={() => scrollPhotos("left")}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-lg flex items-center justify-center transition-all opacity-0 group-hover/photos:opacity-100"
+                    className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-md flex items-center justify-center transition-all opacity-0 group-hover/photos:opacity-100"
                     aria-label="Scroll left"
                   >
-                    <ChevronLeft className="w-6 h-6 text-gray-700" />
+                    <ChevronLeft className="w-6 h-6 text-slate-700" />
                   </button>
                 )}
 
@@ -1002,10 +1020,10 @@ export default function FacilitySidebar({
                 {showRightArrow && (
                   <button
                     onClick={() => scrollPhotos("right")}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-lg flex items-center justify-center transition-all opacity-0 group-hover/photos:opacity-100"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-md flex items-center justify-center transition-all opacity-0 group-hover/photos:opacity-100"
                     aria-label="Scroll right"
                   >
-                    <ChevronRight className="w-6 h-6 text-gray-700" />
+                    <ChevronRight className="w-6 h-6 text-slate-700" />
                   </button>
                 )}
 
@@ -1022,11 +1040,11 @@ export default function FacilitySidebar({
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: 0.1 + Math.min(idx * 0.05, 0.5) }}
                       onClick={() => openPhotoViewer(idx)}
-                      className="relative overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-all cursor-pointer flex-shrink-0 snap-start"
+                      className="relative overflow-hidden rounded-2xl shadow-sm hover:shadow-xl transition-all cursor-pointer flex-shrink-0 snap-start"
                       style={{ width: "280px", height: "180px" }}
                     >
                       {loadingImages[idx] !== false && (
-                        <div className="absolute inset-0 bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200 animate-pulse" />
+                        <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />
                       )}
                       <img
                         src={getPhotoUrl(photoRef)}
@@ -1044,8 +1062,8 @@ export default function FacilitySidebar({
             </motion.div>
           ) : (
             <div className="text-center py-12">
-              <Camera className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-              <p className="text-sm text-gray-500">No photos available</p>
+              <Camera className="w-12 h-12 text-slate-400 mx-auto mb-3" />
+              <p className="text-sm text-slate-500">No photos available</p>
             </div>
           )}
 
@@ -1055,7 +1073,7 @@ export default function FacilitySidebar({
             displayFacility.additional_photos.length > 0 && (
               <>
                 {/* Divider */}
-                <div className="border-t border-gray-200"></div>
+                <div className="border-t border-slate-200"></div>
 
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -1063,16 +1081,16 @@ export default function FacilitySidebar({
                   transition={{ delay: 0.06 }}
                 >
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-sm font-medium text-gray-700 tracking-wide flex items-center gap-2">
+                    <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
                       Additional Photos (
                       {displayFacility.additional_photos.length})
-                      <span className="text-xs font-normal text-gray-500">
+                      <span className="text-xs font-normal text-slate-500">
                         from SerpAPI
                       </span>
                     </h3>
                     <button
                       onClick={() => setIsAdditionalPhotosModalOpen(true)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-lg transition-all"
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-xl transition-all"
                     >
                       <Maximize2 className="w-3.5 h-3.5" />
                       Expand
@@ -1083,10 +1101,10 @@ export default function FacilitySidebar({
                     {showAdditionalLeftArrow && (
                       <button
                         onClick={() => scrollAdditionalPhotos("left")}
-                        className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-lg flex items-center justify-center transition-all opacity-0 group-hover/additional-photos:opacity-100"
+                        className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-md flex items-center justify-center transition-all opacity-0 group-hover/additional-photos:opacity-100"
                         aria-label="Scroll left"
                       >
-                        <ChevronLeft className="w-6 h-6 text-gray-700" />
+                        <ChevronLeft className="w-6 h-6 text-slate-700" />
                       </button>
                     )}
 
@@ -1094,10 +1112,10 @@ export default function FacilitySidebar({
                     {showAdditionalRightArrow && (
                       <button
                         onClick={() => scrollAdditionalPhotos("right")}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-lg flex items-center justify-center transition-all opacity-0 group-hover/additional-photos:opacity-100"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-md flex items-center justify-center transition-all opacity-0 group-hover/additional-photos:opacity-100"
                         aria-label="Scroll right"
                       >
-                        <ChevronRight className="w-6 h-6 text-gray-700" />
+                        <ChevronRight className="w-6 h-6 text-slate-700" />
                       </button>
                     )}
 
@@ -1120,11 +1138,11 @@ export default function FacilitySidebar({
                               delay: 0.1 + Math.min(idx * 0.05, 0.5),
                             }}
                             onClick={() => openPhotoViewer(idx, "additional")}
-                            className="relative overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-all cursor-pointer flex-shrink-0 snap-start"
+                            className="relative overflow-hidden rounded-2xl shadow-sm hover:shadow-xl transition-all cursor-pointer flex-shrink-0 snap-start"
                             style={{ width: "280px", height: "180px" }}
                           >
                             {loadingImages[`additional-${idx}`] !== false && (
-                              <div className="absolute inset-0 bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200 animate-pulse" />
+                              <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />
                             )}
                             <img
                               src={getPhotoDataUrl(photoData)}
@@ -1157,7 +1175,7 @@ export default function FacilitySidebar({
             )}
 
           {/* Divider */}
-          <div className="border-t border-gray-200"></div>
+          <div className="border-t border-slate-200"></div>
 
           {/* Notes Section */}
           <motion.div
@@ -1166,7 +1184,7 @@ export default function FacilitySidebar({
             transition={{ delay: 0.08 }}
           >
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-medium text-gray-700 tracking-wide flex items-center gap-2">
+              <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
                 <StickyNote className="w-4 h-4" />
                 Notes ({notes.length})
               </h3>
@@ -1174,7 +1192,7 @@ export default function FacilitySidebar({
                 {!showAddNoteForm && (
                   <button
                     onClick={() => setShowAddNoteForm(true)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-lg transition-all"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-xl transition-all"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     Add Note
@@ -1183,7 +1201,7 @@ export default function FacilitySidebar({
                 {notes.length > 3 && (
                   <button
                     onClick={() => setShowAllNotes(!showAllNotes)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-lg transition-all"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-xl transition-all"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
                     {showAllNotes ? "Show Less" : "See All"}
@@ -1200,7 +1218,7 @@ export default function FacilitySidebar({
                     value={newNoteText}
                     onChange={(e) => setNewNoteText(e.target.value)}
                     placeholder="Add a note..."
-                    className="flex-1 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 border border-[#E8E9EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004aad] resize-none"
+                    className="flex-1 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 border border-[#E8E9EB] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#004aad] resize-none"
                     rows={2}
                     disabled={addingNote}
                     autoFocus
@@ -1212,7 +1230,7 @@ export default function FacilitySidebar({
                     whileTap={{ scale: 0.98 }}
                     onClick={handleAddNote}
                     disabled={!newNoteText.trim() || addingNote}
-                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-[#004aad] to-[#004aad]/90 hover:from-[#004aad]/90 hover:to-[#004aad]/80 text-white rounded-lg text-sm font-medium shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-[#004aad] to-[#004aad]/90 hover:from-[#004aad]/90 hover:to-[#004aad]/80 text-white rounded-xl text-sm font-medium shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Plus className="w-4 h-4" />
                     <span>{addingNote ? "Adding..." : "Add Note"}</span>
@@ -1225,7 +1243,7 @@ export default function FacilitySidebar({
                       setNewNoteText("");
                     }}
                     disabled={addingNote}
-                    className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Cancel
                   </motion.button>
@@ -1239,9 +1257,9 @@ export default function FacilitySidebar({
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#004aad] mx-auto"></div>
               </div>
             ) : notes.length === 0 ? (
-              <div className="text-center py-6 bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-xl border border-gray-100">
-                <StickyNote className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                <p className="text-sm text-gray-500">No notes yet</p>
+              <div className="text-center py-6 bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-2xl border border-slate-100">
+                <StickyNote className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                <p className="text-sm text-slate-500">No notes yet</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -1253,7 +1271,7 @@ export default function FacilitySidebar({
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.1 + idx * 0.05 }}
-                      className="bg-gradient-to-br from-white to-gray-50/50 rounded-xl p-3 shadow-sm border border-gray-100"
+                      className="bg-gradient-to-br from-white to-slate-50/50 rounded-2xl p-3 shadow-sm border border-slate-100"
                     >
                       {editingNoteId === note.id ? (
                         // Edit Mode
@@ -1261,7 +1279,7 @@ export default function FacilitySidebar({
                           <textarea
                             value={editNoteText}
                             onChange={(e) => setEditNoteText(e.target.value)}
-                            className="w-full px-3 py-2 text-sm text-gray-900 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                            className="w-full px-3 py-2 text-sm text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                             rows={3}
                           />
                           <div className="flex gap-2">
@@ -1269,7 +1287,7 @@ export default function FacilitySidebar({
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
                               onClick={() => handleSaveEdit(note.id)}
-                              className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-lg text-xs font-medium"
+                              className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-xl text-xs font-medium"
                             >
                               <Save className="w-3 h-3" />
                               Save
@@ -1278,7 +1296,7 @@ export default function FacilitySidebar({
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
                               onClick={handleCancelEdit}
-                              className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-xs font-medium"
+                              className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-medium"
                             >
                               <XIcon className="w-3 h-3" />
                               Cancel
@@ -1288,11 +1306,11 @@ export default function FacilitySidebar({
                       ) : (
                         // View Mode
                         <>
-                          <p className="text-sm text-gray-700 leading-relaxed mb-2">
+                          <p className="text-sm text-slate-700 leading-relaxed mb-2">
                             {note.note_text}
                           </p>
                           <div className="flex items-center justify-between">
-                            <span className="text-xs text-gray-500">
+                            <span className="text-xs text-slate-500">
                               {formatRelativeTime(note.created_at)}
                               {note.updated_at !== note.created_at &&
                                 " (edited)"}
@@ -1325,7 +1343,7 @@ export default function FacilitySidebar({
           </motion.div>
 
           {/* Divider */}
-          <div className="border-t border-gray-200"></div>
+          <div className="border-t border-slate-200"></div>
 
           {/* Tags Section */}
           <motion.div
@@ -1334,7 +1352,7 @@ export default function FacilitySidebar({
             transition={{ delay: 0.1 }}
           >
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-medium text-gray-700 tracking-wide flex items-center gap-2">
+              <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
                 <Tag className="w-4 h-4" />
                 Tags ({facilityTags.length})
               </h3>
@@ -1344,7 +1362,7 @@ export default function FacilitySidebar({
                     ref={tagDropdownButtonRef}
                     onClick={() => setShowTagDropdown(!showTagDropdown)}
                     disabled={assigningTag}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     aria-expanded={showTagDropdown}
                   >
                     <Plus className="w-3.5 h-3.5" />
@@ -1355,7 +1373,7 @@ export default function FacilitySidebar({
                   {showTagDropdown && (
                     <div
                       ref={tagDropdownRef}
-                      className="absolute top-full right-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 z-50 max-h-64 overflow-y-auto"
+                      className="absolute top-full right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-slate-200 z-50 max-h-64 overflow-y-auto"
                       role="menu"
                     >
                       {loadingTags ? (
@@ -1363,7 +1381,7 @@ export default function FacilitySidebar({
                           <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#004aad] mx-auto"></div>
                         </div>
                       ) : allTags.length === 0 ? (
-                        <div className="p-4 text-sm text-gray-500 text-center">
+                        <div className="p-4 text-sm text-slate-500 text-center">
                           No tags available. Use "Manage Tags" to create one!
                         </div>
                       ) : (
@@ -1371,16 +1389,14 @@ export default function FacilitySidebar({
                           {allTags
                             .filter(
                               (tag) =>
-                                !facilityTags.some(
-                                  (ft) => ft.id === tag.id,
-                                ),
+                                !facilityTags.some((ft) => ft.id === tag.id),
                             )
                             .map((tag) => (
                               <button
                                 key={tag.id}
                                 onClick={() => handleAssignTag(tag.id)}
                                 disabled={assigningTag}
-                                className="w-full flex items-center gap-2 px-3 py-2 text-left rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full flex items-center gap-2 px-3 py-2 text-left rounded-xl hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 role="menuitem"
                               >
                                 <div
@@ -1388,11 +1404,11 @@ export default function FacilitySidebar({
                                   style={{ backgroundColor: tag.color }}
                                 />
                                 <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-medium text-gray-900 truncate">
+                                  <p className="text-sm font-medium text-slate-900 truncate">
                                     {tag.name}
                                   </p>
                                   {tag.description && (
-                                    <p className="text-xs text-gray-500 truncate">
+                                    <p className="text-xs text-slate-500 truncate">
                                       {tag.description}
                                     </p>
                                   )}
@@ -1401,11 +1417,9 @@ export default function FacilitySidebar({
                             ))}
                           {allTags.filter(
                             (tag) =>
-                              !facilityTags.some(
-                                (ft) => ft.id === tag.id,
-                              ),
+                              !facilityTags.some((ft) => ft.id === tag.id),
                           ).length === 0 && (
-                            <div className="p-4 text-sm text-gray-500 text-center">
+                            <div className="p-4 text-sm text-slate-500 text-center">
                               All tags already assigned
                             </div>
                           )}
@@ -1416,7 +1430,7 @@ export default function FacilitySidebar({
                 </div>
                 <button
                   onClick={() => setIsTagManagementModalOpen(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-gray-900 hover:bg-gray-800 rounded-lg transition-all"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-slate-900 hover:bg-slate-800 rounded-xl transition-all"
                 >
                   Manage Tags
                 </button>
@@ -1432,7 +1446,7 @@ export default function FacilitySidebar({
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.1 + idx * 0.05 }}
-                    className="group relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium text-white shadow-sm hover:shadow-md transition-all"
+                    className="group relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium text-white shadow-sm hover:shadow-sm transition-all"
                     style={{ backgroundColor: tag.color }}
                   >
                     <Tag className="w-3.5 h-3.5" />
@@ -1448,15 +1462,15 @@ export default function FacilitySidebar({
                 ))}
               </div>
             ) : (
-              <div className="text-center py-4 bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-xl border border-gray-100 mb-3">
-                <Tag className="w-6 h-6 text-gray-400 mx-auto mb-2" />
-                <p className="text-xs text-gray-500">No tags assigned</p>
+              <div className="text-center py-4 bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-2xl border border-slate-100 mb-3">
+                <Tag className="w-6 h-6 text-slate-400 mx-auto mb-2" />
+                <p className="text-xs text-slate-500">No tags assigned</p>
               </div>
             )}
           </motion.div>
 
           {/* Divider */}
-          <div className="border-t border-gray-200"></div>
+          <div className="border-t border-slate-200"></div>
 
           {/* Facility Types */}
           <motion.div
@@ -1464,7 +1478,7 @@ export default function FacilitySidebar({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.12 }}
           >
-            <h3 className="text-sm font-medium text-gray-700 mb-3 tracking-wide">
+            <h3 className="text-sm font-medium text-slate-700 mb-3 tracking-wide">
               Facility Types
             </h3>
             <div className="flex flex-wrap gap-2">
@@ -1499,7 +1513,7 @@ export default function FacilitySidebar({
           </motion.div>
 
           {/* Divider */}
-          <div className="border-t border-gray-200"></div>
+          <div className="border-t border-slate-200"></div>
 
           {/* Identified Sports with Confidence Scores */}
           {displayFacility.identified_sports &&
@@ -1509,9 +1523,9 @@ export default function FacilitySidebar({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.15 }}
               >
-                <h3 className="text-sm font-medium text-gray-700 mb-3 tracking-wide flex items-center gap-2">
+                <h3 className="text-sm font-medium text-slate-700 mb-3 tracking-wide flex items-center gap-2">
                   Sports Scraped
-                  <span className="text-xs font-normal text-gray-500">
+                  <span className="text-xs font-normal text-slate-500">
                     (with confidence scores)
                   </span>
                 </h3>
@@ -1522,8 +1536,8 @@ export default function FacilitySidebar({
                     const confidence = metadata?.confidence || "unknown";
 
                     // Color coding based on confidence
-                    let textColor = "text-gray-700";
-                    let borderColor = "border-gray-300";
+                    let textColor = "text-slate-700";
+                    let borderColor = "border-slate-300";
 
                     if (confidence === "high") {
                       textColor = "text-green-700";
@@ -1574,7 +1588,7 @@ export default function FacilitySidebar({
                               <span className="text-xs opacity-75">
                                 {confidenceIcon}
                               </span>
-                              <span className="px-1.5 py-0.5 rounded text-xs font-bold bg-gray-100">
+                              <span className="px-1.5 py-0.5 rounded text-xs font-bold bg-slate-100">
                                 {score}
                               </span>
                             </>
@@ -1585,17 +1599,17 @@ export default function FacilitySidebar({
 
                         {/* Tooltip on hover - appears below badge */}
                         <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 hidden group-hover:block z-[100] pointer-events-none">
-                          <div className="bg-gray-900 text-white text-xs rounded-lg py-2 px-3 shadow-xl max-w-xs whitespace-pre-wrap">
+                          <div className="bg-slate-900 text-white text-xs rounded-xl py-2 px-3 shadow-xl max-w-xs whitespace-pre-wrap">
                             {/* Arrow pointing up */}
                             <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-[-1px]">
-                              <div className="border-8 border-transparent border-b-gray-900"></div>
+                              <div className="border-8 border-transparent border-b-slate-900"></div>
                             </div>
                             {metadata ? (
                               <>
                                 <div className="font-semibold mb-1">
                                   Confidence: {score}/100 ({confidence})
                                 </div>
-                                <div className="text-gray-300">
+                                <div className="text-slate-300">
                                   <div>
                                     <strong>Sources:</strong>{" "}
                                     {metadata.sources.join(", ") || "unknown"}
@@ -1605,7 +1619,7 @@ export default function FacilitySidebar({
                                     {metadata.keywords_matched.join(", ")}
                                   </div>
                                   {metadata.matched_text && (
-                                    <div className="mt-1 italic border-t border-gray-700 pt-1">
+                                    <div className="mt-1 italic border-t border-slate-700 pt-1">
                                       "{metadata.matched_text.substring(0, 100)}
                                       {metadata.matched_text.length > 100
                                         ? "..."
@@ -1630,7 +1644,7 @@ export default function FacilitySidebar({
             )}
 
           {/* Divider */}
-          <div className="border-t border-gray-200"></div>
+          <div className="border-t border-slate-200"></div>
 
           {/* Contact Information */}
           <motion.div
@@ -1639,14 +1653,14 @@ export default function FacilitySidebar({
             transition={{ delay: 0.18 }}
             className="space-y-4"
           >
-            <h3 className="text-sm font-medium text-gray-700 tracking-wide">
+            <h3 className="text-sm font-medium text-slate-700 tracking-wide">
               Contact Information
             </h3>
 
             <div className="space-y-3">
-              <div className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+              <div className="flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors">
                 <MapPin className="w-5 h-5 text-[#004aad] flex-shrink-0 mt-0.5" />
-                <p className="text-gray-700 text-sm leading-relaxed">
+                <p className="text-slate-700 text-sm leading-relaxed">
                   {displayFacility.address}
                 </p>
               </div>
@@ -1656,7 +1670,7 @@ export default function FacilitySidebar({
                   href={`tel:${displayFacility.phone}`}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-[#004aad]/5 transition-colors group"
+                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-[#004aad]/5 transition-colors group"
                 >
                   <Phone className="w-5 h-5 text-[#004aad] group-hover:text-[#004aad]/80 transition-colors" />
                   <span className="text-[#004aad] group-hover:text-[#004aad]/80 font-medium text-sm">
@@ -1672,7 +1686,7 @@ export default function FacilitySidebar({
                   rel="noopener noreferrer"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-[#004aad]/5 transition-colors group"
+                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-[#004aad]/5 transition-colors group"
                 >
                   <Globe className="w-5 h-5 text-[#004aad] group-hover:text-[#004aad]/80 transition-colors flex-shrink-0" />
                   <span className="text-[#004aad] group-hover:text-[#004aad]/80 font-medium text-sm truncate">
@@ -1684,34 +1698,34 @@ export default function FacilitySidebar({
           </motion.div>
 
           {/* Divider */}
-          <div className="border-t border-gray-200"></div>
+          <div className="border-t border-slate-200"></div>
 
           {/* Reviews */}
           {isLoadingDetails ? (
             <div className="space-y-4">
-              <h3 className="text-sm font-medium text-gray-700 tracking-wide">
+              <h3 className="text-sm font-medium text-slate-700 tracking-wide">
                 Reviews
               </h3>
               {/* Loading skeleton */}
               {[1, 2].map((i) => (
                 <div
                   key={i}
-                  className="bg-gradient-to-br from-gray-100 to-gray-50 rounded-xl p-4 animate-pulse"
+                  className="bg-gradient-to-br from-slate-100 to-slate-50 rounded-2xl p-4 animate-pulse"
                 >
                   <div className="flex items-center justify-between mb-3">
-                    <div className="h-4 w-24 bg-gray-300 rounded"></div>
+                    <div className="h-4 w-24 bg-slate-300 rounded"></div>
                     <div className="flex gap-0.5">
                       {[1, 2, 3, 4, 5].map((j) => (
                         <div
                           key={j}
-                          className="w-4 h-4 bg-gray-300 rounded"
+                          className="w-4 h-4 bg-slate-300 rounded"
                         ></div>
                       ))}
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <div className="h-3 bg-gray-300 rounded w-full"></div>
-                    <div className="h-3 bg-gray-300 rounded w-5/6"></div>
+                    <div className="h-3 bg-slate-300 rounded w-full"></div>
+                    <div className="h-3 bg-slate-300 rounded w-5/6"></div>
                   </div>
                 </div>
               ))}
@@ -1723,12 +1737,12 @@ export default function FacilitySidebar({
               transition={{ delay: 0.2 }}
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-medium text-gray-700 tracking-wide">
+                <h3 className="text-sm font-medium text-slate-700 tracking-wide">
                   Reviews ({displayFacility.reviews.length})
                 </h3>
                 <button
                   onClick={() => setIsReviewsModalOpen(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-lg transition-all"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-xl transition-all"
                 >
                   <Maximize2 className="w-3.5 h-3.5" />
                   Expand
@@ -1742,20 +1756,20 @@ export default function FacilitySidebar({
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 + idx * 0.05 }}
                     whileHover={{ scale: 1.01 }}
-                    className="bg-gradient-to-br from-white to-gray-50/50 rounded-xl p-4 shadow-sm hover:shadow-md transition-all border border-gray-100"
+                    className="bg-gradient-to-br from-white to-slate-50/50 rounded-2xl p-4 shadow-sm hover:shadow-sm transition-all border border-slate-100"
                   >
                     <div className="flex items-center justify-between mb-3">
-                      <span className="font-semibold text-gray-900 text-sm">
+                      <span className="font-semibold text-slate-900 text-sm">
                         {review.author_name}
                       </span>
                       <div className="flex gap-0.5">
                         {renderStars(review.rating)}
                       </div>
                     </div>
-                    <p className="text-sm text-gray-700 leading-relaxed mb-2">
+                    <p className="text-sm text-slate-700 leading-relaxed mb-2">
                       {review.text}
                     </p>
-                    <span className="text-xs text-gray-500 font-medium">
+                    <span className="text-xs text-slate-500 font-medium">
                       {review.relative_time_description}
                     </span>
                   </motion.div>
@@ -1764,8 +1778,8 @@ export default function FacilitySidebar({
             </motion.div>
           ) : (
             <div className="text-center py-12">
-              <MessageSquare className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-              <p className="text-sm text-gray-500">No reviews available</p>
+              <MessageSquare className="w-12 h-12 text-slate-400 mx-auto mb-3" />
+              <p className="text-sm text-slate-500">No reviews available</p>
             </div>
           )}
 
@@ -1775,7 +1789,7 @@ export default function FacilitySidebar({
             displayFacility.additional_reviews.length > 0 && (
               <>
                 {/* Divider */}
-                <div className="border-t border-gray-200"></div>
+                <div className="border-t border-slate-200"></div>
 
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -1783,16 +1797,16 @@ export default function FacilitySidebar({
                   transition={{ delay: 0.21 }}
                 >
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-sm font-medium text-gray-700 tracking-wide flex items-center gap-2">
+                    <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
                       Additional Reviews (
                       {displayFacility.additional_reviews.length})
-                      <span className="text-xs font-normal text-gray-500">
+                      <span className="text-xs font-normal text-slate-500">
                         from SerpAPI
                       </span>
                     </h3>
                     <button
                       onClick={() => setIsAdditionalReviewsModalOpen(true)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-lg transition-all"
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-xl transition-all"
                     >
                       <Maximize2 className="w-3.5 h-3.5" />
                       Expand
@@ -1807,82 +1821,84 @@ export default function FacilitySidebar({
                           : 10,
                       )
                       .map((review, idx) => {
-                      const authorName =
-                        review.user?.name || review.author_name || "Anonymous";
-                      const reviewText = review.snippet || review.text || "";
-                      const timeDescription =
-                        review.date || review.relative_time_description || "";
+                        const authorName =
+                          review.user?.name ||
+                          review.author_name ||
+                          "Anonymous";
+                        const reviewText = review.snippet || review.text || "";
+                        const timeDescription =
+                          review.date || review.relative_time_description || "";
 
-                      return (
-                        <motion.div
-                          key={idx}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.1 + idx * 0.05 }}
-                          whileHover={{ scale: 1.01 }}
-                          className="bg-gradient-to-br from-white to-gray-50/50 rounded-xl p-4 shadow-sm hover:shadow-md transition-all border border-gray-100"
-                        >
-                          <div className="flex items-start justify-between mb-3">
-                            <div className="flex items-center gap-2">
-                              {review.user?.thumbnail && (
-                                <img
-                                  src={review.user.thumbnail}
-                                  alt={authorName}
-                                  className="w-8 h-8 rounded-full object-cover"
-                                />
-                              )}
-                              <div>
-                                <div className="flex items-center gap-2">
-                                  <span className="font-semibold text-gray-900 text-sm">
-                                    {authorName}
-                                  </span>
-                                  {review.user?.local_guide && (
-                                    <span className="text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">
-                                      Local Guide
+                        return (
+                          <motion.div
+                            key={idx}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.1 + idx * 0.05 }}
+                            whileHover={{ scale: 1.01 }}
+                            className="bg-gradient-to-br from-white to-slate-50/50 rounded-2xl p-4 shadow-sm hover:shadow-sm transition-all border border-slate-100"
+                          >
+                            <div className="flex items-start justify-between mb-3">
+                              <div className="flex items-center gap-2">
+                                {review.user?.thumbnail && (
+                                  <img
+                                    src={review.user.thumbnail}
+                                    alt={authorName}
+                                    className="w-8 h-8 rounded-full object-cover"
+                                  />
+                                )}
+                                <div>
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-semibold text-slate-900 text-sm">
+                                      {authorName}
                                     </span>
-                                  )}
+                                    {review.user?.local_guide && (
+                                      <span className="text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">
+                                        Local Guide
+                                      </span>
+                                    )}
+                                  </div>
+                                  {review.user &&
+                                    (review.user.reviews ||
+                                      review.user.photos) && (
+                                      <span className="text-xs text-slate-500">
+                                        {review.user.reviews &&
+                                          `${review.user.reviews} reviews`}
+                                        {review.user.reviews &&
+                                          review.user.photos &&
+                                          " • "}
+                                        {review.user.photos &&
+                                          `${review.user.photos} photos`}
+                                      </span>
+                                    )}
                                 </div>
-                                {review.user &&
-                                  (review.user.reviews ||
-                                    review.user.photos) && (
-                                    <span className="text-xs text-gray-500">
-                                      {review.user.reviews &&
-                                        `${review.user.reviews} reviews`}
-                                      {review.user.reviews &&
-                                        review.user.photos &&
-                                        " • "}
-                                      {review.user.photos &&
-                                        `${review.user.photos} photos`}
-                                    </span>
-                                  )}
+                              </div>
+                              <div className="flex gap-0.5">
+                                {renderStars(review.rating)}
                               </div>
                             </div>
-                            <div className="flex gap-0.5">
-                              {renderStars(review.rating)}
+                            <p className="text-sm text-slate-700 leading-relaxed mb-2">
+                              {reviewText}
+                            </p>
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs text-slate-500 font-medium">
+                                {timeDescription}
+                              </span>
+                              {review.link && (
+                                <a
+                                  href={review.link}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center gap-1 text-xs text-[#004aad] hover:text-[#004aad]/80 font-medium transition-colors"
+                                >
+                                  <ExternalLink className="w-3 h-3" />
+                                  View Full
+                                </a>
+                              )}
                             </div>
-                          </div>
-                          <p className="text-sm text-gray-700 leading-relaxed mb-2">
-                            {reviewText}
-                          </p>
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs text-gray-500 font-medium">
-                              {timeDescription}
-                            </span>
-                            {review.link && (
-                              <a
-                                href={review.link}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-1 text-xs text-[#004aad] hover:text-[#004aad]/80 font-medium transition-colors"
-                              >
-                                <ExternalLink className="w-3 h-3" />
-                                View Full
-                              </a>
-                            )}
-                          </div>
-                        </motion.div>
-                      );
-                    })}
+                          </motion.div>
+                        );
+                      })}
                   </div>
                   {displayFacility.additional_reviews.length > 10 && (
                     <motion.button
@@ -1892,7 +1908,7 @@ export default function FacilitySidebar({
                       onClick={() =>
                         setShowAllAdditionalReviews(!showAllAdditionalReviews)
                       }
-                      className="w-full mt-4 py-3 text-sm font-medium text-[#004aad] hover:bg-gray-50 rounded-lg transition-colors border border-gray-200 hover:border-[#004aad]"
+                      className="w-full mt-4 py-3 text-sm font-medium text-[#004aad] hover:bg-slate-50 rounded-xl transition-colors border border-slate-200 hover:border-[#004aad]"
                     >
                       {showAllAdditionalReviews
                         ? "Show Less"
@@ -1904,7 +1920,7 @@ export default function FacilitySidebar({
             )}
 
           {/* Divider */}
-          <div className="border-t border-gray-200"></div>
+          <div className="border-t border-slate-200"></div>
 
           {/* Opening Hours */}
           {displayFacility.opening_hours && (
@@ -1912,10 +1928,10 @@ export default function FacilitySidebar({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.22 }}
-              className="bg-gradient-to-br from-[#E8E9EB]/30 to-[#E8E9EB]/50 rounded-xl p-4 shadow-sm"
+              className="bg-gradient-to-br from-[#E8E9EB]/30 to-[#E8E9EB]/50 rounded-2xl p-4 shadow-sm"
             >
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-medium text-gray-700 tracking-wide flex items-center gap-2">
+                <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
                   <Clock className="w-4 h-4" />
                   Hours
                 </h3>
@@ -1942,7 +1958,7 @@ export default function FacilitySidebar({
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.25 + idx * 0.03 }}
-                        className="text-sm text-gray-700 font-medium"
+                        className="text-sm text-slate-700 font-medium"
                       >
                         {day}
                       </motion.li>
@@ -1973,15 +1989,15 @@ export default function FacilitySidebar({
                 onClick={(e) => e.stopPropagation()}
               >
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-white to-gray-50">
-                  <h2 className="text-xl font-medium text-gray-900">
+                <div className="flex items-center justify-between p-6 border-b border-slate-200 bg-gradient-to-r from-white to-slate-50">
+                  <h2 className="text-xl font-medium text-slate-900">
                     Photos ({facility?.photo_references?.length || 0})
                   </h2>
                   <button
                     onClick={() => setIsPhotosModalOpen(false)}
-                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                    className="p-2 hover:bg-slate-100 rounded-full transition-colors"
                   >
-                    <X className="w-5 h-5 text-gray-600" />
+                    <X className="w-5 h-5 text-slate-600" />
                   </button>
                 </div>
 
@@ -1995,10 +2011,10 @@ export default function FacilitySidebar({
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: idx * 0.03 }}
                         onClick={() => openPhotoViewer(idx)}
-                        className="relative overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-all cursor-pointer aspect-square group"
+                        className="relative overflow-hidden rounded-2xl shadow-sm hover:shadow-xl transition-all cursor-pointer aspect-square group"
                       >
                         {loadingImages[idx] !== false && (
-                          <div className="absolute inset-0 bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200 animate-pulse" />
+                          <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />
                         )}
                         <img
                           src={getPhotoUrl(photoRef)}
@@ -2042,19 +2058,19 @@ export default function FacilitySidebar({
                 onClick={(e) => e.stopPropagation()}
               >
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-white to-gray-50">
+                <div className="flex items-center justify-between p-6 border-b border-slate-200 bg-gradient-to-r from-white to-slate-50">
                   <div>
-                    <h2 className="text-xl font-medium text-gray-900">
+                    <h2 className="text-xl font-medium text-slate-900">
                       Additional Photos (
                       {displayFacility.additional_photos?.length || 0})
                     </h2>
-                    <p className="text-sm text-gray-500 mt-1">from SerpAPI</p>
+                    <p className="text-sm text-slate-500 mt-1">from SerpAPI</p>
                   </div>
                   <button
                     onClick={() => setIsAdditionalPhotosModalOpen(false)}
-                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                    className="p-2 hover:bg-slate-100 rounded-full transition-colors"
                   >
-                    <X className="w-5 h-5 text-gray-600" />
+                    <X className="w-5 h-5 text-slate-600" />
                   </button>
                 </div>
 
@@ -2069,10 +2085,10 @@ export default function FacilitySidebar({
                           animate={{ opacity: 1, scale: 1 }}
                           transition={{ delay: idx * 0.03 }}
                           onClick={() => openPhotoViewer(idx, "additional")}
-                          className="relative overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-all cursor-pointer aspect-square group"
+                          className="relative overflow-hidden rounded-2xl shadow-sm hover:shadow-xl transition-all cursor-pointer aspect-square group"
                         >
                           {loadingImages[`additional-${idx}`] !== false && (
-                            <div className="absolute inset-0 bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200 animate-pulse" />
+                            <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />
                           )}
                           <img
                             src={getPhotoDataUrl(photoData)}
@@ -2124,15 +2140,15 @@ export default function FacilitySidebar({
                 onClick={(e) => e.stopPropagation()}
               >
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-white to-gray-50">
-                  <h2 className="text-xl font-medium text-gray-900">
+                <div className="flex items-center justify-between p-6 border-b border-slate-200 bg-gradient-to-r from-white to-slate-50">
+                  <h2 className="text-xl font-medium text-slate-900">
                     Reviews ({displayFacility?.reviews?.length || 0})
                   </h2>
                   <button
                     onClick={() => setIsReviewsModalOpen(false)}
-                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                    className="p-2 hover:bg-slate-100 rounded-full transition-colors"
                   >
-                    <X className="w-5 h-5 text-gray-600" />
+                    <X className="w-5 h-5 text-slate-600" />
                   </button>
                 </div>
 
@@ -2145,20 +2161,20 @@ export default function FacilitySidebar({
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: idx * 0.05 }}
-                        className="bg-gradient-to-br from-white to-gray-50/50 rounded-xl p-5 shadow-sm hover:shadow-md transition-all border border-gray-100"
+                        className="bg-gradient-to-br from-white to-slate-50/50 rounded-2xl p-5 shadow-sm hover:shadow-sm transition-all border border-slate-100"
                       >
                         <div className="flex items-center justify-between mb-3">
-                          <span className="font-semibold text-gray-900 text-base">
+                          <span className="font-semibold text-slate-900 text-base">
                             {review.author_name}
                           </span>
                           <div className="flex gap-0.5">
                             {renderStars(review.rating)}
                           </div>
                         </div>
-                        <p className="text-sm text-gray-700 leading-relaxed mb-3">
+                        <p className="text-sm text-slate-700 leading-relaxed mb-3">
                           {review.text}
                         </p>
-                        <span className="text-xs text-gray-500 font-medium">
+                        <span className="text-xs text-slate-500 font-medium">
                           {review.relative_time_description}
                         </span>
                       </motion.div>
@@ -2190,19 +2206,19 @@ export default function FacilitySidebar({
                 onClick={(e) => e.stopPropagation()}
               >
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-white to-gray-50">
+                <div className="flex items-center justify-between p-6 border-b border-slate-200 bg-gradient-to-r from-white to-slate-50">
                   <div>
-                    <h2 className="text-xl font-medium text-gray-900">
+                    <h2 className="text-xl font-medium text-slate-900">
                       Additional Reviews (
                       {displayFacility.additional_reviews?.length || 0})
                     </h2>
-                    <p className="text-sm text-gray-500 mt-1">from SerpAPI</p>
+                    <p className="text-sm text-slate-500 mt-1">from SerpAPI</p>
                   </div>
                   <button
                     onClick={() => setIsAdditionalReviewsModalOpen(false)}
-                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                    className="p-2 hover:bg-slate-100 rounded-full transition-colors"
                   >
-                    <X className="w-5 h-5 text-gray-600" />
+                    <X className="w-5 h-5 text-slate-600" />
                   </button>
                 </div>
 
@@ -2222,7 +2238,7 @@ export default function FacilitySidebar({
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: idx * 0.05 }}
-                          className="bg-gradient-to-br from-white to-gray-50/50 rounded-xl p-5 shadow-sm hover:shadow-md transition-all border border-gray-100"
+                          className="bg-gradient-to-br from-white to-slate-50/50 rounded-2xl p-5 shadow-sm hover:shadow-sm transition-all border border-slate-100"
                         >
                           <div className="flex items-start justify-between mb-3">
                             <div className="flex items-center gap-3">
@@ -2235,7 +2251,7 @@ export default function FacilitySidebar({
                               )}
                               <div>
                                 <div className="flex items-center gap-2">
-                                  <span className="font-semibold text-gray-900 text-base">
+                                  <span className="font-semibold text-slate-900 text-base">
                                     {authorName}
                                   </span>
                                   {review.user?.local_guide && (
@@ -2247,7 +2263,7 @@ export default function FacilitySidebar({
                                 {review.user &&
                                   (review.user.reviews ||
                                     review.user.photos) && (
-                                    <span className="text-xs text-gray-500">
+                                    <span className="text-xs text-slate-500">
                                       {review.user.reviews &&
                                         `${review.user.reviews} reviews`}
                                       {review.user.reviews &&
@@ -2263,11 +2279,11 @@ export default function FacilitySidebar({
                               {renderStars(review.rating)}
                             </div>
                           </div>
-                          <p className="text-sm text-gray-700 leading-relaxed mb-3">
+                          <p className="text-sm text-slate-700 leading-relaxed mb-3">
                             {reviewText}
                           </p>
                           <div className="flex items-center justify-between">
-                            <span className="text-xs text-gray-500 font-medium">
+                            <span className="text-xs text-slate-500 font-medium">
                               {timeDescription}
                             </span>
                             {review.link && (
@@ -2294,7 +2310,8 @@ export default function FacilitySidebar({
 
         {/* Photo Lightbox Viewer */}
         {isPhotoViewerOpen &&
-          ((photoViewerSource === "regular" && displayFacility.photo_references) ||
+          ((photoViewerSource === "regular" &&
+            displayFacility.photo_references) ||
             (photoViewerSource === "additional" &&
               displayFacility.additional_photos)) &&
           createPortal(
@@ -2382,7 +2399,7 @@ export default function FacilitySidebar({
                               )
                         }
                         alt={`${displayFacility.name} photo ${selectedPhotoIndex + 1}`}
-                        className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
+                        className="max-w-full max-h-[90vh] object-contain rounded-xl shadow-2xl"
                         referrerPolicy="no-referrer"
                       />
                     </motion.div>
@@ -2421,9 +2438,9 @@ export default function FacilitySidebar({
 
                     // Color scheme based on confidence
                     let accentColor = "gray";
-                    let bgGradient = "from-gray-50 to-gray-100";
-                    let textColor = "text-gray-700";
-                    let iconColor = "text-gray-600";
+                    let bgGradient = "from-slate-50 to-slate-100";
+                    let textColor = "text-slate-700";
+                    let iconColor = "text-slate-600";
 
                     if (confidence === "high") {
                       accentColor = "green";
@@ -2453,7 +2470,7 @@ export default function FacilitySidebar({
                                 ? "border-yellow-200"
                                 : confidence === "low"
                                   ? "border-red-200"
-                                  : "border-gray-200"
+                                  : "border-slate-200"
                           }`}
                         >
                           <div className="flex items-start justify-between">
@@ -2467,7 +2484,7 @@ export default function FacilitySidebar({
                                 >
                                   {sport}
                                 </h3>
-                                <p className="text-sm text-gray-600 mt-1">
+                                <p className="text-sm text-slate-600 mt-1">
                                   Confidence Analysis
                                 </p>
                               </div>
@@ -2476,7 +2493,7 @@ export default function FacilitySidebar({
                               onClick={() => setSelectedSportDetail(null)}
                               className="p-2 hover:bg-white/50 rounded-full transition-colors"
                             >
-                              <X className="w-5 h-5 text-gray-600" />
+                              <X className="w-5 h-5 text-slate-600" />
                             </button>
                           </div>
 
@@ -2489,7 +2506,7 @@ export default function FacilitySidebar({
                                 >
                                   {score}
                                 </span>
-                                <span className="text-gray-500 text-sm">
+                                <span className="text-slate-500 text-sm">
                                   /100
                                 </span>
                               </div>
@@ -2502,24 +2519,24 @@ export default function FacilitySidebar({
                                         ? "bg-yellow-500"
                                         : confidence === "low"
                                           ? "bg-red-500"
-                                          : "bg-gray-500"
+                                          : "bg-slate-500"
                                   }`}
                                   style={{ width: `${score}%` }}
                                 />
                               </div>
                             </div>
                             <div
-                              className={`px-4 py-2 bg-white rounded-lg border-2 ${
+                              className={`px-4 py-2 bg-white rounded-xl border-2 ${
                                 confidence === "high"
                                   ? "border-green-300"
                                   : confidence === "medium"
                                     ? "border-yellow-300"
                                     : confidence === "low"
                                       ? "border-red-300"
-                                      : "border-gray-300"
+                                      : "border-slate-300"
                               }`}
                             >
-                              <div className="text-xs text-gray-500 uppercase">
+                              <div className="text-xs text-slate-500 uppercase">
                                 Confidence
                               </div>
                               <div
@@ -2535,7 +2552,7 @@ export default function FacilitySidebar({
                         <div className="p-6 space-y-4 overflow-y-auto max-h-[50vh]">
                           {/* Sources */}
                           <div>
-                            <h4 className="text-sm font-medium text-gray-700 uppercase tracking-wide mb-2">
+                            <h4 className="text-sm font-medium text-slate-700 uppercase tracking-wide mb-2">
                               Identified From
                             </h4>
                             <div className="flex flex-wrap gap-2">
@@ -2548,7 +2565,7 @@ export default function FacilitySidebar({
                                 return (
                                   <span
                                     key={source}
-                                    className="px-3 py-1.5 bg-[#004aad]/5 text-[#004aad] rounded-lg text-sm font-medium border border-[#004aad]/20"
+                                    className="px-3 py-1.5 bg-[#004aad]/5 text-[#004aad] rounded-xl text-sm font-medium border border-[#004aad]/20"
                                   >
                                     {sourceLabels[source] || source}
                                   </span>
@@ -2559,7 +2576,7 @@ export default function FacilitySidebar({
 
                           {/* Keywords */}
                           <div>
-                            <h4 className="text-sm font-medium text-gray-700 uppercase tracking-wide mb-2">
+                            <h4 className="text-sm font-medium text-slate-700 uppercase tracking-wide mb-2">
                               Matched Keywords
                             </h4>
                             <div className="flex flex-wrap gap-2">
@@ -2577,11 +2594,11 @@ export default function FacilitySidebar({
                           {/* Matched Text */}
                           {metadata.matched_text && (
                             <div>
-                              <h4 className="text-sm font-medium text-gray-700 uppercase tracking-wide mb-2">
+                              <h4 className="text-sm font-medium text-slate-700 uppercase tracking-wide mb-2">
                                 Text Evidence
                               </h4>
-                              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                                <p className="text-sm text-gray-700 italic leading-relaxed">
+                              <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                                <p className="text-sm text-slate-700 italic leading-relaxed">
                                   "{metadata.matched_text}"
                                 </p>
                               </div>
@@ -2590,17 +2607,17 @@ export default function FacilitySidebar({
 
                           {/* Recommendation */}
                           <div
-                            className={`border-2 rounded-lg p-4 ${
+                            className={`border-2 rounded-xl p-4 ${
                               confidence === "high"
                                 ? "border-green-200 bg-green-50/50"
                                 : confidence === "medium"
                                   ? "border-yellow-200 bg-yellow-50/50"
                                   : confidence === "low"
                                     ? "border-red-200 bg-red-50/50"
-                                    : "border-gray-200 bg-gray-50/50"
+                                    : "border-slate-200 bg-slate-50/50"
                             }`}
                           >
-                            <h4 className="text-sm font-medium text-gray-700 uppercase tracking-wide mb-2 flex items-center gap-2">
+                            <h4 className="text-sm font-medium text-slate-700 uppercase tracking-wide mb-2 flex items-center gap-2">
                               <span>💡</span>
                               Recommendation
                             </h4>
@@ -2634,10 +2651,10 @@ export default function FacilitySidebar({
                         </div>
 
                         {/* Footer */}
-                        <div className="border-t border-gray-200 p-4 bg-gray-50">
+                        <div className="border-t border-slate-200 p-4 bg-slate-50">
                           <button
                             onClick={() => setSelectedSportDetail(null)}
-                            className="w-full py-2.5 px-4 bg-gradient-to-r from-[#004aad] to-[#004aad]/90 hover:from-[#004aad]/90 hover:to-[#004aad]/80 text-white rounded-lg font-medium shadow-sm transition-all"
+                            className="w-full py-2.5 px-4 bg-gradient-to-r from-[#004aad] to-[#004aad]/90 hover:from-[#004aad]/90 hover:to-[#004aad]/80 text-white rounded-xl font-medium shadow-sm transition-all"
                           >
                             Close
                           </button>
@@ -2670,23 +2687,23 @@ export default function FacilitySidebar({
                 onClick={(e) => e.stopPropagation()}
               >
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-white to-gray-50">
-                  <h2 className="text-xl font-medium text-gray-900">
+                <div className="flex items-center justify-between p-6 border-b border-slate-200 bg-gradient-to-r from-white to-slate-50">
+                  <h2 className="text-xl font-medium text-slate-900">
                     Manage Tags
                   </h2>
                   <button
                     onClick={() => setIsTagManagementModalOpen(false)}
-                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                    className="p-2 hover:bg-slate-100 rounded-full transition-colors"
                   >
-                    <X className="w-5 h-5 text-gray-600" />
+                    <X className="w-5 h-5 text-slate-600" />
                   </button>
                 </div>
 
                 {/* Modal Body */}
                 <div className="p-6 overflow-y-auto max-h-[calc(85vh-80px)]">
                   {/* Create New Tag Form */}
-                  <div className="mb-6 p-4 bg-gradient-to-br from-[#004aad]/5 to-[#004aad]/10 rounded-xl border border-[#004aad]/20">
-                    <h5 className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-3">
+                  <div className="mb-6 p-4 bg-gradient-to-br from-[#004aad]/5 to-[#004aad]/10 rounded-2xl border border-[#004aad]/20">
+                    <h5 className="text-xs font-medium text-slate-600 uppercase tracking-wide mb-3">
                       Create New Tag
                     </h5>
                     <div className="space-y-3">
@@ -2695,7 +2712,7 @@ export default function FacilitySidebar({
                         value={newTagName}
                         onChange={(e) => setNewTagName(e.target.value)}
                         placeholder="Tag name"
-                        className="w-full px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004aad]"
+                        className="w-full px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#004aad]"
                         disabled={creatingTag}
                       />
                       <input
@@ -2703,11 +2720,11 @@ export default function FacilitySidebar({
                         value={newTagDescription}
                         onChange={(e) => setNewTagDescription(e.target.value)}
                         placeholder="Description (optional)"
-                        className="w-full px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004aad]"
+                        className="w-full px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#004aad]"
                         disabled={creatingTag}
                       />
                       <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-2">
+                        <label className="block text-xs font-medium text-slate-600 mb-2">
                           Color
                         </label>
                         <div className="flex flex-wrap gap-2">
@@ -2717,7 +2734,7 @@ export default function FacilitySidebar({
                               onClick={() => setNewTagColor(colorOption.value)}
                               className={`w-8 h-8 rounded-full transition-all ${
                                 newTagColor === colorOption.value
-                                  ? "ring-2 ring-offset-2 ring-gray-900 scale-110"
+                                  ? "ring-2 ring-offset-2 ring-slate-900 scale-110"
                                   : "hover:scale-105"
                               }`}
                               style={{ backgroundColor: colorOption.value }}
@@ -2732,7 +2749,7 @@ export default function FacilitySidebar({
                         whileTap={{ scale: 0.98 }}
                         onClick={handleCreateTag}
                         disabled={!newTagName.trim() || creatingTag}
-                        className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-[#004aad] to-[#004aad]/90 hover:from-[#004aad]/90 hover:to-[#004aad]/80 text-white rounded-lg text-sm font-medium shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-[#004aad] to-[#004aad]/90 hover:from-[#004aad]/90 hover:to-[#004aad]/80 text-white rounded-xl text-sm font-medium shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Plus className="w-4 h-4" />
                         <span>
@@ -2744,7 +2761,7 @@ export default function FacilitySidebar({
 
                   {/* Existing Tags List */}
                   <div className="space-y-3">
-                    <h5 className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-3">
+                    <h5 className="text-xs font-medium text-slate-600 uppercase tracking-wide mb-3">
                       All Tags ({allTags.length})
                     </h5>
                     {loadingTags ? (
@@ -2752,14 +2769,14 @@ export default function FacilitySidebar({
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#004aad] mx-auto"></div>
                       </div>
                     ) : allTags.length === 0 ? (
-                      <p className="text-sm text-gray-500 text-center py-8">
+                      <p className="text-sm text-slate-500 text-center py-8">
                         No tags created yet
                       </p>
                     ) : (
                       allTags.map((tag) => (
                         <div
                           key={tag.id}
-                          className="bg-white rounded-lg p-3 border border-gray-200 hover:border-gray-300 transition-colors"
+                          className="bg-white rounded-xl p-3 border border-slate-200 hover:border-slate-300 transition-colors"
                         >
                           {editingTagId === tag.id ? (
                             // Edit Mode
@@ -2768,7 +2785,7 @@ export default function FacilitySidebar({
                                 type="text"
                                 value={editTagName}
                                 onChange={(e) => setEditTagName(e.target.value)}
-                                className="w-full px-3 py-2 text-sm text-gray-900 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004aad]"
+                                className="w-full px-3 py-2 text-sm text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#004aad]"
                               />
                               <input
                                 type="text"
@@ -2777,10 +2794,10 @@ export default function FacilitySidebar({
                                   setEditTagDescription(e.target.value)
                                 }
                                 placeholder="Description (optional)"
-                                className="w-full px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004aad]"
+                                className="w-full px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#004aad]"
                               />
                               <div>
-                                <label className="block text-xs font-medium text-gray-600 mb-2">
+                                <label className="block text-xs font-medium text-slate-600 mb-2">
                                   Color
                                 </label>
                                 <div className="flex flex-wrap gap-2">
@@ -2792,7 +2809,7 @@ export default function FacilitySidebar({
                                       }
                                       className={`w-8 h-8 rounded-full transition-all ${
                                         editTagColor === colorOption.value
-                                          ? "ring-2 ring-offset-2 ring-gray-900 scale-110"
+                                          ? "ring-2 ring-offset-2 ring-slate-900 scale-110"
                                           : "hover:scale-105"
                                       }`}
                                       style={{
@@ -2808,7 +2825,7 @@ export default function FacilitySidebar({
                                   whileHover={{ scale: 1.02 }}
                                   whileTap={{ scale: 0.98 }}
                                   onClick={() => handleSaveEditTag(tag.id)}
-                                  className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-lg text-xs font-medium"
+                                  className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-xl text-xs font-medium"
                                 >
                                   <Save className="w-3 h-3" />
                                   Save
@@ -2817,7 +2834,7 @@ export default function FacilitySidebar({
                                   whileHover={{ scale: 1.02 }}
                                   whileTap={{ scale: 0.98 }}
                                   onClick={handleCancelEditTag}
-                                  className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-xs font-medium"
+                                  className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-medium"
                                 >
                                   <XIcon className="w-3 h-3" />
                                   Cancel
@@ -2833,11 +2850,11 @@ export default function FacilitySidebar({
                                   style={{ backgroundColor: tag.color }}
                                 />
                                 <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-medium text-gray-900 truncate">
+                                  <p className="text-sm font-medium text-slate-900 truncate">
                                     {tag.name}
                                   </p>
                                   {tag.description && (
-                                    <p className="text-xs text-gray-500 truncate">
+                                    <p className="text-xs text-slate-500 truncate">
                                       {tag.description}
                                     </p>
                                   )}
