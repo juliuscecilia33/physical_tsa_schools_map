@@ -110,78 +110,43 @@ function loadFacilities(): FacilityToEnrich[] {
 }
 
 /**
- * Fetch data_id from Google Maps search using place details
+ * Fetch data_id from Google Maps API using direct place_id query
  */
 async function getDataIdFromPlaceId(
   placeId: string,
-  facilityName: string,
-  facilityAddress: string,
-  lat: number,
-  lng: number,
 ): Promise<{ success: boolean; dataId?: string; error?: string }> {
   try {
-    // Search for the facility using name and address
-    const searchQuery = `${facilityName} ${facilityAddress}`;
-    const locationParam = `@${lat},${lng},15z`;
-
-    console.log(`     🔍 Search Query: "${searchQuery}"`);
-    console.log(`     📍 Location: ${locationParam}`);
-    console.log(`     🎯 Target place_id: ${placeId}`);
+    console.log(`     🔍 Querying Google Maps API with place_id...`);
+    console.log(`     🎯 place_id: ${placeId}`);
 
     const response = await getJson({
       engine: "google_maps",
-      q: searchQuery,
-      ll: locationParam,
+      place_id: placeId,
       api_key: serpApiKey,
     });
 
-    // Try to find the matching place by place_id
-    const localResults = response.local_results || [];
+    // Direct place_id query returns data in place_results object
+    const dataId = response.place_results?.data_id;
 
-    console.log(`     📊 Search returned ${localResults.length} results`);
-
-    if (localResults.length > 0) {
-      console.log(`     📍 Results breakdown:`);
-      localResults.forEach((place: any, index: number) => {
-        console.log(`        ${index + 1}. "${place.title || place.name || 'Unknown'}"`);
-        console.log(`           place_id: ${place.place_id || 'N/A'}`);
-        console.log(`           data_id: ${place.data_id || 'N/A'}`);
-        console.log(`           address: ${place.address || 'N/A'}`);
-      });
-    } else {
-      console.log(`     ⚠️  No local_results returned from search!`);
-    }
-
-    const matchingPlace = localResults.find(
-      (place: any) => place.place_id === placeId,
-    );
-
-    if (matchingPlace && matchingPlace.data_id) {
-      console.log(`     ✅ Found exact match by place_id!`);
+    if (dataId) {
+      console.log(`     ✅ Got data_id: ${dataId}`);
       return {
         success: true,
-        dataId: matchingPlace.data_id,
+        dataId: dataId,
       };
     }
 
-    // If no exact match, use first result (might be close enough)
-    if (localResults.length > 0 && localResults[0].data_id) {
-      console.log(`     ⚠️  Using first search result (no exact place_id match)`);
-      console.log(`        First result place_id: ${localResults[0].place_id}`);
-      console.log(`        First result data_id: ${localResults[0].data_id}`);
-      return {
-        success: true,
-        dataId: localResults[0].data_id,
-      };
+    console.log(`     ❌ No data_id found in response`);
+    console.log(`     Response keys:`, Object.keys(response));
+    if (response.place_results) {
+      console.log(`     place_results keys:`, Object.keys(response.place_results));
     }
-
-    console.log(`     ❌ No usable data_id found in any result`);
     return {
       success: false,
-      error: "No data_id found in search results",
+      error: "No data_id found in place_id query response",
     };
   } catch (error: any) {
-    console.log(`     ❌ Exception during search: ${error.message}`);
+    console.log(`     ❌ Exception during place_id query: ${error.message}`);
     return {
       success: false,
       error: error.message || "Failed to fetch data_id",
@@ -191,7 +156,8 @@ async function getDataIdFromPlaceId(
 
 /**
  * Fetch photos and reviews from SerpAPI for a given place_id
- * Note: Makes 3 API calls - one for data_id lookup, one for photos, one for reviews
+ * Note: Makes 3 API calls - one for data_id lookup via direct place_id query, one for photos, one for reviews
+ * (Previously made 3 calls via search, now makes 3 calls via direct lookup - more reliable)
  */
 async function fetchSerpApiData(
   placeId: string,
@@ -214,15 +180,9 @@ async function fetchSerpApiData(
   let apiCallsUsed = 0;
 
   try {
-    // Step 1: Get data_id from Google Maps search
-    console.log(`     → Getting data_id...`);
-    const dataIdResult = await getDataIdFromPlaceId(
-      placeId,
-      facilityName,
-      facilityAddress,
-      lat,
-      lng,
-    );
+    // Step 1: Get data_id from direct place_id query
+    console.log(`     → Getting data_id from place_id...`);
+    const dataIdResult = await getDataIdFromPlaceId(placeId);
     apiCallsUsed++;
 
     if (!dataIdResult.success) {
@@ -471,7 +431,10 @@ async function enrichWithSerpApi() {
   console.log("   • SerpAPI limit: 5,000 searches/month");
   console.log("   • Rate limit: 1 request every 2 seconds");
   console.log(
-    "   • Note: Each facility requires 3 API calls (data_id lookup + photos + reviews)",
+    "   • Note: Each facility requires 3 API calls (direct place_id lookup + photos + reviews)",
+  );
+  console.log(
+    "   • Improved: Now uses direct place_id query instead of search (more reliable)",
   );
 
   if (TEST_LIMIT) {
