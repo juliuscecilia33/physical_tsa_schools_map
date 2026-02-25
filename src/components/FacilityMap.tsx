@@ -665,7 +665,10 @@ export default function FacilityMap({
                     <span className="text-[10px] font-medium text-gray-400">Rating</span>
                   </div>
                   <span className="text-base font-bold text-white mt-1">
-                    {(hoveredFacility || clickedFacility)?.rating?.toFixed(1) || "N/A"}
+                    {(() => {
+                      const rating = (hoveredFacility || clickedFacility)?.rating;
+                      return rating ? Number(rating).toFixed(1) : "N/A";
+                    })()}
                   </span>
                 </div>
 
