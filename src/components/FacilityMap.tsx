@@ -304,12 +304,18 @@ export default function FacilityMap({
       if (facility.tags) {
         facility.tags.forEach((tag) => {
           if (!tagsMap.has(tag.id)) {
-            tagsMap.set(tag.id, { id: tag.id, name: tag.name, color: tag.color });
+            tagsMap.set(tag.id, {
+              id: tag.id,
+              name: tag.name,
+              color: tag.color,
+            });
           }
         });
       }
     });
-    return Array.from(tagsMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+    return Array.from(tagsMap.values()).sort((a, b) =>
+      a.name.localeCompare(b.name),
+    );
   }, [facilities]);
 
   // Client-side filtering based on filterOption, selectedSports, selectedTags, and AI filters
@@ -378,7 +384,13 @@ export default function FacilityMap({
     // AI filters will be used by AISearchPanel to show results as cards
 
     return filtered;
-  }, [facilities, filterOption, selectedSports, selectedTags, selectedCategories]);
+  }, [
+    facilities,
+    filterOption,
+    selectedSports,
+    selectedTags,
+    selectedCategories,
+  ]);
 
   // Calculate category counts
   const categoryCounts = useMemo(() => {
@@ -402,8 +414,8 @@ export default function FacilityMap({
       "Parks & Fields": ACTIVITY_CATEGORIES.parks.color,
       "Fitness & Wellness": ACTIVITY_CATEGORIES.fitness.color,
       "Sports Venues": ACTIVITY_CATEGORIES.sports.color,
-      "Educational": ACTIVITY_CATEGORIES.education.color,
-      "Other": ACTIVITY_CATEGORIES.other.color,
+      Educational: ACTIVITY_CATEGORIES.education.color,
+      Other: ACTIVITY_CATEGORIES.other.color,
     };
   }, []);
 
@@ -413,8 +425,8 @@ export default function FacilityMap({
       "Parks & Fields": categoryCounts.parks,
       "Fitness & Wellness": categoryCounts.fitness,
       "Sports Venues": categoryCounts.sports,
-      "Educational": categoryCounts.education,
-      "Other": categoryCounts.other,
+      Educational: categoryCounts.education,
+      Other: categoryCounts.other,
     };
   }, [categoryCounts]);
 
@@ -423,8 +435,8 @@ export default function FacilityMap({
     "Parks & Fields": "parks",
     "Fitness & Wellness": "fitness",
     "Sports Venues": "sports",
-    "Educational": "education",
-    "Other": "other",
+    Educational: "education",
+    Other: "other",
   };
 
   // Helper functions for filter bar
@@ -446,7 +458,7 @@ export default function FacilityMap({
     onSelectedSportsChange(
       selectedSports.includes(sport)
         ? selectedSports.filter((s) => s !== sport)
-        : [...selectedSports, sport]
+        : [...selectedSports, sport],
     );
   };
 
@@ -458,7 +470,7 @@ export default function FacilityMap({
     onSelectedTagsChange(
       selectedTags.includes(tagId)
         ? selectedTags.filter((t) => t !== tagId)
-        : [...selectedTags, tagId]
+        : [...selectedTags, tagId],
     );
   };
 
@@ -628,10 +640,15 @@ export default function FacilityMap({
                         d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
                       />
                     </svg>
-                    <span className="text-[10px] font-medium text-gray-400">Photos</span>
+                    <span className="text-[10px] font-medium text-gray-400">
+                      Photos
+                    </span>
                   </div>
                   <span className="text-base font-bold text-white mt-1">
-                    {formatNumber((hoveredFacility || clickedFacility)?.photo_references?.length || 0)}
+                    {formatNumber(
+                      (hoveredFacility || clickedFacility)?.photo_references
+                        ?.length || 0,
+                    )}
                   </span>
                 </div>
 
@@ -651,10 +668,15 @@ export default function FacilityMap({
                         d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
                       />
                     </svg>
-                    <span className="text-[10px] font-medium text-gray-400">Reviews</span>
+                    <span className="text-[10px] font-medium text-gray-400">
+                      Reviews
+                    </span>
                   </div>
                   <span className="text-base font-bold text-white mt-1">
-                    {formatNumber((hoveredFacility || clickedFacility)?.user_ratings_total || 0)}
+                    {formatNumber(
+                      (hoveredFacility || clickedFacility)
+                        ?.user_ratings_total || 0,
+                    )}
                   </span>
                 </div>
 
@@ -662,11 +684,14 @@ export default function FacilityMap({
                 <div className="px-5 py-3 flex flex-col items-center justify-center border-b border-gray-700">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-yellow-400 text-base">★</span>
-                    <span className="text-[10px] font-medium text-gray-400">Rating</span>
+                    <span className="text-[10px] font-medium text-gray-400">
+                      Rating
+                    </span>
                   </div>
                   <span className="text-base font-bold text-white mt-1">
                     {(() => {
-                      const rating = (hoveredFacility || clickedFacility)?.rating;
+                      const rating = (hoveredFacility || clickedFacility)
+                        ?.rating;
                       return rating ? Number(rating).toFixed(1) : "N/A";
                     })()}
                   </span>
@@ -688,10 +713,14 @@ export default function FacilityMap({
                         d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
                       />
                     </svg>
-                    <span className="text-[10px] font-medium text-gray-400">Tags</span>
+                    <span className="text-[10px] font-medium text-gray-400">
+                      Tags
+                    </span>
                   </div>
                   <span className="text-base font-bold text-white mt-1">
-                    {formatNumber((hoveredFacility || clickedFacility)?.tags?.length || 0)}
+                    {formatNumber(
+                      (hoveredFacility || clickedFacility)?.tags?.length || 0,
+                    )}
                   </span>
                 </div>
 
@@ -711,10 +740,14 @@ export default function FacilityMap({
                         d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
                       />
                     </svg>
-                    <span className="text-[10px] font-medium text-gray-400">Notes</span>
+                    <span className="text-[10px] font-medium text-gray-400">
+                      Notes
+                    </span>
                   </div>
                   <span className="text-base font-bold text-white mt-1">
-                    {(hoveredFacility || clickedFacility)?.has_notes ? "1" : "0"}
+                    {(hoveredFacility || clickedFacility)?.has_notes
+                      ? "1"
+                      : "0"}
                   </span>
                 </div>
               </div>
@@ -759,7 +792,7 @@ export default function FacilityMap({
       <button
         onClick={() => setSidebarVisible(!sidebarVisible)}
         className="absolute top-7 left-4 z-15 flex-shrink-0 flex items-center gap-2 px-4 py-4 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200 hover:bg-gray-50 transition-all text-sm font-medium text-gray-700"
-        title={sidebarVisible ? 'Hide filters sidebar' : 'Show filters sidebar'}
+        title={sidebarVisible ? "Hide filters sidebar" : "Show filters sidebar"}
       >
         {sidebarVisible ? (
           <PanelLeftOpen className="w-5 h-5" />
@@ -790,7 +823,9 @@ export default function FacilityMap({
           selectedTagIds={selectedTags}
           onTagToggle={handleTagToggle}
           onClearTags={handleClearTags}
-          selectedCategories={selectedCategories.map((key) => ACTIVITY_CATEGORIES[key].label)}
+          selectedCategories={selectedCategories.map(
+            (key) => ACTIVITY_CATEGORIES[key].label,
+          )}
           onCategoryToggle={handleCategoryToggle}
           onClearCategories={handleClearCategories}
           categoryCounts={categoryCountsByLabel}
@@ -816,90 +851,90 @@ export default function FacilityMap({
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: -400, opacity: 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="fixed top-[1vh] left-4 h-[98vh] w-full md:w-[340px] bg-white shadow-2xl rounded-2xl p-6 overflow-y-auto z-20"
+            className="fixed top-[1vh] left-24 h-[98vh] w-full md:w-[340px] bg-white shadow-2xl rounded-2xl p-6 overflow-y-auto z-20"
           >
-        {/* Close Button */}
-        <button
-          onClick={() => setSidebarVisible(false)}
-          className="absolute top-4 right-4 p-2 rounded-lg hover:bg-gray-100 transition-colors z-20"
-          title="Close sidebar"
-        >
-          <X className="w-5 h-5 text-gray-600" />
-        </button>
+            {/* Close Button */}
+            <button
+              onClick={() => setSidebarVisible(false)}
+              className="absolute top-4 right-4 p-2 rounded-lg hover:bg-gray-100 transition-colors z-20"
+              title="Close sidebar"
+            >
+              <X className="w-5 h-5 text-gray-600" />
+            </button>
 
-        {/* TSA Logo */}
-        <div className="flex justify-center pb-4 mb-4 border-b border-[#E8E9EB]">
-          <motion.img
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            src="/assets/TSA.png"
-            alt="TSA Logo"
-            className="h-10 w-auto"
-          />
-        </div>
-        <div className="flex items-center gap-2 mb-3">
-          <div className="p-2 bg-gradient-to-br from-[#004aad] to-[#004aad]/90 rounded-lg">
-            <Layers className="w-4 h-4 text-white" />
-          </div>
-          <div>
-            <h2 className="text-base font-bold text-gray-900">
-              Texas Sports Facilities
-            </h2>
-            <p className="text-sm text-gray-500">
-              {filteredFacilities.length.toLocaleString()} of{" "}
-              {facilities.length.toLocaleString()} shown
-            </p>
-          </div>
-        </div>
-
-        <p className="text-sm text-gray-500 mb-4 flex items-center gap-1.5">
-          <span className="inline-block w-2 h-2 bg-[#004aad] rounded-full"></span>
-          Click any marker for details
-        </p>
-
-        {/* Modern Filter Options */}
-        <div className="mb-4">
-          <button
-            onClick={() => toggleSection("displayFilter")}
-            className="flex items-center justify-between w-full mb-3 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
-          >
-            <div className="flex items-center gap-2">
-              <Filter className="w-4 h-4 text-gray-600" />
-              <h3 className="text-sm font-semibold text-gray-700 tracking-wide uppercase">
-                Display Filter
-              </h3>
+            {/* TSA Logo */}
+            <div className="flex justify-center pb-4 mb-4 border-b border-[#E8E9EB]">
+              <motion.img
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
+                src="/assets/TSA.png"
+                alt="TSA Logo"
+                className="h-10 w-auto"
+              />
             </div>
-            {expandedSections.displayFilter ? (
-              <ChevronUp className="w-4 h-4 text-gray-500" />
-            ) : (
-              <ChevronDown className="w-4 h-4 text-gray-500" />
-            )}
-          </button>
-          <AnimatePresence>
-            {expandedSections.displayFilter && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="grid grid-cols-2 gap-2 overflow-hidden"
+            <div className="flex items-center gap-2 mb-3">
+              <div className="p-2 bg-gradient-to-br from-[#004aad] to-[#004aad]/90 rounded-lg">
+                <Layers className="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <h2 className="text-base font-bold text-gray-900">
+                  Texas Sports Facilities
+                </h2>
+                <p className="text-sm text-gray-500">
+                  {filteredFacilities.length.toLocaleString()} of{" "}
+                  {facilities.length.toLocaleString()} shown
+                </p>
+              </div>
+            </div>
+
+            <p className="text-sm text-gray-500 mb-4 flex items-center gap-1.5">
+              <span className="inline-block w-2 h-2 bg-[#004aad] rounded-full"></span>
+              Click any marker for details
+            </p>
+
+            {/* Modern Filter Options */}
+            <div className="mb-4">
+              <button
+                onClick={() => toggleSection("displayFilter")}
+                className="flex items-center justify-between w-full mb-3 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
               >
-                <motion.button
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => onFilterOptionChange("UNHIDDEN_ONLY")}
-                  className={`px-2 py-3 rounded-lg text-xs font-medium transition-all duration-300 flex flex-col items-center justify-center gap-1 cursor-pointer relative ${
-                    filterOption === "UNHIDDEN_ONLY"
-                      ? "bg-gradient-to-r from-[#004aad] to-[#004aad]/90 text-white shadow-lg shadow-[#004aad]/20"
-                      : "bg-gradient-to-r from-[#E8E9EB]/50 to-[#E8E9EB] text-gray-700 hover:from-[#E8E9EB] hover:to-[#E8E9EB]/80 border border-[#E8E9EB]"
-                  }`}
-                >
-                  <span className="text-center leading-tight">All</span>
-                  {filterOption === "UNHIDDEN_ONLY" && (
-                    <Check className="w-3 h-3 absolute top-1 right-1" />
-                  )}
-                </motion.button>
-                {/* <motion.button
+                <div className="flex items-center gap-2">
+                  <Filter className="w-4 h-4 text-gray-600" />
+                  <h3 className="text-sm font-semibold text-gray-700 tracking-wide uppercase">
+                    Display Filter
+                  </h3>
+                </div>
+                {expandedSections.displayFilter ? (
+                  <ChevronUp className="w-4 h-4 text-gray-500" />
+                ) : (
+                  <ChevronDown className="w-4 h-4 text-gray-500" />
+                )}
+              </button>
+              <AnimatePresence>
+                {expandedSections.displayFilter && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="grid grid-cols-2 gap-2 overflow-hidden"
+                  >
+                    <motion.button
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => onFilterOptionChange("UNHIDDEN_ONLY")}
+                      className={`px-2 py-3 rounded-lg text-xs font-medium transition-all duration-300 flex flex-col items-center justify-center gap-1 cursor-pointer relative ${
+                        filterOption === "UNHIDDEN_ONLY"
+                          ? "bg-gradient-to-r from-[#004aad] to-[#004aad]/90 text-white shadow-lg shadow-[#004aad]/20"
+                          : "bg-gradient-to-r from-[#E8E9EB]/50 to-[#E8E9EB] text-gray-700 hover:from-[#E8E9EB] hover:to-[#E8E9EB]/80 border border-[#E8E9EB]"
+                      }`}
+                    >
+                      <span className="text-center leading-tight">All</span>
+                      {filterOption === "UNHIDDEN_ONLY" && (
+                        <Check className="w-3 h-3 absolute top-1 right-1" />
+                      )}
+                    </motion.button>
+                    {/* <motion.button
                   whileTap={{ scale: 0.98 }}
                   onClick={() => onFilterOptionChange("HIDDEN_ONLY")}
                   className={`px-2 py-3 rounded-lg text-xs font-medium transition-all duration-300 flex flex-col items-center justify-center gap-1 cursor-pointer relative ${
@@ -913,361 +948,366 @@ export default function FacilityMap({
                     <Check className="w-3 h-3 absolute top-1 right-1" />
                   )}
                 </motion.button> */}
-                <motion.button
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => onFilterOptionChange("WITH_NOTES_ONLY")}
-                  className={`px-2 py-3 rounded-lg text-xs font-medium transition-all duration-300 flex flex-col items-center justify-center gap-1 cursor-pointer relative ${
-                    filterOption === "WITH_NOTES_ONLY"
-                      ? "bg-gradient-to-r from-[#004aad] to-[#004aad]/90 text-white shadow-lg shadow-[#004aad]/20"
-                      : "bg-gradient-to-r from-[#E8E9EB]/50 to-[#E8E9EB] text-gray-700 hover:from-[#E8E9EB] hover:to-[#E8E9EB]/80 border border-[#E8E9EB]"
-                  }`}
-                >
-                  <span className="text-center leading-tight">
-                    With Notes Only
-                  </span>
-                  {filterOption === "WITH_NOTES_ONLY" && (
-                    <Check className="w-3 h-3 absolute top-1 right-1" />
-                  )}
-                </motion.button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-
-        {/* Sport Filter */}
-        {availableSports.length > 0 && (
-          <div className="mb-4">
-            <button
-              onClick={() => toggleSection("sportFilter")}
-              className="flex items-center justify-between w-full mb-3 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
-            >
-              <div className="flex items-center gap-2">
-                <Filter className="w-4 h-4 text-gray-600" />
-                <h3 className="text-sm font-semibold text-gray-700 tracking-wide uppercase">
-                  Filter by Sport
-                </h3>
-              </div>
-              {expandedSections.sportFilter ? (
-                <ChevronUp className="w-4 h-4 text-gray-500" />
-              ) : (
-                <ChevronDown className="w-4 h-4 text-gray-500" />
-              )}
-            </button>
-            <AnimatePresence>
-              {expandedSections.sportFilter && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="overflow-hidden"
-                >
-                  <div className="max-h-96 overflow-y-auto grid grid-cols-2 gap-2">
-                    {availableSports.map((sport) => (
-                      <motion.button
-                        key={sport}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => {
-                          if (selectedSports.includes(sport)) {
-                            onSelectedSportsChange(
-                              selectedSports.filter((s) => s !== sport),
-                            );
-                          } else {
-                            onSelectedSportsChange([...selectedSports, sport]);
-                          }
-                        }}
-                        className={`px-2 py-3 rounded-lg text-xs font-medium transition-all duration-300 flex flex-col items-center justify-center gap-1 cursor-pointer relative ${
-                          selectedSports.includes(sport)
-                            ? "bg-gradient-to-r from-[#004aad] to-[#004aad]/90 text-white shadow-lg shadow-[#004aad]/20"
-                            : "bg-gradient-to-r from-[#E8E9EB]/50 to-[#E8E9EB] text-gray-700 hover:from-[#E8E9EB] hover:to-[#E8E9EB]/80 border border-[#E8E9EB]"
-                        }`}
-                      >
-                        <span className="text-xl">
-                          {SPORT_EMOJIS[sport] || "🏅"}
-                        </span>
-                        <span className="text-center leading-tight">
-                          {sport}
-                        </span>
-                        {selectedSports.includes(sport) && (
-                          <Check className="w-3 h-3 absolute top-1 right-1" />
-                        )}
-                      </motion.button>
-                    ))}
-                  </div>
-                  {selectedSports.length > 0 && (
                     <motion.button
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
                       whileTap={{ scale: 0.98 }}
-                      onClick={() => onSelectedSportsChange([])}
-                      className="w-full mt-2 px-4 py-3 rounded-lg text-sm font-medium bg-[#c9472b]/10 text-[#c9472b] hover:bg-[#c9472b]/20 border border-[#c9472b]/20 transition-all duration-300 cursor-pointer"
+                      onClick={() => onFilterOptionChange("WITH_NOTES_ONLY")}
+                      className={`px-2 py-3 rounded-lg text-xs font-medium transition-all duration-300 flex flex-col items-center justify-center gap-1 cursor-pointer relative ${
+                        filterOption === "WITH_NOTES_ONLY"
+                          ? "bg-gradient-to-r from-[#004aad] to-[#004aad]/90 text-white shadow-lg shadow-[#004aad]/20"
+                          : "bg-gradient-to-r from-[#E8E9EB]/50 to-[#E8E9EB] text-gray-700 hover:from-[#E8E9EB] hover:to-[#E8E9EB]/80 border border-[#E8E9EB]"
+                      }`}
                     >
-                      Clear Sport Filter ({selectedSports.length})
+                      <span className="text-center leading-tight">
+                        With Notes Only
+                      </span>
+                      {filterOption === "WITH_NOTES_ONLY" && (
+                        <Check className="w-3 h-3 absolute top-1 right-1" />
+                      )}
                     </motion.button>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        )}
-
-        {/* Tag Filter */}
-        {availableTags.length > 0 && (
-          <div className="mb-4">
-            <button
-              onClick={() => toggleSection("tagFilter")}
-              className="flex items-center justify-between w-full mb-3 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
-            >
-              <div className="flex items-center gap-2">
-                <Tag className="w-4 h-4 text-gray-600" />
-                <h3 className="text-sm font-semibold text-gray-700 tracking-wide uppercase">
-                  Filter by Tag
-                </h3>
-              </div>
-              {expandedSections.tagFilter ? (
-                <ChevronUp className="w-4 h-4 text-gray-500" />
-              ) : (
-                <ChevronDown className="w-4 h-4 text-gray-500" />
-              )}
-            </button>
-            <AnimatePresence>
-              {expandedSections.tagFilter && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="overflow-hidden"
-                >
-                  <div className="max-h-96 overflow-y-auto flex flex-wrap gap-2">
-                    {availableTags.map((tag) => (
-                      <motion.button
-                        key={tag.id}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => {
-                          if (selectedTags.includes(tag.id)) {
-                            onSelectedTagsChange(
-                              selectedTags.filter((id) => id !== tag.id),
-                            );
-                          } else {
-                            onSelectedTagsChange([...selectedTags, tag.id]);
-                          }
-                        }}
-                        className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 flex items-center gap-1.5 cursor-pointer relative ${
-                          selectedTags.includes(tag.id)
-                            ? "text-white shadow-lg ring-2 ring-white/50"
-                            : "text-white/80 hover:text-white shadow-sm hover:shadow-md opacity-70 hover:opacity-100"
-                        }`}
-                        style={{ backgroundColor: tag.color }}
-                      >
-                        <Tag className="w-3 h-3" />
-                        <span>{tag.name}</span>
-                        {selectedTags.includes(tag.id) && (
-                          <Check className="w-3 h-3" />
-                        )}
-                      </motion.button>
-                    ))}
-                  </div>
-                  {selectedTags.length > 0 && (
-                    <motion.button
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => onSelectedTagsChange([])}
-                      className="w-full mt-2 px-4 py-3 rounded-lg text-sm font-medium bg-[#c9472b]/10 text-[#c9472b] hover:bg-[#c9472b]/20 border border-[#c9472b]/20 transition-all duration-300 cursor-pointer"
-                    >
-                      Clear Tag Filter ({selectedTags.length})
-                    </motion.button>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        )}
-
-        {/* Category Sub-Cards */}
-        <div>
-          <button
-            onClick={() => toggleSection("categories")}
-            className="flex items-center justify-between w-full mb-3 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
-          >
-            <div className="flex items-center gap-2">
-              <Layers className="w-4 h-4 text-gray-600" />
-              <h3 className="text-sm font-semibold text-gray-700 tracking-wide uppercase">
-                Categories
-              </h3>
-            </div>
-            {expandedSections.categories ? (
-              <ChevronUp className="w-4 h-4 text-gray-500" />
-            ) : (
-              <ChevronDown className="w-4 h-4 text-gray-500" />
-            )}
-          </button>
-          <AnimatePresence>
-            {expandedSections.categories && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="grid grid-cols-2 gap-2 overflow-hidden"
-              >
-                {Object.entries(ACTIVITY_CATEGORIES).map(
-                  ([key, { color, label }], idx) => {
-                    const isSelected = selectedCategories.includes(
-                      key as keyof typeof ACTIVITY_CATEGORIES,
-                    );
-                    return (
-                      <motion.button
-                        key={key}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: idx * 0.05 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => {
-                          const categoryKey =
-                            key as keyof typeof ACTIVITY_CATEGORIES;
-                          if (selectedCategories.includes(categoryKey)) {
-                            setSelectedCategories(
-                              selectedCategories.filter(
-                                (c) => c !== categoryKey,
-                              ),
-                            );
-                          } else {
-                            setSelectedCategories([
-                              ...selectedCategories,
-                              categoryKey,
-                            ]);
-                          }
-                        }}
-                        className={`rounded-lg p-3 transition-all duration-300 cursor-pointer relative ${
-                          isSelected
-                            ? "bg-white border-2"
-                            : "bg-gradient-to-r from-[#E8E9EB]/50 to-[#E8E9EB] hover:from-[#E8E9EB] hover:to-[#E8E9EB]/80 border border-[#E8E9EB]"
-                        }`}
-                        style={isSelected ? { borderColor: color } : undefined}
-                      >
-                        <div className="flex flex-col items-center gap-2">
-                          <div
-                            className="w-4 h-4 rounded-full shadow-sm"
-                            style={{ backgroundColor: color, opacity: 0.9 }}
-                          />
-                          <span
-                            className={`text-xs font-medium text-center leading-tight ${
-                              isSelected ? "text-gray-900" : "text-gray-700"
-                            }`}
-                          >
-                            {label}
-                          </span>
-                          <span
-                            className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-                              isSelected
-                                ? "bg-[#E8E9EB] text-gray-700"
-                                : "bg-[#E8E9EB] text-gray-500"
-                            }`}
-                          >
-                            {categoryCounts[
-                              key as keyof typeof ACTIVITY_CATEGORIES
-                            ].toLocaleString()}
-                          </span>
-                        </div>
-                        {isSelected && (
-                          <Check className="w-3 h-3 text-gray-700 absolute top-1 right-1" />
-                        )}
-                      </motion.button>
-                    );
-                  },
+                  </motion.div>
                 )}
-                {selectedCategories.length > 0 &&
-                  selectedCategories.length < 5 && (
-                    <motion.button
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() =>
-                        setSelectedCategories([
-                          "parks",
-                          "fitness",
-                          "sports",
-                          "education",
-                          "other",
-                        ])
-                      }
-                      className="col-span-2 px-4 py-2.5 rounded-lg text-xs font-medium bg-[#c9472b]/10 text-[#c9472b] hover:bg-[#c9472b]/20 border border-[#c9472b]/20 transition-all duration-300 cursor-pointer"
-                    >
-                      Clear Category Filter ({5 - selectedCategories.length}{" "}
-                      hidden)
-                    </motion.button>
-                  )}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-
-        {/* More Filters */}
-        <div className="mt-4">
-          <button
-            onClick={() => toggleSection("moreFilters")}
-            className="flex items-center justify-between w-full mb-3 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
-          >
-            <div className="flex items-center gap-2">
-              <Filter className="w-4 h-4 text-gray-600" />
-              <h3 className="text-sm font-semibold text-gray-700 tracking-wide uppercase">
-                More Filters
-              </h3>
+              </AnimatePresence>
             </div>
-            {expandedSections.moreFilters ? (
-              <ChevronUp className="w-4 h-4 text-gray-500" />
-            ) : (
-              <ChevronDown className="w-4 h-4 text-gray-500" />
+
+            {/* Sport Filter */}
+            {availableSports.length > 0 && (
+              <div className="mb-4">
+                <button
+                  onClick={() => toggleSection("sportFilter")}
+                  className="flex items-center justify-between w-full mb-3 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                >
+                  <div className="flex items-center gap-2">
+                    <Filter className="w-4 h-4 text-gray-600" />
+                    <h3 className="text-sm font-semibold text-gray-700 tracking-wide uppercase">
+                      Filter by Sport
+                    </h3>
+                  </div>
+                  {expandedSections.sportFilter ? (
+                    <ChevronUp className="w-4 h-4 text-gray-500" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4 text-gray-500" />
+                  )}
+                </button>
+                <AnimatePresence>
+                  {expandedSections.sportFilter && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="max-h-96 overflow-y-auto grid grid-cols-2 gap-2">
+                        {availableSports.map((sport) => (
+                          <motion.button
+                            key={sport}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() => {
+                              if (selectedSports.includes(sport)) {
+                                onSelectedSportsChange(
+                                  selectedSports.filter((s) => s !== sport),
+                                );
+                              } else {
+                                onSelectedSportsChange([
+                                  ...selectedSports,
+                                  sport,
+                                ]);
+                              }
+                            }}
+                            className={`px-2 py-3 rounded-lg text-xs font-medium transition-all duration-300 flex flex-col items-center justify-center gap-1 cursor-pointer relative ${
+                              selectedSports.includes(sport)
+                                ? "bg-gradient-to-r from-[#004aad] to-[#004aad]/90 text-white shadow-lg shadow-[#004aad]/20"
+                                : "bg-gradient-to-r from-[#E8E9EB]/50 to-[#E8E9EB] text-gray-700 hover:from-[#E8E9EB] hover:to-[#E8E9EB]/80 border border-[#E8E9EB]"
+                            }`}
+                          >
+                            <span className="text-xl">
+                              {SPORT_EMOJIS[sport] || "🏅"}
+                            </span>
+                            <span className="text-center leading-tight">
+                              {sport}
+                            </span>
+                            {selectedSports.includes(sport) && (
+                              <Check className="w-3 h-3 absolute top-1 right-1" />
+                            )}
+                          </motion.button>
+                        ))}
+                      </div>
+                      {selectedSports.length > 0 && (
+                        <motion.button
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => onSelectedSportsChange([])}
+                          className="w-full mt-2 px-4 py-3 rounded-lg text-sm font-medium bg-[#c9472b]/10 text-[#c9472b] hover:bg-[#c9472b]/20 border border-[#c9472b]/20 transition-all duration-300 cursor-pointer"
+                        >
+                          Clear Sport Filter ({selectedSports.length})
+                        </motion.button>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             )}
-          </button>
-          <AnimatePresence>
-            {expandedSections.moreFilters && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="grid grid-cols-2 gap-2 overflow-hidden"
+
+            {/* Tag Filter */}
+            {availableTags.length > 0 && (
+              <div className="mb-4">
+                <button
+                  onClick={() => toggleSection("tagFilter")}
+                  className="flex items-center justify-between w-full mb-3 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                >
+                  <div className="flex items-center gap-2">
+                    <Tag className="w-4 h-4 text-gray-600" />
+                    <h3 className="text-sm font-semibold text-gray-700 tracking-wide uppercase">
+                      Filter by Tag
+                    </h3>
+                  </div>
+                  {expandedSections.tagFilter ? (
+                    <ChevronUp className="w-4 h-4 text-gray-500" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4 text-gray-500" />
+                  )}
+                </button>
+                <AnimatePresence>
+                  {expandedSections.tagFilter && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="max-h-96 overflow-y-auto flex flex-wrap gap-2">
+                        {availableTags.map((tag) => (
+                          <motion.button
+                            key={tag.id}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() => {
+                              if (selectedTags.includes(tag.id)) {
+                                onSelectedTagsChange(
+                                  selectedTags.filter((id) => id !== tag.id),
+                                );
+                              } else {
+                                onSelectedTagsChange([...selectedTags, tag.id]);
+                              }
+                            }}
+                            className={`px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 flex items-center gap-1.5 cursor-pointer relative ${
+                              selectedTags.includes(tag.id)
+                                ? "text-white shadow-lg ring-2 ring-white/50"
+                                : "text-white/80 hover:text-white shadow-sm hover:shadow-md opacity-70 hover:opacity-100"
+                            }`}
+                            style={{ backgroundColor: tag.color }}
+                          >
+                            <Tag className="w-3 h-3" />
+                            <span>{tag.name}</span>
+                            {selectedTags.includes(tag.id) && (
+                              <Check className="w-3 h-3" />
+                            )}
+                          </motion.button>
+                        ))}
+                      </div>
+                      {selectedTags.length > 0 && (
+                        <motion.button
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => onSelectedTagsChange([])}
+                          className="w-full mt-2 px-4 py-3 rounded-lg text-sm font-medium bg-[#c9472b]/10 text-[#c9472b] hover:bg-[#c9472b]/20 border border-[#c9472b]/20 transition-all duration-300 cursor-pointer"
+                        >
+                          Clear Tag Filter ({selectedTags.length})
+                        </motion.button>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
+
+            {/* Category Sub-Cards */}
+            <div>
+              <button
+                onClick={() => toggleSection("categories")}
+                className="flex items-center justify-between w-full mb-3 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
               >
-                <motion.button
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => onFilterOptionChange("ALL")}
-                  className={`px-2 py-3 rounded-lg text-xs font-medium transition-all duration-300 flex flex-col items-center justify-center gap-1 cursor-pointer relative ${
-                    filterOption === "ALL"
-                      ? "bg-gradient-to-r from-[#004aad] to-[#004aad]/90 text-white shadow-lg shadow-[#004aad]/20"
-                      : "bg-gradient-to-r from-[#E8E9EB]/50 to-[#E8E9EB] text-gray-700 hover:from-[#E8E9EB] hover:to-[#E8E9EB]/80 border border-[#E8E9EB]"
-                  }`}
-                >
-                  <span className="text-center leading-tight">
-                    All Facilities
-                  </span>
-                  {filterOption === "ALL" && (
-                    <Check className="w-3 h-3 absolute top-1 right-1" />
-                  )}
-                </motion.button>
-                <motion.button
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => onFilterOptionChange("CLEANED_UP_ONLY")}
-                  className={`px-2 py-3 rounded-lg text-xs font-medium transition-all duration-300 flex flex-col items-center justify-center gap-1 cursor-pointer relative ${
-                    filterOption === "CLEANED_UP_ONLY"
-                      ? "bg-gradient-to-r from-[#f97316] to-[#f97316]/90 text-white shadow-lg shadow-[#f97316]/20"
-                      : "bg-gradient-to-r from-[#fed7aa]/50 to-[#fed7aa] text-[#9a3412] hover:from-[#fed7aa] hover:to-[#fed7aa]/80 border border-[#fdba74]"
-                  }`}
-                >
-                  <span className="text-center leading-tight">
-                    Cleaned Up (Low Quality)
-                  </span>
-                  {filterOption === "CLEANED_UP_ONLY" && (
-                    <Check className="w-3 h-3 absolute top-1 right-1" />
-                  )}
-                </motion.button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </motion.div>
+                <div className="flex items-center gap-2">
+                  <Layers className="w-4 h-4 text-gray-600" />
+                  <h3 className="text-sm font-semibold text-gray-700 tracking-wide uppercase">
+                    Categories
+                  </h3>
+                </div>
+                {expandedSections.categories ? (
+                  <ChevronUp className="w-4 h-4 text-gray-500" />
+                ) : (
+                  <ChevronDown className="w-4 h-4 text-gray-500" />
+                )}
+              </button>
+              <AnimatePresence>
+                {expandedSections.categories && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="grid grid-cols-2 gap-2 overflow-hidden"
+                  >
+                    {Object.entries(ACTIVITY_CATEGORIES).map(
+                      ([key, { color, label }], idx) => {
+                        const isSelected = selectedCategories.includes(
+                          key as keyof typeof ACTIVITY_CATEGORIES,
+                        );
+                        return (
+                          <motion.button
+                            key={key}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: idx * 0.05 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() => {
+                              const categoryKey =
+                                key as keyof typeof ACTIVITY_CATEGORIES;
+                              if (selectedCategories.includes(categoryKey)) {
+                                setSelectedCategories(
+                                  selectedCategories.filter(
+                                    (c) => c !== categoryKey,
+                                  ),
+                                );
+                              } else {
+                                setSelectedCategories([
+                                  ...selectedCategories,
+                                  categoryKey,
+                                ]);
+                              }
+                            }}
+                            className={`rounded-lg p-3 transition-all duration-300 cursor-pointer relative ${
+                              isSelected
+                                ? "bg-white border-2"
+                                : "bg-gradient-to-r from-[#E8E9EB]/50 to-[#E8E9EB] hover:from-[#E8E9EB] hover:to-[#E8E9EB]/80 border border-[#E8E9EB]"
+                            }`}
+                            style={
+                              isSelected ? { borderColor: color } : undefined
+                            }
+                          >
+                            <div className="flex flex-col items-center gap-2">
+                              <div
+                                className="w-4 h-4 rounded-full shadow-sm"
+                                style={{ backgroundColor: color, opacity: 0.9 }}
+                              />
+                              <span
+                                className={`text-xs font-medium text-center leading-tight ${
+                                  isSelected ? "text-gray-900" : "text-gray-700"
+                                }`}
+                              >
+                                {label}
+                              </span>
+                              <span
+                                className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                                  isSelected
+                                    ? "bg-[#E8E9EB] text-gray-700"
+                                    : "bg-[#E8E9EB] text-gray-500"
+                                }`}
+                              >
+                                {categoryCounts[
+                                  key as keyof typeof ACTIVITY_CATEGORIES
+                                ].toLocaleString()}
+                              </span>
+                            </div>
+                            {isSelected && (
+                              <Check className="w-3 h-3 text-gray-700 absolute top-1 right-1" />
+                            )}
+                          </motion.button>
+                        );
+                      },
+                    )}
+                    {selectedCategories.length > 0 &&
+                      selectedCategories.length < 5 && (
+                        <motion.button
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() =>
+                            setSelectedCategories([
+                              "parks",
+                              "fitness",
+                              "sports",
+                              "education",
+                              "other",
+                            ])
+                          }
+                          className="col-span-2 px-4 py-2.5 rounded-lg text-xs font-medium bg-[#c9472b]/10 text-[#c9472b] hover:bg-[#c9472b]/20 border border-[#c9472b]/20 transition-all duration-300 cursor-pointer"
+                        >
+                          Clear Category Filter ({5 - selectedCategories.length}{" "}
+                          hidden)
+                        </motion.button>
+                      )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* More Filters */}
+            <div className="mt-4">
+              <button
+                onClick={() => toggleSection("moreFilters")}
+                className="flex items-center justify-between w-full mb-3 p-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+              >
+                <div className="flex items-center gap-2">
+                  <Filter className="w-4 h-4 text-gray-600" />
+                  <h3 className="text-sm font-semibold text-gray-700 tracking-wide uppercase">
+                    More Filters
+                  </h3>
+                </div>
+                {expandedSections.moreFilters ? (
+                  <ChevronUp className="w-4 h-4 text-gray-500" />
+                ) : (
+                  <ChevronDown className="w-4 h-4 text-gray-500" />
+                )}
+              </button>
+              <AnimatePresence>
+                {expandedSections.moreFilters && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="grid grid-cols-2 gap-2 overflow-hidden"
+                  >
+                    <motion.button
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => onFilterOptionChange("ALL")}
+                      className={`px-2 py-3 rounded-lg text-xs font-medium transition-all duration-300 flex flex-col items-center justify-center gap-1 cursor-pointer relative ${
+                        filterOption === "ALL"
+                          ? "bg-gradient-to-r from-[#004aad] to-[#004aad]/90 text-white shadow-lg shadow-[#004aad]/20"
+                          : "bg-gradient-to-r from-[#E8E9EB]/50 to-[#E8E9EB] text-gray-700 hover:from-[#E8E9EB] hover:to-[#E8E9EB]/80 border border-[#E8E9EB]"
+                      }`}
+                    >
+                      <span className="text-center leading-tight">
+                        All Facilities
+                      </span>
+                      {filterOption === "ALL" && (
+                        <Check className="w-3 h-3 absolute top-1 right-1" />
+                      )}
+                    </motion.button>
+                    <motion.button
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => onFilterOptionChange("CLEANED_UP_ONLY")}
+                      className={`px-2 py-3 rounded-lg text-xs font-medium transition-all duration-300 flex flex-col items-center justify-center gap-1 cursor-pointer relative ${
+                        filterOption === "CLEANED_UP_ONLY"
+                          ? "bg-gradient-to-r from-[#f97316] to-[#f97316]/90 text-white shadow-lg shadow-[#f97316]/20"
+                          : "bg-gradient-to-r from-[#fed7aa]/50 to-[#fed7aa] text-[#9a3412] hover:from-[#fed7aa] hover:to-[#fed7aa]/80 border border-[#fdba74]"
+                      }`}
+                    >
+                      <span className="text-center leading-tight">
+                        Cleaned Up (Low Quality)
+                      </span>
+                      {filterOption === "CLEANED_UP_ONLY" && (
+                        <Check className="w-3 h-3 absolute top-1 right-1" />
+                      )}
+                    </motion.button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
 

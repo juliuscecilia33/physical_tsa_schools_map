@@ -26,35 +26,47 @@ export default function NavigationSidebar() {
       initial={{ x: -80 }}
       animate={{ x: 0 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
-      className="fixed left-0 top-0 h-screen w-20 bg-gray-100 border-r border-gray-200 flex flex-col items-center justify-center gap-8 z-50"
+      className="fixed left-0 top-0 h-screen w-20 bg-gray-100 border-r border-gray-200 flex flex-col items-center z-50"
     >
-      {navItems.map((item) => {
-        const Icon = item.icon;
-        const isActive = pathname === item.href;
+      {/* Logo at top */}
+      <div className="w-full py-6 px-2">
+        <img
+          src="/assets/TSA.png"
+          alt="Texas Sports Academy"
+          className="w-full h-auto"
+        />
+      </div>
 
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={`
-              group relative p-3 rounded-lg transition-all duration-200
-              ${
-                isActive
-                  ? "bg-[#004aad] text-white"
-                  : "text-gray-600 hover:bg-gray-200 hover:text-gray-900"
-              }
-            `}
-            title={item.label}
-          >
-            <Icon size={32} strokeWidth={1.5} />
+      {/* Navigation icons - centered in remaining space */}
+      <div className="flex-1 flex flex-col items-center justify-center gap-8">
+        {navItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = pathname === item.href;
 
-            {/* Tooltip on hover */}
-            <span className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
-              {item.label}
-            </span>
-          </Link>
-        );
-      })}
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`
+                group relative p-3 rounded-lg transition-all duration-200
+                ${
+                  isActive
+                    ? "bg-[#004aad] text-white"
+                    : "text-gray-600 hover:bg-gray-200 hover:text-gray-900"
+                }
+              `}
+              title={item.label}
+            >
+              <Icon size={32} strokeWidth={1.5} />
+
+              {/* Tooltip on hover */}
+              <span className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
+                {item.label}
+              </span>
+            </Link>
+          );
+        })}
+      </div>
     </motion.nav>
   );
 }
