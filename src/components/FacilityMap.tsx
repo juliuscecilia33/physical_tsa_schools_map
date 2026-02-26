@@ -631,8 +631,8 @@ export default function FacilityMap({
                     {formatNumber(
                       ((hoveredFacility || clickedFacility)?.photo_references
                         ?.length || 0) +
-                        ((hoveredFacility || clickedFacility)
-                          ?.additional_photos?.length || 0),
+                        ((hoveredFacility || clickedFacility)?.additional_photos
+                          ?.length || 0),
                     )}
                   </span>
                 </div>
@@ -776,7 +776,7 @@ export default function FacilityMap({
       {/* Left: Sidebar Toggle */}
       <button
         onClick={() => setSidebarVisible(!sidebarVisible)}
-        className="absolute top-7 left-4 z-15 flex-shrink-0 flex items-center gap-2 px-4 py-4 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200 hover:bg-slate-50 transition-all text-sm font-medium text-slate-700"
+        className="absolute top-3 left-4 z-15 flex-shrink-0 flex items-center gap-2 px-4 py-4 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200 hover:bg-slate-50 transition-all text-sm font-medium text-slate-700"
         title={sidebarVisible ? "Hide filters sidebar" : "Show filters sidebar"}
       >
         {sidebarVisible ? (
@@ -787,7 +787,7 @@ export default function FacilityMap({
       </button>
 
       {/* Center: Search and Filters */}
-      <div className="absolute top-7 z-10 flex items-center gap-3 w-full justify-center px-4">
+      <div className="absolute top-3 z-10 flex items-center gap-3 w-full justify-center px-4">
         <FacilitySearch
           facilities={filteredFacilities}
           onSelectFacility={handleSearchSelect}
@@ -1179,7 +1179,9 @@ export default function FacilityMap({
                               />
                               <span
                                 className={`text-xs font-medium text-center leading-tight ${
-                                  isSelected ? "text-slate-900" : "text-slate-700"
+                                  isSelected
+                                    ? "text-slate-900"
+                                    : "text-slate-700"
                                 }`}
                               >
                                 {label}
