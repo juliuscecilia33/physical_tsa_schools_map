@@ -289,6 +289,9 @@ export default function FacilitySidebar({
       photoIndexInReview?: number;
       scrapedIndex?: number;
       data?: any;
+      reviewUserThumbnail?: string;
+      reviewUserName?: string;
+      reviewRating?: number;
     }> = [];
 
     // Add all scraped photos first
@@ -313,6 +316,9 @@ export default function FacilitySidebar({
               type: "review",
               reviewIndex: reviewIdx,
               photoIndexInReview: photoIdx,
+              reviewUserThumbnail: review.user?.thumbnail,
+              reviewUserName: review.user?.name || review.author_name || "Anonymous",
+              reviewRating: review.rating,
             });
           });
         }
@@ -321,15 +327,6 @@ export default function FacilitySidebar({
 
     return photos;
   }, [displayFacility?.additional_photos, displayFacility?.additional_reviews]);
-
-  // Count scraped vs review photos
-  const scrapedPhotosCount = useMemo(() => {
-    return combinedPhotos.filter((p) => p.type === "scraped").length;
-  }, [combinedPhotos]);
-
-  const reviewPhotosCount = useMemo(() => {
-    return combinedPhotos.filter((p) => p.type === "review").length;
-  }, [combinedPhotos]);
 
   // Add new note
   const handleAddNote = async () => {
@@ -1114,13 +1111,7 @@ export default function FacilitySidebar({
               >
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
-                    Scraped Photos ({scrapedPhotosCount}
-                    {reviewPhotosCount > 0 && (
-                      <span className="text-xs text-slate-500">
-                        + {reviewPhotosCount} from reviews
-                      </span>
-                    )}
-                    )
+                    Scraped Photos ({combinedPhotos.length})
                   </h3>
                   <button
                     onClick={() => setIsAdditionalPhotosModalOpen(true)}
@@ -1204,10 +1195,27 @@ export default function FacilitySidebar({
                           </div>
                         )}
                         {photo.type === "review" && (
-                          <div className="absolute bottom-2 right-2 bg-purple-600/90 backdrop-blur-sm rounded-lg px-2 py-1">
-                            <span className="text-white text-xs font-medium">
-                              Review
-                            </span>
+                          <div className="absolute bottom-2 right-2 flex items-center gap-1.5">
+                            {photo.reviewUserThumbnail ? (
+                              <img
+                                src={photo.reviewUserThumbnail}
+                                alt={photo.reviewUserName}
+                                className="w-8 h-8 rounded-full border-2 border-white shadow-lg object-cover"
+                                referrerPolicy="no-referrer"
+                              />
+                            ) : (
+                              <div className="w-8 h-8 rounded-full border-2 border-white shadow-lg bg-slate-400 flex items-center justify-center text-white text-xs font-semibold">
+                                {photo.reviewUserName?.charAt(0).toUpperCase()}
+                              </div>
+                            )}
+                            {photo.reviewRating && (
+                              <div className="bg-white/95 backdrop-blur-sm rounded-lg px-1.5 py-0.5 shadow-lg flex items-center gap-0.5">
+                                <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                                <span className="text-xs font-semibold text-slate-900">
+                                  {photo.reviewRating.toFixed(1)}
+                                </span>
+                              </div>
+                            )}
                           </div>
                         )}
                       </motion.div>
@@ -2108,14 +2116,7 @@ export default function FacilitySidebar({
                 <div className="flex items-center justify-between p-6 border-b border-slate-200 bg-gradient-to-r from-white to-slate-50">
                   <div>
                     <h2 className="text-xl font-medium text-slate-900">
-                      Scraped Photos ({scrapedPhotosCount}
-                      {reviewPhotosCount > 0 && (
-                        <span className="text-sm text-slate-500">
-                          {" "}
-                          + {reviewPhotosCount} from reviews
-                        </span>
-                      )}
-                      )
+                      Scraped Photos ({combinedPhotos.length})
                     </h2>
                   </div>
                   <button
@@ -2177,10 +2178,27 @@ export default function FacilitySidebar({
                           </div>
                         )}
                         {photo.type === "review" && (
-                          <div className="absolute bottom-2 right-2 bg-purple-600/90 backdrop-blur-sm rounded-lg px-2 py-1">
-                            <span className="text-white text-xs font-medium">
-                              Review
-                            </span>
+                          <div className="absolute bottom-2 right-2 flex items-center gap-1.5">
+                            {photo.reviewUserThumbnail ? (
+                              <img
+                                src={photo.reviewUserThumbnail}
+                                alt={photo.reviewUserName}
+                                className="w-8 h-8 rounded-full border-2 border-white shadow-lg object-cover"
+                                referrerPolicy="no-referrer"
+                              />
+                            ) : (
+                              <div className="w-8 h-8 rounded-full border-2 border-white shadow-lg bg-slate-400 flex items-center justify-center text-white text-xs font-semibold">
+                                {photo.reviewUserName?.charAt(0).toUpperCase()}
+                              </div>
+                            )}
+                            {photo.reviewRating && (
+                              <div className="bg-white/95 backdrop-blur-sm rounded-lg px-1.5 py-0.5 shadow-lg flex items-center gap-0.5">
+                                <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                                <span className="text-xs font-semibold text-slate-900">
+                                  {photo.reviewRating.toFixed(1)}
+                                </span>
+                              </div>
+                            )}
                           </div>
                         )}
                       </motion.div>
