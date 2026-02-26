@@ -35,11 +35,16 @@ import {
 } from "@/utils/facilityCache";
 import { useFacilityDetails } from "@/hooks/useFacilityDetails";
 import { Note, FacilityTag } from "@/types/facility";
+import Map, { Marker } from "react-map-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
 
 interface CRMFacilityDetailsSidebarProps {
   placeId: string | null;
   onClose: () => void;
 }
+
+// Mapbox token
+const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
 
 // Sport emoji mapping
 const SPORT_EMOJIS: { [key: string]: string } = {
@@ -938,6 +943,43 @@ export default function CRMFacilityDetailsSidebar({
               </div>
             ) : facility ? (
               <>
+                {/* Mini Map */}
+                {facility.location && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.02 }}
+                  >
+                    <h3 className="text-sm font-semibold text-slate-700 tracking-wide mb-3">
+                      Location
+                    </h3>
+                    <div className="relative h-[220px] rounded-2xl overflow-hidden shadow-sm border border-slate-200">
+                      <Map
+                        mapboxAccessToken={MAPBOX_TOKEN}
+                        initialViewState={{
+                          longitude: facility.location.lng,
+                          latitude: facility.location.lat,
+                          zoom: 15,
+                        }}
+                        style={{ width: "100%", height: "100%" }}
+                        mapStyle="mapbox://styles/mapbox/streets-v12"
+                        interactive={true}
+                      >
+                        <Marker
+                          longitude={facility.location.lng}
+                          latitude={facility.location.lat}
+                          color="#004aad"
+                        />
+                      </Map>
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* Divider */}
+                {facility.location && (
+                  <div className="border-t border-slate-200"></div>
+                )}
+
                 {/* Photos */}
                 {facility.photo_references &&
                 facility.photo_references.length > 0 ? (
