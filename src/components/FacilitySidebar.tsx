@@ -191,7 +191,8 @@ export default function FacilitySidebar({
   const [loadingTags, setLoadingTags] = useState(false);
   const [isTagManagementModalOpen, setIsTagManagementModalOpen] =
     useState(false);
-  const [showTagDropdown, setShowTagDropdown] = useState(false);
+  const [isTagAssignmentModalOpen, setIsTagAssignmentModalOpen] =
+    useState(false);
   const [newTagName, setNewTagName] = useState("");
   const [newTagColor, setNewTagColor] = useState("#004aad");
   const [newTagDescription, setNewTagDescription] = useState("");
@@ -201,8 +202,6 @@ export default function FacilitySidebar({
   const [editTagColor, setEditTagColor] = useState("");
   const [editTagDescription, setEditTagDescription] = useState("");
   const [assigningTag, setAssigningTag] = useState(false);
-  const tagDropdownRef = useRef<HTMLDivElement>(null);
-  const tagDropdownButtonRef = useRef<HTMLButtonElement>(null);
   const [facilityTags, setFacilityTags] = useState<FacilityTag[]>([]);
 
   // Fetch notes when facility changes
@@ -600,7 +599,7 @@ export default function FacilitySidebar({
         exact: true,
       });
 
-      setShowTagDropdown(false);
+      setIsTagAssignmentModalOpen(false);
     } catch (error) {
       console.error("Error assigning tag:", error);
       // Revert optimistic update on error
@@ -860,25 +859,6 @@ export default function FacilitySidebar({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isPhotoViewerOpen, selectedPhotoIndex, displayFacility]);
 
-  // Click-outside handler for tag dropdown
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        tagDropdownRef.current &&
-        !tagDropdownRef.current.contains(event.target as Node) &&
-        tagDropdownButtonRef.current &&
-        !tagDropdownButtonRef.current.contains(event.target as Node)
-      ) {
-        setShowTagDropdown(false);
-      }
-    };
-
-    if (showTagDropdown) {
-      document.addEventListener("mousedown", handleClickOutside);
-      return () =>
-        document.removeEventListener("mousedown", handleClickOutside);
-    }
-  }, [showTagDropdown]);
 
   // Early return after all hooks are declared (Rules of Hooks)
   if (!displayFacility) return null;
@@ -1357,77 +1337,14 @@ export default function FacilitySidebar({
                 Tags ({facilityTags.length})
               </h3>
               <div className="flex gap-2">
-                <div className="relative">
-                  <button
-                    ref={tagDropdownButtonRef}
-                    onClick={() => setShowTagDropdown(!showTagDropdown)}
-                    disabled={assigningTag}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                    aria-expanded={showTagDropdown}
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    Assign Tag
-                  </button>
-
-                  {/* Tag Assignment Dropdown */}
-                  {showTagDropdown && (
-                    <div
-                      ref={tagDropdownRef}
-                      className="absolute top-full right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-slate-200 z-50 max-h-64 overflow-y-auto"
-                      role="menu"
-                    >
-                      {loadingTags ? (
-                        <div className="text-center py-4">
-                          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#004aad] mx-auto"></div>
-                        </div>
-                      ) : allTags.length === 0 ? (
-                        <div className="p-4 text-sm text-slate-500 text-center">
-                          No tags available. Use "Manage Tags" to create one!
-                        </div>
-                      ) : (
-                        <div className="p-2">
-                          {allTags
-                            .filter(
-                              (tag) =>
-                                !facilityTags.some((ft) => ft.id === tag.id),
-                            )
-                            .map((tag) => (
-                              <button
-                                key={tag.id}
-                                onClick={() => handleAssignTag(tag.id)}
-                                disabled={assigningTag}
-                                className="w-full flex items-center gap-2 px-3 py-2 text-left rounded-xl hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                role="menuitem"
-                              >
-                                <div
-                                  className="w-4 h-4 rounded-full flex-shrink-0"
-                                  style={{ backgroundColor: tag.color }}
-                                />
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-medium text-slate-900 truncate">
-                                    {tag.name}
-                                  </p>
-                                  {tag.description && (
-                                    <p className="text-xs text-slate-500 truncate">
-                                      {tag.description}
-                                    </p>
-                                  )}
-                                </div>
-                              </button>
-                            ))}
-                          {allTags.filter(
-                            (tag) =>
-                              !facilityTags.some((ft) => ft.id === tag.id),
-                          ).length === 0 && (
-                            <div className="p-4 text-sm text-slate-500 text-center">
-                              All tags already assigned
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
+                <button
+                  onClick={() => setIsTagAssignmentModalOpen(true)}
+                  disabled={assigningTag}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  Assign Tag
+                </button>
                 <button
                   onClick={() => setIsTagManagementModalOpen(true)}
                   className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-slate-900 hover:bg-slate-800 rounded-xl transition-all"
@@ -2882,6 +2799,107 @@ export default function FacilitySidebar({
                       ))
                     )}
                   </div>
+                </div>
+              </motion.div>
+            </motion.div>,
+            document.body,
+          )}
+
+        {/* Tag Assignment Modal */}
+        {isTagAssignmentModalOpen &&
+          createPortal(
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-6 z-[9999]"
+              onClick={() => setIsTagAssignmentModalOpen(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                transition={{ type: "spring", damping: 25 }}
+                className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[85vh] overflow-hidden"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Header */}
+                <div className="flex items-center justify-between p-6 border-b border-slate-200 bg-gradient-to-r from-white to-slate-50">
+                  <h2 className="text-xl font-medium text-slate-900">
+                    Assign Tag
+                  </h2>
+                  <button
+                    onClick={() => setIsTagAssignmentModalOpen(false)}
+                    className="p-2 hover:bg-slate-100 rounded-full transition-colors"
+                  >
+                    <X className="w-5 h-5 text-slate-600" />
+                  </button>
+                </div>
+
+                {/* Content */}
+                <div className="p-6 overflow-y-auto max-h-[calc(85vh-80px)]">
+                  {loadingTags ? (
+                    <div className="text-center py-12">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#004aad] mx-auto"></div>
+                      <p className="text-sm text-slate-500 mt-3">
+                        Loading tags...
+                      </p>
+                    </div>
+                  ) : allTags.length === 0 ? (
+                    <div className="text-center py-12">
+                      <Tag className="w-12 h-12 text-slate-400 mx-auto mb-3" />
+                      <p className="text-sm text-slate-500">
+                        No tags available.
+                      </p>
+                      <p className="text-xs text-slate-400 mt-1">
+                        Use "Manage Tags" to create one!
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {allTags
+                        .filter(
+                          (tag) =>
+                            !facilityTags.some((ft) => ft.id === tag.id),
+                        )
+                        .map((tag) => (
+                          <motion.button
+                            key={tag.id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            onClick={() => handleAssignTag(tag.id)}
+                            disabled={assigningTag}
+                            className="w-full flex items-center gap-3 px-4 py-3 text-left rounded-xl hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed border border-slate-200 hover:border-slate-300 cursor-pointer"
+                          >
+                            <div
+                              className="w-5 h-5 rounded-full flex-shrink-0"
+                              style={{ backgroundColor: tag.color }}
+                            />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-slate-900">
+                                {tag.name}
+                              </p>
+                              {tag.description && (
+                                <p className="text-xs text-slate-500 mt-0.5">
+                                  {tag.description}
+                                </p>
+                              )}
+                            </div>
+                          </motion.button>
+                        ))}
+                      {allTags.filter(
+                        (tag) =>
+                          !facilityTags.some((ft) => ft.id === tag.id),
+                      ).length === 0 && (
+                        <div className="text-center py-12">
+                          <Tag className="w-12 h-12 text-slate-400 mx-auto mb-3" />
+                          <p className="text-sm text-slate-500">
+                            All tags already assigned
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </motion.div>
             </motion.div>,
