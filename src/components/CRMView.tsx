@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Building2,
@@ -15,82 +15,32 @@ import {
   Search,
   Filter,
   Plus,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
-import { Facility } from "@/types/facility";
+import { FacilityLightweight } from "@/types/facility";
+import { useQuery } from "@tanstack/react-query";
 
 const cn = (...classes: (string | undefined | null | false)[]) =>
   classes.filter(Boolean).join(" ");
+
+// Fetch all facilities
+async function fetchAllFacilities(): Promise<FacilityLightweight[]> {
+  const response = await fetch('/api/facilities/all');
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch facilities: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  return data.facilities as FacilityLightweight[];
+}
 
 const TABS = [
   { id: "facilities", label: "Facilities", icon: Building2 },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
   { id: "users", label: "Users", icon: Users },
   { id: "settings", label: "Settings", icon: Settings },
-];
-
-const mockFacilities: Partial<Facility>[] = [
-  {
-    place_id: "ChIJ123456789",
-    name: "Elite Performance Training Center",
-    sport_types: ["gym", "sports_complex"],
-    identified_sports: ["Basketball", "Volleyball", "Performance Training"],
-    address: "123 Sports Way, Dallas, TX 75201",
-    location: { lat: 32.7767, lng: -96.797 },
-    phone: "(214) 555-0123",
-    website: "https://eliteperformance.com",
-    rating: 4.8,
-    user_ratings_total: 142,
-    photo_references: Array(12).fill(""),
-    tags: [
-      { id: "1", name: "High Priority", color: "#ef4444" },
-      { id: "2", name: "Contacted", color: "#3b82f6" },
-    ],
-    has_notes: true,
-  },
-  {
-    place_id: "ChIJ987654321",
-    name: "Texas Strike Baseball",
-    sport_types: ["baseball_field"],
-    identified_sports: ["Baseball", "Softball", "Batting Cages"],
-    address: "456 Diamond Blvd, Austin, TX 78701",
-    location: { lat: 30.2672, lng: -97.7431 },
-    phone: "(512) 555-0456",
-    website: "https://txstrikebaseball.com",
-    rating: 4.5,
-    user_ratings_total: 89,
-    photo_references: Array(8).fill(""),
-    tags: [{ id: "3", name: "Needs Review", color: "#f59e0b" }],
-    has_notes: false,
-  },
-  {
-    place_id: "ChIJabcdefghi",
-    name: "Lone Star Soccer Complex",
-    sport_types: ["soccer_field"],
-    identified_sports: ["Soccer"],
-    address: "789 Goal St, Houston, TX 78702",
-    location: { lat: 29.7604, lng: -95.3698 },
-    phone: "(713) 555-0789",
-    rating: 4.2,
-    user_ratings_total: 315,
-    photo_references: Array(25).fill(""),
-    tags: [],
-    has_notes: true,
-  },
-  {
-    place_id: "ChIJjklmnopqr",
-    name: "Austin Tennis Center",
-    sport_types: ["tennis_court"],
-    identified_sports: ["Tennis", "Pickleball"],
-    address: "321 Racket Ln, Austin, TX 78759",
-    location: { lat: 30.4015, lng: -97.7268 },
-    phone: "(512) 555-9999",
-    website: "https://austintennis.org",
-    rating: 4.7,
-    user_ratings_total: 420,
-    photo_references: Array(18).fill(""),
-    tags: [{ id: "1", name: "High Priority", color: "#ef4444" }],
-    has_notes: false,
-  },
 ];
 
 function CRMTabs({
@@ -155,7 +105,7 @@ function SummaryCard({
   );
 }
 
-function FacilityTable({ facilities }: { facilities: Partial<Facility>[] }) {
+function FacilityTable({ facilities }: { facilities: FacilityLightweight[] }) {
   return (
     <div className="w-full overflow-x-auto rounded-2xl border border-slate-200/60 bg-white shadow-sm">
       <table className="w-full text-sm">
@@ -166,7 +116,10 @@ function FacilityTable({ facilities }: { facilities: Partial<Facility>[] }) {
               Contact Info
             </th>
             <th className="px-5 py-4 font-semibold text-slate-600">
-              Sports & Tags
+              Sports
+            </th>
+            <th className="px-5 py-4 font-semibold text-slate-600">
+              Tags
             </th>
             <th className="px-5 py-4 font-semibold text-slate-600 text-right">
               Metrics
@@ -232,8 +185,8 @@ function FacilityTable({ facilities }: { facilities: Partial<Facility>[] }) {
                   )}
                 </td>
 
-                <td className="px-4 py-3 align-top min-w-[200px]">
-                  <div className="flex flex-wrap gap-1.5 mb-2">
+                <td className="px-4 py-3 align-top min-w-[180px]">
+                  <div className="flex flex-wrap gap-1.5">
                     {facility.identified_sports?.map((sport) => (
                       <span
                         key={sport}
@@ -249,7 +202,10 @@ function FacilityTable({ facilities }: { facilities: Partial<Facility>[] }) {
                       </span>
                     )}
                   </div>
-                  {facility.tags && facility.tags.length > 0 && (
+                </td>
+
+                <td className="px-4 py-3 align-top min-w-[180px]">
+                  {facility.tags && facility.tags.length > 0 ? (
                     <div className="flex flex-wrap gap-1.5">
                       {facility.tags.map((tag) => (
                         <span
@@ -265,6 +221,8 @@ function FacilityTable({ facilities }: { facilities: Partial<Facility>[] }) {
                         </span>
                       ))}
                     </div>
+                  ) : (
+                    <span className="text-xs text-gray-400 italic">No tags</span>
                   )}
                 </td>
 
@@ -284,7 +242,7 @@ function FacilityTable({ facilities }: { facilities: Partial<Facility>[] }) {
                       <Camera className="h-4 w-4" />
                       <span className="tabular-nums">
                         {(facility.photo_references?.length || 0) +
-                          (facility.additional_photos?.length || 0)}{" "}
+                          (facility.additional_photos_count || 0)}{" "}
                         photos
                       </span>
                     </div>
@@ -302,7 +260,7 @@ function FacilityTable({ facilities }: { facilities: Partial<Facility>[] }) {
           {facilities.length === 0 && (
             <tr>
               <td
-                colSpan={5}
+                colSpan={6}
                 className="px-4 py-12 text-center text-gray-500 text-sm"
               >
                 No facilities found.
@@ -314,7 +272,7 @@ function FacilityTable({ facilities }: { facilities: Partial<Facility>[] }) {
           <tr className="border-t border-gray-300 bg-white">
             <td
               className="px-4 py-3 font-semibold text-gray-900 text-xs uppercase tracking-wider"
-              colSpan={3}
+              colSpan={4}
             >
               Total Facilities
             </td>
@@ -334,18 +292,67 @@ function FacilityTable({ facilities }: { facilities: Partial<Facility>[] }) {
 export default function CRMView({ isVisible }: { isVisible: boolean }) {
   const [activeTab, setActiveTab] = useState("facilities");
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(100);
 
-  const filteredFacilities = mockFacilities.filter(
+  // Fetch all facilities with React Query (shares cache with MapView)
+  const { data: facilities = [], isLoading, isError, error } = useQuery({
+    queryKey: ['facilities', 'all'],
+    queryFn: fetchAllFacilities,
+    staleTime: Infinity, // Session-based caching
+    gcTime: Infinity,
+  });
+
+  const filteredFacilities = facilities.filter(
     (f) =>
       f.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       f.address?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
-  const totalReviews = mockFacilities.reduce(
+  // Reset to page 1 when search changes
+  const previousSearchQuery = useRef(searchQuery);
+  useEffect(() => {
+    if (previousSearchQuery.current !== searchQuery) {
+      setCurrentPage(1);
+      previousSearchQuery.current = searchQuery;
+    }
+  }, [searchQuery]);
+
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredFacilities.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedFacilities = filteredFacilities.slice(startIndex, endIndex);
+
+  const totalReviews = facilities.reduce(
     (sum, f) => sum + (f.user_ratings_total || 0),
     0,
   );
-  const facilitiesWithNotes = mockFacilities.filter((f) => f.has_notes).length;
+  const facilitiesWithNotes = facilities.filter((f) => f.has_notes).length;
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className={`w-full min-h-screen bg-white font-poppins text-slate-900 ${!isVisible ? 'hidden' : ''} flex items-center justify-center`}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading facilities...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (isError) {
+    return (
+      <div className={`w-full min-h-screen bg-white font-poppins text-slate-900 ${!isVisible ? 'hidden' : ''} flex items-center justify-center`}>
+        <div className="text-center">
+          <div className="text-red-600 text-xl mb-4">❌ Error loading facilities</div>
+          <p className="text-gray-600">{error?.message || 'Unknown error'}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`w-full min-h-screen bg-white font-poppins text-slate-900 ${!isVisible ? 'hidden' : ''}`}>
@@ -373,14 +380,14 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
               <SummaryCard
                 label="Total Facilities"
-                value={mockFacilities.length}
+                value={facilities.length}
                 icon={Building2}
               />
               <SummaryCard
                 label="Avg Rating"
                 value={(
-                  mockFacilities.reduce((sum, f) => sum + (f.rating || 0), 0) /
-                  mockFacilities.length
+                  facilities.reduce((sum, f) => sum + (f.rating || 0), 0) /
+                  facilities.length
                 ).toFixed(1)}
                 icon={Star}
               />
@@ -424,7 +431,63 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
               </div>
 
               {/* Table */}
-              <FacilityTable facilities={filteredFacilities} />
+              <FacilityTable facilities={paginatedFacilities} />
+
+              {/* Pagination Controls */}
+              {filteredFacilities.length > 0 && (
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-200">
+                  {/* Results Info */}
+                  <div className="text-sm text-slate-600 font-medium">
+                    Showing {startIndex + 1}-{Math.min(endIndex, filteredFacilities.length)} of {filteredFacilities.length} facilities
+                  </div>
+
+                  {/* Page Controls */}
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                      className="flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                      Previous
+                    </button>
+
+                    <div className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700">
+                      Page <span className="font-bold text-slate-900">{currentPage}</span> of <span className="font-bold text-slate-900">{totalPages}</span>
+                    </div>
+
+                    <button
+                      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                      disabled={currentPage === totalPages}
+                      className="flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white"
+                    >
+                      Next
+                      <ChevronRight className="h-4 w-4" />
+                    </button>
+                  </div>
+
+                  {/* Items per page selector */}
+                  <div className="flex items-center gap-2 text-sm">
+                    <label htmlFor="itemsPerPage" className="text-slate-600 font-medium">
+                      Per page:
+                    </label>
+                    <select
+                      id="itemsPerPage"
+                      value={itemsPerPage}
+                      onChange={(e) => {
+                        setItemsPerPage(Number(e.target.value));
+                        setCurrentPage(1);
+                      }}
+                      className="px-3 py-2 border border-slate-200 rounded-lg bg-white text-slate-700 font-semibold focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all shadow-sm"
+                    >
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                      <option value={200}>200</option>
+                      <option value={500}>500</option>
+                    </select>
+                  </div>
+                </div>
+              )}
             </div>
           </motion.div>
         ) : (

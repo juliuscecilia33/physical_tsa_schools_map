@@ -4,7 +4,7 @@ import { useRef, useState, useMemo, useEffect } from "react";
 import Map, { Source, Layer, NavigationControl, Popup } from "react-map-gl";
 import type { MapRef, MapLayerMouseEvent } from "react-map-gl";
 import { Facility } from "@/types/facility";
-import { FilterOption } from "@/app/page";
+import { FilterOption } from "./MapView";
 import FacilitySidebar from "./FacilitySidebar";
 import FacilitySearch from "./FacilitySearch";
 import AISearchPanel from "./AISearchPanel";

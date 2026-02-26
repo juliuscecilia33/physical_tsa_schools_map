@@ -40,6 +40,7 @@ export async function GET(request: NextRequest) {
         rating: facility.rating ? parseFloat(facility.rating) : undefined,
         user_ratings_total: facility.user_ratings_total ? parseInt(facility.user_ratings_total) : undefined,
         photo_references: facility.photo_references || [],
+        additional_photos_count: facility.additional_photos_count || 0,
         opening_hours: facility.opening_hours,
         business_status: facility.business_status,
         hidden: facility.hidden,
