@@ -951,7 +951,7 @@ export default function FacilitySidebar({
               whileHover={{ scale: 1.1, rotate: 90 }}
               whileTap={{ scale: 0.9 }}
               onClick={onClose}
-              className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 transition-colors"
+              className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
               aria-label="Close"
             >
               <X className="w-5 h-5" />
@@ -978,7 +978,7 @@ export default function FacilitySidebar({
                 </h3>
                 <button
                   onClick={() => setIsPhotosModalOpen(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-xl transition-all"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-xl transition-all cursor-pointer"
                 >
                   <Maximize2 className="w-3.5 h-3.5" />
                   Expand
@@ -989,7 +989,7 @@ export default function FacilitySidebar({
                 {showLeftArrow && (
                   <button
                     onClick={() => scrollPhotos("left")}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-md flex items-center justify-center transition-all opacity-0 group-hover/photos:opacity-100"
+                    className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-md flex items-center justify-center transition-all opacity-0 group-hover/photos:opacity-100 cursor-pointer"
                     aria-label="Scroll left"
                   >
                     <ChevronLeft className="w-6 h-6 text-slate-700" />
@@ -1000,7 +1000,7 @@ export default function FacilitySidebar({
                 {showRightArrow && (
                   <button
                     onClick={() => scrollPhotos("right")}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-md flex items-center justify-center transition-all opacity-0 group-hover/photos:opacity-100"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-md flex items-center justify-center transition-all opacity-0 group-hover/photos:opacity-100 cursor-pointer"
                     aria-label="Scroll right"
                   >
                     <ChevronRight className="w-6 h-6 text-slate-700" />
@@ -1070,7 +1070,7 @@ export default function FacilitySidebar({
                     </h3>
                     <button
                       onClick={() => setIsAdditionalPhotosModalOpen(true)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-xl transition-all"
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-xl transition-all cursor-pointer"
                     >
                       <Maximize2 className="w-3.5 h-3.5" />
                       Expand
@@ -1081,7 +1081,7 @@ export default function FacilitySidebar({
                     {showAdditionalLeftArrow && (
                       <button
                         onClick={() => scrollAdditionalPhotos("left")}
-                        className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-md flex items-center justify-center transition-all opacity-0 group-hover/additional-photos:opacity-100"
+                        className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-md flex items-center justify-center transition-all opacity-0 group-hover/additional-photos:opacity-100 cursor-pointer"
                         aria-label="Scroll left"
                       >
                         <ChevronLeft className="w-6 h-6 text-slate-700" />
@@ -1092,7 +1092,7 @@ export default function FacilitySidebar({
                     {showAdditionalRightArrow && (
                       <button
                         onClick={() => scrollAdditionalPhotos("right")}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-md flex items-center justify-center transition-all opacity-0 group-hover/additional-photos:opacity-100"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-md flex items-center justify-center transition-all opacity-0 group-hover/additional-photos:opacity-100 cursor-pointer"
                         aria-label="Scroll right"
                       >
                         <ChevronRight className="w-6 h-6 text-slate-700" />
@@ -1172,7 +1172,7 @@ export default function FacilitySidebar({
                 {!showAddNoteForm && (
                   <button
                     onClick={() => setShowAddNoteForm(true)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-xl transition-all"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-xl transition-all cursor-pointer"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     Add Note
@@ -1181,7 +1181,7 @@ export default function FacilitySidebar({
                 {notes.length > 3 && (
                   <button
                     onClick={() => setShowAllNotes(!showAllNotes)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-xl transition-all"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-xl transition-all cursor-pointer"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
                     {showAllNotes ? "Show Less" : "See All"}
@@ -1210,7 +1210,7 @@ export default function FacilitySidebar({
                     whileTap={{ scale: 0.98 }}
                     onClick={handleAddNote}
                     disabled={!newNoteText.trim() || addingNote}
-                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-[#004aad] to-[#004aad]/90 hover:from-[#004aad]/90 hover:to-[#004aad]/80 text-white rounded-xl text-sm font-medium shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-[#004aad] to-[#004aad]/90 hover:from-[#004aad]/90 hover:to-[#004aad]/80 text-white rounded-xl text-sm font-medium shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                   >
                     <Plus className="w-4 h-4" />
                     <span>{addingNote ? "Adding..." : "Add Note"}</span>
@@ -1223,7 +1223,7 @@ export default function FacilitySidebar({
                       setNewNoteText("");
                     }}
                     disabled={addingNote}
-                    className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                   >
                     Cancel
                   </motion.button>
@@ -1267,7 +1267,7 @@ export default function FacilitySidebar({
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
                               onClick={() => handleSaveEdit(note.id)}
-                              className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-xl text-xs font-medium"
+                              className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-xl text-xs font-medium cursor-pointer"
                             >
                               <Save className="w-3 h-3" />
                               Save
@@ -1276,7 +1276,7 @@ export default function FacilitySidebar({
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
                               onClick={handleCancelEdit}
-                              className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-medium"
+                              className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-medium cursor-pointer"
                             >
                               <XIcon className="w-3 h-3" />
                               Cancel
@@ -1300,7 +1300,7 @@ export default function FacilitySidebar({
                                 whileHover={{ scale: 1.1 }}
                                 whileTap={{ scale: 0.9 }}
                                 onClick={() => handleStartEdit(note)}
-                                className="p-1 hover:bg-[#004aad]/10 rounded text-[#004aad]"
+                                className="p-1 hover:bg-[#004aad]/10 rounded text-[#004aad] cursor-pointer"
                               >
                                 <Edit2 className="w-3.5 h-3.5" />
                               </motion.button>
@@ -1308,7 +1308,7 @@ export default function FacilitySidebar({
                                 whileHover={{ scale: 1.1 }}
                                 whileTap={{ scale: 0.9 }}
                                 onClick={() => handleDeleteNote(note.id)}
-                                className="p-1 hover:bg-red-100 rounded text-red-600"
+                                className="p-1 hover:bg-red-100 rounded text-red-600 cursor-pointer"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
                               </motion.button>
@@ -1340,14 +1340,14 @@ export default function FacilitySidebar({
                 <button
                   onClick={() => setIsTagAssignmentModalOpen(true)}
                   disabled={assigningTag}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   Assign Tag
                 </button>
                 <button
                   onClick={() => setIsTagManagementModalOpen(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-slate-900 hover:bg-slate-800 rounded-xl transition-all"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-slate-900 hover:bg-slate-800 rounded-xl transition-all cursor-pointer"
                 >
                   Manage Tags
                 </button>
@@ -1370,7 +1370,7 @@ export default function FacilitySidebar({
                     <span>{tag.name}</span>
                     <button
                       onClick={() => handleRemoveTag(tag.id)}
-                      className="ml-1 opacity-70 hover:opacity-100 transition-opacity"
+                      className="ml-1 opacity-70 hover:opacity-100 transition-opacity cursor-pointer"
                       title="Remove tag"
                     >
                       <X className="w-3.5 h-3.5" />
@@ -1659,7 +1659,7 @@ export default function FacilitySidebar({
                 </h3>
                 <button
                   onClick={() => setIsReviewsModalOpen(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-xl transition-all"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-xl transition-all cursor-pointer"
                 >
                   <Maximize2 className="w-3.5 h-3.5" />
                   Expand
@@ -1722,7 +1722,7 @@ export default function FacilitySidebar({
                     </h3>
                     <button
                       onClick={() => setIsAdditionalReviewsModalOpen(true)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-xl transition-all"
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-xl transition-all cursor-pointer"
                     >
                       <Maximize2 className="w-3.5 h-3.5" />
                       Expand
@@ -1823,7 +1823,7 @@ export default function FacilitySidebar({
                       onClick={() =>
                         setShowAllAdditionalReviews(!showAllAdditionalReviews)
                       }
-                      className="w-full mt-4 py-3 text-sm font-medium text-[#004aad] hover:bg-slate-50 rounded-xl transition-colors border border-slate-200 hover:border-[#004aad]"
+                      className="w-full mt-4 py-3 text-sm font-medium text-[#004aad] hover:bg-slate-50 rounded-xl transition-colors border border-slate-200 hover:border-[#004aad] cursor-pointer"
                     >
                       {showAllAdditionalReviews
                         ? "Show Less"

@@ -104,7 +104,7 @@ export default function FilterButtonBar({
         <button
           ref={displayButtonRef}
           onClick={() => handleDropdownToggle('display')}
-          className={`flex-shrink-0 flex items-center justify-between gap-2 px-3 py-3.5 min-w-[110px] rounded-2xl shadow-2xl border transition-all text-sm font-medium ${
+          className={`flex-shrink-0 flex items-center justify-between gap-2 px-3 py-3.5 min-w-[110px] rounded-2xl shadow-2xl border transition-all text-sm font-medium cursor-pointer ${
             displayFilterActive || openDropdown === 'display'
               ? 'bg-[#004aad] text-white border-[#004aad]'
               : 'bg-white/95 backdrop-blur-xl text-slate-700 border-slate-200 hover:bg-slate-50'
@@ -126,7 +126,7 @@ export default function FilterButtonBar({
         <button
           ref={sportButtonRef}
           onClick={() => handleDropdownToggle('sport')}
-          className={`flex-shrink-0 flex items-center justify-between gap-2 px-3 py-3.5 min-w-[100px] rounded-2xl shadow-2xl border transition-all text-sm font-medium ${
+          className={`flex-shrink-0 flex items-center justify-between gap-2 px-3 py-3.5 min-w-[100px] rounded-2xl shadow-2xl border transition-all text-sm font-medium cursor-pointer ${
             openDropdown === 'sport'
               ? 'bg-[#004aad] text-white border-[#004aad]'
               : allSportsSelected
@@ -152,7 +152,7 @@ export default function FilterButtonBar({
         <button
           ref={tagButtonRef}
           onClick={() => handleDropdownToggle('tag')}
-          className={`flex-shrink-0 flex items-center justify-between gap-2 px-3 py-3.5 min-w-[95px] rounded-2xl shadow-2xl border transition-all text-sm font-medium ${
+          className={`flex-shrink-0 flex items-center justify-between gap-2 px-3 py-3.5 min-w-[95px] rounded-2xl shadow-2xl border transition-all text-sm font-medium cursor-pointer ${
             openDropdown === 'tag'
               ? 'bg-[#004aad] text-white border-[#004aad]'
               : allTagsSelected
@@ -178,7 +178,7 @@ export default function FilterButtonBar({
         <button
           ref={categoryButtonRef}
           onClick={() => handleDropdownToggle('category')}
-          className={`flex-shrink-0 flex items-center justify-between gap-2 px-3 py-3.5 min-w-[130px] rounded-2xl shadow-2xl border transition-all text-sm font-medium ${
+          className={`flex-shrink-0 flex items-center justify-between gap-2 px-3 py-3.5 min-w-[130px] rounded-2xl shadow-2xl border transition-all text-sm font-medium cursor-pointer ${
             openDropdown === 'category'
               ? 'bg-[#004aad] text-white border-[#004aad]'
               : allCategoriesSelected
@@ -204,7 +204,7 @@ export default function FilterButtonBar({
         <button
           ref={moreButtonRef}
           onClick={() => handleDropdownToggle('more')}
-          className={`flex-shrink-0 flex items-center justify-between gap-2 px-3 py-3.5 min-w-[95px] rounded-2xl shadow-2xl border transition-all text-sm font-medium ${
+          className={`flex-shrink-0 flex items-center justify-between gap-2 px-3 py-3.5 min-w-[95px] rounded-2xl shadow-2xl border transition-all text-sm font-medium cursor-pointer ${
             openDropdown === 'more'
               ? 'bg-[#004aad] text-white border-[#004aad]'
               : 'bg-white/95 backdrop-blur-xl text-slate-700 border-slate-200 hover:bg-slate-50'
