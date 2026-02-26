@@ -1,13 +1,22 @@
-'use client';
+"use client";
 
-import { useState, useRef } from 'react';
-import { PanelLeft, PanelLeftOpen, Eye, Trophy, Tag as TagIcon, Grid3x3, MoreHorizontal, ChevronDown } from 'lucide-react';
-import DisplayFilterDropdown from './FilterDropdowns/DisplayFilterDropdown';
-import SportFilterDropdown from './FilterDropdowns/SportFilterDropdown';
-import TagFilterDropdown from './FilterDropdowns/TagFilterDropdown';
-import CategoryFilterDropdown from './FilterDropdowns/CategoryFilterDropdown';
-import MoreFiltersDropdown from './FilterDropdowns/MoreFiltersDropdown';
-import { VisibilityFilter } from '@/types/facility';
+import { useState, useRef } from "react";
+import {
+  PanelLeft,
+  PanelLeftOpen,
+  Eye,
+  Trophy,
+  Tag as TagIcon,
+  Grid3x3,
+  MoreHorizontal,
+  ChevronDown,
+} from "lucide-react";
+import DisplayFilterDropdown from "./FilterDropdowns/DisplayFilterDropdown";
+import SportFilterDropdown from "./FilterDropdowns/SportFilterDropdown";
+import TagFilterDropdown from "./FilterDropdowns/TagFilterDropdown";
+import CategoryFilterDropdown from "./FilterDropdowns/CategoryFilterDropdown";
+import MoreFiltersDropdown from "./FilterDropdowns/MoreFiltersDropdown";
+import { VisibilityFilter } from "@/types/facility";
 
 interface Tag {
   id: string;
@@ -46,7 +55,7 @@ interface FilterButtonBarProps {
   categoryColors: Record<string, string>;
 }
 
-type OpenDropdown = 'display' | 'sport' | 'tag' | 'category' | 'more' | null;
+type OpenDropdown = "display" | "sport" | "tag" | "category" | "more" | null;
 
 export default function FilterButtonBar({
   sidebarVisible,
@@ -86,7 +95,7 @@ export default function FilterButtonBar({
   };
 
   // Calculate active filter counts
-  const displayFilterActive = visibilityFilter !== 'UNHIDDEN_ONLY';
+  const displayFilterActive = visibilityFilter !== "UNHIDDEN_ONLY";
   const sportFilterCount = selectedSports.length;
   const tagFilterCount = selectedTagIds.length;
   const categoryFilterCount = selectedCategories.length;
@@ -94,8 +103,11 @@ export default function FilterButtonBar({
   // Check if all filters are selected (for outline-only styling)
   const TOTAL_CATEGORIES = 5;
   const allCategoriesSelected = selectedCategories.length === TOTAL_CATEGORIES;
-  const allSportsSelected = availableSports.length > 0 && selectedSports.length === availableSports.length;
-  const allTagsSelected = availableTags.length > 0 && selectedTagIds.length === availableTags.length;
+  const allSportsSelected =
+    availableSports.length > 0 &&
+    selectedSports.length === availableSports.length;
+  const allTagsSelected =
+    availableTags.length > 0 && selectedTagIds.length === availableTags.length;
 
   return (
     <>
@@ -103,11 +115,11 @@ export default function FilterButtonBar({
         {/* Display Filter Button */}
         <button
           ref={displayButtonRef}
-          onClick={() => handleDropdownToggle('display')}
+          onClick={() => handleDropdownToggle("display")}
           className={`flex-shrink-0 flex items-center justify-between gap-2 px-3 py-3 min-w-[100px] rounded-2xl shadow-2xl border transition-all text-sm font-medium cursor-pointer ${
-            displayFilterActive || openDropdown === 'display'
-              ? 'bg-[#004aad] text-white border-[#004aad]'
-              : 'bg-white/95 backdrop-blur-xl text-slate-700 border-slate-200 hover:bg-slate-50'
+            displayFilterActive || openDropdown === "display"
+              ? "bg-[#004aad] text-white border-[#004aad]"
+              : "bg-white/95 backdrop-blur-xl text-slate-700 border-slate-200 hover:bg-slate-50"
           }`}
         >
           <div className="flex items-center gap-1.5">
@@ -125,15 +137,15 @@ export default function FilterButtonBar({
         {/* Sport Filter Button */}
         <button
           ref={sportButtonRef}
-          onClick={() => handleDropdownToggle('sport')}
+          onClick={() => handleDropdownToggle("sport")}
           className={`flex-shrink-0 flex items-center justify-between gap-2 px-3 py-3 min-w-[90px] rounded-2xl shadow-2xl border transition-all text-sm font-medium cursor-pointer ${
-            openDropdown === 'sport'
-              ? 'bg-[#004aad] text-white border-[#004aad]'
+            openDropdown === "sport"
+              ? "bg-[#004aad] text-white border-[#004aad]"
               : allSportsSelected
-              ? 'bg-white/95 backdrop-blur-xl text-[#004aad] border-2 border-[#004aad] hover:bg-slate-50'
-              : sportFilterCount > 0
-              ? 'bg-[#004aad] text-white border-[#004aad]'
-              : 'bg-white/95 backdrop-blur-xl text-slate-700 border-slate-200 hover:bg-slate-50'
+                ? "bg-white/95 backdrop-blur-xl text-[#004aad] border-2 border-[#004aad] hover:bg-slate-50"
+                : sportFilterCount > 0
+                  ? "bg-[#004aad] text-white border-[#004aad]"
+                  : "bg-white/95 backdrop-blur-xl text-slate-700 border-slate-200 hover:bg-slate-50"
           }`}
         >
           <div className="flex items-center gap-1.5">
@@ -151,15 +163,15 @@ export default function FilterButtonBar({
         {/* Tag Filter Button */}
         <button
           ref={tagButtonRef}
-          onClick={() => handleDropdownToggle('tag')}
+          onClick={() => handleDropdownToggle("tag")}
           className={`flex-shrink-0 flex items-center justify-between gap-2 px-3 py-3 min-w-[85px] rounded-2xl shadow-2xl border transition-all text-sm font-medium cursor-pointer ${
-            openDropdown === 'tag'
-              ? 'bg-[#004aad] text-white border-[#004aad]'
+            openDropdown === "tag"
+              ? "bg-[#004aad] text-white border-[#004aad]"
               : allTagsSelected
-              ? 'bg-white/95 backdrop-blur-xl text-[#004aad] border-2 border-[#004aad] hover:bg-slate-50'
-              : tagFilterCount > 0
-              ? 'bg-[#004aad] text-white border-[#004aad]'
-              : 'bg-white/95 backdrop-blur-xl text-slate-700 border-slate-200 hover:bg-slate-50'
+                ? "bg-white/95 backdrop-blur-xl text-[#004aad] border-2 border-[#004aad] hover:bg-slate-50"
+                : tagFilterCount > 0
+                  ? "bg-[#004aad] text-white border-[#004aad]"
+                  : "bg-white/95 backdrop-blur-xl text-slate-700 border-slate-200 hover:bg-slate-50"
           }`}
         >
           <div className="flex items-center gap-1.5">
@@ -177,15 +189,15 @@ export default function FilterButtonBar({
         {/* Category Filter Button */}
         <button
           ref={categoryButtonRef}
-          onClick={() => handleDropdownToggle('category')}
+          onClick={() => handleDropdownToggle("category")}
           className={`flex-shrink-0 flex items-center justify-between gap-2 px-3 py-3 min-w-[115px] rounded-2xl shadow-2xl border transition-all text-sm font-medium cursor-pointer ${
-            openDropdown === 'category'
-              ? 'bg-[#004aad] text-white border-[#004aad]'
+            openDropdown === "category"
+              ? "bg-[#004aad] text-white border-[#004aad]"
               : allCategoriesSelected
-              ? 'bg-white/95 backdrop-blur-xl text-[#004aad] border-2 border-[#004aad] hover:bg-slate-50'
-              : categoryFilterCount > 0
-              ? 'bg-[#004aad] text-white border-[#004aad]'
-              : 'bg-white/95 backdrop-blur-xl text-slate-700 border-slate-200 hover:bg-slate-50'
+                ? "bg-white/95 backdrop-blur-xl text-[#004aad] border-2 border-[#004aad] hover:bg-slate-50"
+                : categoryFilterCount > 0
+                  ? "bg-[#004aad] text-white border-[#004aad]"
+                  : "bg-white/95 backdrop-blur-xl text-slate-700 border-slate-200 hover:bg-slate-50"
           }`}
         >
           <div className="flex items-center gap-1.5">
@@ -201,7 +213,7 @@ export default function FilterButtonBar({
         </button>
 
         {/* More Filters Button */}
-        <button
+        {/* <button
           ref={moreButtonRef}
           onClick={() => handleDropdownToggle('more')}
           className={`flex-shrink-0 flex items-center justify-between gap-2 px-3 py-3 min-w-[85px] rounded-2xl shadow-2xl border transition-all text-sm font-medium cursor-pointer ${
@@ -215,12 +227,12 @@ export default function FilterButtonBar({
             <span className="whitespace-nowrap">More</span>
           </div>
           <ChevronDown className="w-3.5 h-3.5" />
-        </button>
+        </button> */}
       </div>
 
       {/* Dropdown Components */}
       <DisplayFilterDropdown
-        isOpen={openDropdown === 'display'}
+        isOpen={openDropdown === "display"}
         onClose={closeAllDropdowns}
         selectedFilter={visibilityFilter}
         onFilterChange={onVisibilityFilterChange}
@@ -228,7 +240,7 @@ export default function FilterButtonBar({
       />
 
       <SportFilterDropdown
-        isOpen={openDropdown === 'sport'}
+        isOpen={openDropdown === "sport"}
         onClose={closeAllDropdowns}
         availableSports={availableSports}
         selectedSports={selectedSports}
@@ -239,7 +251,7 @@ export default function FilterButtonBar({
       />
 
       <TagFilterDropdown
-        isOpen={openDropdown === 'tag'}
+        isOpen={openDropdown === "tag"}
         onClose={closeAllDropdowns}
         availableTags={availableTags}
         selectedTagIds={selectedTagIds}
@@ -249,7 +261,7 @@ export default function FilterButtonBar({
       />
 
       <CategoryFilterDropdown
-        isOpen={openDropdown === 'category'}
+        isOpen={openDropdown === "category"}
         onClose={closeAllDropdowns}
         selectedCategories={selectedCategories}
         onCategoryToggle={onCategoryToggle}
@@ -260,7 +272,7 @@ export default function FilterButtonBar({
       />
 
       <MoreFiltersDropdown
-        isOpen={openDropdown === 'more'}
+        isOpen={openDropdown === "more"}
         onClose={closeAllDropdowns}
         buttonRef={moreButtonRef}
       />
