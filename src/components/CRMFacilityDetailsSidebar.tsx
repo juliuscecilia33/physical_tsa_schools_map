@@ -1505,11 +1505,24 @@ export default function CRMFacilityDetailsSidebar({
                                         </div>
                                         {metadata.matched_text && (
                                           <div className="mt-1 italic border-t border-slate-700 pt-1">
-                                            "{metadata.matched_text.substring(0, 100)}
-                                            {metadata.matched_text.length > 100
-                                              ? "..."
-                                              : ""}
-                                            "
+                                            {Array.isArray(metadata.matched_text) ? (
+                                              <div>
+                                                <strong>{metadata.matched_text.length} matching review(s):</strong>
+                                                <div className="mt-1 space-y-2 max-h-40 overflow-y-auto">
+                                                  {metadata.matched_text.map((review, idx) => (
+                                                    <div key={idx} className="text-slate-300 border-l-2 border-slate-600 pl-2">
+                                                      "{review.substring(0, 100)}
+                                                      {review.length > 100 ? "..." : ""}"
+                                                    </div>
+                                                  ))}
+                                                </div>
+                                              </div>
+                                            ) : (
+                                              <>
+                                                "{metadata.matched_text.substring(0, 100)}
+                                                {metadata.matched_text.length > 100 ? "..." : ""}"
+                                              </>
+                                            )}
                                           </div>
                                         )}
                                       </div>
