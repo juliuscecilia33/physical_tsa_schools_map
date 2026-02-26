@@ -19,25 +19,14 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { FacilityLightweight } from "@/types/facility";
-import { useQuery } from "@tanstack/react-query";
 import { useLoading } from "@/contexts/LoadingContext";
+import { useFacilities } from "@/hooks/useFacilities";
 import FiltersSidebar, { FilterState } from "./FiltersSidebar";
 import CRMFacilityDetailsSidebar from "./CRMFacilityDetailsSidebar";
+import { SkeletonTableRows } from "./SkeletonTableRow";
 
 const cn = (...classes: (string | undefined | null | false)[]) =>
   classes.filter(Boolean).join(" ");
-
-// Fetch all facilities
-async function fetchAllFacilities(): Promise<FacilityLightweight[]> {
-  const response = await fetch('/api/facilities/all');
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch facilities: ${response.statusText}`);
-  }
-
-  const data = await response.json();
-  return data.facilities as FacilityLightweight[];
-}
 
 const TABS = [
   { id: "facilities", label: "Facilities", icon: Building2 },
@@ -111,9 +100,11 @@ function SummaryCard({
 function FacilityTable({
   facilities,
   onOpenDetails,
+  isLoading,
 }: {
   facilities: FacilityLightweight[];
   onOpenDetails: (placeId: string) => void;
+  isLoading?: boolean;
 }) {
   return (
     <div className="w-full overflow-x-auto rounded-2xl border border-slate-200/60 bg-white shadow-sm">
@@ -139,8 +130,11 @@ function FacilityTable({
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100">
-          <AnimatePresence>
-            {facilities.map((facility, index) => (
+          {isLoading ? (
+            <SkeletonTableRows count={10} />
+          ) : (
+            <AnimatePresence>
+              {facilities.map((facility, index) => (
               <motion.tr
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -272,16 +266,17 @@ function FacilityTable({
                 </td>
               </motion.tr>
             ))}
+            {facilities.length === 0 && !isLoading && (
+              <tr>
+                <td
+                  colSpan={6}
+                  className="px-4 py-12 text-center text-gray-500 text-sm"
+                >
+                  No facilities found.
+                </td>
+              </tr>
+            )}
           </AnimatePresence>
-          {facilities.length === 0 && (
-            <tr>
-              <td
-                colSpan={6}
-                className="px-4 py-12 text-center text-gray-500 text-sm"
-              >
-                No facilities found.
-              </td>
-            </tr>
           )}
         </tbody>
         <tfoot>
@@ -349,20 +344,25 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
     setSelectedFacilityId(placeId);
   };
 
-  // Fetch all facilities with React Query (shares cache with MapView)
-  const { data: facilities = [], isLoading, isError, error } = useQuery({
-    queryKey: ['facilities', 'all'],
-    queryFn: fetchAllFacilities,
-    staleTime: Infinity, // Session-based caching
-    gcTime: Infinity,
-  });
+  // Use shared facilities hook (same data as MapView)
+  const {
+    facilities: allFacilities,
+    isPriorityLoading,
+    isBackgroundLoading,
+    backgroundLoadingComplete,
+    isError,
+    error,
+  } = useFacilities();
 
-  // Signal loading complete when data finishes loading
+  // Convert Facility[] to FacilityLightweight[] (they have the same structure)
+  const facilities = allFacilities as unknown as FacilityLightweight[];
+
+  // Signal loading complete when background loading finishes
   useEffect(() => {
-    if (!isLoading) {
+    if (backgroundLoadingComplete) {
       setLoadingComplete();
     }
-  }, [isLoading, setLoadingComplete]);
+  }, [backgroundLoadingComplete, setLoadingComplete]);
 
   // Save filters to localStorage whenever they change
   useEffect(() => {
@@ -467,20 +467,8 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
   );
   const facilitiesWithNotes = facilities.filter((f) => f.has_notes).length;
 
-  // Show loading state
-  if (isLoading) {
-    return (
-      <div className={`w-full min-h-screen bg-white font-poppins text-slate-900 ${!isVisible ? 'hidden' : ''} flex items-center justify-center`}>
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading facilities...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Show error state
-  if (isError) {
+  // Show error state (only for critical errors, not for loading)
+  if (isError && !isPriorityLoading) {
     return (
       <div className={`w-full min-h-screen bg-white font-poppins text-slate-900 ${!isVisible ? 'hidden' : ''} flex items-center justify-center`}>
         <div className="text-center">
@@ -490,6 +478,10 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
       </div>
     );
   }
+
+  // Determine if we should show loading state
+  const isLoadingData = isPriorityLoading;
+  const showSkeletonRows = isLoadingData || (isBackgroundLoading && facilities.length === 0);
 
   return (
     <div className={`w-full min-h-screen bg-white font-poppins text-slate-900 ${!isVisible ? 'hidden' : ''}`}>
@@ -554,8 +546,17 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
               {/* Toolbar */}
               <div className="flex flex-col sm:flex-row justify-between gap-4 items-center">
                 <div className="flex items-center gap-3">
+                  {/* Background loading indicator */}
+                  {isBackgroundLoading && (
+                    <div className="text-sm text-slate-600 font-medium">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg border border-blue-200">
+                        <div className="animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-blue-600"></div>
+                        Loading more facilities...
+                      </span>
+                    </div>
+                  )}
                   {/* Active filters indicator */}
-                  {activeFilterCount > 0 && (
+                  {!isBackgroundLoading && activeFilterCount > 0 && (
                     <div className="text-sm text-slate-600 font-medium">
                       <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg border border-blue-200">
                         <Filter className="h-3.5 w-3.5" />
@@ -563,7 +564,7 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
                       </span>
                     </div>
                   )}
-                  {activeFilterCount === 0 && (
+                  {!isBackgroundLoading && activeFilterCount === 0 && (
                     <div className="text-sm text-slate-500 font-medium">
                       No filters applied
                     </div>
@@ -594,6 +595,7 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
               <FacilityTable
                 facilities={paginatedFacilities}
                 onOpenDetails={handleOpenDetails}
+                isLoading={showSkeletonRows}
               />
 
               {/* Pagination Controls */}

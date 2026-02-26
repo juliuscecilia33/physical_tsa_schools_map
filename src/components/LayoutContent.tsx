@@ -5,12 +5,12 @@ import { useLoading } from "@/contexts/LoadingContext";
 import NavigationSidebar from "@/components/NavigationSidebar";
 
 export default function LayoutContent({ children }: { children: ReactNode }) {
-  const { isInitialLoading } = useLoading();
+  const { isPriorityLoadComplete } = useLoading();
 
   return (
     <>
-      {!isInitialLoading && <NavigationSidebar />}
-      <div className={isInitialLoading ? "" : "ml-16"}>{children}</div>
+      {isPriorityLoadComplete && <NavigationSidebar />}
+      <div className={isPriorityLoadComplete ? "ml-16" : ""}>{children}</div>
     </>
   );
 }
