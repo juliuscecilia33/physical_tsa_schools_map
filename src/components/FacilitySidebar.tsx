@@ -1479,17 +1479,17 @@ export default function FacilitySidebar({
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.1 + idx * 0.05 }}
-                    className="group relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-white border transition-all"
+                    className="group relative inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-white border transition-all"
                     style={{ borderColor: tag.color, color: tag.color }}
                   >
-                    <Tag className="w-3.5 h-3.5" />
+                    <Tag className="w-3 h-3" />
                     <span>{tag.name}</span>
                     <button
                       onClick={() => handleRemoveTag(tag.id)}
                       className="ml-1 opacity-70 hover:opacity-100 transition-opacity cursor-pointer"
                       title="Remove tag"
                     >
-                      <X className="w-3.5 h-3.5" />
+                      <X className="w-3 h-3" />
                     </button>
                   </motion.div>
                 ))}
@@ -1500,9 +1500,9 @@ export default function FacilitySidebar({
                   transition={{ delay: 0.1 + facilityTags.length * 0.05 }}
                   onClick={() => setIsTagAssignmentModalOpen(true)}
                   disabled={assigningTag}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-slate-100 hover:bg-slate-200 text-slate-600 border-2 border-dashed border-slate-300 hover:border-slate-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-600 border-2 border-dashed border-slate-300 hover:border-slate-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
-                  <Plus className="w-3.5 h-3.5" />
+                  <Plus className="w-3 h-3" />
                   <span>Add</span>
                 </motion.button>
               </div>
@@ -1514,9 +1514,9 @@ export default function FacilitySidebar({
                   animate={{ opacity: 1, scale: 1 }}
                   onClick={() => setIsTagAssignmentModalOpen(true)}
                   disabled={assigningTag}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-slate-100 hover:bg-slate-200 text-slate-600 border-2 border-dashed border-slate-300 hover:border-slate-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-600 border-2 border-dashed border-slate-300 hover:border-slate-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
-                  <Plus className="w-3.5 h-3.5" />
+                  <Plus className="w-3 h-3" />
                   <span>Add Tag</span>
                 </motion.button>
               </div>
@@ -1555,7 +1555,7 @@ export default function FacilitySidebar({
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.1 + idx * 0.05 }}
                     whileHover={{ scale: 1.05 }}
-                    className="px-4 py-1.5 bg-white text-blue-600 border border-blue-600 rounded-full text-sm font-medium transition-all cursor-default flex items-center gap-1.5"
+                    className="px-3 py-1 bg-white text-blue-600 border border-blue-600 rounded-full text-xs font-medium transition-all cursor-default flex items-center gap-1.5"
                   >
                     <span className="text-base">
                       {FACILITY_TYPE_EMOJIS[type] || "🏢"}
@@ -1621,14 +1621,13 @@ export default function FacilitySidebar({
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.12 + idx * 0.05 }}
-                        whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         className="group relative"
                         title={tooltipContent}
                       >
                         <button
                           onClick={() => setSelectedSportDetail(sport)}
-                          className={`px-4 py-1.5 bg-white ${textColor} rounded-full text-sm font-medium transition-all cursor-pointer flex items-center gap-1.5 border ${borderColor}`}
+                          className={`px-3 py-1 bg-white ${textColor} rounded-full text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5 border ${borderColor}`}
                         >
                           <span className="text-lg">
                             {SPORT_EMOJIS[sport] || "🏅"}
@@ -1636,7 +1635,7 @@ export default function FacilitySidebar({
                           <span>{sport}</span>
                           {metadata ? (
                             <>
-                              <span className="px-1.5 py-0.5 rounded text-xs font-bold bg-slate-100">
+                              <span className="px-1 py-0.5 rounded text-xs font-bold bg-slate-100">
                                 {score}
                               </span>
                             </>
