@@ -10,7 +10,7 @@ export default function LayoutContent({ children }: { children: ReactNode }) {
   return (
     <>
       {!isInitialLoading && <NavigationSidebar />}
-      <div className={isInitialLoading ? "" : "ml-20"}>{children}</div>
+      <div className={isInitialLoading ? "" : "ml-16"}>{children}</div>
     </>
   );
 }
