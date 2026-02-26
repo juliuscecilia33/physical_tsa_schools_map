@@ -944,8 +944,8 @@ export default function FacilitySidebar({
           {displayFacility.photo_references &&
           displayFacility.photo_references.length > 0 &&
           (!displayFacility.serp_scraped ||
-            !displayFacility.additional_photos ||
-            displayFacility.additional_photos.length === 0) ? (
+            (displayFacility.additional_photos !== undefined &&
+              displayFacility.additional_photos.length === 0)) ? (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
