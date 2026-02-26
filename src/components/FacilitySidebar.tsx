@@ -873,7 +873,7 @@ export default function FacilitySidebar({
         className="fixed top-[1vh] left-24 h-[98vh] w-full md:w-[480px] bg-white shadow-xl border border-slate-200/60 rounded-2xl z-50 flex flex-col overflow-hidden"
       >
         {/* Header with gradient */}
-        <div className="sticky top-0 bg-gradient-to-br from-white via-white to-[#004aad]/5 backdrop-blur-sm border-b border-[#E8E9EB] shadow-sm z-20">
+        <div className="sticky top-0 bg-white backdrop-blur-sm border-b border-slate-200 shadow-sm z-20">
           {/* Cover Photo */}
           {displayFacility.photo_references &&
             displayFacility.photo_references.length > 0 && (
@@ -947,15 +947,13 @@ export default function FacilitySidebar({
                 </div>
               )}
             </motion.div>
-            <motion.button
-              whileHover={{ scale: 1.1, rotate: 90 }}
-              whileTap={{ scale: 0.9 }}
+            <button
               onClick={onClose}
               className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
               aria-label="Close"
             >
               <X className="w-5 h-5" />
-            </motion.button>
+            </button>
           </div>
         </div>
 
@@ -978,7 +976,7 @@ export default function FacilitySidebar({
                 </h3>
                 <button
                   onClick={() => setIsPhotosModalOpen(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-xl transition-all cursor-pointer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
                 >
                   <Maximize2 className="w-3.5 h-3.5" />
                   Expand
@@ -1070,7 +1068,7 @@ export default function FacilitySidebar({
                     </h3>
                     <button
                       onClick={() => setIsAdditionalPhotosModalOpen(true)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-xl transition-all cursor-pointer"
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
                     >
                       <Maximize2 className="w-3.5 h-3.5" />
                       Expand
@@ -1172,7 +1170,7 @@ export default function FacilitySidebar({
                 {!showAddNoteForm && (
                   <button
                     onClick={() => setShowAddNoteForm(true)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-xl transition-all cursor-pointer"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     Add Note
@@ -1181,7 +1179,7 @@ export default function FacilitySidebar({
                 {notes.length > 3 && (
                   <button
                     onClick={() => setShowAllNotes(!showAllNotes)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-xl transition-all cursor-pointer"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
                     {showAllNotes ? "Show Less" : "See All"}
@@ -1198,7 +1196,7 @@ export default function FacilitySidebar({
                     value={newNoteText}
                     onChange={(e) => setNewNoteText(e.target.value)}
                     placeholder="Add a note..."
-                    className="flex-1 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 border border-[#E8E9EB] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#004aad] resize-none"
+                    className="flex-1 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none transition-all"
                     rows={2}
                     disabled={addingNote}
                     autoFocus
@@ -1210,7 +1208,7 @@ export default function FacilitySidebar({
                     whileTap={{ scale: 0.98 }}
                     onClick={handleAddNote}
                     disabled={!newNoteText.trim() || addingNote}
-                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-[#004aad] to-[#004aad]/90 hover:from-[#004aad]/90 hover:to-[#004aad]/80 text-white rounded-xl text-sm font-medium shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                   >
                     <Plus className="w-4 h-4" />
                     <span>{addingNote ? "Adding..." : "Add Note"}</span>
@@ -1234,7 +1232,7 @@ export default function FacilitySidebar({
             {/* Notes List */}
             {loadingNotes ? (
               <div className="text-center py-4">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#004aad] mx-auto"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
               </div>
             ) : notes.length === 0 ? (
               <div className="text-center py-6 bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-2xl border border-slate-100">
@@ -1259,7 +1257,7 @@ export default function FacilitySidebar({
                           <textarea
                             value={editNoteText}
                             onChange={(e) => setEditNoteText(e.target.value)}
-                            className="w-full px-3 py-2 text-sm text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                            className="w-full px-3 py-2 text-sm text-slate-900 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none transition-all"
                             rows={3}
                           />
                           <div className="flex gap-2">
@@ -1300,7 +1298,7 @@ export default function FacilitySidebar({
                                 whileHover={{ scale: 1.1 }}
                                 whileTap={{ scale: 0.9 }}
                                 onClick={() => handleStartEdit(note)}
-                                className="p-1 hover:bg-[#004aad]/10 rounded text-[#004aad] cursor-pointer"
+                                className="p-1 hover:bg-blue-100 rounded text-blue-600 cursor-pointer"
                               >
                                 <Edit2 className="w-3.5 h-3.5" />
                               </motion.button>
@@ -1340,7 +1338,7 @@ export default function FacilitySidebar({
                 <button
                   onClick={() => setIsTagAssignmentModalOpen(true)}
                   disabled={assigningTag}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   Assign Tag
@@ -1418,7 +1416,7 @@ export default function FacilitySidebar({
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.1 + idx * 0.05 }}
                     whileHover={{ scale: 1.05 }}
-                    className="px-4 py-2 bg-white text-[#004aad] border border-[#004aad] rounded-full text-sm font-medium transition-all cursor-default flex items-center gap-1.5"
+                    className="px-4 py-2 bg-white text-blue-600 border border-blue-600 rounded-full text-sm font-medium transition-all cursor-default flex items-center gap-1.5"
                   >
                     <span className="text-base">
                       {FACILITY_TYPE_EMOJIS[type] || "🏢"}
@@ -1576,7 +1574,7 @@ export default function FacilitySidebar({
 
             <div className="space-y-3">
               <div className="flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors">
-                <MapPin className="w-5 h-5 text-[#004aad] flex-shrink-0 mt-0.5" />
+                <MapPin className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                 <p className="text-slate-700 text-sm leading-relaxed">
                   {displayFacility.address}
                 </p>
@@ -1587,10 +1585,10 @@ export default function FacilitySidebar({
                   href={`tel:${displayFacility.phone}`}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-[#004aad]/5 transition-colors group"
+                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-blue-50 transition-colors group"
                 >
-                  <Phone className="w-5 h-5 text-[#004aad] group-hover:text-[#004aad]/80 transition-colors" />
-                  <span className="text-[#004aad] group-hover:text-[#004aad]/80 font-medium text-sm">
+                  <Phone className="w-5 h-5 text-blue-600 group-hover:text-blue-600/80 transition-colors" />
+                  <span className="text-blue-600 group-hover:text-blue-600/80 font-medium text-sm">
                     {displayFacility.phone}
                   </span>
                 </motion.a>
@@ -1603,10 +1601,10 @@ export default function FacilitySidebar({
                   rel="noopener noreferrer"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-[#004aad]/5 transition-colors group"
+                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-blue-50 transition-colors group"
                 >
-                  <Globe className="w-5 h-5 text-[#004aad] group-hover:text-[#004aad]/80 transition-colors flex-shrink-0" />
-                  <span className="text-[#004aad] group-hover:text-[#004aad]/80 font-medium text-sm truncate">
+                  <Globe className="w-5 h-5 text-blue-600 group-hover:text-blue-600/80 transition-colors flex-shrink-0" />
+                  <span className="text-blue-600 group-hover:text-blue-600/80 font-medium text-sm truncate">
                     {displayFacility.website.replace(/^https?:\/\//, "")}
                   </span>
                 </motion.a>
@@ -1659,7 +1657,7 @@ export default function FacilitySidebar({
                 </h3>
                 <button
                   onClick={() => setIsReviewsModalOpen(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-xl transition-all cursor-pointer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
                 >
                   <Maximize2 className="w-3.5 h-3.5" />
                   Expand
@@ -1722,7 +1720,7 @@ export default function FacilitySidebar({
                     </h3>
                     <button
                       onClick={() => setIsAdditionalReviewsModalOpen(true)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-[#004aad] hover:bg-[#004aad]/90 rounded-xl transition-all cursor-pointer"
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
                     >
                       <Maximize2 className="w-3.5 h-3.5" />
                       Expand
@@ -1804,7 +1802,7 @@ export default function FacilitySidebar({
                                   href={review.link}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="flex items-center gap-1 text-xs text-[#004aad] hover:text-[#004aad]/80 font-medium transition-colors"
+                                  className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors"
                                 >
                                   <ExternalLink className="w-3 h-3" />
                                   View Full
@@ -1823,7 +1821,7 @@ export default function FacilitySidebar({
                       onClick={() =>
                         setShowAllAdditionalReviews(!showAllAdditionalReviews)
                       }
-                      className="w-full mt-4 py-3 text-sm font-medium text-[#004aad] hover:bg-slate-50 rounded-xl transition-colors border border-slate-200 hover:border-[#004aad] cursor-pointer"
+                      className="w-full mt-4 py-3 text-sm font-medium text-blue-600 hover:bg-slate-50 rounded-xl transition-colors border border-slate-200 hover:border-blue-600 cursor-pointer"
                     >
                       {showAllAdditionalReviews
                         ? "Show Less"
@@ -1843,7 +1841,7 @@ export default function FacilitySidebar({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.22 }}
-              className="bg-gradient-to-br from-[#E8E9EB]/30 to-[#E8E9EB]/50 rounded-2xl p-4 shadow-sm"
+              className="bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-2xl p-4 shadow-sm"
             >
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
@@ -2206,7 +2204,7 @@ export default function FacilitySidebar({
                                 href={review.link}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-center gap-1 text-xs text-[#004aad] hover:text-[#004aad]/80 font-medium transition-colors"
+                                className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors"
                               >
                                 <ExternalLink className="w-3 h-3" />
                                 View Full Review
@@ -2480,7 +2478,7 @@ export default function FacilitySidebar({
                                 return (
                                   <span
                                     key={source}
-                                    className="px-3 py-1.5 bg-[#004aad]/5 text-[#004aad] rounded-xl text-sm font-medium border border-[#004aad]/20"
+                                    className="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-xl text-sm font-medium border border-blue-600/20"
                                   >
                                     {sourceLabels[source] || source}
                                   </span>
@@ -2569,7 +2567,7 @@ export default function FacilitySidebar({
                         <div className="border-t border-slate-200 p-4 bg-slate-50">
                           <button
                             onClick={() => setSelectedSportDetail(null)}
-                            className="w-full py-2.5 px-4 bg-gradient-to-r from-[#004aad] to-[#004aad]/90 hover:from-[#004aad]/90 hover:to-[#004aad]/80 text-white rounded-xl font-medium shadow-sm transition-all"
+                            className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium shadow-sm transition-all"
                           >
                             Close
                           </button>
@@ -2617,7 +2615,7 @@ export default function FacilitySidebar({
                 {/* Modal Body */}
                 <div className="p-6 overflow-y-auto max-h-[calc(85vh-80px)]">
                   {/* Create New Tag Form */}
-                  <div className="mb-6 p-4 bg-gradient-to-br from-[#004aad]/5 to-[#004aad]/10 rounded-2xl border border-[#004aad]/20">
+                  <div className="mb-6 p-4 bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-2xl border border-blue-600/20">
                     <h5 className="text-xs font-medium text-slate-600 uppercase tracking-wide mb-3">
                       Create New Tag
                     </h5>
@@ -2627,7 +2625,7 @@ export default function FacilitySidebar({
                         value={newTagName}
                         onChange={(e) => setNewTagName(e.target.value)}
                         placeholder="Tag name"
-                        className="w-full px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#004aad]"
+                        className="w-full px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                         disabled={creatingTag}
                       />
                       <input
@@ -2635,7 +2633,7 @@ export default function FacilitySidebar({
                         value={newTagDescription}
                         onChange={(e) => setNewTagDescription(e.target.value)}
                         placeholder="Description (optional)"
-                        className="w-full px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#004aad]"
+                        className="w-full px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                         disabled={creatingTag}
                       />
                       <div>
@@ -2664,7 +2662,7 @@ export default function FacilitySidebar({
                         whileTap={{ scale: 0.98 }}
                         onClick={handleCreateTag}
                         disabled={!newTagName.trim() || creatingTag}
-                        className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-gradient-to-r from-[#004aad] to-[#004aad]/90 hover:from-[#004aad]/90 hover:to-[#004aad]/80 text-white rounded-xl text-sm font-medium shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Plus className="w-4 h-4" />
                         <span>
@@ -2681,7 +2679,7 @@ export default function FacilitySidebar({
                     </h5>
                     {loadingTags ? (
                       <div className="text-center py-8">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#004aad] mx-auto"></div>
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
                       </div>
                     ) : allTags.length === 0 ? (
                       <p className="text-sm text-slate-500 text-center py-8">
@@ -2700,7 +2698,7 @@ export default function FacilitySidebar({
                                 type="text"
                                 value={editTagName}
                                 onChange={(e) => setEditTagName(e.target.value)}
-                                className="w-full px-3 py-2 text-sm text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#004aad]"
+                                className="w-full px-3 py-2 text-sm text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                               />
                               <input
                                 type="text"
@@ -2709,7 +2707,7 @@ export default function FacilitySidebar({
                                   setEditTagDescription(e.target.value)
                                 }
                                 placeholder="Description (optional)"
-                                className="w-full px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#004aad]"
+                                className="w-full px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                               />
                               <div>
                                 <label className="block text-xs font-medium text-slate-600 mb-2">
@@ -2780,7 +2778,7 @@ export default function FacilitySidebar({
                                   whileHover={{ scale: 1.1 }}
                                   whileTap={{ scale: 0.9 }}
                                   onClick={() => handleStartEditTag(tag)}
-                                  className="p-1.5 hover:bg-[#004aad]/10 rounded text-[#004aad]"
+                                  className="p-1.5 hover:bg-blue-100 rounded text-blue-600"
                                 >
                                   <Edit2 className="w-3.5 h-3.5" />
                                 </motion.button>
@@ -2840,7 +2838,7 @@ export default function FacilitySidebar({
                 <div className="p-6 overflow-y-auto max-h-[calc(85vh-80px)]">
                   {loadingTags ? (
                     <div className="text-center py-12">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#004aad] mx-auto"></div>
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
                       <p className="text-sm text-slate-500 mt-3">
                         Loading tags...
                       </p>
