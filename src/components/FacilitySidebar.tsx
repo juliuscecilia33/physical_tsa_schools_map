@@ -31,7 +31,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { supabase } from "@/lib/supabase";
 import { useQueryClient } from "@tanstack/react-query";
@@ -258,6 +258,78 @@ export default function FacilitySidebar({
 
     fetchTags();
   }, []);
+
+  // Helper functions for photo URLs (defined before useMemo to avoid ReferenceError)
+  const getPhotoUrl = (photoReference: string, highRes: boolean = false) => {
+    const maxWidth = highRes ? 1600 : 400;
+    return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=${maxWidth}&photo_reference=${photoReference}&key=${process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY}`;
+  };
+
+  const getPhotoDataUrl = (
+    photoData: {
+      image?: string;
+      url?: string;
+      thumbnail: string;
+      video?: string;
+    },
+    highRes: boolean = false,
+  ) => {
+    const fullResUrl = photoData.image || photoData.url || photoData.thumbnail;
+    return highRes ? fullResUrl : photoData.thumbnail;
+  };
+
+  // Combine scraped photos with review photos
+  const combinedPhotos = useMemo(() => {
+    if (!displayFacility?.serp_scraped) return [];
+
+    const photos: Array<{
+      url: string;
+      type: "scraped" | "review";
+      reviewIndex?: number;
+      photoIndexInReview?: number;
+      scrapedIndex?: number;
+      data?: any;
+    }> = [];
+
+    // Add all scraped photos first
+    if (displayFacility.additional_photos) {
+      displayFacility.additional_photos.forEach((photoData, idx) => {
+        photos.push({
+          url: getPhotoDataUrl(photoData),
+          type: "scraped",
+          scrapedIndex: idx,
+          data: photoData,
+        });
+      });
+    }
+
+    // Add all review photos
+    if (displayFacility.additional_reviews) {
+      displayFacility.additional_reviews.forEach((review, reviewIdx) => {
+        if (review.images && review.images.length > 0) {
+          review.images.forEach((imageUrl, photoIdx) => {
+            photos.push({
+              url: imageUrl,
+              type: "review",
+              reviewIndex: reviewIdx,
+              photoIndexInReview: photoIdx,
+            });
+          });
+        }
+      });
+    }
+
+    return photos;
+  }, [displayFacility?.additional_photos, displayFacility?.additional_reviews]);
+
+  // Count scraped vs review photos
+  const scrapedPhotosCount = useMemo(() => {
+    return combinedPhotos.filter((p) => p.type === "scraped").length;
+  }, [combinedPhotos]);
+
+  const reviewPhotosCount = useMemo(() => {
+    return combinedPhotos.filter((p) => p.type === "review").length;
+  }, [combinedPhotos]);
 
   // Add new note
   const handleAddNote = async () => {
@@ -660,23 +732,6 @@ export default function FacilitySidebar({
     }
   };
 
-  const getPhotoUrl = (photoReference: string, highRes: boolean = false) => {
-    const maxWidth = highRes ? 1600 : 400;
-    return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=${maxWidth}&photo_reference=${photoReference}&key=${process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY}`;
-  };
-
-  const getPhotoDataUrl = (
-    photoData: {
-      image?: string;
-      url?: string;
-      thumbnail: string;
-      video?: string;
-    },
-    highRes: boolean = false,
-  ) => {
-    const fullResUrl = photoData.image || photoData.url || photoData.thumbnail;
-    return highRes ? fullResUrl : photoData.thumbnail;
-  };
 
   const formatSportType = (type: string) => {
     return type
@@ -1044,111 +1099,124 @@ export default function FacilitySidebar({
           ) : null}
 
           {/* Additional Photos from SerpAPI */}
-          {displayFacility.serp_scraped &&
-            displayFacility.additional_photos &&
-            displayFacility.additional_photos.length > 0 && (
-              <>
-                {/* Divider - only show if regular photos were displayed above */}
-                {displayFacility.photo_references &&
-                  displayFacility.photo_references.length > 0 && (
-                    <div className="border-t border-slate-200"></div>
+          {displayFacility.serp_scraped && combinedPhotos.length > 0 && (
+            <>
+              {/* Divider - only show if regular photos were displayed above */}
+              {displayFacility.photo_references &&
+                displayFacility.photo_references.length > 0 && (
+                  <div className="border-t border-slate-200"></div>
+                )}
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.06 }}
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
+                    Scraped Photos ({scrapedPhotosCount}
+                    {reviewPhotosCount > 0 && (
+                      <span className="text-xs text-slate-500">
+                        + {reviewPhotosCount} from reviews
+                      </span>
+                    )}
+                    )
+                  </h3>
+                  <button
+                    onClick={() => setIsAdditionalPhotosModalOpen(true)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
+                  >
+                    <Maximize2 className="w-3.5 h-3.5" />
+                    Expand
+                  </button>
+                </div>
+                <div className="relative group/additional-photos">
+                  {/* Left Arrow */}
+                  {showAdditionalLeftArrow && (
+                    <button
+                      onClick={() => scrollAdditionalPhotos("left")}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-md flex items-center justify-center transition-all opacity-0 group-hover/additional-photos:opacity-100 cursor-pointer"
+                      aria-label="Scroll left"
+                    >
+                      <ChevronLeft className="w-6 h-6 text-slate-700" />
+                    </button>
                   )}
 
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.06 }}
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
-                      Scraped Photos ({displayFacility.additional_photos.length}
-                      )
-                    </h3>
+                  {/* Right Arrow */}
+                  {showAdditionalRightArrow && (
                     <button
-                      onClick={() => setIsAdditionalPhotosModalOpen(true)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
+                      onClick={() => scrollAdditionalPhotos("right")}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-md flex items-center justify-center transition-all opacity-0 group-hover/additional-photos:opacity-100 cursor-pointer"
+                      aria-label="Scroll right"
                     >
-                      <Maximize2 className="w-3.5 h-3.5" />
-                      Expand
+                      <ChevronRight className="w-6 h-6 text-slate-700" />
                     </button>
-                  </div>
-                  <div className="relative group/additional-photos">
-                    {/* Left Arrow */}
-                    {showAdditionalLeftArrow && (
-                      <button
-                        onClick={() => scrollAdditionalPhotos("left")}
-                        className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-md flex items-center justify-center transition-all opacity-0 group-hover/additional-photos:opacity-100 cursor-pointer"
-                        aria-label="Scroll left"
-                      >
-                        <ChevronLeft className="w-6 h-6 text-slate-700" />
-                      </button>
-                    )}
+                  )}
 
-                    {/* Right Arrow */}
-                    {showAdditionalRightArrow && (
-                      <button
-                        onClick={() => scrollAdditionalPhotos("right")}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-md flex items-center justify-center transition-all opacity-0 group-hover/additional-photos:opacity-100 cursor-pointer"
-                        aria-label="Scroll right"
+                  {/* Scrollable Photo Container */}
+                  <div
+                    ref={additionalPhotoScrollRef}
+                    className="flex gap-3 overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory"
+                    style={{
+                      scrollbarWidth: "none",
+                      msOverflowStyle: "none",
+                    }}
+                  >
+                    {combinedPhotos.map((photo, idx) => (
+                      <motion.div
+                        key={`combined-${idx}`}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{
+                          delay: 0.1 + Math.min(idx * 0.05, 0.5),
+                        }}
+                        onClick={() => {
+                          if (photo.type === "review") {
+                            openReviewPhotoViewer(
+                              photo.reviewIndex!,
+                              photo.photoIndexInReview!,
+                            );
+                          } else {
+                            openPhotoViewer(photo.scrapedIndex!, "additional");
+                          }
+                        }}
+                        className="relative overflow-hidden rounded-2xl shadow-sm hover:shadow-xl transition-all cursor-pointer flex-shrink-0 snap-start"
+                        style={{ width: "280px", height: "180px" }}
                       >
-                        <ChevronRight className="w-6 h-6 text-slate-700" />
-                      </button>
-                    )}
-
-                    {/* Scrollable Photo Container */}
-                    <div
-                      ref={additionalPhotoScrollRef}
-                      className="flex gap-3 overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory"
-                      style={{
-                        scrollbarWidth: "none",
-                        msOverflowStyle: "none",
-                      }}
-                    >
-                      {displayFacility.additional_photos.map(
-                        (photoData, idx) => (
-                          <motion.div
-                            key={idx}
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{
-                              delay: 0.1 + Math.min(idx * 0.05, 0.5),
-                            }}
-                            onClick={() => openPhotoViewer(idx, "additional")}
-                            className="relative overflow-hidden rounded-2xl shadow-sm hover:shadow-xl transition-all cursor-pointer flex-shrink-0 snap-start"
-                            style={{ width: "280px", height: "180px" }}
-                          >
-                            {loadingImages[`additional-${idx}`] !== false && (
-                              <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />
-                            )}
-                            <img
-                              src={getPhotoDataUrl(photoData)}
-                              alt={`${displayFacility.name} additional photo ${idx + 1}`}
-                              className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
-                              referrerPolicy="no-referrer"
-                              onLoadStart={() =>
-                                handleImageLoadStart(`additional-${idx}`)
-                              }
-                              onLoad={() =>
-                                handleImageLoad(`additional-${idx}`)
-                              }
-                              onError={() =>
-                                handleImageLoad(`additional-${idx}`)
-                              }
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity" />
-                            {photoData.video && (
-                              <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm rounded-full p-1.5">
-                                <Camera className="w-4 h-4 text-white" />
-                              </div>
-                            )}
-                          </motion.div>
-                        ),
-                      )}
-                    </div>
+                        {loadingImages[`combined-${idx}`] !== false && (
+                          <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />
+                        )}
+                        <img
+                          src={photo.url}
+                          alt={`${displayFacility.name} photo ${idx + 1}`}
+                          className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                          referrerPolicy="no-referrer"
+                          onLoadStart={() =>
+                            handleImageLoadStart(`combined-${idx}`)
+                          }
+                          onLoad={() => handleImageLoad(`combined-${idx}`)}
+                          onError={() => handleImageLoad(`combined-${idx}`)}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity" />
+                        {photo.type === "scraped" && photo.data?.video && (
+                          <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm rounded-full p-1.5">
+                            <Camera className="w-4 h-4 text-white" />
+                          </div>
+                        )}
+                        {photo.type === "review" && (
+                          <div className="absolute bottom-2 right-2 bg-purple-600/90 backdrop-blur-sm rounded-lg px-2 py-1">
+                            <span className="text-white text-xs font-medium">
+                              Review
+                            </span>
+                          </div>
+                        )}
+                      </motion.div>
+                    ))}
                   </div>
-                </motion.div>
-              </>
-            )}
+                </div>
+              </motion.div>
+            </>
+          )}
 
           {/* Divider - only show if photos sections were displayed above */}
           {((displayFacility.photo_references &&
@@ -2019,7 +2087,7 @@ export default function FacilitySidebar({
 
         {/* Additional Photos Grid Modal */}
         {isAdditionalPhotosModalOpen &&
-          displayFacility.additional_photos &&
+          combinedPhotos.length > 0 &&
           createPortal(
             <motion.div
               initial={{ opacity: 0 }}
@@ -2040,8 +2108,14 @@ export default function FacilitySidebar({
                 <div className="flex items-center justify-between p-6 border-b border-slate-200 bg-gradient-to-r from-white to-slate-50">
                   <div>
                     <h2 className="text-xl font-medium text-slate-900">
-                      Scraped Photos (
-                      {displayFacility.additional_photos?.length || 0})
+                      Scraped Photos ({scrapedPhotosCount}
+                      {reviewPhotosCount > 0 && (
+                        <span className="text-sm text-slate-500">
+                          {" "}
+                          + {reviewPhotosCount} from reviews
+                        </span>
+                      )}
+                      )
                     </h2>
                   </div>
                   <button
@@ -2055,43 +2129,62 @@ export default function FacilitySidebar({
                 {/* Photos Grid */}
                 <div className="p-6 overflow-y-auto max-h-[calc(85vh-80px)]">
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {displayFacility.additional_photos?.map(
-                      (photoData, idx) => (
-                        <motion.div
-                          key={idx}
-                          initial={{ opacity: 0, scale: 0.9 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: idx * 0.03 }}
-                          onClick={() => openPhotoViewer(idx, "additional")}
-                          className="relative overflow-hidden rounded-2xl shadow-sm hover:shadow-xl transition-all cursor-pointer aspect-square group"
-                        >
-                          {loadingImages[`additional-${idx}`] !== false && (
-                            <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />
-                          )}
-                          <img
-                            src={getPhotoDataUrl(photoData)}
-                            alt={`${displayFacility.name} additional photo ${idx + 1}`}
-                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                            referrerPolicy="no-referrer"
-                            onLoadStart={() =>
-                              handleImageLoadStart(`additional-${idx}`)
-                            }
-                            onLoad={() => handleImageLoad(`additional-${idx}`)}
-                            onError={() => handleImageLoad(`additional-${idx}`)}
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-2">
+                    {combinedPhotos.map((photo, idx) => (
+                      <motion.div
+                        key={`modal-combined-${idx}`}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: idx * 0.03 }}
+                        onClick={() => {
+                          if (photo.type === "review") {
+                            openReviewPhotoViewer(
+                              photo.reviewIndex!,
+                              photo.photoIndexInReview!,
+                            );
+                          } else {
+                            openPhotoViewer(photo.scrapedIndex!, "additional");
+                          }
+                          setIsAdditionalPhotosModalOpen(false);
+                        }}
+                        className="relative overflow-hidden rounded-2xl shadow-sm hover:shadow-xl transition-all cursor-pointer aspect-square group"
+                      >
+                        {loadingImages[`modal-combined-${idx}`] !== false && (
+                          <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />
+                        )}
+                        <img
+                          src={photo.url}
+                          alt={`${displayFacility.name} photo ${idx + 1}`}
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                          referrerPolicy="no-referrer"
+                          onLoadStart={() =>
+                            handleImageLoadStart(`modal-combined-${idx}`)
+                          }
+                          onLoad={() =>
+                            handleImageLoad(`modal-combined-${idx}`)
+                          }
+                          onError={() =>
+                            handleImageLoad(`modal-combined-${idx}`)
+                          }
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-2">
+                          <span className="text-white text-xs font-medium">
+                            Click to view
+                          </span>
+                        </div>
+                        {photo.type === "scraped" && photo.data?.video && (
+                          <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm rounded-full p-1.5">
+                            <Camera className="w-4 h-4 text-white" />
+                          </div>
+                        )}
+                        {photo.type === "review" && (
+                          <div className="absolute bottom-2 right-2 bg-purple-600/90 backdrop-blur-sm rounded-lg px-2 py-1">
                             <span className="text-white text-xs font-medium">
-                              Click to view
+                              Review
                             </span>
                           </div>
-                          {photoData.video && (
-                            <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm rounded-full p-1.5">
-                              <Camera className="w-4 h-4 text-white" />
-                            </div>
-                          )}
-                        </motion.div>
-                      ),
-                    )}
+                        )}
+                      </motion.div>
+                    ))}
                   </div>
                 </div>
               </motion.div>
