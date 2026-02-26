@@ -4,6 +4,8 @@ import "./globals.css";
 import { ReactQueryProvider } from "@/providers/ReactQueryProvider";
 import NavigationSidebar from "@/components/NavigationSidebar";
 import ViewManager from "@/components/ViewManager";
+import { LoadingProvider } from "@/contexts/LoadingContext";
+import LayoutContent from "@/components/LayoutContent";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -36,11 +38,12 @@ export default function RootLayout({
         className={`${inter.variable} ${poppins.variable} font-sans antialiased`}
       >
         <ReactQueryProvider>
-          <NavigationSidebar />
-          <div className="ml-20">
-            <ViewManager />
-            {children}
-          </div>
+          <LoadingProvider>
+            <LayoutContent>
+              <ViewManager />
+              {children}
+            </LayoutContent>
+          </LoadingProvider>
         </ReactQueryProvider>
       </body>
     </html>

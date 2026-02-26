@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { FacilityLightweight } from "@/types/facility";
 import { useQuery } from "@tanstack/react-query";
+import { useLoading } from "@/contexts/LoadingContext";
 
 const cn = (...classes: (string | undefined | null | false)[]) =>
   classes.filter(Boolean).join(" ");
@@ -294,6 +295,7 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(100);
+  const { setLoadingComplete } = useLoading();
 
   // Fetch all facilities with React Query (shares cache with MapView)
   const { data: facilities = [], isLoading, isError, error } = useQuery({
@@ -302,6 +304,13 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
     staleTime: Infinity, // Session-based caching
     gcTime: Infinity,
   });
+
+  // Signal loading complete when data finishes loading
+  useEffect(() => {
+    if (!isLoading) {
+      setLoadingComplete();
+    }
+  }, [isLoading, setLoadingComplete]);
 
   const filteredFacilities = facilities.filter(
     (f) =>

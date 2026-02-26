@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { Facility } from "@/types/facility";
 import { useQuery } from "@tanstack/react-query";
 import ProgressBar from "@/components/ProgressBar";
+import { useLoading } from "@/contexts/LoadingContext";
 
 const FacilityMap = dynamic(() => import("@/components/FacilityMap"), {
   ssr: false,
@@ -37,6 +38,7 @@ export default function MapView({ isVisible }: { isVisible: boolean }) {
   const [selectedSports, setSelectedSports] = useState<string[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [progress, setProgress] = useState(0);
+  const { setLoadingComplete } = useLoading();
 
   // Fetch all facilities with React Query
   const { data: facilities = [], isLoading, isError, error } = useQuery({
@@ -63,8 +65,9 @@ export default function MapView({ isVisible }: { isVisible: boolean }) {
     } else {
       // When loading completes, jump to 100%
       setProgress(100);
+      setLoadingComplete();
     }
-  }, [isLoading]);
+  }, [isLoading, setLoadingComplete]);
 
   // Optimistic update for facility hidden status
   // This will be handled by cache invalidation later
@@ -79,7 +82,7 @@ export default function MapView({ isVisible }: { isVisible: boolean }) {
     const loadedCount = totalCount ? Math.floor(totalCount * (progress / 100)) : 0;
 
     return (
-      <div className={`fixed inset-0 flex items-center justify-center bg-gray-100 z-[100] ml-20 ${!isVisible ? 'hidden' : ''}`}>
+      <div className={`fixed inset-0 flex items-center justify-center bg-gray-100 z-[100] ${!isVisible ? 'hidden' : ''}`}>
         <ProgressBar
           progress={progress}
           loadedCount={loadedCount}
@@ -92,7 +95,7 @@ export default function MapView({ isVisible }: { isVisible: boolean }) {
   // Show error state if there's an error
   if (isError) {
     return (
-      <div className={`fixed inset-0 flex items-center justify-center bg-gray-100 z-[100] ml-20 ${!isVisible ? 'hidden' : ''}`}>
+      <div className={`fixed inset-0 flex items-center justify-center bg-gray-100 z-[100] ${!isVisible ? 'hidden' : ''}`}>
         <div className="text-center">
           <div className="text-red-600 text-xl mb-4">❌ Error loading facilities</div>
           <p className="text-gray-600">{error?.message || 'Unknown error'}</p>
