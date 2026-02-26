@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import { Facility } from "@/types/facility";
 import { useQuery } from "@tanstack/react-query";
@@ -21,53 +21,152 @@ const FacilityMap = dynamic(() => import("@/components/FacilityMap"), {
 
 export type FilterOption = 'UNHIDDEN_ONLY' | 'ALL' | 'HIDDEN_ONLY' | 'WITH_NOTES_ONLY' | 'CLEANED_UP_ONLY';
 
-// Fetch all facilities
-async function fetchAllFacilities(): Promise<Facility[]> {
-  const response = await fetch('/api/facilities/all');
+// SerpAPI tag ID for priority loading
+const SERPAPI_TAG_ID = 'e326fe36-5536-4209-87ed-f99528e1d1ee';
+
+// Fetch facilities by tag IDs
+async function fetchFacilitiesByTags(tagIds: string[]): Promise<Facility[]> {
+  const response = await fetch(`/api/facilities/by-tag?tagIds=${tagIds.join(',')}`);
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch facilities: ${response.statusText}`);
+    throw new Error(`Failed to fetch facilities by tags: ${response.statusText}`);
   }
 
   const data = await response.json();
   return data.facilities as Facility[];
 }
 
+// Fetch facilities excluding specific tag IDs (paginated)
+async function fetchFacilitiesExcludingTags(
+  excludeTagIds: string[],
+  offset: number,
+  limit: number
+): Promise<{ facilities: Facility[]; hasMore: boolean }> {
+  const response = await fetch(
+    `/api/facilities/excluding-tags?excludeTagIds=${excludeTagIds.join(',')}&offset=${offset}&limit=${limit}`
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch facilities excluding tags: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  return {
+    facilities: data.facilities as Facility[],
+    hasMore: data.hasMore || false,
+  };
+}
+
 export default function MapView({ isVisible }: { isVisible: boolean }) {
   const [filterOption, setFilterOption] = useState<FilterOption>('UNHIDDEN_ONLY');
   const [selectedSports, setSelectedSports] = useState<string[]>([]);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  // Pre-select SerpAPI tag for priority loading
+  const [selectedTags, setSelectedTags] = useState<string[]>([SERPAPI_TAG_ID]);
   const [progress, setProgress] = useState(0);
+  const [backgroundFacilities, setBackgroundFacilities] = useState<Facility[]>([]);
+  const [isBackgroundLoading, setIsBackgroundLoading] = useState(false);
+  const [backgroundLoadingComplete, setBackgroundLoadingComplete] = useState(false);
+  const backgroundAbortController = useRef<AbortController | null>(null);
   const { setLoadingComplete } = useLoading();
 
-  // Fetch all facilities with React Query
-  const { data: facilities = [], isLoading, isError, error } = useQuery({
-    queryKey: ['facilities', 'all'],
-    queryFn: fetchAllFacilities,
-    staleTime: Infinity, // Session-based caching
+  // Phase 1: Fetch SerpAPI-tagged facilities immediately (priority load)
+  const {
+    data: priorityFacilities = [],
+    isLoading: isPriorityLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ['facilities', 'serpapi'],
+    queryFn: () => fetchFacilitiesByTags([SERPAPI_TAG_ID]),
+    staleTime: Infinity,
     gcTime: Infinity,
   });
 
-  // Simulate progress while loading
+  // Phase 2: Background batch loading of remaining facilities (excluding SerpAPI tag)
   useEffect(() => {
-    if (isLoading) {
+    // Only start background loading after priority facilities are loaded
+    // Start even if priorityFacilities.length is 0 (edge case: no SerpAPI facilities exist)
+    if (!isPriorityLoading && !backgroundLoadingComplete) {
+      setIsBackgroundLoading(true);
+      backgroundAbortController.current = new AbortController();
+
+      const batchSize = 1000;
+      let offset = 0;
+      let allBackgroundFacilities: Facility[] = [];
+
+      const fetchNextBatch = async () => {
+        try {
+          if (backgroundAbortController.current?.signal.aborted) {
+            return;
+          }
+
+          const { facilities, hasMore } = await fetchFacilitiesExcludingTags(
+            [SERPAPI_TAG_ID],
+            offset,
+            batchSize
+          );
+
+          allBackgroundFacilities = [...allBackgroundFacilities, ...facilities];
+          setBackgroundFacilities(allBackgroundFacilities);
+
+          console.log(
+            `Background batch loaded: ${facilities.length} facilities (offset: ${offset})`
+          );
+
+          if (hasMore && !backgroundAbortController.current?.signal.aborted) {
+            offset += batchSize;
+            // Add small delay between batches to not overwhelm the server
+            setTimeout(fetchNextBatch, 100);
+          } else {
+            setIsBackgroundLoading(false);
+            setBackgroundLoadingComplete(true);
+            console.log(
+              `Background loading complete. Total: ${allBackgroundFacilities.length} facilities`
+            );
+          }
+        } catch (error) {
+          console.error('Background loading error:', error);
+          setIsBackgroundLoading(false);
+          // Don't set backgroundLoadingComplete, so user still has priority facilities
+        }
+      };
+
+      fetchNextBatch();
+
+      // Cleanup on unmount
+      return () => {
+        backgroundAbortController.current?.abort();
+      };
+    }
+  }, [isPriorityLoading, priorityFacilities.length, backgroundLoadingComplete]);
+
+  // Merge priority and background facilities
+  const facilities = [...priorityFacilities, ...backgroundFacilities];
+
+  // Update progress based on two-phase loading
+  useEffect(() => {
+    if (isPriorityLoading) {
+      // Phase 1: Priority loading (0-90%)
       setProgress(0);
       const interval = setInterval(() => {
         setProgress((prev) => {
-          if (prev >= 90) {
+          if (prev >= 85) {
             clearInterval(interval);
-            return 90;
+            return 85;
           }
-          return prev + 2;
+          return prev + 3;
         });
       }, 50);
       return () => clearInterval(interval);
+    } else if (!backgroundLoadingComplete) {
+      // Phase 1 complete, jump to 90%
+      setProgress(90);
     } else {
-      // When loading completes, jump to 100%
+      // Phase 2 complete, jump to 100%
       setProgress(100);
       setLoadingComplete();
     }
-  }, [isLoading, setLoadingComplete]);
+  }, [isPriorityLoading, backgroundLoadingComplete, setLoadingComplete]);
 
   // Optimistic update for facility hidden status
   // This will be handled by cache invalidation later
@@ -76,9 +175,9 @@ export default function MapView({ isVisible }: { isVisible: boolean }) {
     console.log(`Facility ${place_id} hidden status changed to ${hidden}`);
   };
 
-  // Show loading state with progress bar
-  if (isLoading || progress < 100) {
-    const totalCount = facilities.length > 0 ? facilities.length : null;
+  // Show loading state with progress bar (only for priority loading phase)
+  if (isPriorityLoading || progress < 90) {
+    const totalCount = priorityFacilities.length > 0 ? priorityFacilities.length : null;
     const loadedCount = totalCount ? Math.floor(totalCount * (progress / 100)) : 0;
 
     return (
