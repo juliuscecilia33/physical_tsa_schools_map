@@ -12,7 +12,8 @@
     "filter:texas:execute": "tsx scripts/filter-texas-facilities.ts --execute",
     "filter:texas:v2": "tsx scripts/filter-texas-facilities-v2.ts",
     "filter:texas:v2:compare": "tsx scripts/filter-texas-facilities-v2.ts --compare",
-    "filter:texas:v2:execute": "tsx scripts/filter-texas-facilities-v2.ts --execute"
+    "filter:texas:v2:execute": "tsx scripts/filter-texas-facilities-v2.ts --execute",
+    "assign:serpapi-tag": "tsx scripts/assign-serpapi-tag.ts"
   },
   "repository": {
     "type": "git",

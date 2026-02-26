@@ -629,8 +629,10 @@ export default function FacilityMap({
                   </div>
                   <span className="text-base font-bold text-white mt-1">
                     {formatNumber(
-                      (hoveredFacility || clickedFacility)?.photo_references
-                        ?.length || 0,
+                      ((hoveredFacility || clickedFacility)?.photo_references
+                        ?.length || 0) +
+                        ((hoveredFacility || clickedFacility)
+                          ?.additional_photos_count || 0),
                     )}
                   </span>
                 </div>
