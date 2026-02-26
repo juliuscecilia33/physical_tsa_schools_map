@@ -49,6 +49,7 @@ export async function GET(request: NextRequest) {
         tags: facility.tags || [],
         serp_scraped: facility.serp_scraped,
         serp_scraped_at: facility.serp_scraped_at,
+        total_photo_count: facility.total_photo_count,
       })
     );
 

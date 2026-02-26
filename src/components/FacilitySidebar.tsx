@@ -45,6 +45,7 @@ interface FacilitySidebarProps {
   facility: Facility | null;
   onClose: () => void;
   onUpdateFacility: (place_id: string, hidden: boolean) => void;
+  onFacilityDataLoaded?: (fullFacility: Facility) => void;
 }
 
 // Sport emoji mapping
@@ -141,6 +142,7 @@ export default function FacilitySidebar({
   facility,
   onClose,
   onUpdateFacility,
+  onFacilityDataLoaded,
 }: FacilitySidebarProps) {
   const queryClient = useQueryClient();
   const contentRef = useRef<HTMLDivElement>(null);
@@ -151,6 +153,13 @@ export default function FacilitySidebar({
 
   // Use full facility data if available, otherwise fall back to lightweight data
   const displayFacility = fullFacility || facility;
+
+  // Notify parent when full facility data is loaded
+  useEffect(() => {
+    if (fullFacility && onFacilityDataLoaded) {
+      onFacilityDataLoaded(fullFacility);
+    }
+  }, [fullFacility, onFacilityDataLoaded]);
   const [loadingImages, setLoadingImages] = useState<{
     [key: string]: boolean;
   }>({});

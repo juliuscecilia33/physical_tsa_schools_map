@@ -35,7 +35,8 @@ RETURNS TABLE (
   has_notes BOOLEAN,
   tags JSONB,
   serp_scraped BOOLEAN,
-  serp_scraped_at TIMESTAMPTZ
+  serp_scraped_at TIMESTAMPTZ,
+  total_photo_count INTEGER
 ) AS $$
 BEGIN
   RETURN QUERY
@@ -80,7 +81,19 @@ BEGIN
       '[]'::jsonb
     ) AS tags,
     f.serp_scraped,
-    f.serp_scraped_at
+    f.serp_scraped_at,
+    (CASE
+      WHEN f.serp_scraped = true THEN
+        COALESCE(jsonb_array_length(f.additional_photos), 0) +
+        COALESCE(
+          (SELECT SUM(jsonb_array_length(review->'images'))::INTEGER
+           FROM jsonb_array_elements(f.additional_reviews) AS review),
+          0
+        )
+      ELSE
+        COALESCE(array_length(f.photo_references, 1), 0) +
+        COALESCE(jsonb_array_length(f.additional_photos), 0)
+    END)::INTEGER AS total_photo_count
   FROM sports_facilities f
   WHERE
     (include_hidden OR f.hidden = false)

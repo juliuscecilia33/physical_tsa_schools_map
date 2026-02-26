@@ -72,7 +72,7 @@ const RETRY_DELAY_MS = 5000; // 5 seconds
 
 // Pagination limits
 const MAX_PHOTOS = 40; // Stop after collecting 50 photos
-const MAX_REVIEWS = 50; // Stop after collecting 50 reviews
+const MAX_REVIEWS = 58; // Stop after collecting 50 reviews
 
 // Helper functions
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

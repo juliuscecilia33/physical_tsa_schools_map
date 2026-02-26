@@ -145,6 +145,33 @@ function formatNumber(num: number | undefined): string {
   return num.toLocaleString();
 }
 
+// Helper function to calculate total photo count including review photos
+function getTotalPhotoCount(facility: Facility | null): number {
+  if (!facility) return 0;
+
+  // Use precomputed value if available (from lightweight query)
+  if (facility.total_photo_count !== undefined) {
+    return facility.total_photo_count;
+  }
+
+  // Fall back to calculation (for full data or if field not yet in database)
+  // For scraped facilities, count additional_photos + all review photos
+  if (facility.serp_scraped) {
+    const scrapedPhotosCount = facility.additional_photos?.length || 0;
+    const reviewPhotosCount =
+      facility.additional_reviews?.reduce((total, review) => {
+        return total + (review.images?.length || 0);
+      }, 0) || 0;
+    return scrapedPhotosCount + reviewPhotosCount;
+  }
+
+  // For non-scraped facilities, count photo_references + additional_photos
+  return (
+    (facility.photo_references?.length || 0) +
+    (facility.additional_photos?.length || 0)
+  );
+}
+
 // Helper function to apply AI filters to facilities
 function applyAIFilters(
   facilities: Facility[],
@@ -633,10 +660,7 @@ export default function FacilityMap({
                   </div>
                   <span className="text-base font-bold text-white mt-1">
                     {formatNumber(
-                      ((hoveredFacility || clickedFacility)?.photo_references
-                        ?.length || 0) +
-                        ((hoveredFacility || clickedFacility)?.additional_photos
-                          ?.length || 0),
+                      getTotalPhotoCount(hoveredFacility || clickedFacility),
                     )}
                   </span>
                 </div>
@@ -1310,6 +1334,12 @@ export default function FacilityMap({
           setClickedFacility(null);
         }}
         onUpdateFacility={onUpdateFacility}
+        onFacilityDataLoaded={(fullFacility) => {
+          // Update clickedFacility with full data so popup shows correct counts
+          if (clickedFacility && fullFacility.place_id === clickedFacility.place_id) {
+            setClickedFacility(fullFacility);
+          }
+        }}
       />
 
       {/* AI Search Panel */}

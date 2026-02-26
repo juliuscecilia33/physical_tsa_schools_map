@@ -41,6 +41,7 @@ export interface Facility {
   additional_reviews?: Review[]; // Full review data from SerpAPI (beyond 5 from Google Places)
   serp_scraped?: boolean; // Whether this facility has been enriched with SerpAPI data
   serp_scraped_at?: string; // Timestamp of when SerpAPI enrichment was performed
+  total_photo_count?: number; // Precomputed total photo count (including review photos)
 }
 
 export interface Review {
