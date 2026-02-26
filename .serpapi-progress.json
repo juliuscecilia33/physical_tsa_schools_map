@@ -1,6 +1,6 @@
 {
-  "processedCount": 606,
-  "successCount": 606,
+  "processedCount": 608,
+  "successCount": 608,
   "failedCount": 0,
   "skippedCount": 0,
   "processedPlaceIds": [
@@ -609,12 +609,14 @@
     "ChIJLSGzfSkzW4YR99uGci9DCjs",
     "ChIJv0S-upO3XIYRalH0VkIbNyU",
     "ChIJD9FGAmmKXIYRyupLidh40qk",
-    "ChIJ08bQstiCQIYRJMe73R56PDc"
+    "ChIJ08bQstiCQIYRJMe73R56PDc",
+    "ChIJuYvjGQOBToYR2gKY8QFIhME",
+    "ChIJkd4W-xWjToYRFbT_J0F098U"
   ],
-  "lastProcessedIndex": 605,
-  "apiCallsUsed": 5396,
-  "imagesUploaded": 23527,
+  "lastProcessedIndex": 607,
+  "apiCallsUsed": 5414,
+  "imagesUploaded": 23607,
   "imageUploadsFailed": 435,
-  "lastUpdated": "2026-02-26T23:55:38.545Z",
+  "lastUpdated": "2026-02-26T23:58:27.765Z",
   "errors": []
 }

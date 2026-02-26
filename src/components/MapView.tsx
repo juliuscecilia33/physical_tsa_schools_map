@@ -21,10 +21,14 @@ const FacilityMap = dynamic(() => import("@/components/FacilityMap"), {
 
 export type FilterOption = 'UNHIDDEN_ONLY' | 'ALL' | 'HIDDEN_ONLY' | 'WITH_NOTES_ONLY' | 'CLEANED_UP_ONLY';
 
+// SerpAPI tag ID for default tag filter selection
+const SERPAPI_TAG_ID = 'e326fe36-5536-4209-87ed-f99528e1d1ee';
+
 export default function MapView({ isVisible }: { isVisible: boolean }) {
   const [filterOption, setFilterOption] = useState<FilterOption>('UNHIDDEN_ONLY');
   const [selectedSports, setSelectedSports] = useState<string[]>([]);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  // Pre-select SerpAPI tag by default
+  const [selectedTags, setSelectedTags] = useState<string[]>([SERPAPI_TAG_ID]);
   const [progress, setProgress] = useState(0);
   const { setLoadingComplete, setPriorityLoadComplete } = useLoading();
 
