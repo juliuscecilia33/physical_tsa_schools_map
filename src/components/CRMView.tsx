@@ -21,6 +21,7 @@ import {
 import { FacilityLightweight } from "@/types/facility";
 import { useQuery } from "@tanstack/react-query";
 import { useLoading } from "@/contexts/LoadingContext";
+import FiltersSidebar, { FilterState } from "./FiltersSidebar";
 
 const cn = (...classes: (string | undefined | null | false)[]) =>
   classes.filter(Boolean).join(" ");
@@ -290,11 +291,52 @@ function FacilityTable({ facilities }: { facilities: FacilityLightweight[] }) {
   );
 }
 
+// Helper to extract city from address
+function extractCity(address: string): string {
+  // Try to extract city from address (typically after first comma)
+  const parts = address.split(",");
+  if (parts.length >= 2) {
+    return parts[1].trim();
+  }
+  return "";
+}
+
+// Load filters from localStorage
+function loadFiltersFromStorage(): FilterState {
+  if (typeof window === "undefined") {
+    return getDefaultFilters();
+  }
+  try {
+    const stored = localStorage.getItem("crm-filters");
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (error) {
+    console.error("Failed to load filters from localStorage:", error);
+  }
+  return getDefaultFilters();
+}
+
+// Get default filter state
+function getDefaultFilters(): FilterState {
+  return {
+    searchQuery: "",
+    selectedSports: [],
+    selectedCities: [],
+    addressSearch: "",
+    minRating: null,
+    minReviews: null,
+    selectedTags: [],
+    hasNotes: null,
+  };
+}
+
 export default function CRMView({ isVisible }: { isVisible: boolean }) {
   const [activeTab, setActiveTab] = useState("facilities");
-  const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(100);
+  const [isFiltersSidebarOpen, setIsFiltersSidebarOpen] = useState(false);
+  const [filters, setFilters] = useState<FilterState>(loadFiltersFromStorage);
   const { setLoadingComplete } = useLoading();
 
   // Fetch all facilities with React Query (shares cache with MapView)
@@ -312,20 +354,111 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
     }
   }, [isLoading, setLoadingComplete]);
 
-  const filteredFacilities = facilities.filter(
-    (f) =>
-      f.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      f.address?.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
-
-  // Reset to page 1 when search changes
-  const previousSearchQuery = useRef(searchQuery);
+  // Save filters to localStorage whenever they change
   useEffect(() => {
-    if (previousSearchQuery.current !== searchQuery) {
-      setCurrentPage(1);
-      previousSearchQuery.current = searchQuery;
+    try {
+      localStorage.setItem("crm-filters", JSON.stringify(filters));
+    } catch (error) {
+      console.error("Failed to save filters to localStorage:", error);
     }
-  }, [searchQuery]);
+  }, [filters]);
+
+  // Extract unique sports and cities from facilities
+  const availableSports = Array.from(
+    new Set(
+      facilities.flatMap((f) => f.identified_sports || [])
+    )
+  ).sort();
+
+  const availableCities = Array.from(
+    new Set(
+      facilities
+        .map((f) => extractCity(f.address))
+        .filter((city) => city !== "")
+    )
+  ).sort();
+
+  // Apply all filters
+  const filteredFacilities = facilities.filter((facility) => {
+    // Name search
+    if (filters.searchQuery) {
+      const query = filters.searchQuery.toLowerCase();
+      const matchesName = facility.name?.toLowerCase().includes(query);
+      if (!matchesName) return false;
+    }
+
+    // Sports filter
+    if (filters.selectedSports.length > 0) {
+      const hasSport = filters.selectedSports.some((sport) =>
+        facility.identified_sports?.includes(sport)
+      );
+      if (!hasSport) return false;
+    }
+
+    // City filter
+    if (filters.selectedCities.length > 0) {
+      const facilityCity = extractCity(facility.address);
+      if (!filters.selectedCities.includes(facilityCity)) return false;
+    }
+
+    // Address search
+    if (filters.addressSearch) {
+      const query = filters.addressSearch.toLowerCase();
+      const matchesAddress = facility.address?.toLowerCase().includes(query);
+      if (!matchesAddress) return false;
+    }
+
+    // Min rating
+    if (filters.minRating !== null) {
+      if (!facility.rating || facility.rating < filters.minRating) return false;
+    }
+
+    // Min reviews
+    if (filters.minReviews !== null) {
+      if (
+        !facility.user_ratings_total ||
+        facility.user_ratings_total < filters.minReviews
+      )
+        return false;
+    }
+
+    // Tags filter
+    if (filters.selectedTags.length > 0) {
+      const facilityTagIds = facility.tags?.map((t) => t.id) || [];
+      const hasTag = filters.selectedTags.some((tagId) =>
+        facilityTagIds.includes(tagId)
+      );
+      if (!hasTag) return false;
+    }
+
+    // Has notes filter
+    if (filters.hasNotes !== null) {
+      if (filters.hasNotes && !facility.has_notes) return false;
+      if (!filters.hasNotes && facility.has_notes) return false;
+    }
+
+    return true;
+  });
+
+  // Reset to page 1 when filters change
+  const previousFilters = useRef(filters);
+  useEffect(() => {
+    if (JSON.stringify(previousFilters.current) !== JSON.stringify(filters)) {
+      setCurrentPage(1);
+      previousFilters.current = filters;
+    }
+  }, [filters]);
+
+  // Count active filters
+  const activeFilterCount =
+    (filters.searchQuery ? 1 : 0) +
+    filters.selectedSports.length +
+    filters.selectedCities.length +
+    (filters.addressSearch ? 1 : 0) +
+    (filters.minRating !== null ? 1 : 0) +
+    (filters.minReviews !== null ? 1 : 0) +
+    filters.selectedTags.length +
+    (filters.hasNotes !== null ? 1 : 0);
 
   // Calculate pagination
   const totalPages = Math.ceil(filteredFacilities.length / itemsPerPage);
@@ -365,6 +498,16 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
 
   return (
     <div className={`w-full min-h-screen bg-white font-poppins text-slate-900 ${!isVisible ? 'hidden' : ''}`}>
+      {/* Filters Sidebar */}
+      <FiltersSidebar
+        isOpen={isFiltersSidebarOpen}
+        onClose={() => setIsFiltersSidebarOpen(false)}
+        filters={filters}
+        onFiltersChange={setFilters}
+        availableSports={availableSports}
+        availableCities={availableCities}
+      />
+
       <div className="w-full h-full p-6 md:p-8 lg:p-12 space-y-8">
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
@@ -416,21 +559,35 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
             <div className="rounded-2xl border border-slate-200/60 bg-white p-5 shadow-sm space-y-5">
               {/* Toolbar */}
               <div className="flex flex-col sm:flex-row justify-between gap-4 items-center">
-                <div className="relative w-full sm:w-80">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                  <input
-                    type="text"
-                    placeholder="Search facilities..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 text-sm font-medium border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-slate-400 text-slate-900 shadow-sm"
-                  />
+                <div className="flex items-center gap-3">
+                  {/* Active filters indicator */}
+                  {activeFilterCount > 0 && (
+                    <div className="text-sm text-slate-600 font-medium">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg border border-blue-200">
+                        <Filter className="h-3.5 w-3.5" />
+                        {activeFilterCount} active filter{activeFilterCount !== 1 ? 's' : ''}
+                      </span>
+                    </div>
+                  )}
+                  {activeFilterCount === 0 && (
+                    <div className="text-sm text-slate-500 font-medium">
+                      No filters applied
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-3 w-full sm:w-auto">
-                  <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-xl border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition-colors shadow-sm active:bg-slate-100">
+                  <button
+                    onClick={() => setIsFiltersSidebarOpen(true)}
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-xl border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition-colors shadow-sm active:bg-slate-100 relative"
+                  >
                     <Filter className="h-4 w-4 text-slate-500" />
                     Filters
+                    {activeFilterCount > 0 && (
+                      <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white">
+                        {activeFilterCount}
+                      </span>
+                    )}
                   </button>
                   <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-colors shadow-sm active:bg-blue-800">
                     <Plus className="h-4 w-4" />

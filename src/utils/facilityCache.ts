@@ -74,7 +74,7 @@ export function updateFacilityNotesFlag(
 export function updateFacilityTags(
   queryClient: QueryClient,
   placeId: string,
-  tags: Array<{ id: string; name: string; color: string; description?: string }>
+  tags: Array<{ id: string; name: string; color: string; description: string | null }>
 ) {
   updateFacilityInCache(queryClient, placeId, { tags });
 }

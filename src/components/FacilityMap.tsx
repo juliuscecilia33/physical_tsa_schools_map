@@ -632,7 +632,7 @@ export default function FacilityMap({
                       ((hoveredFacility || clickedFacility)?.photo_references
                         ?.length || 0) +
                         ((hoveredFacility || clickedFacility)
-                          ?.additional_photos_count || 0),
+                          ?.additional_photos?.length || 0),
                     )}
                   </span>
                 </div>
