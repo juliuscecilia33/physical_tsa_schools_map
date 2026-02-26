@@ -567,6 +567,10 @@ export default function FacilityMap({
         onClick={(e) => {
           if (e.features && e.features.length > 0) {
             onMarkerClick(e);
+          } else {
+            // Close sidebar and popup when clicking outside markers
+            setSelectedFacility(null);
+            setClickedFacility(null);
           }
         }}
         onMouseMove={(e) => {

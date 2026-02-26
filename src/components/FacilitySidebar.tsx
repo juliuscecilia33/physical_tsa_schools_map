@@ -1794,86 +1794,91 @@ export default function FacilitySidebar({
             )}
 
           {/* Reviews */}
-          {isLoadingDetails ? (
-            <div className="space-y-4">
-              <h3 className="text-sm font-medium text-slate-700 tracking-wide">
-                Reviews
-              </h3>
-              {/* Loading skeleton */}
-              {[1, 2].map((i) => (
-                <div
-                  key={i}
-                  className="bg-gradient-to-br from-slate-100 to-slate-50 rounded-2xl p-4 animate-pulse"
-                >
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="h-4 w-24 bg-slate-300 rounded"></div>
-                    <div className="flex gap-0.5">
-                      {[1, 2, 3, 4, 5].map((j) => (
-                        <div
-                          key={j}
-                          className="w-4 h-4 bg-slate-300 rounded"
-                        ></div>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="h-3 bg-slate-300 rounded w-full"></div>
-                    <div className="h-3 bg-slate-300 rounded w-5/6"></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : displayFacility.reviews && displayFacility.reviews.length > 0 ? (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <div className="flex items-center justify-between mb-4">
+          {!(
+            displayFacility.serp_scraped &&
+            displayFacility.additional_reviews &&
+            displayFacility.additional_reviews.length > 0
+          ) &&
+            (isLoadingDetails ? (
+              <div className="space-y-4">
                 <h3 className="text-sm font-medium text-slate-700 tracking-wide">
-                  Reviews ({displayFacility.reviews.length})
+                  Reviews
                 </h3>
-                <button
-                  onClick={() => setIsReviewsModalOpen(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
-                >
-                  <Maximize2 className="w-3.5 h-3.5" />
-                  Expand
-                </button>
-              </div>
-              <div className="space-y-0">
-                {displayFacility.reviews.map((review, idx) => (
-                  <motion.div
-                    key={idx}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 + idx * 0.05 }}
-                    className={`py-4 ${idx !== 0 ? "border-t border-slate-200" : ""}`}
+                {/* Loading skeleton */}
+                {[1, 2].map((i) => (
+                  <div
+                    key={i}
+                    className="bg-gradient-to-br from-slate-100 to-slate-50 rounded-2xl p-4 animate-pulse"
                   >
                     <div className="flex items-center justify-between mb-3">
-                      <span className="font-semibold text-slate-900 text-sm">
-                        {review.author_name}
-                      </span>
+                      <div className="h-4 w-24 bg-slate-300 rounded"></div>
                       <div className="flex gap-0.5">
-                        {renderStars(review.rating)}
+                        {[1, 2, 3, 4, 5].map((j) => (
+                          <div
+                            key={j}
+                            className="w-4 h-4 bg-slate-300 rounded"
+                          ></div>
+                        ))}
                       </div>
                     </div>
-                    <p className="text-sm text-slate-700 leading-relaxed mb-2">
-                      {review.text}
-                    </p>
-                    <span className="text-xs text-slate-500 font-medium">
-                      {review.relative_time_description}
-                    </span>
-                  </motion.div>
+                    <div className="space-y-2">
+                      <div className="h-3 bg-slate-300 rounded w-full"></div>
+                      <div className="h-3 bg-slate-300 rounded w-5/6"></div>
+                    </div>
+                  </div>
                 ))}
               </div>
-            </motion.div>
-          ) : (
-            <div className="text-center py-12">
-              <MessageSquare className="w-12 h-12 text-slate-400 mx-auto mb-3" />
-              <p className="text-sm text-slate-500">No reviews available</p>
-            </div>
-          )}
+            ) : displayFacility.reviews && displayFacility.reviews.length > 0 ? (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-medium text-slate-700 tracking-wide">
+                    Reviews ({displayFacility.reviews.length})
+                  </h3>
+                  <button
+                    onClick={() => setIsReviewsModalOpen(true)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
+                  >
+                    <Maximize2 className="w-3.5 h-3.5" />
+                    Expand
+                  </button>
+                </div>
+                <div className="space-y-0">
+                  {displayFacility.reviews.map((review, idx) => (
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1 + idx * 0.05 }}
+                      className={`py-4 ${idx !== 0 ? "border-t border-slate-200" : ""}`}
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="font-semibold text-slate-900 text-sm">
+                          {review.author_name}
+                        </span>
+                        <div className="flex gap-0.5">
+                          {renderStars(review.rating)}
+                        </div>
+                      </div>
+                      <p className="text-sm text-slate-700 leading-relaxed mb-2">
+                        {review.text}
+                      </p>
+                      <span className="text-xs text-slate-500 font-medium">
+                        {review.relative_time_description}
+                      </span>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            ) : (
+              <div className="text-center py-12">
+                <MessageSquare className="w-12 h-12 text-slate-400 mx-auto mb-3" />
+                <p className="text-sm text-slate-500">No reviews available</p>
+              </div>
+            ))}
 
           {/* Divider */}
           <div className="border-t border-slate-200"></div>
