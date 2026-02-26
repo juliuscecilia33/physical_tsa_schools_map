@@ -22,6 +22,7 @@ import { FacilityLightweight } from "@/types/facility";
 import { useQuery } from "@tanstack/react-query";
 import { useLoading } from "@/contexts/LoadingContext";
 import FiltersSidebar, { FilterState } from "./FiltersSidebar";
+import CRMFacilityDetailsSidebar from "./CRMFacilityDetailsSidebar";
 
 const cn = (...classes: (string | undefined | null | false)[]) =>
   classes.filter(Boolean).join(" ");
@@ -107,7 +108,13 @@ function SummaryCard({
   );
 }
 
-function FacilityTable({ facilities }: { facilities: FacilityLightweight[] }) {
+function FacilityTable({
+  facilities,
+  onOpenDetails,
+}: {
+  facilities: FacilityLightweight[];
+  onOpenDetails: (placeId: string) => void;
+}) {
   return (
     <div className="w-full overflow-x-auto rounded-2xl border border-slate-200/60 bg-white shadow-sm">
       <table className="w-full text-sm">
@@ -139,7 +146,8 @@ function FacilityTable({ facilities }: { facilities: FacilityLightweight[] }) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
                 key={facility.place_id}
-                className="hover:bg-slate-50/60 transition-colors group"
+                onClick={() => onOpenDetails(facility.place_id)}
+                className="hover:bg-slate-50/60 transition-colors group cursor-pointer"
               >
                 <td className="px-5 py-4 align-top min-w-[200px]">
                   <div className="font-semibold text-slate-800 mb-1 group-hover:text-blue-600 transition-colors">
@@ -252,7 +260,13 @@ function FacilityTable({ facilities }: { facilities: FacilityLightweight[] }) {
                 </td>
 
                 <td className="px-5 py-4 align-middle text-right">
-                  <button className="px-4 py-2 text-xs font-semibold rounded-lg border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 hover:text-blue-600 hover:border-blue-200 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/20 active:bg-slate-100">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent row click from also triggering
+                      onOpenDetails(facility.place_id);
+                    }}
+                    className="px-4 py-2 text-xs font-semibold rounded-lg border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 hover:text-blue-600 hover:border-blue-200 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/20 active:bg-slate-100"
+                  >
                     View Details
                   </button>
                 </td>
@@ -326,7 +340,14 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
   const [itemsPerPage, setItemsPerPage] = useState(100);
   const [isFiltersSidebarOpen, setIsFiltersSidebarOpen] = useState(false);
   const [filters, setFilters] = useState<FilterState>(loadFiltersFromStorage);
+  const [selectedFacilityId, setSelectedFacilityId] = useState<string | null>(null);
   const { setLoadingComplete } = useLoading();
+
+  // Handler to open facility details and close filters
+  const handleOpenDetails = (placeId: string) => {
+    setIsFiltersSidebarOpen(false); // Auto-close filters sidebar
+    setSelectedFacilityId(placeId);
+  };
 
   // Fetch all facilities with React Query (shares cache with MapView)
   const { data: facilities = [], isLoading, isError, error } = useQuery({
@@ -570,7 +591,10 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
               </div>
 
               {/* Table */}
-              <FacilityTable facilities={paginatedFacilities} />
+              <FacilityTable
+                facilities={paginatedFacilities}
+                onOpenDetails={handleOpenDetails}
+              />
 
               {/* Pagination Controls */}
               {filteredFacilities.length > 0 && (
@@ -650,6 +674,12 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
           </motion.div>
         )}
       </div>
+
+      {/* Facility Details Sidebar */}
+      <CRMFacilityDetailsSidebar
+        placeId={selectedFacilityId}
+        onClose={() => setSelectedFacilityId(null)}
+      />
     </div>
   );
 }
