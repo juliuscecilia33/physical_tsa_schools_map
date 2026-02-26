@@ -1626,9 +1626,6 @@ export default function FacilitySidebar({
                     <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
                       Scraped Reviews (
                       {displayFacility.additional_reviews.length})
-                      <span className="text-xs font-normal text-slate-500">
-                        from SerpAPI
-                      </span>
                     </h3>
                     <button
                       onClick={() => setIsAdditionalReviewsModalOpen(true)}

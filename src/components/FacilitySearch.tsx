@@ -168,9 +168,9 @@ export default function FacilitySearch({
               setIsExpanded(true);
               setTimeout(() => inputRef.current?.focus(), 100);
             }}
-            className="py-3.5 px-3.5 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200 hover:bg-gray-50 transition-all"
+            className="py-3 px-3 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200 hover:bg-gray-50 transition-all"
           >
-            <Search className="w-6 h-6 text-gray-600" />
+            <Search className="w-5 h-5 text-gray-600" />
           </motion.button>
         ) : (
           // Expanded: Full Search Bar
