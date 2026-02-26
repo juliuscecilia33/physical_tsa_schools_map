@@ -284,7 +284,17 @@ export default function FacilitySidebar({
     highRes: boolean = false,
   ) => {
     const fullResUrl = photoData.image || photoData.url || photoData.thumbnail;
-    return highRes ? fullResUrl : photoData.thumbnail;
+    const baseUrl = highRes ? fullResUrl : photoData.thumbnail;
+
+    // Try to optimize Supabase Storage images with transformation API
+    // If transformation fails (404), browser will fall back to original URL
+    if (!highRes && baseUrl.includes('supabase.co/storage')) {
+      // Add width parameter for on-the-fly resizing (300px for thumbnails)
+      // This works if Supabase Image Transformation is enabled
+      return `${baseUrl}?width=300&quality=80`;
+    }
+
+    return baseUrl;
   };
 
   // Combine scraped photos with review photos
@@ -1085,6 +1095,7 @@ export default function FacilitySidebar({
                         src={getPhotoUrl(photoRef)}
                         alt={`${displayFacility.name} photo ${idx + 1}`}
                         className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                        loading={idx < 5 ? "eager" : "lazy"}
                         onLoadStart={() => handleImageLoadStart(idx)}
                         onLoad={() => handleImageLoad(idx)}
                         onError={() => handleImageLoad(idx)}
@@ -1191,6 +1202,7 @@ export default function FacilitySidebar({
                           alt={`${displayFacility.name} photo ${idx + 1}`}
                           className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
                           referrerPolicy="no-referrer"
+                          loading={idx < 5 ? "eager" : "lazy"}
                           onLoadStart={() =>
                             handleImageLoadStart(`combined-${idx}`)
                           }
@@ -1829,6 +1841,7 @@ export default function FacilitySidebar({
                                       alt={`Review image ${imgIdx + 1}`}
                                       className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                                       referrerPolicy="no-referrer"
+                                      loading={idx < 10 ? "eager" : "lazy"}
                                       onLoadStart={() =>
                                         handleImageLoadStart(
                                           `review-${idx}-img-${imgIdx}`,
