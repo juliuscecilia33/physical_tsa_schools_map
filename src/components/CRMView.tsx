@@ -291,16 +291,6 @@ function FacilityTable({ facilities }: { facilities: FacilityLightweight[] }) {
   );
 }
 
-// Helper to extract city from address
-function extractCity(address: string): string {
-  // Try to extract city from address (typically after first comma)
-  const parts = address.split(",");
-  if (parts.length >= 2) {
-    return parts[1].trim();
-  }
-  return "";
-}
-
 // Load filters from localStorage
 function loadFiltersFromStorage(): FilterState {
   if (typeof window === "undefined") {
@@ -322,7 +312,6 @@ function getDefaultFilters(): FilterState {
   return {
     searchQuery: "",
     selectedSports: [],
-    selectedCities: [],
     addressSearch: "",
     minRating: null,
     minReviews: null,
@@ -363,18 +352,10 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
     }
   }, [filters]);
 
-  // Extract unique sports and cities from facilities
+  // Extract unique sports from facilities
   const availableSports = Array.from(
     new Set(
       facilities.flatMap((f) => f.identified_sports || [])
-    )
-  ).sort();
-
-  const availableCities = Array.from(
-    new Set(
-      facilities
-        .map((f) => extractCity(f.address))
-        .filter((city) => city !== "")
     )
   ).sort();
 
@@ -393,12 +374,6 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
         facility.identified_sports?.includes(sport)
       );
       if (!hasSport) return false;
-    }
-
-    // City filter
-    if (filters.selectedCities.length > 0) {
-      const facilityCity = extractCity(facility.address);
-      if (!filters.selectedCities.includes(facilityCity)) return false;
     }
 
     // Address search
@@ -453,7 +428,6 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
   const activeFilterCount =
     (filters.searchQuery ? 1 : 0) +
     filters.selectedSports.length +
-    filters.selectedCities.length +
     (filters.addressSearch ? 1 : 0) +
     (filters.minRating !== null ? 1 : 0) +
     (filters.minReviews !== null ? 1 : 0) +
@@ -505,7 +479,6 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
         filters={filters}
         onFiltersChange={setFilters}
         availableSports={availableSports}
-        availableCities={availableCities}
       />
 
       <div className="w-full h-full p-6 md:p-8 lg:p-12 space-y-8">
