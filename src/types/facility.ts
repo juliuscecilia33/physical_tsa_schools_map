@@ -56,6 +56,8 @@ export interface Review {
   link?: string; // URL to full review
   snippet?: string; // Review text from SerpAPI
   iso_date?: string; // ISO format timestamp
+  likes?: number; // Number of likes/thumbs up on the review
+  images?: string[]; // Array of image URLs attached to the review
   user?: {
     name: string;
     thumbnail?: string;
