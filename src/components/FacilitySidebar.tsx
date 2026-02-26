@@ -859,7 +859,6 @@ export default function FacilitySidebar({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isPhotoViewerOpen, selectedPhotoIndex, displayFacility]);
 
-
   // Early return after all hooks are declared (Rules of Hooks)
   if (!displayFacility) return null;
 
@@ -870,29 +869,11 @@ export default function FacilitySidebar({
         animate={{ x: 0 }}
         exit={{ x: "-100%" }}
         transition={{ type: "spring", damping: 25, stiffness: 200 }}
-        className="fixed top-[1vh] left-24 h-[98vh] w-full md:w-[480px] bg-white shadow-xl border border-slate-200/60 rounded-2xl z-50 flex flex-col overflow-hidden"
+        className="fixed top-[1vh] left-24 h-[98vh] w-full md:w-[400px] bg-white shadow-xl rounded-2xl z-50 flex flex-col overflow-hidden"
       >
         {/* Header with gradient */}
-        <div className="sticky top-0 bg-white backdrop-blur-sm border-b border-slate-200 shadow-sm z-20">
-          {/* Cover Photo */}
-          {displayFacility.photo_references &&
-            displayFacility.photo_references.length > 0 && (
-              <div className="relative w-full h-48 overflow-hidden">
-                {loadingImages[0] !== false && (
-                  <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />
-                )}
-                <img
-                  src={getPhotoUrl(displayFacility.photo_references[0])}
-                  alt={`${displayFacility.name} cover`}
-                  className="w-full h-full object-cover"
-                  onLoadStart={() => handleImageLoadStart(0)}
-                  onLoad={() => handleImageLoad(0)}
-                  onError={() => handleImageLoad(0)}
-                />
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/30" />
-              </div>
-            )}
-          <div className="px-6 pb-6 pt-4 flex justify-between items-start">
+        <div className="sticky top-0 bg-white z-20">
+          <div className="px-5 pt-4 flex justify-between items-start">
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -958,7 +939,7 @@ export default function FacilitySidebar({
         </div>
 
         {/* Content */}
-        <div ref={contentRef} className="flex-1 overflow-y-auto p-6 space-y-6">
+        <div ref={contentRef} className="flex-1 overflow-y-auto p-5 space-y-4">
           {/* Photos */}
           {displayFacility.photo_references &&
           displayFacility.photo_references.length > 0 &&
@@ -1055,8 +1036,11 @@ export default function FacilitySidebar({
             displayFacility.additional_photos &&
             displayFacility.additional_photos.length > 0 && (
               <>
-                {/* Divider */}
-                <div className="border-t border-slate-200"></div>
+                {/* Divider - only show if regular photos were displayed above */}
+                {displayFacility.photo_references &&
+                  displayFacility.photo_references.length > 0 && (
+                    <div className="border-t border-slate-200"></div>
+                  )}
 
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -1065,11 +1049,8 @@ export default function FacilitySidebar({
                 >
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
-                      Additional Photos (
-                      {displayFacility.additional_photos.length})
-                      <span className="text-xs font-normal text-slate-500">
-                        from SerpAPI
-                      </span>
+                      Scraped Photos ({displayFacility.additional_photos.length}
+                      )
                     </h3>
                     <button
                       onClick={() => setIsAdditionalPhotosModalOpen(true)}
@@ -1157,8 +1138,14 @@ export default function FacilitySidebar({
               </>
             )}
 
-          {/* Divider */}
-          <div className="border-t border-slate-200"></div>
+          {/* Divider - only show if photos sections were displayed above */}
+          {((displayFacility.photo_references &&
+            displayFacility.photo_references.length > 0) ||
+            (displayFacility.serp_scraped &&
+              displayFacility.additional_photos &&
+              displayFacility.additional_photos.length > 0)) && (
+            <div className="border-t border-slate-200"></div>
+          )}
 
           {/* Notes Section */}
           <motion.div
@@ -1669,7 +1656,7 @@ export default function FacilitySidebar({
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 + idx * 0.05 }}
-                            className={`py-4 ${idx !== 0 ? 'border-t border-slate-200' : ''}`}
+                            className={`py-4 ${idx !== 0 ? "border-t border-slate-200" : ""}`}
                           >
                             <div className="flex items-start justify-between mb-3">
                               <div className="flex items-center gap-2">
@@ -1711,12 +1698,13 @@ export default function FacilitySidebar({
                                 <div className="flex gap-0.5">
                                   {renderStars(review.rating)}
                                 </div>
-                                {review.likes !== undefined && review.likes > 0 && (
-                                  <span className="text-xs text-slate-500 flex items-center gap-1">
-                                    <span>👍</span>
-                                    <span>{review.likes}</span>
-                                  </span>
-                                )}
+                                {review.likes !== undefined &&
+                                  review.likes > 0 && (
+                                    <span className="text-xs text-slate-500 flex items-center gap-1">
+                                      <span>👍</span>
+                                      <span>{review.likes}</span>
+                                    </span>
+                                  )}
                               </div>
                             </div>
                             <p className="text-sm text-slate-700 leading-relaxed mb-2">
@@ -1731,7 +1719,9 @@ export default function FacilitySidebar({
                                     key={imgIdx}
                                     className="relative flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer"
                                   >
-                                    {loadingImages[`review-${idx}-img-${imgIdx}`] !== false && (
+                                    {loadingImages[
+                                      `review-${idx}-img-${imgIdx}`
+                                    ] !== false && (
                                       <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />
                                     )}
                                     <img
@@ -1740,13 +1730,19 @@ export default function FacilitySidebar({
                                       className="w-full h-full object-cover"
                                       referrerPolicy="no-referrer"
                                       onLoadStart={() =>
-                                        handleImageLoadStart(`review-${idx}-img-${imgIdx}`)
+                                        handleImageLoadStart(
+                                          `review-${idx}-img-${imgIdx}`,
+                                        )
                                       }
                                       onLoad={() =>
-                                        handleImageLoad(`review-${idx}-img-${imgIdx}`)
+                                        handleImageLoad(
+                                          `review-${idx}-img-${imgIdx}`,
+                                        )
                                       }
                                       onError={() =>
-                                        handleImageLoad(`review-${idx}-img-${imgIdx}`)
+                                        handleImageLoad(
+                                          `review-${idx}-img-${imgIdx}`,
+                                        )
                                       }
                                     />
                                   </div>
@@ -1850,7 +1846,7 @@ export default function FacilitySidebar({
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 + idx * 0.05 }}
-                    className={`py-4 ${idx !== 0 ? 'border-t border-slate-200' : ''}`}
+                    className={`py-4 ${idx !== 0 ? "border-t border-slate-200" : ""}`}
                   >
                     <div className="flex items-center justify-between mb-3">
                       <span className="font-semibold text-slate-900 text-sm">
@@ -1876,7 +1872,6 @@ export default function FacilitySidebar({
               <p className="text-sm text-slate-500">No reviews available</p>
             </div>
           )}
-
 
           {/* Divider */}
           <div className="border-t border-slate-200"></div>
@@ -2020,10 +2015,9 @@ export default function FacilitySidebar({
                 <div className="flex items-center justify-between p-6 border-b border-slate-200 bg-gradient-to-r from-white to-slate-50">
                   <div>
                     <h2 className="text-xl font-medium text-slate-900">
-                      Additional Photos (
+                      Scraped Photos (
                       {displayFacility.additional_photos?.length || 0})
                     </h2>
-                    <p className="text-sm text-slate-500 mt-1">from SerpAPI</p>
                   </div>
                   <button
                     onClick={() => setIsAdditionalPhotosModalOpen(false)}
@@ -2904,8 +2898,7 @@ export default function FacilitySidebar({
                     <div className="space-y-2">
                       {allTags
                         .filter(
-                          (tag) =>
-                            !facilityTags.some((ft) => ft.id === tag.id),
+                          (tag) => !facilityTags.some((ft) => ft.id === tag.id),
                         )
                         .map((tag) => (
                           <motion.button
@@ -2933,8 +2926,7 @@ export default function FacilitySidebar({
                           </motion.button>
                         ))}
                       {allTags.filter(
-                        (tag) =>
-                          !facilityTags.some((ft) => ft.id === tag.id),
+                        (tag) => !facilityTags.some((ft) => ft.id === tag.id),
                       ).length === 0 && (
                         <div className="text-center py-12">
                           <Tag className="w-12 h-12 text-slate-400 mx-auto mb-3" />
