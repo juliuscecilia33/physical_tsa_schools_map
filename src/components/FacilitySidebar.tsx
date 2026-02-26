@@ -2764,21 +2764,65 @@ export default function FacilitySidebar({
                               </h4>
                               {Array.isArray(metadata.matched_text) ? (
                                 <div className="space-y-3">
-                                  {metadata.matched_text.map((review, idx) => (
-                                    <div key={idx} className="bg-slate-50 border border-slate-200 rounded-xl p-4">
-                                      <div className="flex items-center gap-2 mb-2">
-                                        <span className="text-xs font-semibold text-slate-500 uppercase">Review {idx + 1}</span>
+                                  {metadata.matched_text.map((review, idx) => {
+                                    // Highlight matched keywords in the review text
+                                    const highlightKeywords = (text: string, keywords: string[]) => {
+                                      if (!keywords || keywords.length === 0) return text;
+
+                                      // Create a regex that matches any of the keywords (case-insensitive)
+                                      const pattern = keywords.map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+                                      const regex = new RegExp(`(${pattern})`, 'gi');
+
+                                      // Split text by matches and wrap matches in spans
+                                      const parts = text.split(regex);
+                                      return parts.map((part, i) => {
+                                        const isMatch = keywords.some(k => k.toLowerCase() === part.toLowerCase());
+                                        return isMatch ? (
+                                          <mark key={i} className="bg-yellow-200 font-semibold px-0.5 rounded">
+                                            {part}
+                                          </mark>
+                                        ) : (
+                                          <span key={i}>{part}</span>
+                                        );
+                                      });
+                                    };
+
+                                    return (
+                                      <div key={idx} className="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                                        <div className="flex items-center gap-2 mb-2">
+                                          <span className="text-xs font-semibold text-slate-500 uppercase">Review {idx + 1}</span>
+                                        </div>
+                                        <p className="text-sm text-slate-700 italic leading-relaxed">
+                                          "{highlightKeywords(review, metadata.keywords_matched)}"
+                                        </p>
                                       </div>
-                                      <p className="text-sm text-slate-700 italic leading-relaxed">
-                                        "{review}"
-                                      </p>
-                                    </div>
-                                  ))}
+                                    );
+                                  })}
                                 </div>
                               ) : (
                                 <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
                                   <p className="text-sm text-slate-700 italic leading-relaxed">
-                                    "{metadata.matched_text}"
+                                    "{(() => {
+                                      // Highlight keywords in single matched text too
+                                      const text = metadata.matched_text;
+                                      const keywords = metadata.keywords_matched;
+                                      if (!keywords || keywords.length === 0) return text;
+
+                                      const pattern = keywords.map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+                                      const regex = new RegExp(`(${pattern})`, 'gi');
+                                      const parts = text.split(regex);
+
+                                      return parts.map((part, i) => {
+                                        const isMatch = keywords.some(k => k.toLowerCase() === part.toLowerCase());
+                                        return isMatch ? (
+                                          <mark key={i} className="bg-yellow-200 font-semibold px-0.5 rounded">
+                                            {part}
+                                          </mark>
+                                        ) : (
+                                          <span key={i}>{part}</span>
+                                        );
+                                      });
+                                    })()}"
                                   </p>
                                 </div>
                               )}
