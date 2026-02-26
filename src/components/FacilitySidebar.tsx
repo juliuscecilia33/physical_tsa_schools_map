@@ -289,9 +289,11 @@ export default function FacilitySidebar({
     // Try to optimize Supabase Storage images with transformation API
     // If transformation fails (404), browser will fall back to original URL
     if (!highRes && baseUrl.includes('supabase.co/storage')) {
-      // Add width parameter for on-the-fly resizing (300px for thumbnails)
-      // This works if Supabase Image Transformation is enabled
-      return `${baseUrl}?width=300&quality=80`;
+      // More aggressive compression for faster preview loading
+      // width=280: Match display size exactly (280px × 180px)
+      // quality=60: Lower quality but acceptable for thumbnails (~40% smaller files)
+      // resize=cover: Crop to fill dimensions for consistent aspect ratio
+      return `${baseUrl}?width=280&quality=60&resize=cover`;
     }
 
     return baseUrl;
