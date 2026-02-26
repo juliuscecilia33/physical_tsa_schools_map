@@ -1,9 +1,9 @@
 export interface SportMetadata {
   score: number; // 0-100 confidence score
-  sources: Array<'name' | 'review' | 'api'>; // Where the sport was identified from
+  sources: Array<'name' | 'review' | 'api' | 'serp_review'>; // Where the sport was identified from
   keywords_matched: string[]; // Keywords that triggered identification
   confidence: 'high' | 'medium' | 'low'; // Confidence level
-  matched_text?: string; // The actual text that contained the match
+  matched_text?: string | string[]; // The actual text/review(s) that contained the match
 }
 
 export interface PhotoData {
@@ -41,6 +41,7 @@ export interface Facility {
   additional_reviews?: Review[]; // Full review data from SerpAPI (beyond 5 from Google Places)
   serp_scraped?: boolean; // Whether this facility has been enriched with SerpAPI data
   serp_scraped_at?: string; // Timestamp of when SerpAPI enrichment was performed
+  sport_metadata_reassessed?: boolean; // Whether sport_metadata has been re-assessed using additional_reviews
   total_photo_count?: number; // Precomputed total photo count (including review photos)
 }
 

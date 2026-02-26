@@ -1668,11 +1668,24 @@ export default function FacilitySidebar({
                                   </div>
                                   {metadata.matched_text && (
                                     <div className="mt-1 italic border-t border-slate-700 pt-1">
-                                      "{metadata.matched_text.substring(0, 100)}
-                                      {metadata.matched_text.length > 100
-                                        ? "..."
-                                        : ""}
-                                      "
+                                      {Array.isArray(metadata.matched_text) ? (
+                                        <div>
+                                          <strong>{metadata.matched_text.length} matching review(s):</strong>
+                                          <div className="mt-1 space-y-2 max-h-40 overflow-y-auto">
+                                            {metadata.matched_text.map((review, idx) => (
+                                              <div key={idx} className="text-slate-300 border-l-2 border-slate-600 pl-2">
+                                                "{review.substring(0, 100)}
+                                                {review.length > 100 ? "..." : ""}"
+                                              </div>
+                                            ))}
+                                          </div>
+                                        </div>
+                                      ) : (
+                                        <>
+                                          "{metadata.matched_text.substring(0, 100)}
+                                          {metadata.matched_text.length > 100 ? "..." : ""}"
+                                        </>
+                                      )}
                                     </div>
                                   )}
                                 </div>
@@ -2747,13 +2760,28 @@ export default function FacilitySidebar({
                           {metadata.matched_text && (
                             <div>
                               <h4 className="text-sm font-medium text-slate-700 uppercase tracking-wide mb-2">
-                                Text Evidence
+                                Text Evidence {Array.isArray(metadata.matched_text) && `(${metadata.matched_text.length} reviews)`}
                               </h4>
-                              <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
-                                <p className="text-sm text-slate-700 italic leading-relaxed">
-                                  "{metadata.matched_text}"
-                                </p>
-                              </div>
+                              {Array.isArray(metadata.matched_text) ? (
+                                <div className="space-y-3">
+                                  {metadata.matched_text.map((review, idx) => (
+                                    <div key={idx} className="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                                      <div className="flex items-center gap-2 mb-2">
+                                        <span className="text-xs font-semibold text-slate-500 uppercase">Review {idx + 1}</span>
+                                      </div>
+                                      <p className="text-sm text-slate-700 italic leading-relaxed">
+                                        "{review}"
+                                      </p>
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : (
+                                <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                                  <p className="text-sm text-slate-700 italic leading-relaxed">
+                                    "{metadata.matched_text}"
+                                  </p>
+                                </div>
+                              )}
                             </div>
                           )}
 

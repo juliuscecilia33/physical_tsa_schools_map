@@ -1336,7 +1336,10 @@ export default function FacilityMap({
         onUpdateFacility={onUpdateFacility}
         onFacilityDataLoaded={(fullFacility) => {
           // Update clickedFacility with full data so popup shows correct counts
-          if (clickedFacility && fullFacility.place_id === clickedFacility.place_id) {
+          if (
+            clickedFacility &&
+            fullFacility.place_id === clickedFacility.place_id
+          ) {
             setClickedFacility(fullFacility);
           }
         }}
