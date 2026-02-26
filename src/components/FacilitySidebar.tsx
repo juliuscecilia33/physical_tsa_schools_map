@@ -873,7 +873,7 @@ export default function FacilitySidebar({
       >
         {/* Header with gradient */}
         <div className="sticky top-0 bg-white z-20">
-          <div className="px-5 pt-4 flex justify-between items-start">
+          <div className="px-5 pt-4 pb-3 flex justify-between items-start">
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -1326,22 +1326,12 @@ export default function FacilitySidebar({
                 <Tag className="w-4 h-4" />
                 Tags ({facilityTags.length})
               </h3>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setIsTagAssignmentModalOpen(true)}
-                  disabled={assigningTag}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  Assign Tag
-                </button>
-                <button
-                  onClick={() => setIsTagManagementModalOpen(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-slate-900 hover:bg-slate-800 rounded-xl transition-all cursor-pointer"
-                >
-                  Manage Tags
-                </button>
-              </div>
+              <button
+                onClick={() => setIsTagManagementModalOpen(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-slate-900 hover:bg-slate-800 rounded-xl transition-all cursor-pointer"
+              >
+                Manage Tags
+              </button>
             </div>
 
             {/* Assigned Tags Display */}
@@ -1353,8 +1343,8 @@ export default function FacilitySidebar({
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.1 + idx * 0.05 }}
-                    className="group relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium text-white shadow-sm hover:shadow-sm transition-all"
-                    style={{ backgroundColor: tag.color }}
+                    className="group relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-white border transition-all"
+                    style={{ borderColor: tag.color, color: tag.color }}
                   >
                     <Tag className="w-3.5 h-3.5" />
                     <span>{tag.name}</span>
@@ -1367,11 +1357,32 @@ export default function FacilitySidebar({
                     </button>
                   </motion.div>
                 ))}
+                {/* Inline Add Tag Button */}
+                <motion.button
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.1 + facilityTags.length * 0.05 }}
+                  onClick={() => setIsTagAssignmentModalOpen(true)}
+                  disabled={assigningTag}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-slate-100 hover:bg-slate-200 text-slate-600 border-2 border-dashed border-slate-300 hover:border-slate-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Add</span>
+                </motion.button>
               </div>
             ) : (
-              <div className="text-center py-4 bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-2xl border border-slate-100 mb-3">
-                <Tag className="w-6 h-6 text-slate-400 mx-auto mb-2" />
-                <p className="text-xs text-slate-500">No tags assigned</p>
+              <div className="flex flex-wrap gap-2 mb-3">
+                {/* Add Tag Button when no tags exist */}
+                <motion.button
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  onClick={() => setIsTagAssignmentModalOpen(true)}
+                  disabled={assigningTag}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-slate-100 hover:bg-slate-200 text-slate-600 border-2 border-dashed border-slate-300 hover:border-slate-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Add Tag</span>
+                </motion.button>
               </div>
             )}
           </motion.div>
@@ -1408,7 +1419,7 @@ export default function FacilitySidebar({
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.1 + idx * 0.05 }}
                     whileHover={{ scale: 1.05 }}
-                    className="px-4 py-2 bg-white text-blue-600 border border-blue-600 rounded-full text-sm font-medium transition-all cursor-default flex items-center gap-1.5"
+                    className="px-4 py-1.5 bg-white text-blue-600 border border-blue-600 rounded-full text-sm font-medium transition-all cursor-default flex items-center gap-1.5"
                   >
                     <span className="text-base">
                       {FACILITY_TYPE_EMOJIS[type] || "🏢"}
@@ -1432,9 +1443,6 @@ export default function FacilitySidebar({
               >
                 <h3 className="text-sm font-medium text-slate-700 mb-3 tracking-wide flex items-center gap-2">
                   Sports Scraped
-                  <span className="text-xs font-normal text-slate-500">
-                    (with confidence scores)
-                  </span>
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {displayFacility.identified_sports.map((sport, idx) => {
@@ -1484,7 +1492,7 @@ export default function FacilitySidebar({
                       >
                         <button
                           onClick={() => setSelectedSportDetail(sport)}
-                          className={`px-4 py-2 bg-white ${textColor} rounded-full text-sm font-medium transition-all cursor-pointer flex items-center gap-1.5 border ${borderColor}`}
+                          className={`px-4 py-1.5 bg-white ${textColor} rounded-full text-sm font-medium transition-all cursor-pointer flex items-center gap-1.5 border ${borderColor}`}
                         >
                           <span className="text-lg">
                             {SPORT_EMOJIS[sport] || "🏅"}
@@ -1492,9 +1500,6 @@ export default function FacilitySidebar({
                           <span>{sport}</span>
                           {metadata ? (
                             <>
-                              <span className="text-xs opacity-75">
-                                {confidenceIcon}
-                              </span>
                               <span className="px-1.5 py-0.5 rounded text-xs font-bold bg-slate-100">
                                 {score}
                               </span>
