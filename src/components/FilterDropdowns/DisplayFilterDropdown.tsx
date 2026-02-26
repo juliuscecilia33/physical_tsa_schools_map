@@ -88,13 +88,13 @@ export default function DisplayFilterDropdown({
                     onFilterChange(option.value);
                     onClose();
                   }}
-                  className={`w-full text-left px-4 py-3 rounded-lg transition-all ${
+                  className={`w-full text-left px-3 py-2.5 rounded-lg transition-all ${
                     selectedFilter === option.value
                       ? 'bg-[#004aad] text-white shadow-md'
                       : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
                   }`}
                 >
-                  <div className="font-medium text-sm">{option.label}</div>
+                  <div className="font-medium text-xs">{option.label}</div>
                   <div className={`text-xs mt-1 ${selectedFilter === option.value ? 'text-white/80' : 'text-gray-500'}`}>
                     {option.description}
                   </div>

@@ -97,13 +97,13 @@ export default function SportFilterDropdown({
                     <button
                       key={sport}
                       onClick={() => onSportToggle(sport)}
-                      className={`px-3 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
+                      className={`px-2.5 py-2 rounded-lg text-xs font-medium transition-all flex items-center gap-2 ${
                         isSelected
                           ? 'bg-[#004aad] text-white shadow-md'
                           : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
                       }`}
                     >
-                      <span className="text-base">{sportEmojis[sport] || '🏃'}</span>
+                      <span className="text-sm">{sportEmojis[sport] || '🏃'}</span>
                       <span className="truncate text-left flex-1">{sport}</span>
                     </button>
                   );

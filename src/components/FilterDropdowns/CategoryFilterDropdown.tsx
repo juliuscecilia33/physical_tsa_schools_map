@@ -107,7 +107,7 @@ export default function CategoryFilterDropdown({
                   <button
                     key={category}
                     onClick={() => onCategoryToggle(category)}
-                    className={`w-full px-4 py-3 rounded-lg text-sm font-medium transition-all flex items-center justify-between ${
+                    className={`w-full px-3 py-2.5 rounded-lg text-xs font-medium transition-all flex items-center justify-between ${
                       isSelected
                         ? 'bg-[#004aad] text-white shadow-md'
                         : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
@@ -115,7 +115,7 @@ export default function CategoryFilterDropdown({
                   >
                     <div className="flex items-center gap-2">
                       <div
-                        className="w-3 h-3 rounded-full"
+                        className="w-2.5 h-2.5 rounded-full"
                         style={{
                           backgroundColor: isSelected ? 'white' : color,
                         }}
@@ -123,7 +123,7 @@ export default function CategoryFilterDropdown({
                       <span>{category}</span>
                     </div>
                     <span
-                      className={`text-xs px-2 py-1 rounded-full ${
+                      className={`text-xs px-1.5 py-0.5 rounded-full ${
                         isSelected ? 'bg-white/20' : 'bg-gray-200 text-gray-600'
                       }`}
                     >

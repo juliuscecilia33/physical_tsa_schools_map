@@ -107,15 +107,15 @@ export default function TagFilterDropdown({
                       <button
                         key={tag.id}
                         onClick={() => onTagToggle(tag.id)}
-                        className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                        className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
                           isSelected
-                            ? 'shadow-md ring-2 ring-offset-1'
-                            : 'hover:shadow-sm'
+                            ? 'border-opacity-100'
+                            : 'border-opacity-30 opacity-60 hover:opacity-100'
                         }`}
                         style={{
-                          backgroundColor: isSelected ? tag.color : `${tag.color}30`,
+                          backgroundColor: isSelected ? tag.color : `${tag.color}10`,
                           color: isSelected ? 'white' : tag.color,
-                          '--tw-ring-color': isSelected ? tag.color : 'transparent',
+                          borderColor: tag.color,
                         } as React.CSSProperties}
                         title={tag.description || tag.name}
                       >
