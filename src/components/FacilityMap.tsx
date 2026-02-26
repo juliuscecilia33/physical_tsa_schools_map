@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { AISearchFilters } from "@/app/api/ai-search/route";
+import { useAllTags } from "@/hooks/useAllTags";
 
 interface FacilityMapProps {
   facilities: Facility[];
@@ -297,26 +298,8 @@ export default function FacilityMap({
     return Array.from(sportsSet).sort();
   }, [facilities]);
 
-  // Get available tags from all facilities
-  const availableTags = useMemo(() => {
-    const tagsMap = new globalThis.Map();
-    facilities.forEach((facility) => {
-      if (facility.tags) {
-        facility.tags.forEach((tag) => {
-          if (!tagsMap.has(tag.id)) {
-            tagsMap.set(tag.id, {
-              id: tag.id,
-              name: tag.name,
-              color: tag.color,
-            });
-          }
-        });
-      }
-    });
-    return Array.from(tagsMap.values()).sort((a, b) =>
-      a.name.localeCompare(b.name),
-    );
-  }, [facilities]);
+  // Fetch all available tags from the database (not just tags assigned to facilities)
+  const { data: availableTags = [] } = useAllTags();
 
   // Client-side filtering based on filterOption, selectedSports, selectedTags, and AI filters
   const filteredFacilities = useMemo(() => {

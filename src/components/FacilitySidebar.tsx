@@ -1748,15 +1748,14 @@ export default function FacilitySidebar({
                   Expand
                 </button>
               </div>
-              <div className="space-y-4">
+              <div className="space-y-0">
                 {displayFacility.reviews.map((review, idx) => (
                   <motion.div
                     key={idx}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 + idx * 0.05 }}
-                    whileHover={{ scale: 1.01 }}
-                    className="bg-gradient-to-br from-white to-slate-50/50 rounded-2xl p-4 shadow-sm hover:shadow-sm transition-all border border-slate-100"
+                    className={`py-4 ${idx !== 0 ? 'border-t border-slate-200' : ''}`}
                   >
                     <div className="flex items-center justify-between mb-3">
                       <span className="font-semibold text-slate-900 text-sm">
@@ -1812,7 +1811,7 @@ export default function FacilitySidebar({
                       Expand
                     </button>
                   </div>
-                  <div className="space-y-4">
+                  <div className="space-y-0">
                     {displayFacility.additional_reviews
                       .slice(
                         0,
@@ -1835,8 +1834,7 @@ export default function FacilitySidebar({
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 + idx * 0.05 }}
-                            whileHover={{ scale: 1.01 }}
-                            className="bg-gradient-to-br from-white to-slate-50/50 rounded-2xl p-4 shadow-sm hover:shadow-sm transition-all border border-slate-100"
+                            className={`py-4 ${idx !== 0 ? 'border-t border-slate-200' : ''}`}
                           >
                             <div className="flex items-start justify-between mb-3">
                               <div className="flex items-center gap-2">
