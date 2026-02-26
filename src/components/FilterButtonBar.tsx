@@ -104,29 +104,29 @@ export default function FilterButtonBar({
         <button
           ref={displayButtonRef}
           onClick={() => handleDropdownToggle('display')}
-          className={`flex-shrink-0 flex items-center justify-between gap-3 px-5 py-4 min-w-[140px] rounded-2xl shadow-2xl border transition-all text-sm font-medium ${
+          className={`flex-shrink-0 flex items-center justify-between gap-2 px-3 py-3.5 min-w-[110px] rounded-2xl shadow-2xl border transition-all text-sm font-medium ${
             displayFilterActive || openDropdown === 'display'
               ? 'bg-[#004aad] text-white border-[#004aad]'
               : 'bg-white/95 backdrop-blur-xl text-slate-700 border-slate-200 hover:bg-slate-50'
           }`}
         >
-          <div className="flex items-center gap-2">
-            <Eye className="w-5 h-5" />
+          <div className="flex items-center gap-1.5">
+            <Eye className="w-4 h-4" />
             <span className="whitespace-nowrap">Display</span>
             {displayFilterActive && (
-              <span className="px-1.5 py-0.5 bg-white/20 rounded-full text-xs">
+              <span className="px-1 py-0.5 bg-white/20 rounded-full text-xs">
                 1
               </span>
             )}
           </div>
-          <ChevronDown className="w-4 h-4" />
+          <ChevronDown className="w-3.5 h-3.5" />
         </button>
 
         {/* Sport Filter Button */}
         <button
           ref={sportButtonRef}
           onClick={() => handleDropdownToggle('sport')}
-          className={`flex-shrink-0 flex items-center justify-between gap-3 px-5 py-4 min-w-[130px] rounded-2xl shadow-2xl border transition-all text-sm font-medium ${
+          className={`flex-shrink-0 flex items-center justify-between gap-2 px-3 py-3.5 min-w-[100px] rounded-2xl shadow-2xl border transition-all text-sm font-medium ${
             openDropdown === 'sport'
               ? 'bg-[#004aad] text-white border-[#004aad]'
               : allSportsSelected
@@ -136,23 +136,23 @@ export default function FilterButtonBar({
               : 'bg-white/95 backdrop-blur-xl text-slate-700 border-slate-200 hover:bg-slate-50'
           }`}
         >
-          <div className="flex items-center gap-2">
-            <Trophy className="w-5 h-5" />
+          <div className="flex items-center gap-1.5">
+            <Trophy className="w-4 h-4" />
             <span className="whitespace-nowrap">Sport</span>
             {sportFilterCount > 0 && (
-              <span className="px-1.5 py-0.5 bg-white/20 rounded-full text-xs">
+              <span className="px-1 py-0.5 bg-white/20 rounded-full text-xs">
                 {sportFilterCount}
               </span>
             )}
           </div>
-          <ChevronDown className="w-4 h-4" />
+          <ChevronDown className="w-3.5 h-3.5" />
         </button>
 
         {/* Tag Filter Button */}
         <button
           ref={tagButtonRef}
           onClick={() => handleDropdownToggle('tag')}
-          className={`flex-shrink-0 flex items-center justify-between gap-3 px-5 py-4 min-w-[120px] rounded-2xl shadow-2xl border transition-all text-sm font-medium ${
+          className={`flex-shrink-0 flex items-center justify-between gap-2 px-3 py-3.5 min-w-[95px] rounded-2xl shadow-2xl border transition-all text-sm font-medium ${
             openDropdown === 'tag'
               ? 'bg-[#004aad] text-white border-[#004aad]'
               : allTagsSelected
@@ -162,23 +162,23 @@ export default function FilterButtonBar({
               : 'bg-white/95 backdrop-blur-xl text-slate-700 border-slate-200 hover:bg-slate-50'
           }`}
         >
-          <div className="flex items-center gap-2">
-            <TagIcon className="w-5 h-5" />
+          <div className="flex items-center gap-1.5">
+            <TagIcon className="w-4 h-4" />
             <span className="whitespace-nowrap">Tags</span>
             {tagFilterCount > 0 && (
-              <span className="px-1.5 py-0.5 bg-white/20 rounded-full text-xs">
+              <span className="px-1 py-0.5 bg-white/20 rounded-full text-xs">
                 {tagFilterCount}
               </span>
             )}
           </div>
-          <ChevronDown className="w-4 h-4" />
+          <ChevronDown className="w-3.5 h-3.5" />
         </button>
 
         {/* Category Filter Button */}
         <button
           ref={categoryButtonRef}
           onClick={() => handleDropdownToggle('category')}
-          className={`flex-shrink-0 flex items-center justify-between gap-3 px-5 py-4 min-w-[160px] rounded-2xl shadow-2xl border transition-all text-sm font-medium ${
+          className={`flex-shrink-0 flex items-center justify-between gap-2 px-3 py-3.5 min-w-[130px] rounded-2xl shadow-2xl border transition-all text-sm font-medium ${
             openDropdown === 'category'
               ? 'bg-[#004aad] text-white border-[#004aad]'
               : allCategoriesSelected
@@ -188,33 +188,33 @@ export default function FilterButtonBar({
               : 'bg-white/95 backdrop-blur-xl text-slate-700 border-slate-200 hover:bg-slate-50'
           }`}
         >
-          <div className="flex items-center gap-2">
-            <Grid3x3 className="w-5 h-5" />
+          <div className="flex items-center gap-1.5">
+            <Grid3x3 className="w-4 h-4" />
             <span className="whitespace-nowrap">Categories</span>
             {categoryFilterCount > 0 && (
-              <span className="px-1.5 py-0.5 bg-white/20 rounded-full text-xs">
+              <span className="px-1 py-0.5 bg-white/20 rounded-full text-xs">
                 {categoryFilterCount}
               </span>
             )}
           </div>
-          <ChevronDown className="w-4 h-4" />
+          <ChevronDown className="w-3.5 h-3.5" />
         </button>
 
         {/* More Filters Button */}
         <button
           ref={moreButtonRef}
           onClick={() => handleDropdownToggle('more')}
-          className={`flex-shrink-0 flex items-center justify-between gap-3 px-5 py-4 min-w-[120px] rounded-2xl shadow-2xl border transition-all text-sm font-medium ${
+          className={`flex-shrink-0 flex items-center justify-between gap-2 px-3 py-3.5 min-w-[95px] rounded-2xl shadow-2xl border transition-all text-sm font-medium ${
             openDropdown === 'more'
               ? 'bg-[#004aad] text-white border-[#004aad]'
               : 'bg-white/95 backdrop-blur-xl text-slate-700 border-slate-200 hover:bg-slate-50'
           }`}
         >
-          <div className="flex items-center gap-2">
-            <MoreHorizontal className="w-5 h-5" />
+          <div className="flex items-center gap-1.5">
+            <MoreHorizontal className="w-4 h-4" />
             <span className="whitespace-nowrap">More</span>
           </div>
-          <ChevronDown className="w-4 h-4" />
+          <ChevronDown className="w-3.5 h-3.5" />
         </button>
       </div>
 

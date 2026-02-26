@@ -890,7 +890,7 @@ export default function FacilitySidebar({
         animate={{ x: 0 }}
         exit={{ x: "-100%" }}
         transition={{ type: "spring", damping: 25, stiffness: 200 }}
-        className="fixed top-[1vh] left-4 h-[98vh] w-full md:w-[480px] bg-white shadow-xl border border-slate-200/60 rounded-2xl z-50 flex flex-col overflow-hidden"
+        className="fixed top-[1vh] left-24 h-[98vh] w-full md:w-[480px] bg-white shadow-xl border border-slate-200/60 rounded-2xl z-50 flex flex-col overflow-hidden"
       >
         {/* Header with gradient */}
         <div className="sticky top-0 bg-gradient-to-br from-white via-white to-[#004aad]/5 backdrop-blur-sm border-b border-[#E8E9EB] shadow-sm z-20">
