@@ -1106,6 +1106,31 @@ export default function FacilitySidebar({
                 </div>
               </div>
             </motion.div>
+          ) : isLoadingDetails &&
+            displayFacility.total_photo_count &&
+            displayFacility.total_photo_count > 0 ? (
+            // Show skeleton loader when loading and we know photos exist
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05 }}
+            >
+              <h3 className="text-sm font-medium text-slate-700 tracking-wide mb-3">
+                Scraped Photos{" "}
+                <span className="text-slate-500 tabular-nums">
+                  ({displayFacility.total_photo_count})
+                </span>
+              </h3>
+              <div className="flex gap-3 overflow-x-auto scrollbar-hide">
+                {[1, 2, 3, 4].map((i) => (
+                  <div
+                    key={i}
+                    className="bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 rounded-2xl animate-pulse flex-shrink-0"
+                    style={{ width: "280px", height: "180px" }}
+                  />
+                ))}
+              </div>
+            </motion.div>
           ) : !displayFacility.serp_scraped ||
             !displayFacility.additional_photos ||
             displayFacility.additional_photos.length === 0 ? (
