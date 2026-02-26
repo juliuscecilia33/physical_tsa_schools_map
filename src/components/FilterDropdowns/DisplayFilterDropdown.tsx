@@ -88,7 +88,7 @@ export default function DisplayFilterDropdown({
                     onFilterChange(option.value);
                     onClose();
                   }}
-                  className={`w-full text-left px-3 py-2.5 rounded-lg transition-all ${
+                  className={`w-full text-left px-3 py-2.5 rounded-lg transition-all cursor-pointer ${
                     selectedFilter === option.value
                       ? 'bg-[#004aad] text-white shadow-md'
                       : 'bg-gray-50 text-gray-700 hover:bg-gray-100'

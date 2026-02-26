@@ -90,7 +90,7 @@ export default function CategoryFilterDropdown({
                   onClick={() => {
                     onClearCategories();
                   }}
-                  className="text-xs text-[#004aad] hover:text-[#003380] font-medium"
+                  className="text-xs text-[#004aad] hover:text-[#003380] font-medium cursor-pointer"
                 >
                   Clear ({selectedCategories.length})
                 </button>
@@ -107,7 +107,7 @@ export default function CategoryFilterDropdown({
                   <button
                     key={category}
                     onClick={() => onCategoryToggle(category)}
-                    className={`w-full px-3 py-2.5 rounded-lg text-xs font-medium transition-all flex items-center justify-between ${
+                    className={`w-full px-3 py-2.5 rounded-lg text-xs font-medium transition-all flex items-center justify-between cursor-pointer ${
                       isSelected
                         ? 'bg-[#004aad] text-white shadow-md'
                         : 'bg-gray-50 text-gray-700 hover:bg-gray-100'

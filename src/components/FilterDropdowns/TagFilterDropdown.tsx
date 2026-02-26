@@ -87,7 +87,7 @@ export default function TagFilterDropdown({
                   onClick={() => {
                     onClearTags();
                   }}
-                  className="text-xs text-[#004aad] hover:text-[#003380] font-medium"
+                  className="text-xs text-[#004aad] hover:text-[#003380] font-medium cursor-pointer"
                 >
                   Clear ({selectedTagIds.length})
                 </button>
@@ -107,7 +107,7 @@ export default function TagFilterDropdown({
                       <button
                         key={tag.id}
                         onClick={() => onTagToggle(tag.id)}
-                        className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
+                        className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-all cursor-pointer ${
                           isSelected
                             ? 'border-opacity-100'
                             : 'border-opacity-30 opacity-60 hover:opacity-100'

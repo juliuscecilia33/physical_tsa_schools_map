@@ -82,7 +82,7 @@ export default function SportFilterDropdown({
                   onClick={() => {
                     onClearSports();
                   }}
-                  className="text-xs text-[#004aad] hover:text-[#003380] font-medium"
+                  className="text-xs text-[#004aad] hover:text-[#003380] font-medium cursor-pointer"
                 >
                   Clear ({selectedSports.length})
                 </button>
@@ -97,7 +97,7 @@ export default function SportFilterDropdown({
                     <button
                       key={sport}
                       onClick={() => onSportToggle(sport)}
-                      className={`px-2.5 py-2 rounded-lg text-xs font-medium transition-all flex items-center gap-2 ${
+                      className={`px-2.5 py-2 rounded-lg text-xs font-medium transition-all flex items-center gap-2 cursor-pointer ${
                         isSelected
                           ? 'bg-[#004aad] text-white shadow-md'
                           : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
