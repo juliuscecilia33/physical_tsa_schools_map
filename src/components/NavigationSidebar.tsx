@@ -60,7 +60,7 @@ export default function NavigationSidebar() {
               <Icon size={32} strokeWidth={1.5} />
 
               {/* Tooltip on hover */}
-              <span className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
+              <span className="absolute left-full ml-2 top-1/2 -translate-y-1/2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
                 {item.label}
               </span>
             </Link>
