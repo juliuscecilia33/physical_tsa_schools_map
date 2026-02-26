@@ -176,8 +176,9 @@ export default function FacilitySidebar({
   const [isPhotoViewerOpen, setIsPhotoViewerOpen] = useState(false);
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
   const [photoViewerSource, setPhotoViewerSource] = useState<
-    "regular" | "additional"
+    "regular" | "additional" | "review"
   >("regular");
+  const [selectedReviewIndex, setSelectedReviewIndex] = useState(0);
   const [showAddNoteForm, setShowAddNoteForm] = useState(false);
   const [isAdditionalPhotosModalOpen, setIsAdditionalPhotosModalOpen] =
     useState(false);
@@ -827,15 +828,26 @@ export default function FacilitySidebar({
     setIsPhotoViewerOpen(true);
   };
 
+  const openReviewPhotoViewer = (reviewIndex: number, photoIndex: number) => {
+    setSelectedReviewIndex(reviewIndex);
+    setSelectedPhotoIndex(photoIndex);
+    setPhotoViewerSource("review");
+    setIsPhotoViewerOpen(true);
+  };
+
   const closePhotoViewer = () => {
     setIsPhotoViewerOpen(false);
   };
 
   const goToNextPhoto = () => {
-    const photos =
-      photoViewerSource === "regular"
-        ? displayFacility?.photo_references
-        : displayFacility?.additional_photos;
+    let photos;
+    if (photoViewerSource === "regular") {
+      photos = displayFacility?.photo_references;
+    } else if (photoViewerSource === "additional") {
+      photos = displayFacility?.additional_photos;
+    } else if (photoViewerSource === "review") {
+      photos = displayFacility?.additional_reviews?.[selectedReviewIndex]?.images;
+    }
     if (!photos) return;
     const totalPhotos = photos.length;
     setSelectedPhotoIndex((prev) => (prev < totalPhotos - 1 ? prev + 1 : prev));
@@ -1719,7 +1731,8 @@ export default function FacilitySidebar({
                                 {review.images.map((imageUrl, imgIdx) => (
                                   <div
                                     key={imgIdx}
-                                    className="relative flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                                    onClick={() => openReviewPhotoViewer(idx, imgIdx)}
+                                    className="relative flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all cursor-pointer group"
                                   >
                                     {loadingImages[
                                       `review-${idx}-img-${imgIdx}`
@@ -1729,7 +1742,7 @@ export default function FacilitySidebar({
                                     <img
                                       src={imageUrl}
                                       alt={`Review image ${imgIdx + 1}`}
-                                      className="w-full h-full object-cover"
+                                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                                       referrerPolicy="no-referrer"
                                       onLoadStart={() =>
                                         handleImageLoadStart(
@@ -1747,6 +1760,11 @@ export default function FacilitySidebar({
                                         )
                                       }
                                     />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-1">
+                                      <span className="text-white text-[10px] font-medium">
+                                        Click to view
+                                      </span>
+                                    </div>
                                   </div>
                                 ))}
                               </div>
@@ -2274,7 +2292,9 @@ export default function FacilitySidebar({
           ((photoViewerSource === "regular" &&
             displayFacility.photo_references) ||
             (photoViewerSource === "additional" &&
-              displayFacility.additional_photos)) &&
+              displayFacility.additional_photos) ||
+            (photoViewerSource === "review" &&
+              displayFacility.additional_reviews?.[selectedReviewIndex]?.images)) &&
           createPortal(
             <motion.div
               initial={{ opacity: 0 }}
@@ -2284,10 +2304,14 @@ export default function FacilitySidebar({
               onClick={closePhotoViewer}
             >
               {(() => {
-                const photos =
-                  photoViewerSource === "regular"
-                    ? displayFacility.photo_references
-                    : displayFacility.additional_photos;
+                let photos;
+                if (photoViewerSource === "regular") {
+                  photos = displayFacility.photo_references;
+                } else if (photoViewerSource === "additional") {
+                  photos = displayFacility.additional_photos;
+                } else if (photoViewerSource === "review") {
+                  photos = displayFacility.additional_reviews?.[selectedReviewIndex]?.images;
+                }
                 if (!photos) return null;
                 const totalPhotos = photos.length;
                 const currentPhoto = photos[selectedPhotoIndex];
@@ -2308,6 +2332,11 @@ export default function FacilitySidebar({
                       {photoViewerSource === "additional" && (
                         <span className="ml-2 text-xs opacity-75">
                           (SerpAPI)
+                        </span>
+                      )}
+                      {photoViewerSource === "review" && (
+                        <span className="ml-2 text-xs opacity-75">
+                          (Review Photo)
                         </span>
                       )}
                     </div>
@@ -2351,13 +2380,15 @@ export default function FacilitySidebar({
                         src={
                           photoViewerSource === "regular"
                             ? getPhotoUrl(currentPhoto as string, true)
-                            : getPhotoDataUrl(
-                                currentPhoto as {
-                                  image: string;
-                                  thumbnail: string;
-                                },
-                                true,
-                              )
+                            : photoViewerSource === "additional"
+                              ? getPhotoDataUrl(
+                                  currentPhoto as {
+                                    image: string;
+                                    thumbnail: string;
+                                  },
+                                  true,
+                                )
+                              : (currentPhoto as string)
                         }
                         alt={`${displayFacility.name} photo ${selectedPhotoIndex + 1}`}
                         className="max-w-full max-h-[90vh] object-contain rounded-xl shadow-2xl"
