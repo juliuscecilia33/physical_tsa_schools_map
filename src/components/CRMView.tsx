@@ -17,6 +17,7 @@ import {
   Plus,
   ChevronLeft,
   ChevronRight,
+  Mail,
 } from "lucide-react";
 import { FacilityLightweight } from "@/types/facility";
 import { useLoading } from "@/contexts/LoadingContext";
@@ -24,12 +25,16 @@ import { useFacilities } from "@/hooks/useFacilities";
 import FiltersSidebar, { FilterState } from "./FiltersSidebar";
 import CRMFacilityDetailsSidebar from "./CRMFacilityDetailsSidebar";
 import { SkeletonTableRows } from "./SkeletonTableRow";
+import OutreachView from "./outreach/OutreachView";
+import OutreachStatusBadge from "./outreach/OutreachStatusBadge";
+import QuickActionsDropdown from "./outreach/QuickActionsDropdown";
 
 const cn = (...classes: (string | undefined | null | false)[]) =>
   classes.filter(Boolean).join(" ");
 
 const TABS = [
   { id: "facilities", label: "Facilities", icon: Building2 },
+  { id: "outreach", label: "Outreach", icon: Mail },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
   { id: "users", label: "Users", icon: Users },
   { id: "settings", label: "Settings", icon: Settings },
@@ -120,6 +125,9 @@ function FacilityTable({
             </th>
             <th className="px-5 py-4 font-semibold text-slate-600">
               Tags
+            </th>
+            <th className="px-5 py-4 font-semibold text-slate-600">
+              Outreach Status
             </th>
             <th className="px-5 py-4 font-semibold text-slate-600 text-right">
               Metrics
@@ -230,6 +238,21 @@ function FacilityTable({
                   )}
                 </td>
 
+                <td className="px-5 py-4 align-top min-w-[150px]">
+                  <OutreachStatusBadge
+                    status={
+                      // Mock statuses - randomly assign for demo
+                      index % 7 === 0 ? "won" :
+                      index % 7 === 1 ? "proposal-sent" :
+                      index % 7 === 2 ? "meeting-scheduled" :
+                      index % 7 === 3 ? "responded" :
+                      index % 7 === 4 ? "contacted" :
+                      index % 7 === 5 ? "lost" :
+                      "not-contacted"
+                    }
+                  />
+                </td>
+
                 <td className="px-5 py-4 align-top text-right min-w-[120px]">
                   <div className="flex flex-col items-end gap-1.5 text-xs">
                     <div className="flex items-center gap-1.5" title="Rating">
@@ -254,22 +277,28 @@ function FacilityTable({
                 </td>
 
                 <td className="px-5 py-4 align-middle text-right">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation(); // Prevent row click from also triggering
-                      onOpenDetails(facility.place_id);
-                    }}
-                    className="px-4 py-2 text-xs font-semibold rounded-lg border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 hover:text-blue-600 hover:border-blue-200 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/20 active:bg-slate-100"
-                  >
-                    View Details
-                  </button>
+                  <div className="flex items-center justify-end gap-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent row click from also triggering
+                        onOpenDetails(facility.place_id);
+                      }}
+                      className="px-4 py-2 text-xs font-semibold rounded-lg border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 hover:text-blue-600 hover:border-blue-200 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/20 active:bg-slate-100"
+                    >
+                      View Details
+                    </button>
+                    <QuickActionsDropdown
+                      facilityId={facility.place_id}
+                      facilityName={facility.name}
+                    />
+                  </div>
                 </td>
               </motion.tr>
             ))}
             {facilities.length === 0 && !isLoading && (
               <tr>
                 <td
-                  colSpan={6}
+                  colSpan={7}
                   className="px-4 py-12 text-center text-gray-500 text-sm"
                 >
                   No facilities found.
@@ -283,7 +312,7 @@ function FacilityTable({
           <tr className="border-t border-gray-300 bg-white">
             <td
               className="px-4 py-3 font-semibold text-gray-900 text-xs uppercase tracking-wider"
-              colSpan={4}
+              colSpan={5}
             >
               Total Facilities
             </td>
@@ -508,7 +537,7 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
           <CRMTabs activeTab={activeTab} setActiveTab={setActiveTab} />
         </div>
 
-        {activeTab === "facilities" ? (
+        {activeTab === "facilities" && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -655,7 +684,11 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
               )}
             </div>
           </motion.div>
-        ) : (
+        )}
+
+        {activeTab === "outreach" && <OutreachView />}
+
+        {activeTab !== "facilities" && activeTab !== "outreach" && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
