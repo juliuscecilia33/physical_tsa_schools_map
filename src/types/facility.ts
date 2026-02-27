@@ -76,10 +76,24 @@ export interface OpeningHours {
   weekday_text?: string[];
 }
 
+export interface PhotoReference {
+  type: "scraped" | "review";
+  scrapedIndex?: number;
+  photoData?: PhotoData;
+  reviewIndex?: number;
+  photoIndexInReview?: number;
+  reviewUserName?: string;
+  reviewRating?: number;
+  url: string;
+  thumbnail?: string;
+  assignedAt: string;
+}
+
 export interface Note {
   id: string;
   place_id: string;
   note_text: string;
+  assigned_photo?: PhotoReference | null;
   created_at: string;
   updated_at: string;
 }

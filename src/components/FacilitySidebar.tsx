@@ -30,6 +30,7 @@ import {
   Tag,
   ChevronDown,
   ChevronUp,
+  Image as ImageIcon,
 } from "lucide-react";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
@@ -42,6 +43,7 @@ import {
 import { useFacilityDetails } from "@/hooks/useFacilityDetails";
 import SportDetailModal from "@/components/SportDetailModal";
 import TagManagerModal from "@/components/TagManagerModal";
+import AddNoteModal from "@/components/AddNoteModal";
 
 interface FacilitySidebarProps {
   facility: Facility | null;
@@ -171,6 +173,8 @@ export default function FacilitySidebar({
   const [addingNote, setAddingNote] = useState(false);
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const [editNoteText, setEditNoteText] = useState("");
+  const [editNotePhoto, setEditNotePhoto] = useState<any>(null);
+  const [showEditPhotoPicker, setShowEditPhotoPicker] = useState(false);
   const [selectedSportDetail, setSelectedSportDetail] = useState<string | null>(
     null,
   );
@@ -197,6 +201,7 @@ export default function FacilitySidebar({
     useState(false);
   const [showAllAdditionalReviews, setShowAllAdditionalReviews] =
     useState(false);
+  const [isAddNoteModalOpen, setIsAddNoteModalOpen] = useState(false);
 
   // Tag-related state
   const [allTags, setAllTags] = useState<FacilityTag[]>([]);
@@ -352,28 +357,52 @@ export default function FacilitySidebar({
   }, [displayFacility?.additional_photos, displayFacility?.additional_reviews]);
 
   // Add new note
-  const handleAddNote = async () => {
-    if (!newNoteText.trim() || !displayFacility || !facility) return;
+  const handleAddNote = async (noteText: string, selectedPhoto: any) => {
+    if (!noteText.trim() || !displayFacility || !facility) return;
 
     setAddingNote(true);
+
+    // Build assigned_photo object if photo was selected
+    let assignedPhotoData: any = null;
+    if (selectedPhoto) {
+      assignedPhotoData = {
+        type: selectedPhoto.type,
+        url: selectedPhoto.url,
+        assignedAt: new Date().toISOString(),
+      };
+
+      if (selectedPhoto.type === "scraped") {
+        assignedPhotoData.scrapedIndex = selectedPhoto.scrapedIndex;
+        assignedPhotoData.photoData = selectedPhoto.data;
+        assignedPhotoData.thumbnail = selectedPhoto.data?.thumbnail;
+      } else if (selectedPhoto.type === "review") {
+        assignedPhotoData.reviewIndex = selectedPhoto.reviewIndex;
+        assignedPhotoData.photoIndexInReview = selectedPhoto.photoIndexInReview;
+        assignedPhotoData.reviewUserName = selectedPhoto.reviewUserName;
+        assignedPhotoData.reviewRating = selectedPhoto.reviewRating;
+        assignedPhotoData.thumbnail = selectedPhoto.url;
+      }
+    }
+
     const tempNote: Note = {
       id: `temp-${Date.now()}`,
       place_id: facility.place_id,
-      note_text: newNoteText,
+      note_text: noteText,
+      assigned_photo: assignedPhotoData,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
 
     // Optimistic update
     setNotes((prev) => [tempNote, ...prev]);
-    setNewNoteText("");
 
     try {
       const { data, error } = await supabase
         .from("facility_notes")
         .insert({
           place_id: facility.place_id,
-          note_text: newNoteText,
+          note_text: noteText,
+          assigned_photo: assignedPhotoData,
         })
         .select()
         .single();
@@ -391,8 +420,8 @@ export default function FacilitySidebar({
         queryKey: ["facility", "full", facility.place_id],
       });
 
-      // Close the form after successful add
-      setShowAddNoteForm(false);
+      // Close the modal after successful add
+      setIsAddNoteModalOpen(false);
     } catch (error) {
       console.error("Error adding note:", error);
       // Revert optimistic update
@@ -407,12 +436,33 @@ export default function FacilitySidebar({
   const handleStartEdit = (note: Note) => {
     setEditingNoteId(note.id);
     setEditNoteText(note.note_text);
+
+    // Set initial photo state if note has an assigned photo
+    if (note.assigned_photo) {
+      // Reconstruct photo object from stored reference
+      const photoObj = {
+        type: note.assigned_photo.type,
+        url: note.assigned_photo.url,
+        scrapedIndex: note.assigned_photo.scrapedIndex,
+        reviewIndex: note.assigned_photo.reviewIndex,
+        photoIndexInReview: note.assigned_photo.photoIndexInReview,
+        reviewUserName: note.assigned_photo.reviewUserName,
+        reviewRating: note.assigned_photo.reviewRating,
+        data: note.assigned_photo.photoData,
+      };
+      setEditNotePhoto(photoObj);
+    } else {
+      setEditNotePhoto(null);
+    }
+    setShowEditPhotoPicker(false);
   };
 
   // Cancel editing
   const handleCancelEdit = () => {
     setEditingNoteId(null);
     setEditNoteText("");
+    setEditNotePhoto(null);
+    setShowEditPhotoPicker(false);
   };
 
   // Save edited note
@@ -423,6 +473,28 @@ export default function FacilitySidebar({
     const oldNote = notes.find((n) => n.id === noteId);
     if (!oldNote) return;
 
+    // Build assigned_photo object if photo was selected
+    let assignedPhotoData: any = null;
+    if (editNotePhoto) {
+      assignedPhotoData = {
+        type: editNotePhoto.type,
+        url: editNotePhoto.url,
+        assignedAt: new Date().toISOString(),
+      };
+
+      if (editNotePhoto.type === "scraped") {
+        assignedPhotoData.scrapedIndex = editNotePhoto.scrapedIndex;
+        assignedPhotoData.photoData = editNotePhoto.data;
+        assignedPhotoData.thumbnail = editNotePhoto.data?.thumbnail;
+      } else if (editNotePhoto.type === "review") {
+        assignedPhotoData.reviewIndex = editNotePhoto.reviewIndex;
+        assignedPhotoData.photoIndexInReview = editNotePhoto.photoIndexInReview;
+        assignedPhotoData.reviewUserName = editNotePhoto.reviewUserName;
+        assignedPhotoData.reviewRating = editNotePhoto.reviewRating;
+        assignedPhotoData.thumbnail = editNotePhoto.url;
+      }
+    }
+
     // Optimistic update
     setNotes((prev) =>
       prev.map((n) =>
@@ -430,17 +502,23 @@ export default function FacilitySidebar({
           ? {
               ...n,
               note_text: editNoteText,
+              assigned_photo: assignedPhotoData,
               updated_at: new Date().toISOString(),
             }
           : n,
       ),
     );
     setEditingNoteId(null);
+    setEditNotePhoto(null);
+    setShowEditPhotoPicker(false);
 
     try {
       const { error } = await supabase
         .from("facility_notes")
-        .update({ note_text: editNoteText })
+        .update({
+          note_text: editNoteText,
+          assigned_photo: assignedPhotoData,
+        })
         .eq("id", noteId);
 
       if (error) throw error;
@@ -1295,15 +1373,13 @@ export default function FacilitySidebar({
                 Notes ({notes.length})
               </h3>
               <div className="flex gap-2">
-                {!showAddNoteForm && (
-                  <button
-                    onClick={() => setShowAddNoteForm(true)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    Add Note
-                  </button>
-                )}
+                <button
+                  onClick={() => setIsAddNoteModalOpen(true)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  Add Note
+                </button>
                 {notes.length > 3 && (
                   <button
                     onClick={() => setShowAllNotes(!showAllNotes)}
@@ -1315,47 +1391,6 @@ export default function FacilitySidebar({
                 )}
               </div>
             </div>
-
-            {/* Add New Note Form */}
-            {showAddNoteForm && (
-              <div className="mb-4">
-                <div className="flex gap-2">
-                  <textarea
-                    value={newNoteText}
-                    onChange={(e) => setNewNoteText(e.target.value)}
-                    placeholder="Add a note..."
-                    className="flex-1 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none transition-all"
-                    rows={2}
-                    disabled={addingNote}
-                    autoFocus
-                  />
-                </div>
-                <div className="mt-2 flex gap-2">
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={handleAddNote}
-                    disabled={!newNoteText.trim() || addingNote}
-                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span>{addingNote ? "Adding..." : "Add Note"}</span>
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => {
-                      setShowAddNoteForm(false);
-                      setNewNoteText("");
-                    }}
-                    disabled={addingNote}
-                    className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                  >
-                    Cancel
-                  </motion.button>
-                </div>
-              </div>
-            )}
 
             {/* Notes List */}
             {loadingNotes ? (
@@ -1381,13 +1416,119 @@ export default function FacilitySidebar({
                     >
                       {editingNoteId === note.id ? (
                         // Edit Mode
-                        <div className="space-y-2">
+                        <div className="space-y-3">
                           <textarea
                             value={editNoteText}
                             onChange={(e) => setEditNoteText(e.target.value)}
                             className="w-full px-3 py-2 text-sm text-slate-900 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none transition-all"
                             rows={3}
                           />
+
+                          {/* Photo Picker for Edit Mode */}
+                          {combinedPhotos.length > 0 && (
+                            <div>
+                              <button
+                                onClick={() =>
+                                  setShowEditPhotoPicker(!showEditPhotoPicker)
+                                }
+                                className="flex items-center justify-between w-full px-3 py-2 text-xs font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <ImageIcon className="w-3.5 h-3.5" />
+                                  <span>
+                                    {editNotePhoto ? "Change Photo" : "Add Photo"}
+                                  </span>
+                                </div>
+                                {showEditPhotoPicker ? (
+                                  <ChevronUp className="w-3.5 h-3.5" />
+                                ) : (
+                                  <ChevronDown className="w-3.5 h-3.5" />
+                                )}
+                              </button>
+
+                              {/* Current Photo Preview */}
+                              {editNotePhoto && (
+                                <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-lg">
+                                  <div className="flex items-center gap-2">
+                                    <img
+                                      src={editNotePhoto.url}
+                                      alt="Selected"
+                                      className="w-12 h-12 rounded object-cover"
+                                      referrerPolicy="no-referrer"
+                                    />
+                                    <div className="flex-1 text-xs text-slate-600">
+                                      {editNotePhoto.type === "scraped"
+                                        ? "Scraped Photo"
+                                        : `Review by ${editNotePhoto.reviewUserName}`}
+                                    </div>
+                                    <button
+                                      onClick={() => setEditNotePhoto(null)}
+                                      className="p-1 hover:bg-red-100 rounded text-red-600"
+                                    >
+                                      <X className="w-3 h-3" />
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Photo Grid */}
+                              {showEditPhotoPicker && (
+                                <div className="mt-2 max-h-40 overflow-y-auto border border-slate-200 rounded-lg p-2">
+                                  <div className="grid grid-cols-4 gap-2">
+                                    {combinedPhotos.map((photo, idx) => {
+                                      const isSelected =
+                                        editNotePhoto?.url === photo.url;
+                                      return (
+                                        <div
+                                          key={`edit-photo-${idx}`}
+                                          onClick={() => {
+                                            if (isSelected) {
+                                              setEditNotePhoto(null);
+                                            } else {
+                                              setEditNotePhoto(photo);
+                                            }
+                                          }}
+                                          className={`relative cursor-pointer rounded overflow-hidden aspect-square ${
+                                            isSelected
+                                              ? "ring-2 ring-blue-500"
+                                              : "ring-1 ring-slate-200"
+                                          }`}
+                                        >
+                                          <img
+                                            src={photo.url}
+                                            alt={`Photo ${idx + 1}`}
+                                            className="w-full h-full object-cover"
+                                            referrerPolicy="no-referrer"
+                                            loading="lazy"
+                                          />
+                                          {isSelected && (
+                                            <div className="absolute inset-0 bg-blue-500/20 flex items-center justify-center">
+                                              <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                                                <svg
+                                                  className="w-3 h-3 text-white"
+                                                  fill="none"
+                                                  viewBox="0 0 24 24"
+                                                  stroke="currentColor"
+                                                >
+                                                  <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M5 13l4 4L19 7"
+                                                  />
+                                                </svg>
+                                              </div>
+                                            </div>
+                                          )}
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
                           <div className="flex gap-2">
                             <motion.button
                               whileHover={{ scale: 1.05 }}
@@ -1412,10 +1553,57 @@ export default function FacilitySidebar({
                       ) : (
                         // View Mode
                         <>
-                          <p className="text-sm text-slate-700 leading-relaxed mb-2">
-                            {note.note_text}
-                          </p>
-                          <div className="flex items-center justify-between">
+                          <div className="flex gap-3">
+                            {/* Assigned Photo Thumbnail */}
+                            {note.assigned_photo && (
+                              <div
+                                onClick={() => {
+                                  if (note.assigned_photo?.type === "review") {
+                                    openReviewPhotoViewer(
+                                      note.assigned_photo.reviewIndex!,
+                                      note.assigned_photo.photoIndexInReview!,
+                                    );
+                                  } else if (
+                                    note.assigned_photo?.type === "scraped"
+                                  ) {
+                                    openPhotoViewer(
+                                      note.assigned_photo.scrapedIndex!,
+                                      "additional",
+                                    );
+                                  }
+                                }}
+                                className="relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all cursor-pointer group"
+                              >
+                                <img
+                                  src={
+                                    note.assigned_photo.thumbnail ||
+                                    note.assigned_photo.url
+                                  }
+                                  alt="Note photo"
+                                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                                  referrerPolicy="no-referrer"
+                                />
+                                {note.assigned_photo.type === "review" &&
+                                  note.assigned_photo.reviewRating && (
+                                    <div className="absolute bottom-1 right-1 bg-white/95 backdrop-blur-sm rounded px-1 py-0.5 shadow-sm flex items-center gap-0.5">
+                                      <Star className="w-2.5 h-2.5 fill-yellow-400 text-yellow-400" />
+                                      <span className="text-[10px] font-semibold text-slate-900">
+                                        {note.assigned_photo.reviewRating.toFixed(
+                                          1,
+                                        )}
+                                      </span>
+                                    </div>
+                                  )}
+                              </div>
+                            )}
+                            {/* Note Text */}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm text-slate-700 leading-relaxed mb-2">
+                                {note.note_text}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between mt-2">
                             <span className="text-xs text-slate-500">
                               {formatRelativeTime(note.created_at)}
                               {note.updated_at !== note.created_at &&
@@ -2600,6 +2788,16 @@ export default function FacilitySidebar({
           setShowCreateTagSection={setShowCreateTagSection}
           showManageTagsSection={showManageTagsSection}
           setShowManageTagsSection={setShowManageTagsSection}
+        />
+
+        {/* Add Note Modal */}
+        <AddNoteModal
+          isOpen={isAddNoteModalOpen}
+          onClose={() => setIsAddNoteModalOpen(false)}
+          onSave={handleAddNote}
+          combinedPhotos={combinedPhotos}
+          facilityName={displayFacility.name}
+          isSaving={addingNote}
         />
       </motion.div>
     </AnimatePresence>
