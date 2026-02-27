@@ -25,7 +25,7 @@ import {
   Maximize2,
   Tag,
 } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { supabase } from "@/lib/supabase";
 import { useQueryClient } from "@tanstack/react-query";
@@ -152,8 +152,9 @@ export default function CRMFacilityDetailsSidebar({
   const [isPhotoViewerOpen, setIsPhotoViewerOpen] = useState(false);
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
   const [photoViewerSource, setPhotoViewerSource] = useState<
-    "regular" | "additional"
+    "regular" | "additional" | "review"
   >("regular");
+  const [selectedReviewIndex, setSelectedReviewIndex] = useState(0);
   const [showAddNoteForm, setShowAddNoteForm] = useState(false);
   const [isAdditionalPhotosModalOpen, setIsAdditionalPhotosModalOpen] =
     useState(false);
@@ -652,6 +653,56 @@ export default function CRMFacilityDetailsSidebar({
     return highRes ? fullResUrl : photoData.thumbnail;
   };
 
+  // Combine scraped photos with review photos
+  const combinedPhotos = useMemo(() => {
+    if (!facility?.serp_scraped) return [];
+
+    const photos: Array<{
+      url: string;
+      type: "scraped" | "review";
+      reviewIndex?: number;
+      photoIndexInReview?: number;
+      scrapedIndex?: number;
+      data?: any;
+      reviewUserThumbnail?: string;
+      reviewUserName?: string;
+      reviewRating?: number;
+    }> = [];
+
+    // Add all scraped photos first
+    if (facility.additional_photos) {
+      facility.additional_photos.forEach((photoData, idx) => {
+        photos.push({
+          url: getPhotoDataUrl(photoData),
+          type: "scraped",
+          scrapedIndex: idx,
+          data: photoData,
+        });
+      });
+    }
+
+    // Add all review photos
+    if (facility.additional_reviews) {
+      facility.additional_reviews.forEach((review, reviewIdx) => {
+        if (review.images && review.images.length > 0) {
+          review.images.forEach((imageUrl, photoIdx) => {
+            photos.push({
+              url: imageUrl,
+              type: "review",
+              reviewIndex: reviewIdx,
+              photoIndexInReview: photoIdx,
+              reviewUserThumbnail: review.user?.thumbnail,
+              reviewUserName: review.user?.name || review.author_name || "Anonymous",
+              reviewRating: review.rating,
+            });
+          });
+        }
+      });
+    }
+
+    return photos;
+  }, [facility?.additional_photos, facility?.additional_reviews]);
+
   const formatSportType = (type: string) => {
     return type
       .split("_")
@@ -802,15 +853,26 @@ export default function CRMFacilityDetailsSidebar({
     setIsPhotoViewerOpen(true);
   };
 
+  const openReviewPhotoViewer = (reviewIndex: number, photoIndex: number) => {
+    setSelectedReviewIndex(reviewIndex);
+    setSelectedPhotoIndex(photoIndex);
+    setPhotoViewerSource("review");
+    setIsPhotoViewerOpen(true);
+  };
+
   const closePhotoViewer = () => {
     setIsPhotoViewerOpen(false);
   };
 
   const goToNextPhoto = () => {
-    const photos =
-      photoViewerSource === "regular"
-        ? facility?.photo_references
-        : facility?.additional_photos;
+    let photos;
+    if (photoViewerSource === "regular") {
+      photos = facility?.photo_references;
+    } else if (photoViewerSource === "additional") {
+      photos = facility?.additional_photos;
+    } else if (photoViewerSource === "review") {
+      photos = facility?.additional_reviews?.[selectedReviewIndex]?.images;
+    }
     if (!photos) return;
     const totalPhotos = photos.length;
     setSelectedPhotoIndex((prev) => (prev < totalPhotos - 1 ? prev + 1 : prev));
@@ -938,9 +1000,10 @@ export default function CRMFacilityDetailsSidebar({
               </div>
             ) : facility ? (
               <>
-                {/* Photos */}
+                {/* Photos - only show if no scraped photos available */}
                 {facility.photo_references &&
-                facility.photo_references.length > 0 ? (
+                facility.photo_references.length > 0 &&
+                (!facility.serp_scraped || combinedPhotos.length === 0) ? (
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -1018,16 +1081,16 @@ export default function CRMFacilityDetailsSidebar({
                     </div>
                   </motion.div>
                 ) : (
-                  <div className="text-center py-12">
-                    <Camera className="w-12 h-12 text-slate-400 mx-auto mb-3" />
-                    <p className="text-sm text-slate-500">No photos available</p>
-                  </div>
+                  (!facility.serp_scraped || combinedPhotos.length === 0) && (
+                    <div className="text-center py-12">
+                      <Camera className="w-12 h-12 text-slate-400 mx-auto mb-3" />
+                      <p className="text-sm text-slate-500">No photos available</p>
+                    </div>
+                  )
                 )}
 
-                {/* Additional Photos from SerpAPI */}
-                {facility.serp_scraped &&
-                  facility.additional_photos &&
-                  facility.additional_photos.length > 0 && (
+                {/* Scraped Photos (from SerpAPI) */}
+                {facility.serp_scraped && combinedPhotos.length > 0 && (
                     <>
                       {/* Divider */}
                       <div className="border-t border-slate-200"></div>
@@ -1039,10 +1102,7 @@ export default function CRMFacilityDetailsSidebar({
                       >
                         <div className="flex items-center justify-between mb-3">
                           <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
-                            Additional Photos ({facility.additional_photos.length})
-                            <span className="text-xs font-normal text-slate-500">
-                              from SerpAPI
-                            </span>
+                            Scraped Photos ({combinedPhotos.length})
                           </h3>
                           <button
                             onClick={() => setIsAdditionalPhotosModalOpen(true)}
@@ -1084,36 +1144,69 @@ export default function CRMFacilityDetailsSidebar({
                               msOverflowStyle: "none",
                             }}
                           >
-                            {facility.additional_photos.map((photoData, idx) => (
+                            {combinedPhotos.map((photo, idx) => (
                               <motion.div
-                                key={idx}
+                                key={`combined-${idx}`}
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 transition={{
                                   delay: 0.1 + Math.min(idx * 0.05, 0.5),
                                 }}
-                                onClick={() => openPhotoViewer(idx, "additional")}
+                                onClick={() => {
+                                  if (photo.type === "review") {
+                                    openReviewPhotoViewer(
+                                      photo.reviewIndex!,
+                                      photo.photoIndexInReview!
+                                    );
+                                  } else {
+                                    openPhotoViewer(photo.scrapedIndex!, "additional");
+                                  }
+                                }}
                                 className="relative overflow-hidden rounded-2xl shadow-sm hover:shadow-xl transition-all cursor-pointer flex-shrink-0 snap-start"
                                 style={{ width: "280px", height: "180px" }}
                               >
-                                {loadingImages[`additional-${idx}`] !== false && (
+                                {loadingImages[`combined-${idx}`] !== false && (
                                   <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />
                                 )}
                                 <img
-                                  src={getPhotoDataUrl(photoData)}
-                                  alt={`${facility.name} additional photo ${idx + 1}`}
+                                  src={photo.url}
+                                  alt={`${facility.name} photo ${idx + 1}`}
                                   className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
                                   referrerPolicy="no-referrer"
                                   onLoadStart={() =>
-                                    handleImageLoadStart(`additional-${idx}`)
+                                    handleImageLoadStart(`combined-${idx}`)
                                   }
-                                  onLoad={() => handleImageLoad(`additional-${idx}`)}
-                                  onError={() => handleImageLoad(`additional-${idx}`)}
+                                  onLoad={() => handleImageLoad(`combined-${idx}`)}
+                                  onError={() => handleImageLoad(`combined-${idx}`)}
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity" />
-                                {photoData.video && (
+                                {photo.type === "scraped" && photo.data?.video && (
                                   <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm rounded-full p-1.5">
                                     <Camera className="w-4 h-4 text-white" />
+                                  </div>
+                                )}
+                                {photo.type === "review" && (
+                                  <div className="absolute bottom-2 right-2 flex items-center gap-1.5">
+                                    {photo.reviewUserThumbnail ? (
+                                      <img
+                                        src={photo.reviewUserThumbnail}
+                                        alt={photo.reviewUserName}
+                                        className="w-8 h-8 rounded-full border-2 border-white shadow-lg object-cover"
+                                        referrerPolicy="no-referrer"
+                                      />
+                                    ) : (
+                                      <div className="w-8 h-8 rounded-full border-2 border-white shadow-lg bg-slate-400 flex items-center justify-center text-white text-xs font-semibold">
+                                        {photo.reviewUserName?.charAt(0).toUpperCase()}
+                                      </div>
+                                    )}
+                                    {photo.reviewRating && (
+                                      <div className="bg-white/95 backdrop-blur-sm rounded-lg px-1.5 py-0.5 shadow-lg flex items-center gap-0.5">
+                                        <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                                        <span className="text-xs font-semibold text-slate-900">
+                                          {photo.reviewRating.toFixed(1)}
+                                        </span>
+                                      </div>
+                                    )}
                                   </div>
                                 )}
                               </motion.div>
@@ -1598,8 +1691,12 @@ export default function CRMFacilityDetailsSidebar({
                 {/* Divider */}
                 <div className="border-t border-slate-200"></div>
 
-                {/* Reviews */}
-                {facility.reviews && facility.reviews.length > 0 ? (
+                {/* Reviews - only show if no scraped reviews available */}
+                {facility.reviews &&
+                facility.reviews.length > 0 &&
+                (!facility.serp_scraped ||
+                  !facility.additional_reviews ||
+                  facility.additional_reviews.length === 0) ? (
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -1645,10 +1742,14 @@ export default function CRMFacilityDetailsSidebar({
                     </div>
                   </motion.div>
                 ) : (
-                  <div className="text-center py-12">
-                    <MessageSquare className="w-12 h-12 text-slate-400 mx-auto mb-3" />
-                    <p className="text-sm text-slate-500">No reviews available</p>
-                  </div>
+                  (!facility.serp_scraped ||
+                    !facility.additional_reviews ||
+                    facility.additional_reviews.length === 0) && (
+                    <div className="text-center py-12">
+                      <MessageSquare className="w-12 h-12 text-slate-400 mx-auto mb-3" />
+                      <p className="text-sm text-slate-500">No reviews available</p>
+                    </div>
+                  )
                 )}
 
                 {/* Additional Reviews from SerpAPI */}
@@ -1745,6 +1846,51 @@ export default function CRMFacilityDetailsSidebar({
                                   <p className="text-sm text-slate-700 leading-relaxed mb-2">
                                     {reviewText}
                                   </p>
+
+                                  {/* Review Images */}
+                                  {review.images && review.images.length > 0 && (
+                                    <div className="mb-3 flex gap-2 overflow-x-auto">
+                                      {review.images.map((imageUrl, imgIdx) => (
+                                        <div
+                                          key={imgIdx}
+                                          onClick={() => openReviewPhotoViewer(idx, imgIdx)}
+                                          className="relative flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all cursor-pointer group"
+                                        >
+                                          {loadingImages[
+                                            `review-${idx}-img-${imgIdx}`
+                                          ] !== false && (
+                                            <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />
+                                          )}
+                                          <img
+                                            src={imageUrl}
+                                            alt={`Review image ${imgIdx + 1}`}
+                                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                                            referrerPolicy="no-referrer"
+                                            onLoadStart={() =>
+                                              handleImageLoadStart(
+                                                `review-${idx}-img-${imgIdx}`
+                                              )
+                                            }
+                                            onLoad={() =>
+                                              handleImageLoad(
+                                                `review-${idx}-img-${imgIdx}`
+                                              )
+                                            }
+                                            onError={() =>
+                                              handleImageLoad(
+                                                `review-${idx}-img-${imgIdx}`
+                                              )
+                                            }
+                                          />
+                                          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-1">
+                                            <span className="text-white text-[10px] font-medium">
+                                              Click to view
+                                            </span>
+                                          </div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
                                   <div className="flex items-center justify-between">
                                     <span className="text-xs text-slate-500 font-medium">
                                       {timeDescription}
@@ -2165,9 +2311,9 @@ export default function CRMFacilityDetailsSidebar({
             document.body
           )}
 
-        {/* Additional Photos Grid Modal */}
+        {/* Scraped Photos Grid Modal */}
         {isAdditionalPhotosModalOpen &&
-          facility?.additional_photos &&
+          facility?.serp_scraped &&
           createPortal(
             <motion.div
               initial={{ opacity: 0 }}
@@ -2188,9 +2334,8 @@ export default function CRMFacilityDetailsSidebar({
                 <div className="flex items-center justify-between p-6 border-b border-slate-200 bg-gradient-to-r from-white to-slate-50">
                   <div>
                     <h2 className="text-xl font-medium text-slate-900">
-                      Additional Photos ({facility.additional_photos.length})
+                      Scraped Photos ({combinedPhotos.length})
                     </h2>
-                    <p className="text-sm text-slate-500 mt-1">from SerpAPI</p>
                   </div>
                   <button
                     onClick={() => setIsAdditionalPhotosModalOpen(false)}
@@ -2203,35 +2348,69 @@ export default function CRMFacilityDetailsSidebar({
                 {/* Photos Grid */}
                 <div className="p-6 overflow-y-auto max-h-[calc(85vh-80px)]">
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {facility.additional_photos.map((photoData, idx) => (
+                    {combinedPhotos.map((photo, idx) => (
                       <motion.div
-                        key={idx}
+                        key={`modal-combined-${idx}`}
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: idx * 0.03 }}
-                        onClick={() => openPhotoViewer(idx, "additional")}
+                        onClick={() => {
+                          if (photo.type === "review") {
+                            openReviewPhotoViewer(
+                              photo.reviewIndex!,
+                              photo.photoIndexInReview!
+                            );
+                          } else {
+                            openPhotoViewer(photo.scrapedIndex!, "additional");
+                          }
+                          setIsAdditionalPhotosModalOpen(false);
+                        }}
                         className="relative overflow-hidden rounded-2xl shadow-sm hover:shadow-xl transition-all cursor-pointer aspect-square group"
                       >
-                        {loadingImages[`additional-${idx}`] !== false && (
+                        {loadingImages[`modal-combined-${idx}`] !== false && (
                           <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />
                         )}
                         <img
-                          src={getPhotoDataUrl(photoData)}
-                          alt={`${facility.name} additional photo ${idx + 1}`}
+                          src={photo.url}
+                          alt={`${facility.name} photo ${idx + 1}`}
                           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                           referrerPolicy="no-referrer"
-                          onLoadStart={() => handleImageLoadStart(`additional-${idx}`)}
-                          onLoad={() => handleImageLoad(`additional-${idx}`)}
-                          onError={() => handleImageLoad(`additional-${idx}`)}
+                          onLoadStart={() => handleImageLoadStart(`modal-combined-${idx}`)}
+                          onLoad={() => handleImageLoad(`modal-combined-${idx}`)}
+                          onError={() => handleImageLoad(`modal-combined-${idx}`)}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-2">
                           <span className="text-white text-xs font-medium">
                             Click to view
                           </span>
                         </div>
-                        {photoData.video && (
+                        {photo.type === "scraped" && photo.data?.video && (
                           <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm rounded-full p-1.5">
                             <Camera className="w-4 h-4 text-white" />
+                          </div>
+                        )}
+                        {photo.type === "review" && (
+                          <div className="absolute bottom-2 right-2 flex items-center gap-1.5">
+                            {photo.reviewUserThumbnail ? (
+                              <img
+                                src={photo.reviewUserThumbnail}
+                                alt={photo.reviewUserName}
+                                className="w-8 h-8 rounded-full border-2 border-white shadow-lg object-cover"
+                                referrerPolicy="no-referrer"
+                              />
+                            ) : (
+                              <div className="w-8 h-8 rounded-full border-2 border-white shadow-lg bg-slate-400 flex items-center justify-center text-white text-xs font-semibold">
+                                {photo.reviewUserName?.charAt(0).toUpperCase()}
+                              </div>
+                            )}
+                            {photo.reviewRating && (
+                              <div className="bg-white/95 backdrop-blur-sm rounded-lg px-1.5 py-0.5 shadow-lg flex items-center gap-0.5">
+                                <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                                <span className="text-xs font-semibold text-slate-900">
+                                  {photo.reviewRating.toFixed(1)}
+                                </span>
+                              </div>
+                            )}
                           </div>
                         )}
                       </motion.div>
@@ -2243,56 +2422,68 @@ export default function CRMFacilityDetailsSidebar({
             document.body
           )}
 
-        {/* Photo Viewer Modal - simplified, just showing current implementation exists */}
-        {isPhotoViewerOpen && facility && (
-          <div className="fixed inset-0 bg-black z-[10000] flex items-center justify-center">
-            <button
-              onClick={closePhotoViewer}
-              className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors z-10"
-            >
-              <X className="w-6 h-6 text-white" />
-            </button>
-            {selectedPhotoIndex > 0 && (
+        {/* Photo Viewer Modal */}
+        {isPhotoViewerOpen &&
+          facility &&
+          ((photoViewerSource === "regular" && facility.photo_references) ||
+            (photoViewerSource === "additional" && facility.additional_photos) ||
+            (photoViewerSource === "review" &&
+              facility.additional_reviews?.[selectedReviewIndex]?.images)) && (
+            <div className="fixed inset-0 bg-black z-[10000] flex items-center justify-center">
               <button
-                onClick={goToPrevPhoto}
-                className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors z-10"
+                onClick={closePhotoViewer}
+                className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors z-10"
               >
-                <ChevronLeft className="w-6 h-6 text-white" />
+                <X className="w-6 h-6 text-white" />
               </button>
-            )}
-            {photoViewerSource === "regular" &&
-            facility.photo_references &&
-            selectedPhotoIndex < facility.photo_references.length - 1 ? (
-              <button
-                onClick={goToNextPhoto}
-                className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors z-10"
-              >
-                <ChevronRight className="w-6 h-6 text-white" />
-              </button>
-            ) : photoViewerSource === "additional" &&
-              facility.additional_photos &&
-              selectedPhotoIndex < facility.additional_photos.length - 1 ? (
-              <button
-                onClick={goToNextPhoto}
-                className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors z-10"
-              >
-                <ChevronRight className="w-6 h-6 text-white" />
-              </button>
-            ) : null}
-            <img
-              src={
-                photoViewerSource === "regular"
-                  ? getPhotoUrl(facility.photo_references![selectedPhotoIndex], true)
-                  : getPhotoDataUrl(
-                      facility.additional_photos![selectedPhotoIndex],
-                      true
-                    )
-              }
-              alt="Full size preview"
-              className="max-w-[90vw] max-h-[90vh] object-contain"
-            />
-          </div>
-        )}
+              {selectedPhotoIndex > 0 && (
+                <button
+                  onClick={goToPrevPhoto}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors z-10"
+                >
+                  <ChevronLeft className="w-6 h-6 text-white" />
+                </button>
+              )}
+              {(() => {
+                let photos;
+                if (photoViewerSource === "regular") {
+                  photos = facility.photo_references;
+                } else if (photoViewerSource === "additional") {
+                  photos = facility.additional_photos;
+                } else if (photoViewerSource === "review") {
+                  photos = facility.additional_reviews?.[selectedReviewIndex]?.images;
+                }
+                return (
+                  photos &&
+                  selectedPhotoIndex < photos.length - 1 && (
+                    <button
+                      onClick={goToNextPhoto}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors z-10"
+                    >
+                      <ChevronRight className="w-6 h-6 text-white" />
+                    </button>
+                  )
+                );
+              })()}
+              <img
+                src={
+                  photoViewerSource === "regular"
+                    ? getPhotoUrl(facility.photo_references![selectedPhotoIndex], true)
+                    : photoViewerSource === "additional"
+                      ? getPhotoDataUrl(
+                          facility.additional_photos![selectedPhotoIndex],
+                          true
+                        )
+                      : facility.additional_reviews?.[selectedReviewIndex]?.images?.[
+                          selectedPhotoIndex
+                        ] || ""
+                }
+                alt="Full size preview"
+                className="max-w-[90vw] max-h-[90vh] object-contain"
+                referrerPolicy="no-referrer"
+              />
+            </div>
+          )}
       </>
     </AnimatePresence>
   );
