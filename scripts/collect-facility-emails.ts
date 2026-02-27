@@ -38,7 +38,8 @@ interface ProgressState {
   skippedCount: number;
   processedPlaceIds: string[];
   lastProcessedIndex: number;
-  emailsFound: number;
+  totalEmailsFound: number;
+  facilitiesWithEmails: number;
   lastUpdated: string;
   errors: Array<{
     place_id: string;
@@ -51,7 +52,7 @@ interface ProgressState {
 const PROGRESS_FILE = path.join(__dirname, "../.email-scraping-progress.json");
 
 // Test mode: Set to a number to limit processing (e.g., 10 for testing), or null to process all
-const TEST_LIMIT: number | null = 10;
+const TEST_LIMIT: number | null = null;
 
 // Rate limiting
 const DELAY_BETWEEN_REQUESTS_MS = 2000; // 2 seconds between requests to be respectful
@@ -74,7 +75,8 @@ function loadProgress(): ProgressState {
     skippedCount: 0,
     processedPlaceIds: [],
     lastProcessedIndex: -1,
-    emailsFound: 0,
+    totalEmailsFound: 0,
+    facilitiesWithEmails: 0,
     lastUpdated: new Date().toISOString(),
     errors: [],
   };
@@ -94,21 +96,21 @@ function extractEmails(text: string): string[] {
   const matches = text.match(emailRegex) || [];
 
   // Filter out common false positives and placeholder emails
-  const filtered = matches.filter(email => {
+  const filtered = matches.filter((email) => {
     const lower = email.toLowerCase();
     return (
-      !lower.includes('example.com') &&
-      !lower.includes('test.com') &&
-      !lower.includes('placeholder') &&
-      !lower.includes('yourdomain') &&
-      !lower.includes('yoursite') &&
-      !lower.includes('@sentry.io') &&
-      !lower.includes('@wixpress.com') &&
-      !lower.includes('@2x.png') &&
-      !lower.endsWith('.png') &&
-      !lower.endsWith('.jpg') &&
-      !lower.endsWith('.jpeg') &&
-      !lower.endsWith('.gif')
+      !lower.includes("example.com") &&
+      !lower.includes("test.com") &&
+      !lower.includes("placeholder") &&
+      !lower.includes("yourdomain") &&
+      !lower.includes("yoursite") &&
+      !lower.includes("@sentry.io") &&
+      !lower.includes("@wixpress.com") &&
+      !lower.includes("@2x.png") &&
+      !lower.endsWith(".png") &&
+      !lower.endsWith(".jpg") &&
+      !lower.endsWith(".jpeg") &&
+      !lower.endsWith(".gif")
     );
   });
 
@@ -120,22 +122,24 @@ function extractEmails(text: string): string[] {
  * Normalize URL to ensure it has a protocol
  */
 function normalizeUrl(url: string): string {
-  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+  if (!url.startsWith("http://") && !url.startsWith("https://")) {
     return `https://${url}`;
   }
   return url;
 }
 
 /**
- * Scrape email from a website
+ * Scrape emails from a website
  * Checks main page and common contact pages
+ * Returns an array of all unique emails found
  */
-async function scrapeEmailFromWebsite(
+async function scrapeEmailsFromWebsite(
   websiteUrl: string,
-  facilityName: string
-): Promise<string | null> {
+  facilityName: string,
+): Promise<string[]> {
   const url = normalizeUrl(websiteUrl);
   const urlsToCheck: string[] = [url];
+  const allEmails = new Set<string>(); // Use Set to avoid duplicates across pages
 
   try {
     // Try to extract base domain for contact page URLs
@@ -143,21 +147,22 @@ async function scrapeEmailFromWebsite(
     const baseUrl = `${urlObj.protocol}//${urlObj.host}`;
 
     // Add common contact page patterns
-    const contactPaths = ['/contact', '/contact-us', '/about'];
-    contactPaths.forEach(path => {
+    const contactPaths = ["/contact", "/contact-us", "/about"];
+    contactPaths.forEach((path) => {
       urlsToCheck.push(`${baseUrl}${path}`);
     });
   } catch (error) {
     // If URL parsing fails, just check the main URL
   }
 
-  // Check each URL (main page + contact pages)
+  // Check each URL (main page + contact pages) and collect ALL emails
   for (const checkUrl of urlsToCheck) {
     try {
       const response = await axios.get(checkUrl, {
         timeout: REQUEST_TIMEOUT_MS,
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
         },
         maxRedirects: 5,
         validateStatus: (status) => status >= 200 && status < 400,
@@ -168,50 +173,29 @@ async function scrapeEmailFromWebsite(
         const $ = cheerio.load(response.data);
 
         // Remove script and style tags to avoid parsing JS/CSS
-        $('script, style').remove();
+        $("script, style").remove();
 
         // Check mailto links first (most reliable)
         const mailtoLinks: string[] = [];
         $('a[href^="mailto:"]').each((i, elem) => {
-          const href = $(elem).attr('href');
+          const href = $(elem).attr("href");
           if (href) {
-            const email = href.replace('mailto:', '').split('?')[0].trim();
+            const email = href.replace("mailto:", "").split("?")[0].trim();
             mailtoLinks.push(email);
           }
         });
 
         if (mailtoLinks.length > 0) {
-          const filtered = extractEmails(mailtoLinks.join(' '));
-          if (filtered.length > 0) {
-            console.log(`   ✓ Found email in mailto link: ${filtered[0]}`);
-            return filtered[0];
-          }
+          const filtered = extractEmails(mailtoLinks.join(" "));
+          filtered.forEach(email => allEmails.add(email));
         }
 
         // Extract text from body
-        const bodyText = $('body').text();
+        const bodyText = $("body").text();
 
         // Look for emails in the text
         const emails = extractEmails(bodyText);
-
-        if (emails.length > 0) {
-          // Prefer emails that look like they belong to the facility
-          // (e.g., contain facility name or are not generic info@/contact@)
-          const facilityNameWords = facilityName
-            .toLowerCase()
-            .replace(/[^a-z0-9\s]/g, '')
-            .split(/\s+/)
-            .filter(word => word.length > 3);
-
-          const preferredEmail = emails.find(email => {
-            const emailLower = email.toLowerCase();
-            return facilityNameWords.some(word => emailLower.includes(word));
-          });
-
-          const selectedEmail = preferredEmail || emails[0];
-          console.log(`   ✓ Found email in page content: ${selectedEmail}`);
-          return selectedEmail;
-        }
+        emails.forEach(email => allEmails.add(email));
       }
     } catch (error: any) {
       // Continue to next URL if this one fails
@@ -224,23 +208,30 @@ async function scrapeEmailFromWebsite(
     }
   }
 
-  return null;
+  // Convert Set to sorted array and return
+  const emailArray = Array.from(allEmails).sort();
+
+  if (emailArray.length > 0) {
+    console.log(`   ✓ Found ${emailArray.length} email(s): ${emailArray.join(", ")}`);
+  }
+
+  return emailArray;
 }
 
 /**
- * Update facility with email in database
+ * Update facility with emails in database
  */
-async function updateFacilityEmail(
+async function updateFacilityEmails(
   facilityId: string,
-  email: string | null,
-  attempted: boolean
+  emails: string[],
+  attempted: boolean,
 ): Promise<void> {
   const updateData: any = {
     email_scrape_attempted: attempted,
   };
 
-  if (email) {
-    updateData.email = email;
+  if (emails.length > 0) {
+    updateData.email = emails;
     updateData.email_scraped_at = new Date().toISOString();
   }
 
@@ -259,7 +250,7 @@ async function updateFacilityEmail(
  */
 async function processFacilities() {
   console.log("\n🔍 Starting Email Collection Process\n");
-  console.log("=" .repeat(60));
+  console.log("=".repeat(60));
 
   const progress = loadProgress();
 
@@ -298,11 +289,16 @@ async function processFacilities() {
   // Resume from where we left off
   let startIndex = 0;
   if (progress.processedPlaceIds.length > 0) {
-    const lastProcessedPlaceId = progress.processedPlaceIds[progress.processedPlaceIds.length - 1];
-    const lastIndex = facilitiesToProcess.findIndex(f => f.place_id === lastProcessedPlaceId);
+    const lastProcessedPlaceId =
+      progress.processedPlaceIds[progress.processedPlaceIds.length - 1];
+    const lastIndex = facilitiesToProcess.findIndex(
+      (f) => f.place_id === lastProcessedPlaceId,
+    );
     if (lastIndex !== -1) {
       startIndex = lastIndex + 1;
-      console.log(`📍 Resuming from index ${startIndex} (previously processed ${progress.processedCount} facilities)\n`);
+      console.log(
+        `📍 Resuming from index ${startIndex} (previously processed ${progress.processedCount} facilities)\n`,
+      );
     }
   }
 
@@ -320,19 +316,20 @@ async function processFacilities() {
       continue;
     }
 
-    let email: string | null = null;
+    let emails: string[] = [];
     let success = false;
 
     try {
-      // Scrape email from website
-      email = await scrapeEmailFromWebsite(facility.website, facility.name);
+      // Scrape emails from website
+      emails = await scrapeEmailsFromWebsite(facility.website, facility.name);
 
       // Update database
-      await updateFacilityEmail(facility.id, email, true);
+      await updateFacilityEmails(facility.id, emails, true);
 
-      if (email) {
-        console.log(`   ✅ Email found and saved: ${email}`);
-        progress.emailsFound++;
+      if (emails.length > 0) {
+        console.log(`   ✅ ${emails.length} email(s) found and saved`);
+        progress.totalEmailsFound += emails.length;
+        progress.facilitiesWithEmails++;
         progress.successCount++;
       } else {
         console.log(`   ℹ️  No email found`);
@@ -352,7 +349,7 @@ async function processFacilities() {
 
       // Still mark as attempted even if there was an error
       try {
-        await updateFacilityEmail(facility.id, null, true);
+        await updateFacilityEmails(facility.id, [], true);
       } catch (updateError) {
         console.log(`   ⚠️  Failed to mark as attempted in database`);
       }
@@ -374,14 +371,17 @@ async function processFacilities() {
   console.log("\n" + "=".repeat(60));
   console.log("\n📊 Final Summary:");
   console.log(`   Total processed: ${progress.processedCount}`);
-  console.log(`   Emails found: ${progress.emailsFound}`);
-  console.log(`   No email found: ${progress.failedCount - progress.errors.length}`);
+  console.log(`   Facilities with emails: ${progress.facilitiesWithEmails}`);
+  console.log(`   Total emails found: ${progress.totalEmailsFound}`);
+  console.log(
+    `   No email found: ${progress.failedCount - progress.errors.length}`,
+  );
   console.log(`   Errors: ${progress.errors.length}`);
   console.log(`   Skipped (duplicates): ${progress.skippedCount}`);
 
   if (progress.errors.length > 0) {
     console.log("\n⚠️  Errors encountered:");
-    progress.errors.slice(-10).forEach(err => {
+    progress.errors.slice(-10).forEach((err) => {
       console.log(`   - ${err.name}: ${err.error}`);
     });
   }
