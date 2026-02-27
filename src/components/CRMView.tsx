@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
 import {
   Building2,
   BarChart3,
@@ -17,6 +18,8 @@ import {
   Plus,
   ChevronLeft,
   ChevronRight,
+  Map,
+  Eye,
 } from "lucide-react";
 import { FacilityLightweight } from "@/types/facility";
 import { useLoading } from "@/contexts/LoadingContext";
@@ -110,10 +113,12 @@ function SummaryCard({
 function FacilityTable({
   facilities,
   onOpenDetails,
+  onViewOnMap,
   isLoading,
 }: {
   facilities: FacilityLightweight[];
   onOpenDetails: (placeId: string) => void;
+  onViewOnMap: (placeId: string) => void;
   isLoading?: boolean;
 }) {
   return (
@@ -264,15 +269,28 @@ function FacilityTable({
                 </td>
 
                 <td className="px-5 py-4 align-middle text-right">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation(); // Prevent row click from also triggering
-                      onOpenDetails(facility.place_id);
-                    }}
-                    className="px-4 py-2 text-xs font-semibold rounded-lg border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 hover:text-blue-600 hover:border-blue-200 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/20 active:bg-slate-100"
-                  >
-                    View Details
-                  </button>
+                  <div className="flex items-center justify-end gap-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onViewOnMap(facility.place_id);
+                      }}
+                      title="View on Map"
+                      className="p-2 rounded-lg border border-slate-200 text-slate-700 bg-white hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/20 active:bg-slate-100 cursor-pointer"
+                    >
+                      <Map className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onOpenDetails(facility.place_id);
+                      }}
+                      title="View Details"
+                      className="p-2 rounded-lg border border-slate-200 text-slate-700 bg-white hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/20 active:bg-slate-100 cursor-pointer"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </button>
+                  </div>
                 </td>
               </motion.tr>
             ))}
@@ -596,11 +614,17 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
   const [selectedFacilityId, setSelectedFacilityId] = useState<string | null>(null);
   const [selectedSport, setSelectedSport] = useState<string | null>(null);
   const { setLoadingComplete } = useLoading();
+  const router = useRouter();
 
   // Handler to open facility details and close filters
   const handleOpenDetails = (placeId: string) => {
     setIsFiltersSidebarOpen(false); // Auto-close filters sidebar
     setSelectedFacilityId(placeId);
+  };
+
+  // Handler to view facility on map
+  const handleViewOnMap = (placeId: string) => {
+    router.push(`/?focus=${placeId}`);
   };
 
   // Handler to open sport facilities sidebar
@@ -625,7 +649,7 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
   // Filter facilities by selected sport (with deduplication to prevent duplicate keys)
   const sportFacilities = selectedSport
     ? Array.from(
-        new Map(
+        new Map<string, FacilityLightweight>(
           facilities
             .filter((f) => f.identified_sports?.includes(selectedSport))
             .map((facility) => [facility.place_id, facility])
@@ -871,6 +895,7 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
               <FacilityTable
                 facilities={paginatedFacilities}
                 onOpenDetails={handleOpenDetails}
+                onViewOnMap={handleViewOnMap}
                 isLoading={showSkeletonRows}
               />
 
