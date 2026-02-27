@@ -23,6 +23,7 @@ import { useLoading } from "@/contexts/LoadingContext";
 import { useFacilities } from "@/hooks/useFacilities";
 import FiltersSidebar, { FilterState } from "./FiltersSidebar";
 import CRMFacilityDetailsSidebar from "./CRMFacilityDetailsSidebar";
+import SportFacilitiesSidebar from "./SportFacilitiesSidebar";
 import { SkeletonTableRows } from "./SkeletonTableRow";
 import {
   BarChart,
@@ -388,9 +389,11 @@ function AnalyticsSkeletonLoader() {
 function AnalyticsView({
   facilities,
   isLoading,
+  onSportClick,
 }: {
   facilities: FacilityLightweight[];
   isLoading: boolean;
+  onSportClick: (sport: string) => void;
 }) {
   const analytics = calculateSportAnalytics(facilities);
 
@@ -474,7 +477,16 @@ function AnalyticsView({
               ]}
               labelStyle={{ fontWeight: 600, color: "#1e293b" }}
             />
-            <Bar dataKey="count" radius={[0, 8, 8, 0]}>
+            <Bar
+              dataKey="count"
+              radius={[0, 8, 8, 0]}
+              onClick={(data: any) => {
+                if (data && data.sport) {
+                  onSportClick(data.sport);
+                }
+              }}
+              cursor="pointer"
+            >
               {chartData.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
@@ -521,7 +533,8 @@ function AnalyticsView({
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: index * 0.01 }}
-                  className="hover:bg-slate-50/60 transition-colors"
+                  onClick={() => onSportClick(item.sport)}
+                  className="hover:bg-slate-50/60 transition-colors cursor-pointer"
                 >
                   <td className="px-6 py-3 text-slate-500 font-medium">
                     #{index + 1}
@@ -581,12 +594,19 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
   const [isFiltersSidebarOpen, setIsFiltersSidebarOpen] = useState(false);
   const [filters, setFilters] = useState<FilterState>(loadFiltersFromStorage);
   const [selectedFacilityId, setSelectedFacilityId] = useState<string | null>(null);
+  const [selectedSport, setSelectedSport] = useState<string | null>(null);
   const { setLoadingComplete } = useLoading();
 
   // Handler to open facility details and close filters
   const handleOpenDetails = (placeId: string) => {
     setIsFiltersSidebarOpen(false); // Auto-close filters sidebar
     setSelectedFacilityId(placeId);
+  };
+
+  // Handler to open sport facilities sidebar
+  const handleSportClick = (sport: string) => {
+    setIsFiltersSidebarOpen(false); // Close filters sidebar
+    setSelectedSport(sport);
   };
 
   // Use shared facilities hook (same data as MapView)
@@ -601,6 +621,17 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
 
   // Convert Facility[] to FacilityLightweight[] (they have the same structure)
   const facilities = allFacilities as unknown as FacilityLightweight[];
+
+  // Filter facilities by selected sport (with deduplication to prevent duplicate keys)
+  const sportFacilities = selectedSport
+    ? Array.from(
+        new Map(
+          facilities
+            .filter((f) => f.identified_sports?.includes(selectedSport))
+            .map((facility) => [facility.place_id, facility])
+        ).values()
+      )
+    : [];
 
   // Signal loading complete when background loading finishes
   useEffect(() => {
@@ -901,7 +932,11 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
             </div>
           </motion.div>
         ) : activeTab === "analytics" ? (
-          <AnalyticsView facilities={facilities} isLoading={showSkeletonRows} />
+          <AnalyticsView
+            facilities={facilities}
+            isLoading={showSkeletonRows}
+            onSportClick={handleSportClick}
+          />
         ) : (
           <motion.div
             initial={{ opacity: 0 }}
@@ -931,6 +966,17 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
       <CRMFacilityDetailsSidebar
         placeId={selectedFacilityId}
         onClose={() => setSelectedFacilityId(null)}
+      />
+
+      {/* Sport Facilities Sidebar */}
+      <SportFacilitiesSidebar
+        sport={selectedSport}
+        onClose={() => setSelectedSport(null)}
+        facilities={sportFacilities}
+        onFacilityClick={(placeId) => {
+          setSelectedSport(null); // Close sport sidebar
+          setSelectedFacilityId(placeId); // Open facility details
+        }}
       />
     </div>
   );
