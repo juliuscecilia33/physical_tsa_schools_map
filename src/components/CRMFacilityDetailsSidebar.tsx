@@ -1411,7 +1411,7 @@ export default function CRMFacilityDetailsSidebar({
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.1 + idx * 0.05 }}
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border-2 transition-all"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-all"
                         style={{
                           color: tag.color,
                           borderColor: tag.color,
