@@ -24,6 +24,15 @@ import { useFacilities } from "@/hooks/useFacilities";
 import FiltersSidebar, { FilterState } from "./FiltersSidebar";
 import CRMFacilityDetailsSidebar from "./CRMFacilityDetailsSidebar";
 import { SkeletonTableRows } from "./SkeletonTableRow";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  Cell,
+} from "recharts";
 
 const cn = (...classes: (string | undefined | null | false)[]) =>
   classes.filter(Boolean).join(" ");
@@ -297,6 +306,242 @@ function FacilityTable({
         </tfoot>
       </table>
     </div>
+  );
+}
+
+// Analytics data aggregation
+function calculateSportAnalytics(facilities: FacilityLightweight[]) {
+  const sportCounts: Record<string, number> = {};
+  let facilitiesWithoutSports = 0;
+
+  facilities.forEach((facility) => {
+    const sports = facility.identified_sports || [];
+    if (sports.length === 0) {
+      facilitiesWithoutSports++;
+    } else {
+      sports.forEach((sport) => {
+        sportCounts[sport] = (sportCounts[sport] || 0) + 1;
+      });
+    }
+  });
+
+  // Convert to array and sort by count descending
+  const sportData = Object.entries(sportCounts)
+    .map(([sport, count]) => ({
+      sport,
+      count,
+      percentage: ((count / facilities.length) * 100).toFixed(1),
+    }))
+    .sort((a, b) => b.count - a.count);
+
+  const topSport = sportData[0];
+
+  return {
+    sportData,
+    totalUniqueSports: sportData.length,
+    topSport: topSport
+      ? { name: topSport.sport, count: topSport.count }
+      : { name: "N/A", count: 0 },
+    facilitiesWithoutSports,
+    totalFacilities: facilities.length,
+  };
+}
+
+// Skeleton loader for analytics
+function AnalyticsSkeletonLoader() {
+  return (
+    <div className="space-y-8 animate-pulse">
+      {/* Summary cards skeleton */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+        {[1, 2, 3, 4].map((i) => (
+          <div
+            key={i}
+            className="rounded-2xl border border-slate-200/60 bg-white p-5 h-32"
+          >
+            <div className="h-8 w-8 bg-slate-200 rounded-lg mb-3"></div>
+            <div className="h-4 w-24 bg-slate-200 rounded mb-2"></div>
+            <div className="h-8 w-16 bg-slate-200 rounded"></div>
+          </div>
+        ))}
+      </div>
+
+      {/* Chart skeleton */}
+      <div className="rounded-2xl border border-slate-200/60 bg-white p-8">
+        <div className="h-6 w-48 bg-slate-200 rounded mb-6"></div>
+        <div className="space-y-3">
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+            <div key={i} className="flex items-center gap-3">
+              <div className="h-4 w-20 bg-slate-200 rounded"></div>
+              <div
+                className="h-8 bg-slate-200 rounded"
+                style={{ width: `${Math.random() * 60 + 20}%` }}
+              ></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Analytics View Component
+function AnalyticsView({
+  facilities,
+  isLoading,
+}: {
+  facilities: FacilityLightweight[];
+  isLoading: boolean;
+}) {
+  const analytics = calculateSportAnalytics(facilities);
+
+  // Show skeleton while loading
+  if (isLoading || facilities.length === 0) {
+    return <AnalyticsSkeletonLoader />;
+  }
+
+  // Limit to top 25 sports for chart readability
+  const chartData = analytics.sportData.slice(0, 25);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="space-y-8"
+    >
+      {/* Summary Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+        <SummaryCard
+          label="Unique Sports"
+          value={analytics.totalUniqueSports}
+          icon={BarChart3}
+        />
+        <SummaryCard
+          label="Top Sport"
+          value={`${analytics.topSport.name} (${analytics.topSport.count})`}
+          icon={Star}
+        />
+        <SummaryCard
+          label="Total Facilities"
+          value={analytics.totalFacilities}
+          icon={Building2}
+        />
+        <SummaryCard
+          label="Without Sports"
+          value={analytics.facilitiesWithoutSports}
+          icon={FileText}
+        />
+      </div>
+
+      {/* Main Chart */}
+      <div className="rounded-2xl border border-slate-200/60 bg-white p-8 shadow-sm">
+        <div className="mb-6">
+          <h3 className="text-xl font-bold text-slate-900">
+            Facilities by Sport
+          </h3>
+          <p className="text-sm text-slate-500 mt-1">
+            Top {chartData.length} sports across all facilities
+            {analytics.sportData.length > 25 && (
+              <span className="ml-1 text-slate-400">
+                (showing top 25 of {analytics.sportData.length})
+              </span>
+            )}
+          </p>
+        </div>
+
+        <ResponsiveContainer width="100%" height={Math.max(400, chartData.length * 35)}>
+          <BarChart
+            data={chartData}
+            layout="vertical"
+            margin={{ top: 5, right: 30, left: 120, bottom: 5 }}
+          >
+            <XAxis type="number" />
+            <YAxis
+              dataKey="sport"
+              type="category"
+              width={110}
+              tick={{ fontSize: 12, fill: "#475569" }}
+            />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "white",
+                border: "1px solid #e2e8f0",
+                borderRadius: "8px",
+                boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+              }}
+              formatter={(value: number | undefined) => [
+                `${value ?? 0} facilities`,
+                "Count",
+              ]}
+              labelStyle={{ fontWeight: 600, color: "#1e293b" }}
+            />
+            <Bar dataKey="count" radius={[0, 8, 8, 0]}>
+              {chartData.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={`hsl(${217 + index * 5}, 91%, ${60 - index * 0.5}%)`}
+                />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Sport Statistics Table */}
+      <div className="rounded-2xl border border-slate-200/60 bg-white shadow-sm overflow-hidden">
+        <div className="p-6 border-b border-slate-200/60">
+          <h3 className="text-xl font-bold text-slate-900">
+            Complete Sport Statistics
+          </h3>
+          <p className="text-sm text-slate-500 mt-1">
+            All {analytics.sportData.length} sports identified across facilities
+          </p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left text-xs text-slate-500 uppercase tracking-wider border-b border-slate-200/60 bg-slate-50/50">
+                <th className="px-6 py-4 font-semibold text-slate-600">
+                  Rank
+                </th>
+                <th className="px-6 py-4 font-semibold text-slate-600">
+                  Sport
+                </th>
+                <th className="px-6 py-4 font-semibold text-slate-600 text-right">
+                  Facilities
+                </th>
+                <th className="px-6 py-4 font-semibold text-slate-600 text-right">
+                  % of Total
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {analytics.sportData.map((item, index) => (
+                <motion.tr
+                  key={item.sport}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: index * 0.01 }}
+                  className="hover:bg-slate-50/60 transition-colors"
+                >
+                  <td className="px-6 py-3 text-slate-500 font-medium">
+                    #{index + 1}
+                  </td>
+                  <td className="px-6 py-3 font-semibold text-slate-800">
+                    {item.sport}
+                  </td>
+                  <td className="px-6 py-3 text-right tabular-nums font-bold text-slate-900">
+                    {item.count.toLocaleString()}
+                  </td>
+                  <td className="px-6 py-3 text-right tabular-nums text-slate-600">
+                    {item.percentage}%
+                  </td>
+                </motion.tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </motion.div>
   );
 }
 
@@ -655,6 +900,8 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
               )}
             </div>
           </motion.div>
+        ) : activeTab === "analytics" ? (
+          <AnalyticsView facilities={facilities} isLoading={showSkeletonRows} />
         ) : (
           <motion.div
             initial={{ opacity: 0 }}
@@ -663,7 +910,10 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
           >
             <div className="text-center">
               <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-slate-50 border border-slate-100 mb-6 shadow-sm">
-                <BarChart3 className="h-10 w-10 text-slate-400" />
+                {(() => {
+                  const TabIcon = TABS.find((t) => t.id === activeTab)?.icon || BarChart3;
+                  return <TabIcon className="h-10 w-10 text-slate-400" />;
+                })()}
               </div>
               <h2 className="text-xl font-bold tracking-tight text-slate-900 mb-2">
                 Module Coming Soon
