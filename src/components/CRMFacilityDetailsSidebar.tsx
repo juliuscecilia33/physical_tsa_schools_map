@@ -35,6 +35,7 @@ import {
 } from "@/utils/facilityCache";
 import { useFacilityDetails } from "@/hooks/useFacilityDetails";
 import { Note, FacilityTag } from "@/types/facility";
+import SportDetailModal from "@/components/SportDetailModal";
 
 interface CRMFacilityDetailsSidebarProps {
   placeId: string | null;
@@ -162,6 +163,9 @@ export default function CRMFacilityDetailsSidebar({
     useState(false);
   const [showAllAdditionalReviews, setShowAllAdditionalReviews] =
     useState(false);
+  const [selectedSportDetail, setSelectedSportDetail] = useState<string | null>(
+    null
+  );
 
   // Tag-related state
   const [allTags, setAllTags] = useState<FacilityTag[]>([]);
@@ -1480,9 +1484,9 @@ export default function CRMFacilityDetailsSidebar({
                           animate={{ opacity: 1, scale: 1 }}
                           transition={{ delay: 0.1 + idx * 0.05 }}
                           whileHover={{ scale: 1.05 }}
-                          className="px-4 py-2 bg-white text-blue-600 border border-blue-600 rounded-full text-sm font-medium transition-all cursor-default flex items-center gap-1.5"
+                          className="px-3 py-1.5 bg-white text-blue-600 border border-blue-600 rounded-full text-xs font-medium transition-all cursor-default flex items-center gap-1.5"
                         >
-                          <span className="text-base">
+                          <span className="text-sm">
                             {FACILITY_TYPE_EMOJIS[type] || "🏢"}
                           </span>
                           <span>{formatSportType(type)}</span>
@@ -1549,15 +1553,14 @@ export default function CRMFacilityDetailsSidebar({
                               initial={{ opacity: 0, scale: 0.8 }}
                               animate={{ opacity: 1, scale: 1 }}
                               transition={{ delay: 0.12 + idx * 0.05 }}
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
                               className="group relative"
                               title={tooltipContent}
                             >
                               <button
-                                className={`px-4 py-2 bg-white ${textColor} rounded-full text-sm font-medium transition-all cursor-pointer flex items-center gap-1.5 border ${borderColor}`}
+                                onClick={() => setSelectedSportDetail(sport)}
+                                className={`px-3 py-1.5 bg-white ${textColor} rounded-full text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5 border ${borderColor}`}
                               >
-                                <span className="text-lg">
+                                <span className="text-sm">
                                   {SPORT_EMOJIS[sport] || "🏅"}
                                 </span>
                                 <span>{sport}</span>
@@ -2484,6 +2487,17 @@ export default function CRMFacilityDetailsSidebar({
               />
             </div>
           )}
+
+        {/* Sport Detail Modal */}
+        {facility && (
+          <SportDetailModal
+            isOpen={selectedSportDetail !== null}
+            onClose={() => setSelectedSportDetail(null)}
+            selectedSport={selectedSportDetail}
+            onSelectSport={setSelectedSportDetail}
+            facility={facility}
+          />
+        )}
       </>
     </AnimatePresence>
   );
