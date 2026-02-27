@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
+import { useSearchParams } from "next/navigation";
 import { Facility } from "@/types/facility";
 import ProgressBar from "@/components/ProgressBar";
 import { useLoading } from "@/contexts/LoadingContext";
@@ -25,6 +26,9 @@ export type FilterOption = 'UNHIDDEN_ONLY' | 'ALL' | 'HIDDEN_ONLY' | 'WITH_NOTES
 const SERPAPI_TAG_ID = 'e326fe36-5536-4209-87ed-f99528e1d1ee';
 
 export default function MapView({ isVisible }: { isVisible: boolean }) {
+  const searchParams = useSearchParams();
+  const focusPlaceId = searchParams.get('focus');
+
   const [filterOption, setFilterOption] = useState<FilterOption>('UNHIDDEN_ONLY');
   const [selectedSports, setSelectedSports] = useState<string[]>([]);
   // Pre-select SerpAPI tag by default
@@ -117,6 +121,7 @@ export default function MapView({ isVisible }: { isVisible: boolean }) {
         selectedTags={selectedTags}
         onSelectedTagsChange={setSelectedTags}
         onUpdateFacility={updateFacilityHidden}
+        focusPlaceId={focusPlaceId}
       />
     </main>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useMemo, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Map, { Source, Layer, NavigationControl, Popup } from "react-map-gl";
 import type { MapRef, MapLayerMouseEvent } from "react-map-gl";
 import { Facility } from "@/types/facility";
@@ -35,6 +36,7 @@ interface FacilityMapProps {
   selectedTags: string[];
   onSelectedTagsChange: (tags: string[]) => void;
   onUpdateFacility: (place_id: string, hidden: boolean) => void;
+  focusPlaceId?: string | null;
 }
 
 // Sport emoji mapping
@@ -268,6 +270,7 @@ export default function FacilityMap({
   selectedTags,
   onSelectedTagsChange,
   onUpdateFacility,
+  focusPlaceId,
 }: FacilityMapProps) {
   const [selectedFacility, setSelectedFacility] = useState<Facility | null>(
     null,
@@ -290,6 +293,7 @@ export default function FacilityMap({
   >(["parks", "fitness", "sports", "education", "other"]);
   const [isAnimating, setIsAnimating] = useState(false);
   const mapRef = useRef<MapRef>(null);
+  const router = useRouter();
 
   // Expose animation state globally for cache persistence logic
   useEffect(() => {
@@ -297,6 +301,38 @@ export default function FacilityMap({
       (window as any).__mapAnimating = isAnimating;
     }
   }, [isAnimating]);
+
+  // Handle focus from CRM view (via URL query param)
+  useEffect(() => {
+    if (focusPlaceId && facilities.length > 0) {
+      // Find the facility by place_id
+      const facility = facilities.find((f) => f.place_id === focusPlaceId);
+
+      if (facility) {
+        // Focus map on facility location with smooth animation
+        const map = mapRef.current?.getMap();
+        setIsAnimating(true);
+        map?.flyTo({
+          center: [facility.location.lng, facility.location.lat],
+          zoom: 16,
+          duration: 1500,
+        });
+        // Clear animation flag after animation completes
+        setTimeout(() => setIsAnimating(false), 1600);
+
+        // Open facility sidebar
+        setSelectedFacility(facility);
+      }
+    }
+  }, [focusPlaceId, facilities]);
+
+  // Clear focus URL parameter when sidebar closes
+  useEffect(() => {
+    if (!selectedFacility && focusPlaceId) {
+      // Sidebar was closed, clear the focus query parameter
+      router.replace('/');
+    }
+  }, [selectedFacility, focusPlaceId, router]);
 
   const toggleSection = (section: keyof typeof expandedSections) => {
     setExpandedSections((prev) => ({

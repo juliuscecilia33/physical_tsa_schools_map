@@ -25,9 +25,11 @@ import {
   ExternalLink,
   Maximize2,
   Tag,
+  Map,
 } from "lucide-react";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useQueryClient } from "@tanstack/react-query";
 import {
@@ -125,6 +127,7 @@ export default function CRMFacilityDetailsSidebar({
   onClose,
 }: CRMFacilityDetailsSidebarProps) {
   const queryClient = useQueryClient();
+  const router = useRouter();
   const contentRef = useRef<HTMLDivElement>(null);
 
   // Fetch full facility details including reviews and additional data
@@ -643,6 +646,13 @@ export default function CRMFacilityDetailsSidebar({
     }
   };
 
+  // Navigate to map view and focus on this facility
+  const handleViewOnMap = () => {
+    if (facility) {
+      router.push(`/?focus=${facility.place_id}`);
+    }
+  };
+
   const getPhotoUrl = (photoReference: string, highRes: boolean = false) => {
     const maxWidth = highRes ? 1600 : 400;
     return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=${maxWidth}&photo_reference=${photoReference}&key=${process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY}`;
@@ -1048,13 +1058,27 @@ export default function CRMFacilityDetailsSidebar({
                 </>
               ) : null}
             </div>
-            <button
-              onClick={onClose}
-              className="flex-shrink-0 p-2 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
-              aria-label="Close"
-            >
-              <X className="w-5 h-5 text-slate-600" />
-            </button>
+            <div className="flex items-center gap-2">
+              {facility && (
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleViewOnMap}
+                  className="flex items-center gap-1.5 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium shadow-sm transition-all cursor-pointer"
+                  title="View on Map"
+                >
+                  <Map className="w-4 h-4" />
+                  <span className="hidden sm:inline">View on Map</span>
+                </motion.button>
+              )}
+              <button
+                onClick={onClose}
+                className="flex-shrink-0 p-2 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                aria-label="Close"
+              >
+                <X className="w-5 h-5 text-slate-600" />
+              </button>
+            </div>
           </div>
 
           {/* Content */}
