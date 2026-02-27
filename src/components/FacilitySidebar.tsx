@@ -44,6 +44,7 @@ import { useFacilityDetails } from "@/hooks/useFacilityDetails";
 import SportDetailModal from "@/components/SportDetailModal";
 import TagManagerModal from "@/components/TagManagerModal";
 import AddNoteModal from "@/components/AddNoteModal";
+import EditNoteModal from "@/components/EditNoteModal";
 
 interface FacilitySidebarProps {
   facility: Facility | null;
@@ -169,12 +170,7 @@ export default function FacilitySidebar({
   }>({});
   const [notes, setNotes] = useState<Note[]>([]);
   const [loadingNotes, setLoadingNotes] = useState(false);
-  const [newNoteText, setNewNoteText] = useState("");
   const [addingNote, setAddingNote] = useState(false);
-  const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
-  const [editNoteText, setEditNoteText] = useState("");
-  const [editNotePhoto, setEditNotePhoto] = useState<any>(null);
-  const [showEditPhotoPicker, setShowEditPhotoPicker] = useState(false);
   const [selectedSportDetail, setSelectedSportDetail] = useState<string | null>(
     null,
   );
@@ -202,6 +198,8 @@ export default function FacilitySidebar({
   const [showAllAdditionalReviews, setShowAllAdditionalReviews] =
     useState(false);
   const [isAddNoteModalOpen, setIsAddNoteModalOpen] = useState(false);
+  const [isEditNoteModalOpen, setIsEditNoteModalOpen] = useState(false);
+  const [editingNote, setEditingNote] = useState<Note | null>(null);
 
   // Tag-related state
   const [allTags, setAllTags] = useState<FacilityTag[]>([]);
@@ -434,92 +432,64 @@ export default function FacilitySidebar({
 
   // Start editing a note
   const handleStartEdit = (note: Note) => {
-    setEditingNoteId(note.id);
-    setEditNoteText(note.note_text);
-
-    // Set initial photo state if note has an assigned photo
-    if (note.assigned_photo) {
-      // Reconstruct photo object from stored reference
-      const photoObj = {
-        type: note.assigned_photo.type,
-        url: note.assigned_photo.url,
-        scrapedIndex: note.assigned_photo.scrapedIndex,
-        reviewIndex: note.assigned_photo.reviewIndex,
-        photoIndexInReview: note.assigned_photo.photoIndexInReview,
-        reviewUserName: note.assigned_photo.reviewUserName,
-        reviewRating: note.assigned_photo.reviewRating,
-        data: note.assigned_photo.photoData,
-      };
-      setEditNotePhoto(photoObj);
-    } else {
-      setEditNotePhoto(null);
-    }
-    setShowEditPhotoPicker(false);
-  };
-
-  // Cancel editing
-  const handleCancelEdit = () => {
-    setEditingNoteId(null);
-    setEditNoteText("");
-    setEditNotePhoto(null);
-    setShowEditPhotoPicker(false);
+    setEditingNote(note);
+    setIsEditNoteModalOpen(true);
   };
 
   // Save edited note
-  const handleSaveEdit = async (noteId: string) => {
-    if (!editNoteText.trim()) return;
-    if (!facility) return;
+  const handleSaveEdit = async (noteText: string, selectedPhoto: any) => {
+    if (!noteText.trim()) return;
+    if (!facility || !editingNote) return;
 
-    const oldNote = notes.find((n) => n.id === noteId);
+    const oldNote = notes.find((n) => n.id === editingNote.id);
     if (!oldNote) return;
+
+    setAddingNote(true); // Reuse addingNote state for saving
 
     // Build assigned_photo object if photo was selected
     let assignedPhotoData: any = null;
-    if (editNotePhoto) {
+    if (selectedPhoto) {
       assignedPhotoData = {
-        type: editNotePhoto.type,
-        url: editNotePhoto.url,
+        type: selectedPhoto.type,
+        url: selectedPhoto.url,
         assignedAt: new Date().toISOString(),
       };
 
-      if (editNotePhoto.type === "scraped") {
-        assignedPhotoData.scrapedIndex = editNotePhoto.scrapedIndex;
-        assignedPhotoData.photoData = editNotePhoto.data;
-        assignedPhotoData.thumbnail = editNotePhoto.data?.thumbnail;
-      } else if (editNotePhoto.type === "review") {
-        assignedPhotoData.reviewIndex = editNotePhoto.reviewIndex;
-        assignedPhotoData.photoIndexInReview = editNotePhoto.photoIndexInReview;
-        assignedPhotoData.reviewUserName = editNotePhoto.reviewUserName;
-        assignedPhotoData.reviewRating = editNotePhoto.reviewRating;
-        assignedPhotoData.thumbnail = editNotePhoto.url;
+      if (selectedPhoto.type === "scraped") {
+        assignedPhotoData.scrapedIndex = selectedPhoto.scrapedIndex;
+        assignedPhotoData.photoData = selectedPhoto.data;
+        assignedPhotoData.thumbnail = selectedPhoto.data?.thumbnail;
+      } else if (selectedPhoto.type === "review") {
+        assignedPhotoData.reviewIndex = selectedPhoto.reviewIndex;
+        assignedPhotoData.photoIndexInReview = selectedPhoto.photoIndexInReview;
+        assignedPhotoData.reviewUserName = selectedPhoto.reviewUserName;
+        assignedPhotoData.reviewRating = selectedPhoto.reviewRating;
+        assignedPhotoData.thumbnail = selectedPhoto.url;
       }
     }
 
     // Optimistic update
     setNotes((prev) =>
       prev.map((n) =>
-        n.id === noteId
+        n.id === editingNote.id
           ? {
               ...n,
-              note_text: editNoteText,
+              note_text: noteText,
               assigned_photo: assignedPhotoData,
               updated_at: new Date().toISOString(),
             }
           : n,
       ),
     );
-    setEditingNoteId(null);
-    setEditNotePhoto(null);
-    setShowEditPhotoPicker(false);
 
     try {
       const { error } = await supabase
         .from("facility_notes")
         .update({
-          note_text: editNoteText,
+          note_text: noteText,
           assigned_photo: assignedPhotoData,
         })
-        .eq("id", noteId);
+        .eq("id", editingNote.id);
 
       if (error) throw error;
 
@@ -527,11 +497,19 @@ export default function FacilitySidebar({
       queryClient.invalidateQueries({
         queryKey: ["facility", "full", facility.place_id],
       });
+
+      // Close modal
+      setIsEditNoteModalOpen(false);
+      setEditingNote(null);
     } catch (error) {
       console.error("Error updating note:", error);
       // Revert optimistic update
-      setNotes((prev) => prev.map((n) => (n.id === noteId ? oldNote : n)));
+      setNotes((prev) =>
+        prev.map((n) => (n.id === editingNote.id ? oldNote : n)),
+      );
       alert("Failed to update note. Please try again.");
+    } finally {
+      setAddingNote(false);
     }
   };
 
@@ -1414,145 +1392,7 @@ export default function FacilitySidebar({
                       transition={{ delay: 0.1 + idx * 0.05 }}
                       className="bg-gradient-to-br from-white to-slate-50/50 rounded-2xl p-3 shadow-sm border border-slate-100"
                     >
-                      {editingNoteId === note.id ? (
-                        // Edit Mode
-                        <div className="space-y-3">
-                          <textarea
-                            value={editNoteText}
-                            onChange={(e) => setEditNoteText(e.target.value)}
-                            className="w-full px-3 py-2 text-sm text-slate-900 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none transition-all"
-                            rows={3}
-                          />
-
-                          {/* Photo Picker for Edit Mode */}
-                          {combinedPhotos.length > 0 && (
-                            <div>
-                              <button
-                                onClick={() =>
-                                  setShowEditPhotoPicker(!showEditPhotoPicker)
-                                }
-                                className="flex items-center justify-between w-full px-3 py-2 text-xs font-medium text-slate-700 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors"
-                              >
-                                <div className="flex items-center gap-2">
-                                  <ImageIcon className="w-3.5 h-3.5" />
-                                  <span>
-                                    {editNotePhoto ? "Change Photo" : "Add Photo"}
-                                  </span>
-                                </div>
-                                {showEditPhotoPicker ? (
-                                  <ChevronUp className="w-3.5 h-3.5" />
-                                ) : (
-                                  <ChevronDown className="w-3.5 h-3.5" />
-                                )}
-                              </button>
-
-                              {/* Current Photo Preview */}
-                              {editNotePhoto && (
-                                <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-lg">
-                                  <div className="flex items-center gap-2">
-                                    <img
-                                      src={editNotePhoto.url}
-                                      alt="Selected"
-                                      className="w-12 h-12 rounded object-cover"
-                                      referrerPolicy="no-referrer"
-                                    />
-                                    <div className="flex-1 text-xs text-slate-600">
-                                      {editNotePhoto.type === "scraped"
-                                        ? "Scraped Photo"
-                                        : `Review by ${editNotePhoto.reviewUserName}`}
-                                    </div>
-                                    <button
-                                      onClick={() => setEditNotePhoto(null)}
-                                      className="p-1 hover:bg-red-100 rounded text-red-600"
-                                    >
-                                      <X className="w-3 h-3" />
-                                    </button>
-                                  </div>
-                                </div>
-                              )}
-
-                              {/* Photo Grid */}
-                              {showEditPhotoPicker && (
-                                <div className="mt-2 max-h-40 overflow-y-auto border border-slate-200 rounded-lg p-2">
-                                  <div className="grid grid-cols-4 gap-2">
-                                    {combinedPhotos.map((photo, idx) => {
-                                      const isSelected =
-                                        editNotePhoto?.url === photo.url;
-                                      return (
-                                        <div
-                                          key={`edit-photo-${idx}`}
-                                          onClick={() => {
-                                            if (isSelected) {
-                                              setEditNotePhoto(null);
-                                            } else {
-                                              setEditNotePhoto(photo);
-                                            }
-                                          }}
-                                          className={`relative cursor-pointer rounded overflow-hidden aspect-square ${
-                                            isSelected
-                                              ? "ring-2 ring-blue-500"
-                                              : "ring-1 ring-slate-200"
-                                          }`}
-                                        >
-                                          <img
-                                            src={photo.url}
-                                            alt={`Photo ${idx + 1}`}
-                                            className="w-full h-full object-cover"
-                                            referrerPolicy="no-referrer"
-                                            loading="lazy"
-                                          />
-                                          {isSelected && (
-                                            <div className="absolute inset-0 bg-blue-500/20 flex items-center justify-center">
-                                              <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
-                                                <svg
-                                                  className="w-3 h-3 text-white"
-                                                  fill="none"
-                                                  viewBox="0 0 24 24"
-                                                  stroke="currentColor"
-                                                >
-                                                  <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth={2}
-                                                    d="M5 13l4 4L19 7"
-                                                  />
-                                                </svg>
-                                              </div>
-                                            </div>
-                                          )}
-                                        </div>
-                                      );
-                                    })}
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          )}
-
-                          <div className="flex gap-2">
-                            <motion.button
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
-                              onClick={() => handleSaveEdit(note.id)}
-                              className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-xl text-xs font-medium cursor-pointer"
-                            >
-                              <Save className="w-3 h-3" />
-                              Save
-                            </motion.button>
-                            <motion.button
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
-                              onClick={handleCancelEdit}
-                              className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-medium cursor-pointer"
-                            >
-                              <XIcon className="w-3 h-3" />
-                              Cancel
-                            </motion.button>
-                          </div>
-                        </div>
-                      ) : (
-                        // View Mode
-                        <>
+                      <>
                           {/* Note Text */}
                           <p className="text-sm text-slate-700 leading-relaxed mb-3">
                             {note.note_text}
@@ -1633,7 +1473,6 @@ export default function FacilitySidebar({
                             </div>
                           </div>
                         </>
-                      )}
                     </motion.div>
                   ))}
               </div>
@@ -2803,6 +2642,37 @@ export default function FacilitySidebar({
           facilityName={displayFacility.name}
           isSaving={addingNote}
         />
+
+        {/* Edit Note Modal */}
+        {editingNote && (
+          <EditNoteModal
+            isOpen={isEditNoteModalOpen}
+            onClose={() => {
+              setIsEditNoteModalOpen(false);
+              setEditingNote(null);
+            }}
+            onSave={handleSaveEdit}
+            combinedPhotos={combinedPhotos}
+            facilityName={displayFacility.name}
+            isSaving={addingNote}
+            initialNoteText={editingNote.note_text}
+            initialPhoto={
+              editingNote.assigned_photo
+                ? {
+                    type: editingNote.assigned_photo.type,
+                    url: editingNote.assigned_photo.url,
+                    scrapedIndex: editingNote.assigned_photo.scrapedIndex,
+                    reviewIndex: editingNote.assigned_photo.reviewIndex,
+                    photoIndexInReview:
+                      editingNote.assigned_photo.photoIndexInReview,
+                    reviewUserName: editingNote.assigned_photo.reviewUserName,
+                    reviewRating: editingNote.assigned_photo.reviewRating,
+                    data: editingNote.assigned_photo.photoData,
+                  }
+                : null
+            }
+          />
+        )}
       </motion.div>
     </AnimatePresence>
   );
