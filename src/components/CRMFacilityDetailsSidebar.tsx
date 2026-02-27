@@ -999,7 +999,7 @@ export default function CRMFacilityDetailsSidebar({
           className="fixed right-0 top-0 bottom-0 w-full sm:w-[480px] bg-white shadow-2xl z-[60] flex flex-col overflow-hidden"
         >
           {/* Header */}
-          <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between z-10">
+          <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-start justify-between z-10">
             <div className="flex-1 pr-4">
               {isLoadingDetails ? (
                 <div className="space-y-2">
@@ -1055,30 +1055,27 @@ export default function CRMFacilityDetailsSidebar({
                       </span>
                     </div>
                   )}
+
+                  {/* View on Map Button */}
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleViewOnMap}
+                    className="mt-3 flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium shadow-sm transition-all cursor-pointer"
+                  >
+                    <Map className="w-4 h-4" />
+                    <span>View on Map</span>
+                  </motion.button>
                 </>
               ) : null}
             </div>
-            <div className="flex items-center gap-2">
-              {facility && (
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={handleViewOnMap}
-                  className="flex items-center gap-1.5 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium shadow-sm transition-all cursor-pointer"
-                  title="View on Map"
-                >
-                  <Map className="w-4 h-4" />
-                  <span className="hidden sm:inline">View on Map</span>
-                </motion.button>
-              )}
-              <button
-                onClick={onClose}
-                className="flex-shrink-0 p-2 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
-                aria-label="Close"
-              >
-                <X className="w-5 h-5 text-slate-600" />
-              </button>
-            </div>
+            <button
+              onClick={onClose}
+              className="flex-shrink-0 p-2 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+              aria-label="Close"
+            >
+              <X className="w-5 h-5 text-slate-600" />
+            </button>
           </div>
 
           {/* Content */}
