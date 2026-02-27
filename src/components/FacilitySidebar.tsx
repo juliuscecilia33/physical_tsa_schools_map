@@ -7,6 +7,7 @@ import {
   MapPin,
   Phone,
   Globe,
+  Mail,
   Clock,
   Star,
   StarHalf,
@@ -1769,6 +1770,21 @@ export default function FacilitySidebar({
                   </span>
                 </motion.a>
               )}
+
+              {displayFacility.email && displayFacility.email.length > 0 && displayFacility.email.map((emailAddress, idx) => (
+                <motion.a
+                  key={idx}
+                  href={`mailto:${emailAddress}`}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-blue-50 transition-colors group"
+                >
+                  <Mail className="w-5 h-5 text-blue-600 group-hover:text-blue-600/80 transition-colors" />
+                  <span className="text-blue-600 group-hover:text-blue-600/80 font-medium text-sm">
+                    {emailAddress}
+                  </span>
+                </motion.a>
+              ))}
             </div>
           </motion.div>
 

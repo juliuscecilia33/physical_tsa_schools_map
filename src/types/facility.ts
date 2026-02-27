@@ -26,6 +26,8 @@ export interface Facility {
   };
   phone?: string;
   website?: string;
+  email?: string[];
+  email_scraped_at?: string;
   rating?: number;
   user_ratings_total?: number;
   reviews?: Review[];

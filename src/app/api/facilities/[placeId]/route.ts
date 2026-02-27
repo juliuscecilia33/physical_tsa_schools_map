@@ -53,6 +53,8 @@ export async function GET(
       },
       phone: data.phone,
       website: data.website,
+      email: data.email || [],
+      email_scraped_at: data.email_scraped_at,
       rating: data.rating ? parseFloat(data.rating) : undefined,
       user_ratings_total: data.user_ratings_total ? parseInt(data.user_ratings_total) : undefined,
       reviews: data.reviews || [],
