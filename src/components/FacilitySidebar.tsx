@@ -182,6 +182,10 @@ export default function FacilitySidebar({
   const [showAdditionalLeftArrow, setShowAdditionalLeftArrow] = useState(false);
   const [showAdditionalRightArrow, setShowAdditionalRightArrow] =
     useState(false);
+  const reviewImageScrollRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
+  const [reviewImageArrowVisibility, setReviewImageArrowVisibility] = useState<{
+    [key: number]: { left: boolean; right: boolean };
+  }>({});
   const [showAllNotes, setShowAllNotes] = useState(false);
   const [isPhotosModalOpen, setIsPhotosModalOpen] = useState(false);
   const [isReviewsModalOpen, setIsReviewsModalOpen] = useState(false);
@@ -916,6 +920,40 @@ export default function FacilitySidebar({
     setShowAdditionalRightArrow(scrollLeft < scrollWidth - clientWidth - 1);
   };
 
+  // Handle review images scroll
+  const scrollReviewImages = (reviewIndex: number, direction: "left" | "right") => {
+    const ref = reviewImageScrollRefs.current[reviewIndex];
+    if (!ref) return;
+    const scrollAmount = 200; // Smaller scroll for review images
+    const newScrollLeft =
+      ref.scrollLeft + (direction === "right" ? scrollAmount : -scrollAmount);
+    ref.scrollTo({
+      left: newScrollLeft,
+      behavior: "smooth",
+    });
+  };
+
+  // Update review image arrow visibility for a specific review
+  const updateReviewImageArrows = (reviewIndex: number) => {
+    const ref = reviewImageScrollRefs.current[reviewIndex];
+    if (!ref) return;
+    const { scrollLeft, scrollWidth, clientWidth } = ref;
+    setReviewImageArrowVisibility((prev) => ({
+      ...prev,
+      [reviewIndex]: {
+        left: scrollLeft > 0,
+        right: scrollLeft < scrollWidth - clientWidth - 1,
+      },
+    }));
+  };
+
+  // Update all review image arrows
+  const updateAllReviewImageArrows = () => {
+    Object.keys(reviewImageScrollRefs.current).forEach((key) => {
+      updateReviewImageArrows(parseInt(key));
+    });
+  };
+
   // Update arrows when photos are loaded or facility changes
   useEffect(() => {
     updatePhotoArrows();
@@ -947,6 +985,33 @@ export default function FacilitySidebar({
       };
     }
   }, [displayFacility]);
+
+  // Update arrows for review images when reviews change
+  useEffect(() => {
+    // Initial update for all review image galleries
+    updateAllReviewImageArrows();
+
+    // Attach scroll and resize listeners to all review image containers
+    const listeners: Array<{ ref: HTMLDivElement; reviewIndex: number }> = [];
+    Object.entries(reviewImageScrollRefs.current).forEach(([key, ref]) => {
+      if (ref) {
+        const reviewIndex = parseInt(key);
+        const scrollHandler = () => updateReviewImageArrows(reviewIndex);
+        ref.addEventListener("scroll", scrollHandler);
+        window.addEventListener("resize", scrollHandler);
+        listeners.push({ ref, reviewIndex });
+      }
+    });
+
+    // Cleanup
+    return () => {
+      listeners.forEach(({ ref, reviewIndex }) => {
+        const scrollHandler = () => updateReviewImageArrows(reviewIndex);
+        ref.removeEventListener("scroll", scrollHandler);
+        window.removeEventListener("resize", scrollHandler);
+      });
+    };
+  }, [displayFacility?.additional_reviews]);
 
   // Photo viewer handlers
   const openPhotoViewer = (
@@ -1894,47 +1959,77 @@ export default function FacilitySidebar({
 
                             {/* Review Images */}
                             {review.images && review.images.length > 0 && (
-                              <div className="mb-3 flex gap-2 overflow-x-auto">
-                                {review.images.map((imageUrl, imgIdx) => (
-                                  <div
-                                    key={imgIdx}
-                                    onClick={() => openReviewPhotoViewer(idx, imgIdx)}
-                                    className="relative flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all cursor-pointer group"
+                              <div className="mb-3 relative group/review-images">
+                                {/* Left Arrow */}
+                                {reviewImageArrowVisibility[idx]?.left && (
+                                  <button
+                                    onClick={() => scrollReviewImages(idx, "left")}
+                                    className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-md flex items-center justify-center transition-all opacity-0 group-hover/review-images:opacity-100 cursor-pointer"
+                                    aria-label="Scroll left"
                                   >
-                                    {loadingImages[
-                                      `review-${idx}-img-${imgIdx}`
-                                    ] !== false && (
-                                      <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />
-                                    )}
-                                    <img
-                                      src={imageUrl}
-                                      alt={`Review image ${imgIdx + 1}`}
-                                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                                      referrerPolicy="no-referrer"
-                                      loading={idx < 10 ? "eager" : "lazy"}
-                                      onLoadStart={() =>
-                                        handleImageLoadStart(
-                                          `review-${idx}-img-${imgIdx}`,
-                                        )
-                                      }
-                                      onLoad={() =>
-                                        handleImageLoad(
-                                          `review-${idx}-img-${imgIdx}`,
-                                        )
-                                      }
-                                      onError={() =>
-                                        handleImageLoad(
-                                          `review-${idx}-img-${imgIdx}`,
-                                        )
-                                      }
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-1">
-                                      <span className="text-white text-[10px] font-medium">
-                                        Click to view
-                                      </span>
+                                    <ChevronLeft className="w-6 h-6 text-slate-700" />
+                                  </button>
+                                )}
+
+                                {/* Right Arrow */}
+                                {reviewImageArrowVisibility[idx]?.right && (
+                                  <button
+                                    onClick={() => scrollReviewImages(idx, "right")}
+                                    className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-md flex items-center justify-center transition-all opacity-0 group-hover/review-images:opacity-100 cursor-pointer"
+                                    aria-label="Scroll right"
+                                  >
+                                    <ChevronRight className="w-6 h-6 text-slate-700" />
+                                  </button>
+                                )}
+
+                                <div
+                                  ref={(el) => {
+                                    reviewImageScrollRefs.current[idx] = el;
+                                  }}
+                                  className="flex gap-2 overflow-x-auto scrollbar-hide scroll-smooth"
+                                  style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+                                >
+                                  {review.images.map((imageUrl, imgIdx) => (
+                                    <div
+                                      key={imgIdx}
+                                      onClick={() => openReviewPhotoViewer(idx, imgIdx)}
+                                      className="relative flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all cursor-pointer group"
+                                    >
+                                      {loadingImages[
+                                        `review-${idx}-img-${imgIdx}`
+                                      ] !== false && (
+                                        <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />
+                                      )}
+                                      <img
+                                        src={imageUrl}
+                                        alt={`Review image ${imgIdx + 1}`}
+                                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                                        referrerPolicy="no-referrer"
+                                        loading={idx < 10 ? "eager" : "lazy"}
+                                        onLoadStart={() =>
+                                          handleImageLoadStart(
+                                            `review-${idx}-img-${imgIdx}`,
+                                          )
+                                        }
+                                        onLoad={() =>
+                                          handleImageLoad(
+                                            `review-${idx}-img-${imgIdx}`,
+                                          )
+                                        }
+                                        onError={() =>
+                                          handleImageLoad(
+                                            `review-${idx}-img-${imgIdx}`,
+                                          )
+                                        }
+                                      />
+                                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-1">
+                                        <span className="text-white text-[10px] font-medium">
+                                          Click to view
+                                        </span>
+                                      </div>
                                     </div>
-                                  </div>
-                                ))}
+                                  ))}
+                                </div>
                               </div>
                             )}
                             <div className="flex items-center justify-between">
