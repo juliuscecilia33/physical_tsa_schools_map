@@ -38,7 +38,6 @@ import { useFacilityDetails } from "@/hooks/useFacilityDetails";
 import { Note, FacilityTag } from "@/types/facility";
 import SportDetailModal from "@/components/SportDetailModal";
 import TagManagerModal from "@/components/TagManagerModal";
-import CommunicationTimeline from "@/components/outreach/CommunicationTimeline";
 
 interface CRMFacilityDetailsSidebarProps {
   placeId: string | null;
@@ -1452,18 +1451,6 @@ export default function CRMFacilityDetailsSidebar({
                         ))}
                     </div>
                   )}
-                </motion.div>
-
-                {/* Divider */}
-                <div className="border-t border-slate-200"></div>
-
-                {/* Communication Timeline */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.09 }}
-                >
-                  <CommunicationTimeline />
                 </motion.div>
 
                 {/* Divider */}
