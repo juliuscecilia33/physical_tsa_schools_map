@@ -1553,58 +1553,62 @@ export default function FacilitySidebar({
                       ) : (
                         // View Mode
                         <>
-                          <div className="flex gap-3">
-                            {/* Assigned Photo Thumbnail */}
-                            {note.assigned_photo && (
-                              <div
-                                onClick={() => {
-                                  if (note.assigned_photo?.type === "review") {
-                                    openReviewPhotoViewer(
-                                      note.assigned_photo.reviewIndex!,
-                                      note.assigned_photo.photoIndexInReview!,
-                                    );
-                                  } else if (
-                                    note.assigned_photo?.type === "scraped"
-                                  ) {
-                                    openPhotoViewer(
-                                      note.assigned_photo.scrapedIndex!,
-                                      "additional",
-                                    );
-                                  }
-                                }}
-                                className="relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all cursor-pointer group"
-                              >
-                                <img
-                                  src={
-                                    note.assigned_photo.thumbnail ||
-                                    note.assigned_photo.url
-                                  }
-                                  alt="Note photo"
-                                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                                  referrerPolicy="no-referrer"
-                                />
-                                {note.assigned_photo.type === "review" &&
-                                  note.assigned_photo.reviewRating && (
-                                    <div className="absolute bottom-1 right-1 bg-white/95 backdrop-blur-sm rounded px-1 py-0.5 shadow-sm flex items-center gap-0.5">
-                                      <Star className="w-2.5 h-2.5 fill-yellow-400 text-yellow-400" />
-                                      <span className="text-[10px] font-semibold text-slate-900">
-                                        {note.assigned_photo.reviewRating.toFixed(
-                                          1,
-                                        )}
-                                      </span>
-                                    </div>
-                                  )}
+                          {/* Note Text */}
+                          <p className="text-sm text-slate-700 leading-relaxed mb-3">
+                            {note.note_text}
+                          </p>
+
+                          {/* Assigned Photo */}
+                          {note.assigned_photo && (
+                            <div
+                              onClick={() => {
+                                if (note.assigned_photo?.type === "review") {
+                                  openReviewPhotoViewer(
+                                    note.assigned_photo.reviewIndex!,
+                                    note.assigned_photo.photoIndexInReview!,
+                                  );
+                                } else if (
+                                  note.assigned_photo?.type === "scraped"
+                                ) {
+                                  openPhotoViewer(
+                                    note.assigned_photo.scrapedIndex!,
+                                    "additional",
+                                  );
+                                }
+                              }}
+                              className="mb-3 relative flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all cursor-pointer group"
+                            >
+                              <img
+                                src={
+                                  note.assigned_photo.thumbnail ||
+                                  note.assigned_photo.url
+                                }
+                                alt="Note photo"
+                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                                referrerPolicy="no-referrer"
+                              />
+                              {note.assigned_photo.type === "review" &&
+                                note.assigned_photo.reviewRating && (
+                                  <div className="absolute bottom-1 right-1 bg-white/95 backdrop-blur-sm rounded px-1 py-0.5 shadow-sm flex items-center gap-0.5">
+                                    <Star className="w-2.5 h-2.5 fill-yellow-400 text-yellow-400" />
+                                    <span className="text-[10px] font-semibold text-slate-900">
+                                      {note.assigned_photo.reviewRating.toFixed(
+                                        1,
+                                      )}
+                                    </span>
+                                  </div>
+                                )}
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-1">
+                                <span className="text-white text-[10px] font-medium">
+                                  Click to view
+                                </span>
                               </div>
-                            )}
-                            {/* Note Text */}
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm text-slate-700 leading-relaxed mb-2">
-                                {note.note_text}
-                              </p>
                             </div>
-                          </div>
-                          <div className="flex items-center justify-between mt-2">
-                            <span className="text-xs text-slate-500">
+                          )}
+
+                          {/* Timestamp and Actions */}
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-slate-500 font-medium">
                               {formatRelativeTime(note.created_at)}
                               {note.updated_at !== note.created_at &&
                                 " (edited)"}
