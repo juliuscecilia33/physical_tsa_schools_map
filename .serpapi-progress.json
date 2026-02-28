@@ -1,6 +1,6 @@
 {
-  "processedCount": 1135,
-  "successCount": 1134,
+  "processedCount": 1142,
+  "successCount": 1141,
   "failedCount": 1,
   "skippedCount": 0,
   "processedPlaceIds": [
@@ -1137,13 +1137,20 @@
     "ChIJ1--XONw7TIYRhkyv_PLeV6o",
     "ChIJHaSnpWgbTIYRwe1CQ57RCoA",
     "ChIJAQCQBoHBQIYRl0EFIMDQZl8",
-    "ChIJ_dcAkMVyToYR1FXHO18YlNY"
+    "ChIJ_dcAkMVyToYR1FXHO18YlNY",
+    "ChIJ_5vqUq-HToYRZosgwOR9fxM",
+    "ChIJE_YDI1VOAYcRK3_x8qqmTwc",
+    "ChIJWSbUADRHNoYRfZa04TKtfjI",
+    "ChIJjdezI3-Bb4YR3K4QMaZSAE4",
+    "ChIJ26N3Vpl_ToYRs8Tz3EzJnl8",
+    "ChIJBdEvUy62RIYRUB5JS3AHtGM",
+    "ChIJK6vqnB5a54YR4wKBSPlHOsc"
   ],
-  "lastProcessedIndex": 1134,
-  "apiCallsUsed": 10056,
-  "imagesUploaded": 43109,
-  "imageUploadsFailed": 776,
-  "lastUpdated": "2026-02-28T00:12:05.004Z",
+  "lastProcessedIndex": 1141,
+  "apiCallsUsed": 10116,
+  "imagesUploaded": 43377,
+  "imageUploadsFailed": 778,
+  "lastUpdated": "2026-02-28T00:19:37.680Z",
   "errors": [
     {
       "place_id": "ChIJ4zlj24D53YYRg4_gkRyAxtI",
