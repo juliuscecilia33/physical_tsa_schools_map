@@ -18,7 +18,7 @@ import {
   Plus,
   ChevronLeft,
   ChevronRight,
-  Map,
+  Map as MapIcon,
   Eye,
 } from "lucide-react";
 import { FacilityLightweight } from "@/types/facility";
@@ -206,16 +206,24 @@ function FacilityTable({
 
                 <td className="px-4 py-3 align-top min-w-[180px]">
                   <div className="flex flex-wrap gap-1.5">
-                    {facility.identified_sports?.map((sport) => (
-                      <span
-                        key={sport}
-                        className="text-[10px] bg-blue-50 text-blue-700 font-semibold px-2 py-0.5 rounded uppercase tracking-wide border border-blue-100"
-                      >
-                        {sport}
-                      </span>
-                    ))}
+                    {facility.identified_sports
+                      ?.filter((sport) => {
+                        const score = facility.sport_metadata?.[sport]?.score ?? 0;
+                        return score >= 40;
+                      })
+                      .map((sport) => (
+                        <span
+                          key={sport}
+                          className="text-[10px] bg-blue-50 text-blue-700 font-semibold px-2 py-0.5 rounded uppercase tracking-wide border border-blue-100"
+                        >
+                          {sport}
+                        </span>
+                      ))}
                     {(!facility.identified_sports ||
-                      facility.identified_sports.length === 0) && (
+                      facility.identified_sports.length === 0 ||
+                      facility.identified_sports.filter(
+                        (sport) => (facility.sport_metadata?.[sport]?.score ?? 0) >= 40
+                      ).length === 0) && (
                       <span className="text-xs text-gray-400 italic">
                         No sports
                       </span>
@@ -278,7 +286,7 @@ function FacilityTable({
                       title="View on Map"
                       className="p-2 rounded-lg border border-slate-200 text-slate-700 bg-white hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/20 active:bg-slate-100 cursor-pointer"
                     >
-                      <Map className="h-4 w-4" />
+                      <MapIcon className="h-4 w-4" />
                     </button>
                     <button
                       onClick={(e) => {
@@ -761,10 +769,6 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
   const endIndex = startIndex + itemsPerPage;
   const paginatedFacilities = filteredFacilities.slice(startIndex, endIndex);
 
-  const totalReviews = facilities.reduce(
-    (sum, f) => sum + (f.user_ratings_total || 0),
-    0,
-  );
   const facilitiesWithNotes = facilities.filter((f) => f.has_notes).length;
 
   // Show error state (only for critical errors, not for loading)
@@ -815,24 +819,11 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
             className="space-y-8"
           >
             {/* Metrics Row */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+            <div className="grid grid-cols-2 gap-5">
               <SummaryCard
                 label="Total Facilities"
                 value={facilities.length}
                 icon={Building2}
-              />
-              <SummaryCard
-                label="Avg Rating"
-                value={(
-                  facilities.reduce((sum, f) => sum + (f.rating || 0), 0) /
-                  facilities.length
-                ).toFixed(1)}
-                icon={Star}
-              />
-              <SummaryCard
-                label="Total Reviews"
-                value={totalReviews}
-                icon={Users}
               />
               <SummaryCard
                 label="With Notes"
