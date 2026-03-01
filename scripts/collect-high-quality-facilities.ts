@@ -217,6 +217,76 @@ const SMALL_TEXAS_CITIES = [
   "Navasota, Texas",
 ];
 
+// ===== MEDIUM TEXAS CITIES =====
+// Cities with 50,000-140,000 population not covered in TARGET_CITIES
+// These are major cities that were missing from the original collection
+const MEDIUM_TEXAS_CITIES = [
+  // HOUSTON METRO AREA
+  "The Woodlands, Texas",
+  "Sugar Land, Texas",
+  "Atascocita, Texas",
+  "Baytown, Texas",
+  "Missouri City, Texas",
+  "Spring, Texas",
+  "Texas City, Texas",
+  "Conroe, Texas",
+
+  // DFW METROPLEX
+  "Lewisville, Texas",
+  "Allen, Texas",
+  "Flower Mound, Texas",
+  "Mansfield, Texas",
+  "North Richland Hills, Texas",
+  "Rowlett, Texas",
+  "Euless, Texas",
+  "Wylie, Texas",
+  "Little Elm, Texas",
+  "Burleson, Texas",
+  "Rockwall, Texas",
+  "Grapevine, Texas",
+  "DeSoto, Texas",
+
+  // AUSTIN METRO AREA
+  "Georgetown, Texas",
+  "Cedar Park, Texas",
+  "Leander, Texas",
+  "Pflugerville, Texas",
+  "Kyle, Texas",
+  "San Marcos, Texas",
+
+  // RIO GRANDE VALLEY
+  "Edinburg, Texas",
+  "Mission, Texas",
+  "Pharr, Texas",
+  "Harlingen, Texas",
+
+  // WEST TEXAS
+  "Midland, Texas",
+  "Odessa, Texas",
+  "Abilene, Texas",
+  "San Angelo, Texas",
+
+  // EAST TEXAS
+  "Tyler, Texas",
+  "Longview, Texas",
+
+  // SOUTHEAST TEXAS
+  "Beaumont, Texas",
+  "Port Arthur, Texas",
+
+  // CENTRAL/HILL COUNTRY
+  "New Braunfels, Texas",
+  "Temple, Texas",
+  "Bryan, Texas",
+
+  // NORTH TEXAS
+  "Wichita Falls, Texas",
+
+  // GULF COAST
+  "Galveston, Texas",
+  "Victoria, Texas",
+];
+
 // ===== HIGH-QUALITY SEARCH QUERIES =====
 const HIGH_QUALITY_SEARCHES = [
   // Indoor multi-sport facilities
@@ -271,10 +341,10 @@ const FACILITY_CHAINS = [
   "Velocity Sports Performance",
 ];
 
-// ===== QUALITY THRESHOLDS FOR SMALL TOWNS =====
-const MIN_RATING = 3.5; // Lowered from 4.0 for small towns
-const MIN_REVIEWS = 5; // Lowered from 20 for small towns
-const MIN_COMPLETENESS_SCORE = 25; // Lowered from 50 for small towns
+// ===== QUALITY THRESHOLDS FOR MEDIUM CITIES =====
+const MIN_RATING = 4.0; // Higher standard for larger cities
+const MIN_REVIEWS = 10; // Higher standard for larger cities
+const MIN_COMPLETENESS_SCORE = 40; // Higher standard for larger cities
 const PROXIMITY_THRESHOLD_METERS = 50;
 
 // Quality keywords in facility names
@@ -324,6 +394,7 @@ const HIGH_QUALITY_TYPES = [
   "sports_club",
   "community_center",
   "recreation_center",
+  "sports_facility",
 ];
 
 // ===== SPORT IDENTIFICATION CONSTANTS =====
@@ -402,7 +473,7 @@ interface ProgressState {
 
 const PROGRESS_FILE = path.join(
   __dirname,
-  "../.small-texas-cities-facilities-progress.json",
+  "../.medium-texas-cities-facilities-progress.json",
 );
 
 // ===== HELPER FUNCTIONS =====
@@ -536,9 +607,9 @@ function isHighQualityFacility(place: any): {
     ["sports_complex", "recreation_center", "athletic_field"].includes(type),
   );
 
-  // For small towns: only require higher rating/reviews if NO quality indicators at all
+  // For medium cities: require higher rating/reviews if NO quality indicators
   if (!hasQualityKeyword && !hasMultipleSports && !hasAthletic) {
-    if (place.rating < 4.0 || place.user_ratings_total < 10) {
+    if (place.rating < 4.2 || place.user_ratings_total < 15) {
       return {
         passed: false,
         reason: "No quality indicators and low engagement",
@@ -1058,12 +1129,12 @@ async function processFacilities(
 // ===== MAIN FUNCTION =====
 
 async function collectHighQualityFacilities() {
-  console.log("🚀 Small Texas Cities Athletic Facilities Collection");
+  console.log("🚀 Medium Texas Cities Athletic Facilities Collection");
   console.log("=".repeat(60));
-  console.log(`📊 Target Cities: ${SMALL_TEXAS_CITIES.length}`);
+  console.log(`📊 Target Cities: ${MEDIUM_TEXAS_CITIES.length}`);
   console.log(`🏢 Facility Chains: ${FACILITY_CHAINS.length}`);
   console.log(`🔍 Search Types: ${HIGH_QUALITY_SEARCHES.length}`);
-  console.log(`\n🎯 Quality Criteria (Adjusted for Small Towns):`);
+  console.log(`\n🎯 Quality Criteria (Higher Standards for Medium Cities):`);
   console.log(`   ✓ Minimum rating: ${MIN_RATING}`);
   console.log(`   ✓ Minimum reviews: ${MIN_REVIEWS}`);
   console.log(`   ✓ Minimum completeness: ${MIN_COMPLETENESS_SCORE}/100`);
@@ -1079,7 +1150,7 @@ async function collectHighQualityFacilities() {
   ) {
     console.log(`♻️  Resuming:`);
     console.log(
-      `   Cities: ${progress.processedCities.length}/${SMALL_TEXAS_CITIES.length}`,
+      `   Cities: ${progress.processedCities.length}/${MEDIUM_TEXAS_CITIES.length}`,
     );
     console.log(
       `   Chains: ${progress.processedChains.length}/${FACILITY_CHAINS.length}`,
@@ -1108,15 +1179,15 @@ async function collectHighQualityFacilities() {
   }
 
   // Process cities
-  for (let i = 0; i < SMALL_TEXAS_CITIES.length; i++) {
-    const city = SMALL_TEXAS_CITIES[i];
+  for (let i = 0; i < MEDIUM_TEXAS_CITIES.length; i++) {
+    const city = MEDIUM_TEXAS_CITIES[i];
 
     if (progress.processedCities.includes(city)) {
       continue;
     }
 
     try {
-      await processCity(city, i, SMALL_TEXAS_CITIES.length, progress);
+      await processCity(city, i, MEDIUM_TEXAS_CITIES.length, progress);
       progress.processedCities.push(city);
       saveProgress(progress);
 
@@ -1127,13 +1198,13 @@ async function collectHighQualityFacilities() {
           (progress.processedCities.length + progress.processedChains.length) /
           elapsed;
         const remaining =
-          SMALL_TEXAS_CITIES.length - progress.processedCities.length;
+          MEDIUM_TEXAS_CITIES.length - progress.processedCities.length;
         const eta = remaining / rate;
 
         console.log("\n" + "=".repeat(60));
         console.log("📊 Overall Progress:");
         console.log(
-          `   Cities: ${progress.processedCities.length}/${SMALL_TEXAS_CITIES.length}`,
+          `   Cities: ${progress.processedCities.length}/${MEDIUM_TEXAS_CITIES.length}`,
         );
         console.log(
           `   Chains: ${progress.processedChains.length}/${FACILITY_CHAINS.length}`,
@@ -1168,7 +1239,7 @@ async function collectHighQualityFacilities() {
   console.log("=".repeat(60));
   console.log(`📊 Final Statistics:`);
   console.log(
-    `   Cities Processed: ${progress.processedCities.length}/${SMALL_TEXAS_CITIES.length}`,
+    `   Cities Processed: ${progress.processedCities.length}/${MEDIUM_TEXAS_CITIES.length}`,
   );
   console.log(
     `   Chains Processed: ${progress.processedChains.length}/${FACILITY_CHAINS.length}`,
