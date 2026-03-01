@@ -21,8 +21,7 @@ if (!supabaseUrl || !supabaseAnonKey || !supabaseServiceKey || !serpApiKey) {
   process.exit(1);
 }
 
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
-// Service role client for storage operations (bypasses RLS)
+// Service role client for all operations (bypasses RLS)
 const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
 interface FacilityToEnrich {
@@ -539,7 +538,7 @@ async function updateFacilityWithSerpData(
       updateData.serp_data_id = dataId;
     }
 
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from("sports_facilities")
       .update(updateData)
       .eq("id", facilityId);

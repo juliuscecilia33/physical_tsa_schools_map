@@ -7,13 +7,22 @@ dotenv.config({ path: path.join(__dirname, "../.env.local") });
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 if (!supabaseUrl || !supabaseAnonKey) {
   console.error("❌ Error: Missing required environment variables");
   process.exit(1);
 }
 
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+if (!supabaseServiceKey) {
+  console.error("❌ Error: SUPABASE_SERVICE_ROLE_KEY not found");
+  console.error("   This script requires service role key to bypass RLS policies");
+  console.error("   Add SUPABASE_SERVICE_ROLE_KEY to your .env.local file");
+  process.exit(1);
+}
+
+// Use service role client to bypass RLS policies
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 // Sport keywords organized by sport type (same as identify-facility-sports.ts)
 const SPORT_KEYWORDS = {

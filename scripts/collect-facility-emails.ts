@@ -20,7 +20,7 @@ if (!supabaseUrl || !supabaseAnonKey || !supabaseServiceKey) {
   process.exit(1);
 }
 
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Use service role client to bypass RLS policies
 const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
 interface FacilityToScrape {
@@ -256,7 +256,7 @@ async function processFacilities() {
 
   // Query facilities that need email scraping
   // Conditions: serp_scraped = true, website IS NOT NULL, email_scrape_attempted = false
-  const query = supabase
+  const query = supabaseAdmin
     .from("sports_facilities")
     .select("id, place_id, name, website, address")
     .eq("serp_scraped", true)

@@ -16,16 +16,14 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 if (!supabaseServiceKey) {
-  console.warn("⚠️  Warning: SUPABASE_SERVICE_ROLE_KEY not found");
-  console.warn("   Using anon key instead (may have RLS restrictions)");
+  console.error("❌ Error: SUPABASE_SERVICE_ROLE_KEY not found");
+  console.error("   This script requires service role key to bypass RLS policies");
+  console.error("   Add SUPABASE_SERVICE_ROLE_KEY to your .env.local file");
+  process.exit(1);
 }
 
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
 // Create admin client with service role key (bypasses RLS)
-const supabaseAdmin = supabaseServiceKey
-  ? createClient(supabaseUrl, supabaseServiceKey)
-  : supabase;
+const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
 // The "Scraped by SerpAPI" tag ID
 const SERPAPI_TAG_ID = "e326fe36-5536-4209-87ed-f99528e1d1ee";
