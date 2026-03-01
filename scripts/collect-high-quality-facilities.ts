@@ -373,7 +373,9 @@ const SPORT_KEYWORDS = {
   Bowling: ["bowling"],
   Skating: ["skating", "skate park", "roller"],
   Climbing: ["climbing", "bouldering"],
-  "Water Sports": ["kayak", "canoe", "rowing", "sailing"],
+  Rowing: ["rowing"],
+  Sailing: ["sailing"],
+  "Water Sports": ["kayak", "canoe"],
 };
 
 interface SportMetadata {
@@ -569,19 +571,21 @@ function findMatchingKeywords(
   text: string,
 ): { keywords: string[]; matchedText: string } {
   const keywords = SPORT_KEYWORDS[sport as keyof typeof SPORT_KEYWORDS] || [];
-  const textLower = text.toLowerCase();
   const matched: string[] = [];
   let matchedText = "";
 
   for (const keyword of keywords) {
-    const index = textLower.indexOf(keyword);
-    if (index !== -1) {
+    // Use word boundary regex to match whole words only
+    const regex = new RegExp(`\\b${keyword}\\b`, "i");
+    const match = text.match(regex);
+    if (match) {
       matched.push(keyword);
+      const index = match.index!;
       const start = Math.max(0, index - 20);
-      const end = Math.min(textLower.length, index + keyword.length + 30);
+      const end = Math.min(text.length, index + keyword.length + 30);
       matchedText = text.substring(start, end).trim();
       if (start > 0) matchedText = "..." + matchedText;
-      if (end < textLower.length) matchedText = matchedText + "...";
+      if (end < text.length) matchedText = matchedText + "...";
       break;
     }
   }

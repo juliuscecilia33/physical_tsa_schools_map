@@ -56,7 +56,9 @@ export const SPORT_KEYWORDS = {
   Bowling: ["bowling"],
   Skating: ["skating", "skate park", "roller"],
   Climbing: ["climbing", "bouldering"],
-  "Water Sports": ["kayak", "canoe", "rowing", "sailing"],
+  Rowing: ["rowing"],
+  Sailing: ["sailing"],
+  "Water Sports": ["kayak", "canoe"],
 } as const;
 
 export type SportType = keyof typeof SPORT_KEYWORDS;

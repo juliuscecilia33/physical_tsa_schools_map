@@ -51,7 +51,9 @@ const SPORT_KEYWORDS = {
   Bowling: ["bowling"],
   Skating: ["skating", "skate park", "roller"],
   Climbing: ["climbing", "bouldering"],
-  "Water Sports": ["kayak", "canoe", "rowing", "sailing"],
+  Rowing: ["rowing"],
+  Sailing: ["sailing"],
+  "Water Sports": ["kayak", "canoe"],
 };
 
 interface SportMetadata {
@@ -91,11 +93,13 @@ function findMatchingKeywordsInReview(
   reviewText: string
 ): { keywords: string[]; fullReview: string } {
   const keywords = SPORT_KEYWORDS[sport as keyof typeof SPORT_KEYWORDS] || [];
-  const textLower = reviewText.toLowerCase();
   const matched: string[] = [];
 
   for (const keyword of keywords) {
-    if (textLower.includes(keyword)) {
+    // Use word boundary regex to match whole words only
+    // This prevents "rowing" from matching in "growing" or "throwing"
+    const regex = new RegExp(`\\b${keyword}\\b`, "i");
+    if (regex.test(reviewText)) {
       matched.push(keyword);
     }
   }
