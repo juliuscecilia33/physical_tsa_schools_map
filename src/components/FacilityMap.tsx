@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useMemo, useEffect } from "react";
+import { useRef, useState, useMemo, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Map, { Source, Layer, NavigationControl, Popup } from "react-map-gl";
 import type { MapRef, MapLayerMouseEvent } from "react-map-gl";
@@ -614,6 +614,20 @@ export default function FacilityMap({
     // Open facility sidebar
     setSelectedFacility(facility);
   };
+
+  // Memoize the callback to prevent unnecessary re-renders of FacilitySidebar
+  const handleFacilityDataLoaded = useCallback(
+    (fullFacility: Facility) => {
+      // Update clickedFacility with full data so popup shows correct counts
+      if (
+        clickedFacility &&
+        fullFacility.place_id === clickedFacility.place_id
+      ) {
+        setClickedFacility(fullFacility);
+      }
+    },
+    [clickedFacility]
+  );
 
   return (
     <div className="relative w-full h-screen">
@@ -1370,15 +1384,7 @@ export default function FacilityMap({
           setClickedFacility(null);
         }}
         onUpdateFacility={onUpdateFacility}
-        onFacilityDataLoaded={(fullFacility) => {
-          // Update clickedFacility with full data so popup shows correct counts
-          if (
-            clickedFacility &&
-            fullFacility.place_id === clickedFacility.place_id
-          ) {
-            setClickedFacility(fullFacility);
-          }
-        }}
+        onFacilityDataLoaded={handleFacilityDataLoaded}
       />
 
       {/* AI Search Panel */}

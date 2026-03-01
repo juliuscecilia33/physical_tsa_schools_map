@@ -30,7 +30,7 @@ import {
 import { useState, useEffect, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   updateFacilityNotesFlag,
@@ -126,6 +126,7 @@ export default function CRMFacilityDetailsSidebar({
   placeId,
   onClose,
 }: CRMFacilityDetailsSidebarProps) {
+  const supabase = createClient(); // SSR-compatible Supabase client
   const queryClient = useQueryClient();
   const router = useRouter();
   const contentRef = useRef<HTMLDivElement>(null);
@@ -194,6 +195,14 @@ export default function CRMFacilityDetailsSidebar({
   const [showCreateTagSection, setShowCreateTagSection] = useState(false);
   const [showManageTagsSection, setShowManageTagsSection] = useState(false);
 
+  // Current user state
+  const [currentUser, setCurrentUser] = useState<{
+    id: string;
+    email?: string;
+    display_name?: string;
+    avatar_url?: string;
+  } | null>(null);
+
   // Predefined color palette for tags
   const TAG_COLORS = [
     { name: "TSA Blue", value: "#004aad" },
@@ -207,6 +216,57 @@ export default function CRMFacilityDetailsSidebar({
     { name: "Indigo", value: "#6366f1" },
     { name: "Gray", value: "#6b7280" },
   ];
+
+  // Fetch current user on mount and listen to auth changes
+  useEffect(() => {
+    console.log('[AUTH DEBUG] Setting up auth listener...');
+
+    // Initial session fetch (more reliable than getUser)
+    const initSession = async () => {
+      console.log('[AUTH DEBUG] Fetching initial session...');
+      const { data: { session } } = await supabase.auth.getSession();
+      console.log('[AUTH DEBUG] Initial session:', session);
+      if (session?.user) {
+        setCurrentUser({
+          id: session.user.id,
+          email: session.user.email,
+          display_name: session.user.user_metadata?.full_name,
+          avatar_url: session.user.user_metadata?.avatar_url || session.user.user_metadata?.picture,
+        });
+        console.log('[AUTH DEBUG] User set from initial session:', session.user.id);
+      } else {
+        console.log('[AUTH DEBUG] No session found');
+      }
+    };
+    initSession();
+
+    // CRITICAL: Listen to auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log('[AUTH DEBUG] Auth state changed, event:', _event, 'session:', session);
+
+      // Only update user state if we have a session, or if user explicitly signed out
+      if (session?.user) {
+        setCurrentUser({
+          id: session.user.id,
+          email: session.user.email,
+          display_name: session.user.user_metadata?.full_name,
+          avatar_url: session.user.user_metadata?.avatar_url || session.user.user_metadata?.picture,
+        });
+        console.log('[AUTH DEBUG] User state updated from auth event:', session.user.id);
+      } else if (_event === 'SIGNED_OUT') {
+        setCurrentUser(null);
+        console.log('[AUTH DEBUG] User signed out');
+      } else {
+        console.log('[AUTH DEBUG] Ignoring event with null session:', _event);
+      }
+      // Ignore INITIAL_SESSION with null - keep existing user state
+    });
+
+    return () => {
+      console.log('[AUTH DEBUG] Cleaning up auth listener');
+      subscription.unsubscribe();
+    };
+  }, []);
 
   // Fetch notes when facility changes
   useEffect(() => {
@@ -264,13 +324,29 @@ export default function CRMFacilityDetailsSidebar({
 
   // Add new note
   const handleAddNote = async () => {
+    console.log('[AUTH DEBUG] handleAddNote called, currentUser:', currentUser);
+
     if (!newNoteText.trim() || !facility) return;
 
     setAddingNote(true);
+
+    // Check if user is logged in (using already-loaded currentUser state)
+    if (!currentUser) {
+      console.log('[AUTH DEBUG] currentUser is null/undefined, showing alert');
+      alert("You must be logged in to create a note.");
+      setAddingNote(false);
+      return;
+    }
+
+    console.log('[AUTH DEBUG] currentUser validated, proceeding with note creation');
+
     const tempNote: Note = {
       id: `temp-${Date.now()}`,
       place_id: facility.place_id,
       note_text: newNoteText,
+      created_by: currentUser.id,
+      user_display_name: currentUser.display_name || null,
+      user_avatar_url: currentUser.avatar_url || null,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
@@ -285,6 +361,9 @@ export default function CRMFacilityDetailsSidebar({
         .insert({
           place_id: facility.place_id,
           note_text: newNoteText,
+          created_by: currentUser.id,
+          user_display_name: currentUser.display_name,
+          user_avatar_url: currentUser.avatar_url,
         })
         .select()
         .single();
@@ -1442,28 +1521,64 @@ export default function CRMFacilityDetailsSidebar({
                                 <p className="text-sm text-slate-700 leading-relaxed mb-2">
                                   {note.note_text}
                                 </p>
-                                <div className="flex items-center justify-between">
-                                  <span className="text-xs text-slate-500">
-                                    {formatRelativeTime(note.created_at)}
-                                    {note.updated_at !== note.created_at && " (edited)"}
-                                  </span>
-                                  <div className="flex gap-2">
-                                    <motion.button
-                                      whileHover={{ scale: 1.1 }}
-                                      whileTap={{ scale: 0.9 }}
-                                      onClick={() => handleStartEdit(note)}
-                                      className="p-1 hover:bg-blue-100 rounded text-blue-600 cursor-pointer"
-                                    >
-                                      <Edit2 className="w-3.5 h-3.5" />
-                                    </motion.button>
-                                    <motion.button
-                                      whileHover={{ scale: 1.1 }}
-                                      whileTap={{ scale: 0.9 }}
-                                      onClick={() => handleDeleteNote(note.id)}
-                                      className="p-1 hover:bg-red-100 rounded text-red-600 cursor-pointer"
-                                    >
-                                      <Trash2 className="w-3.5 h-3.5" />
-                                    </motion.button>
+
+                                {/* Creator Info and Actions */}
+                                <div className="space-y-1">
+                                  {/* Creator info with avatar and display name */}
+                                  {note.created_by && (
+                                    <div className="flex items-center gap-2">
+                                      {/* Avatar */}
+                                      {note.user_avatar_url ? (
+                                        <img
+                                          src={note.user_avatar_url}
+                                          alt={note.user_display_name || "User"}
+                                          className="w-6 h-6 rounded-full"
+                                        />
+                                      ) : (
+                                        <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-semibold">
+                                          {(note.user_display_name?.[0] || "U").toUpperCase()}
+                                        </div>
+                                      )}
+                                      {/* Display name */}
+                                      <span className="text-xs text-slate-500">
+                                        {note.user_display_name || "User"}
+                                      </span>
+                                    </div>
+                                  )}
+                                  {!note.created_by && (
+                                    <div className="text-xs text-slate-400 italic">
+                                      Legacy note (no creator)
+                                    </div>
+                                  )}
+
+                                  {/* Timestamp and actions */}
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-xs text-slate-500">
+                                      {formatRelativeTime(note.created_at)}
+                                      {note.updated_at !== note.created_at && " (edited)"}
+                                    </span>
+
+                                    {/* Only show edit/delete if current user is the creator or note is legacy */}
+                                    {(currentUser && (note.created_by === currentUser.id || !note.created_by)) && (
+                                      <div className="flex gap-2">
+                                        <motion.button
+                                          whileHover={{ scale: 1.1 }}
+                                          whileTap={{ scale: 0.9 }}
+                                          onClick={() => handleStartEdit(note)}
+                                          className="p-1 hover:bg-blue-100 rounded text-blue-600 cursor-pointer"
+                                        >
+                                          <Edit2 className="w-3.5 h-3.5" />
+                                        </motion.button>
+                                        <motion.button
+                                          whileHover={{ scale: 1.1 }}
+                                          whileTap={{ scale: 0.9 }}
+                                          onClick={() => handleDeleteNote(note.id)}
+                                          className="p-1 hover:bg-red-100 rounded text-red-600 cursor-pointer"
+                                        >
+                                          <Trash2 className="w-3.5 h-3.5" />
+                                        </motion.button>
+                                      </div>
+                                    )}
                                   </div>
                                 </div>
                               </>

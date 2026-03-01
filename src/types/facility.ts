@@ -96,6 +96,9 @@ export interface Note {
   place_id: string;
   note_text: string;
   assigned_photo?: PhotoReference | null;
+  created_by: string | null; // UUID of the user who created the note (null for legacy notes)
+  user_display_name?: string | null; // Display name of the creator (from Google profile)
+  user_avatar_url?: string | null; // Avatar URL of the creator (from Google profile)
   created_at: string;
   updated_at: string;
 }
