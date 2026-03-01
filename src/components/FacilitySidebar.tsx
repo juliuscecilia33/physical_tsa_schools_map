@@ -235,13 +235,9 @@ export default function FacilitySidebar({
 
   // Fetch current user on mount and listen to auth changes
   useEffect(() => {
-    console.log('[AUTH DEBUG] Setting up auth listener...');
-
-    // Initial session fetch (more reliable than getUser)
+    // Initial session fetch
     const initSession = async () => {
-      console.log('[AUTH DEBUG] Fetching initial session...');
       const { data: { session } } = await supabase.auth.getSession();
-      console.log('[AUTH DEBUG] Initial session:', session);
       if (session?.user) {
         setCurrentUser({
           id: session.user.id,
@@ -249,17 +245,12 @@ export default function FacilitySidebar({
           display_name: session.user.user_metadata?.full_name,
           avatar_url: session.user.user_metadata?.avatar_url || session.user.user_metadata?.picture,
         });
-        console.log('[AUTH DEBUG] User set from initial session:', session.user.id);
-      } else {
-        console.log('[AUTH DEBUG] No session found');
       }
     };
     initSession();
 
-    // CRITICAL: Listen to auth state changes
+    // Listen to auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log('[AUTH DEBUG] Auth state changed, event:', _event, 'session:', session);
-
       // Only update user state if we have a session, or if user explicitly signed out
       if (session?.user) {
         setCurrentUser({
@@ -268,18 +259,12 @@ export default function FacilitySidebar({
           display_name: session.user.user_metadata?.full_name,
           avatar_url: session.user.user_metadata?.avatar_url || session.user.user_metadata?.picture,
         });
-        console.log('[AUTH DEBUG] User state updated from auth event:', session.user.id);
       } else if (_event === 'SIGNED_OUT') {
         setCurrentUser(null);
-        console.log('[AUTH DEBUG] User signed out');
-      } else {
-        console.log('[AUTH DEBUG] Ignoring event with null session:', _event);
       }
-      // Ignore INITIAL_SESSION with null - keep existing user state
     });
 
     return () => {
-      console.log('[AUTH DEBUG] Cleaning up auth listener');
       subscription.unsubscribe();
     };
   }, []);
@@ -421,21 +406,16 @@ export default function FacilitySidebar({
 
   // Add new note
   const handleAddNote = async (noteText: string, selectedPhoto: any) => {
-    console.log('[AUTH DEBUG] handleAddNote called, currentUser:', currentUser);
-
     if (!noteText.trim() || !displayFacility || !facility) return;
 
     setAddingNote(true);
 
-    // Check if user is logged in (using already-loaded currentUser state)
+    // Check if user is logged in
     if (!currentUser) {
-      console.log('[AUTH DEBUG] currentUser is null/undefined, showing alert');
       alert("You must be logged in to create a note.");
       setAddingNote(false);
       return;
     }
-
-    console.log('[AUTH DEBUG] currentUser validated, proceeding with note creation');
 
     // Build assigned_photo object if photo was selected
     let assignedPhotoData: any = null;
@@ -1591,45 +1571,46 @@ export default function FacilitySidebar({
                           )}
 
                           {/* Creator Info, Timestamp and Actions */}
-                          <div className="space-y-1">
-                            {/* Creator info with avatar and display name */}
-                            {note.created_by && (
-                              <div className="flex items-center gap-2">
-                                {/* Avatar */}
-                                {note.user_avatar_url ? (
-                                  <img
-                                    src={note.user_avatar_url}
-                                    alt={note.user_display_name || "User"}
-                                    className="w-6 h-6 rounded-full"
-                                  />
-                                ) : (
-                                  <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-semibold">
-                                    {(note.user_display_name?.[0] || "U").toUpperCase()}
-                                  </div>
-                                )}
-                                {/* Display name */}
-                                <span className="text-xs text-slate-500">
-                                  {note.user_display_name || "User"}
+                          <div className="flex items-center justify-between">
+                            {/* Avatar, name, and timestamp in one row */}
+                            <div className="flex items-center gap-2">
+                              {note.created_by ? (
+                                <>
+                                  {/* Avatar */}
+                                  {note.user_avatar_url ? (
+                                    <img
+                                      src={note.user_avatar_url}
+                                      alt={note.user_display_name || "User"}
+                                      className="w-6 h-6 rounded-full"
+                                      referrerPolicy="no-referrer"
+                                    />
+                                  ) : (
+                                    <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-semibold">
+                                      {(note.user_display_name?.[0] || "U").toUpperCase()}
+                                    </div>
+                                  )}
+                                  {/* Display name */}
+                                  <span className="text-xs text-slate-500">
+                                    {note.user_display_name || "User"}
+                                  </span>
+                                  {/* Dot separator */}
+                                  <span className="text-xs text-slate-400">•</span>
+                                  {/* Timestamp */}
+                                  <span className="text-xs text-slate-500">
+                                    {formatRelativeTime(note.created_at)}
+                                    {note.updated_at !== note.created_at && " (edited)"}
+                                  </span>
+                                </>
+                              ) : (
+                                <span className="text-xs text-slate-400 italic">
+                                  Legacy note • {formatRelativeTime(note.created_at)}
                                 </span>
-                              </div>
-                            )}
-                            {!note.created_by && (
-                              <div className="text-xs text-slate-400 italic">
-                                Legacy note (no creator)
-                              </div>
-                            )}
+                              )}
+                            </div>
 
-                            {/* Timestamp and actions */}
-                            <div className="flex items-center justify-between">
-                              <span className="text-xs text-slate-500 font-medium">
-                                {formatRelativeTime(note.created_at)}
-                                {note.updated_at !== note.created_at &&
-                                  " (edited)"}
-                              </span>
-
-                              {/* Only show edit/delete if current user is the creator or note is legacy */}
-                              {(currentUser && (note.created_by === currentUser.id || !note.created_by)) && (
-                                <div className="flex gap-2">
+                            {/* Edit/Delete actions */}
+                            {(currentUser && (note.created_by === currentUser.id || !note.created_by)) && (
+                              <div className="flex gap-2">
                                   <motion.button
                                     whileHover={{ scale: 1.1 }}
                                     whileTap={{ scale: 0.9 }}
@@ -1648,7 +1629,6 @@ export default function FacilitySidebar({
                                   </motion.button>
                                 </div>
                               )}
-                            </div>
                           </div>
                         </>
                     </motion.div>
