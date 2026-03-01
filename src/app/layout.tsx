@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
 import { ReactQueryProvider } from "@/providers/ReactQueryProvider";
-import NavigationSidebar from "@/components/NavigationSidebar";
-import ViewManager from "@/components/ViewManager";
 import { LoadingProvider } from "@/contexts/LoadingContext";
 import LayoutContent from "@/components/LayoutContent";
 
@@ -40,7 +38,6 @@ export default function RootLayout({
         <ReactQueryProvider>
           <LoadingProvider>
             <LayoutContent>
-              <ViewManager />
               {children}
             </LayoutContent>
           </LoadingProvider>

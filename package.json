@@ -30,6 +30,7 @@
     "@anthropic-ai/sdk": "^0.78.0",
     "@eslint/eslintrc": "^3.3.3",
     "@googlemaps/google-maps-services-js": "^3.4.2",
+    "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.97.0",
     "@tailwindcss/postcss": "^4.2.0",
     "@tanstack/react-query": "^5.90.21",
