@@ -27,6 +27,7 @@ import { useFacilities } from "@/hooks/useFacilities";
 import FiltersSidebar, { FilterState } from "./FiltersSidebar";
 import CRMFacilityDetailsSidebar from "./CRMFacilityDetailsSidebar";
 import SportFacilitiesSidebar from "./SportFacilitiesSidebar";
+import AddFacilitySidebar from "./AddFacilitySidebar";
 import { SkeletonTableRows } from "./SkeletonTableRow";
 import {
   BarChart,
@@ -621,6 +622,7 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
   const [filters, setFilters] = useState<FilterState>(loadFiltersFromStorage);
   const [selectedFacilityId, setSelectedFacilityId] = useState<string | null>(null);
   const [selectedSport, setSelectedSport] = useState<string | null>(null);
+  const [isAddFacilitySidebarOpen, setIsAddFacilitySidebarOpen] = useState(false);
   const { setLoadingComplete } = useLoading();
   const router = useRouter();
 
@@ -875,7 +877,10 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
                       </span>
                     )}
                   </button>
-                  <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-colors shadow-sm active:bg-blue-800">
+                  <button
+                    onClick={() => setIsAddFacilitySidebarOpen(true)}
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-colors shadow-sm active:bg-blue-800"
+                  >
                     <Plus className="h-4 w-4" />
                     Add Facility
                   </button>
@@ -992,6 +997,17 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
         onFacilityClick={(placeId) => {
           setSelectedSport(null); // Close sport sidebar
           setSelectedFacilityId(placeId); // Open facility details
+        }}
+      />
+
+      {/* Add Facility Sidebar */}
+      <AddFacilitySidebar
+        isOpen={isAddFacilitySidebarOpen}
+        onClose={() => setIsAddFacilitySidebarOpen(false)}
+        onSuccess={(placeId) => {
+          setIsAddFacilitySidebarOpen(false);
+          // Optionally open the new facility in details sidebar
+          setSelectedFacilityId(placeId);
         }}
       />
     </div>
