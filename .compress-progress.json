@@ -1,0 +1,325 @@
+{
+  "processedCount": 100,
+  "successCount": 84,
+  "failedCount": 16,
+  "skippedCount": 2,
+  "processedFacilityIds": [
+    "2651e40a-b22d-4b23-9fd7-8ff121dfdd25",
+    "c675e478-4ccb-45bb-ba28-300715a96376",
+    "4a061622-fc06-4b70-92ee-712d0a0f4815",
+    "49350647-41e0-4026-8814-bebe3d391ca3",
+    "35439add-5fc6-4e60-8f6b-75aa94c59d8b",
+    "9e0235ef-4c4a-4c66-905b-a4d89f48450f",
+    "ce67ae5c-185f-442d-94f7-edfb520ec907",
+    "eaa9bbad-6daa-43c5-8482-57a03b68ccbe",
+    "83da94e7-dbad-4539-b59c-c7f42d6bcba8",
+    "0c66d8ae-59d8-4592-be42-992fea0e9bb8",
+    "d68564ad-6226-4c48-9efd-e2a728f5b36e",
+    "b2b97a16-f78a-4d45-afc9-df0e80219a57",
+    "2ccb89fa-2a2d-47dc-9f60-eb7edaff9117",
+    "3076c7da-2dc8-4734-9ed6-b5ce956d2411",
+    "ac58fbcb-372a-4a06-a228-44de40324e01",
+    "fa7c88e2-6886-4281-98fc-2d71344ea322",
+    "c4ceae32-061c-43b8-9f2d-4fd888c4650c",
+    "8b42c857-7cf4-4374-9a6c-203caf67ab3b",
+    "0ed71665-10ed-468f-9922-75811da38bb6",
+    "a9953be9-e41c-4bb3-9002-4f12175eaad1",
+    "812274a8-8831-444c-b73d-044f98b769b2",
+    "1746cce9-18b1-476d-84c2-0de02a767da5",
+    "b28b86f4-0e93-4094-8d6e-a8bdc44d94a9",
+    "2ea817cc-9c76-474c-b6c9-0f7597ab8a88",
+    "b941e364-3a2f-4f25-8ceb-3e8c78f767e2",
+    "8fa1d33f-4e30-4e7c-8596-5775184aba59",
+    "d511510a-b438-4348-bc87-6245f8bdebad",
+    "e00be917-eedc-4e3c-b112-7a2df69dc403",
+    "264591f3-f6e8-4c88-9878-a26f1cdc2ff0",
+    "e1215bbc-7f33-43cb-bb00-dbfa68860205",
+    "5cec4b75-9f15-4473-a80e-4fda51571ef3",
+    "3f9beeec-81b7-4d89-9a89-4c8ca52b1f2a",
+    "e8fb9ec7-7970-4205-9d24-0c2c02d7373e",
+    "5f9724e9-460b-41de-8c1c-e03099b1883b",
+    "15556737-a578-4a30-ad10-5f88dca5491e",
+    "d71278a6-2bfd-4b1e-91e6-52525f004d09",
+    "e2533b45-e446-473e-8434-e1e8a483df81",
+    "8d0de470-40e0-4809-8362-d619980e07b9",
+    "4ed38282-eac1-414a-8a79-5e160007b906",
+    "c462de0e-3acb-4db3-8a02-128f362ae308",
+    "e847bbf5-e840-4450-8bcc-2287dc7b4ddd",
+    "bd27dd6e-cf6d-42b0-8bc6-5d453da7e34b",
+    "848dfda3-91fa-4092-8a68-296454dfe47e",
+    "e81eb6e9-87d5-41ef-b37f-457834f5fc6a",
+    "8ae91cf4-528e-4579-97f6-86e30565f190",
+    "c701bcfb-8f50-4e68-8be0-aa227042204f",
+    "0e739203-f6b1-4afe-ba9a-19db94cf651b",
+    "0da2c8fe-7fc9-488a-9cdf-a3315a182cb1",
+    "c91c39bb-0cad-4efa-b2a9-17e5a883eb90",
+    "38211814-a7ed-441a-be25-9563f09ea602",
+    "e67a5622-e79a-4699-b687-f1da35291d40",
+    "09b3afae-3f93-4079-b507-ddc9a2803765",
+    "c661b7e6-837d-462a-aca4-5f95bb38c979",
+    "f2744ce1-4c30-4de5-8e70-66e953a3b148",
+    "e2865e49-b6c5-4352-bf2b-0898f68a7a39",
+    "1563fa5c-ad40-4643-8faf-95cc97f165f0",
+    "9cb0a283-02fd-4ef3-954e-90bb52e0c0bd",
+    "59b025be-31c9-4561-89c7-1395f5a5bb2d",
+    "87a18b6d-05cc-47a8-9fce-20a57b2ac49d",
+    "5296fe04-270c-4f30-aca7-9d6e12d65e2e",
+    "6dc72abc-87fb-49e6-8b98-cbc665132b04",
+    "b3ac5791-f54d-4e52-8f64-3c8edbaedd61",
+    "4b117ddc-56d3-4d09-9cd5-721c7a399625",
+    "001b2450-71a0-42f0-8130-453d61adc841",
+    "37061b2d-a764-422e-a05b-17be82bddea9",
+    "dbb37d86-b5fe-45d9-a7a4-88e040f94db2",
+    "edac830d-4c9d-4cb7-9e30-44de37ef482c",
+    "5d704544-35d9-4aba-8c68-0333d3a5e938",
+    "9c9a81aa-94ec-4807-88f0-15a0eb010aaa",
+    "e561f311-bac4-41a8-9d27-81de230516d4",
+    "d605c7cd-1d76-4b6a-8a49-ee477f48531e",
+    "6ca6366d-80b3-42ef-9fd4-56a57ee73e9b",
+    "3b931700-c647-471f-9522-5bf8edf76490",
+    "2c40fc92-6a41-42a1-86d7-9dd8a806fcc9",
+    "77dc9c4d-3966-412a-9314-022cfb6c51e3",
+    "a9c14794-e867-4ef8-83b9-56390f7838f6",
+    "8ee88d74-050e-41ef-8c05-b4f7c8ad657c",
+    "5374ae58-6483-44fd-9815-c4bb2ebf9de0",
+    "f59c3fb2-e5cb-49d3-a76e-0fb5b5e6f2ce",
+    "706942dd-1715-4869-86e8-2e7f5906239c",
+    "c6f6d870-dc85-41aa-a5c7-47eba9f85c2e",
+    "9831f2ff-e8e6-4697-8add-fa2ee4befc7f",
+    "a58460ea-ff38-447f-abe3-02fe39bc26c0",
+    "5a7453eb-48fc-48e2-84fe-9b302eec6895"
+  ],
+  "lastProcessedIndex": 101,
+  "imagesProcessed": 3586,
+  "imagesSkipped": 0,
+  "imagesFailed": 32,
+  "totalBytesBefore": 8242256328,
+  "totalBytesAfter": 3258682196,
+  "lastUpdated": "2026-03-02T04:11:40.358Z",
+  "errors": [
+    {
+      "facility_id": "c8861bb6-f825-4d28-a60f-695b1edfef7b",
+      "facility_name": "The La Feria Recreation Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/c8861bb6-f825-4d28-a60f-695b1edfef7b/1772413170003_0.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-02T01:30:00.288Z"
+    },
+    {
+      "facility_id": "c8861bb6-f825-4d28-a60f-695b1edfef7b",
+      "facility_name": "The La Feria Recreation Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/c8861bb6-f825-4d28-a60f-695b1edfef7b/1772413171379_1.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-02T01:30:00.897Z"
+    },
+    {
+      "facility_id": "c8861bb6-f825-4d28-a60f-695b1edfef7b",
+      "facility_name": "The La Feria Recreation Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/c8861bb6-f825-4d28-a60f-695b1edfef7b/1772413172866_2.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-02T01:30:01.440Z"
+    },
+    {
+      "facility_id": "c8861bb6-f825-4d28-a60f-695b1edfef7b",
+      "facility_name": "The La Feria Recreation Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/c8861bb6-f825-4d28-a60f-695b1edfef7b/1772413173783_3.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-02T01:30:02.010Z"
+    },
+    {
+      "facility_id": "c8861bb6-f825-4d28-a60f-695b1edfef7b",
+      "facility_name": "The La Feria Recreation Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/c8861bb6-f825-4d28-a60f-695b1edfef7b/1772413174638_4.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-02T01:30:02.624Z"
+    },
+    {
+      "facility_id": "c8861bb6-f825-4d28-a60f-695b1edfef7b",
+      "facility_name": "The La Feria Recreation Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/c8861bb6-f825-4d28-a60f-695b1edfef7b/1772413176157_5.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-02T01:30:03.044Z"
+    },
+    {
+      "facility_id": "c8861bb6-f825-4d28-a60f-695b1edfef7b",
+      "facility_name": "The La Feria Recreation Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/c8861bb6-f825-4d28-a60f-695b1edfef7b/1772413177864_6.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-02T01:30:03.519Z"
+    },
+    {
+      "facility_id": "c8861bb6-f825-4d28-a60f-695b1edfef7b",
+      "facility_name": "The La Feria Recreation Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/c8861bb6-f825-4d28-a60f-695b1edfef7b/1772413178704_7.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-02T01:30:03.964Z"
+    },
+    {
+      "facility_id": "fe41e2b9-7c1c-4104-893d-75c6c5e3b12e",
+      "facility_name": "Fitness Connection",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/fe41e2b9-7c1c-4104-893d-75c6c5e3b12e/1772229823486_0.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-02T01:31:08.024Z"
+    },
+    {
+      "facility_id": "fe41e2b9-7c1c-4104-893d-75c6c5e3b12e",
+      "facility_name": "Fitness Connection",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/fe41e2b9-7c1c-4104-893d-75c6c5e3b12e/1772229825290_1.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-02T01:31:08.517Z"
+    },
+    {
+      "facility_id": "fe41e2b9-7c1c-4104-893d-75c6c5e3b12e",
+      "facility_name": "Fitness Connection",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/fe41e2b9-7c1c-4104-893d-75c6c5e3b12e/1772229826741_2.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-02T01:31:08.924Z"
+    },
+    {
+      "facility_id": "fe41e2b9-7c1c-4104-893d-75c6c5e3b12e",
+      "facility_name": "Fitness Connection",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/fe41e2b9-7c1c-4104-893d-75c6c5e3b12e/1772229828208_3.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-02T01:31:09.373Z"
+    },
+    {
+      "facility_id": "fe41e2b9-7c1c-4104-893d-75c6c5e3b12e",
+      "facility_name": "Fitness Connection",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/fe41e2b9-7c1c-4104-893d-75c6c5e3b12e/1772229830573_4.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-02T01:31:09.789Z"
+    },
+    {
+      "facility_id": "028cb98a-02c0-4f18-aa60-4801f9c08de4",
+      "facility_name": "Irwin Field",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/028cb98a-02c0-4f18-aa60-4801f9c08de4/1772235485524_20.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-02T01:41:36.480Z"
+    },
+    {
+      "facility_id": "028cb98a-02c0-4f18-aa60-4801f9c08de4",
+      "facility_name": "Irwin Field",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/028cb98a-02c0-4f18-aa60-4801f9c08de4/1772235491227_25.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-02T01:41:45.628Z"
+    },
+    {
+      "facility_id": "5ae1e1f1-60aa-477e-94ac-2b3944e1ec5c",
+      "facility_name": "Angleton Bates Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/5ae1e1f1-60aa-477e-94ac-2b3944e1ec5c/1772235650965_3.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-02T01:47:30.666Z"
+    },
+    {
+      "facility_id": "8b08a83f-f9eb-4952-968a-58f55a1cbd06",
+      "facility_name": "Keller Sports Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/8b08a83f-f9eb-4952-968a-58f55a1cbd06/1772299346184_17.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-02T02:06:08.026Z"
+    },
+    {
+      "facility_id": "c721926a-cacc-4ae8-b667-9a1886dbe186",
+      "facility_name": "Kenneth Hall Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/c721926a-cacc-4ae8-b667-9a1886dbe186/1772212960975_17.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-02T02:13:11.344Z"
+    },
+    {
+      "facility_id": "3e3f93c5-64d7-4d48-b426-6845a19ddc14",
+      "facility_name": "UFCU Disch-Falk Field",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/3e3f93c5-64d7-4d48-b426-6845a19ddc14/1772055232401_14.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-02T02:30:45.278Z"
+    },
+    {
+      "facility_id": "de87118a-2a97-493a-8227-c036576d65f4",
+      "facility_name": "Panola College",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/de87118a-2a97-493a-8227-c036576d65f4/1772342088356_37.jpg",
+      "error": "Failed to upload compressed image",
+      "timestamp": "2026-03-02T02:34:18.172Z"
+    },
+    {
+      "facility_id": "5c052da8-bdc6-4736-a0ce-387cabf882fd",
+      "facility_name": "La Player Soccer League",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/5c052da8-bdc6-4736-a0ce-387cabf882fd/1772321177976_19.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-02T02:49:24.833Z"
+    },
+    {
+      "facility_id": "915bb243-c933-4ff7-8f91-f031875c0b61",
+      "facility_name": "Lucy Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/915bb243-c933-4ff7-8f91-f031875c0b61/1772343416050_31.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-02T03:11:42.417Z"
+    },
+    {
+      "facility_id": "0231ea4a-7fe2-449e-aa66-8c31d7e25685",
+      "facility_name": "Kennedy Softball Complex",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/0231ea4a-7fe2-449e-aa66-8c31d7e25685/1772318983397_21.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-02T03:14:52.078Z"
+    },
+    {
+      "facility_id": "0231ea4a-7fe2-449e-aa66-8c31d7e25685",
+      "facility_name": "Kennedy Softball Complex",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/0231ea4a-7fe2-449e-aa66-8c31d7e25685/1772318996673_33.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-02T03:15:18.425Z"
+    },
+    {
+      "facility_id": "525b4fd7-c8d4-46f3-93e1-6b2305038277",
+      "facility_name": "Meadow Bend Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/525b4fd7-c8d4-46f3-93e1-6b2305038277/1772244416995_30.jpg",
+      "error": "Failed to upload compressed image",
+      "timestamp": "2026-03-02T03:24:02.452Z"
+    },
+    {
+      "facility_id": "0f975f86-87ba-4b40-80f9-9cae62da9e69",
+      "facility_name": "Kittrell Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/0f975f86-87ba-4b40-80f9-9cae62da9e69/1772239219134_17.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-02T03:37:51.141Z"
+    },
+    {
+      "facility_id": "a5b2ec2f-0107-4304-9013-540b865beb26",
+      "facility_name": "Bayside Community Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/a5b2ec2f-0107-4304-9013-540b865beb26/1772252530346_14.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-02T03:52:00.960Z"
+    },
+    {
+      "facility_id": "a5b2ec2f-0107-4304-9013-540b865beb26",
+      "facility_name": "Bayside Community Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/a5b2ec2f-0107-4304-9013-540b865beb26/1772252544253_24.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-02T03:52:24.328Z"
+    },
+    {
+      "facility_id": "22ca243b-7a15-4d80-94f0-ad1a817d2399",
+      "facility_name": "T&C Sports",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/22ca243b-7a15-4d80-94f0-ad1a817d2399/1772247314469_27.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-02T03:55:38.473Z"
+    },
+    {
+      "facility_id": "22ca243b-7a15-4d80-94f0-ad1a817d2399",
+      "facility_name": "T&C Sports",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/22ca243b-7a15-4d80-94f0-ad1a817d2399/1772247319667_32.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-02T03:55:49.366Z"
+    },
+    {
+      "facility_id": "22ca243b-7a15-4d80-94f0-ad1a817d2399",
+      "facility_name": "T&C Sports",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/22ca243b-7a15-4d80-94f0-ad1a817d2399/1772247320952_33.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-02T03:55:50.239Z"
+    },
+    {
+      "facility_id": "cb68b5bd-4d95-4613-b57d-9758eed1196b",
+      "facility_name": "Carrico Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cb68b5bd-4d95-4613-b57d-9758eed1196b/1772302249680_30.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-02T04:02:01.285Z"
+    }
+  ]
+}

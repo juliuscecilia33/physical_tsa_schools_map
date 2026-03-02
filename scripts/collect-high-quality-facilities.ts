@@ -11,13 +11,22 @@ const client = new Client({});
 const GOOGLE_API_KEY = process.env.GOOGLE_PLACES_API_KEY!;
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 if (!GOOGLE_API_KEY || !supabaseUrl || !supabaseAnonKey) {
   console.error("❌ Error: Missing required environment variables");
   process.exit(1);
 }
 
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+if (!supabaseServiceKey) {
+  console.error("❌ Error: SUPABASE_SERVICE_ROLE_KEY not found");
+  console.error("   This script requires service role key to bypass RLS policies");
+  console.error("   Add SUPABASE_SERVICE_ROLE_KEY to your .env.local file");
+  process.exit(1);
+}
+
+// Create admin client with service role key (bypasses RLS)
+const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
 // ===== TARGET CITIES =====
 // Original large cities (already collected - commented out)
@@ -509,7 +518,7 @@ function saveProgress(progress: ProgressState) {
 
 async function facilityExists(placeId: string): Promise<boolean> {
   // Check if facility exists (including cleaned_up facilities)
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from("sports_facilities")
     .select("place_id, cleaned_up")
     .eq("place_id", placeId)
@@ -524,7 +533,7 @@ async function facilityExists(placeId: string): Promise<boolean> {
 }
 
 async function findNearbyFacility(lat: number, lng: number): Promise<boolean> {
-  const { data, error } = await supabase.rpc("find_nearby_facilities", {
+  const { data, error } = await supabaseAdmin.rpc("find_nearby_facilities", {
     lat,
     lng,
     radius_meters: PROXIMITY_THRESHOLD_METERS,
@@ -948,7 +957,7 @@ async function fetchAndValidatePlace(
 
 async function insertFacility(facilityData: any): Promise<boolean> {
   try {
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from("sports_facilities")
       .upsert(facilityData, { onConflict: "place_id" });
 
