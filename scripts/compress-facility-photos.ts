@@ -51,6 +51,8 @@ interface ProgressState {
   imagesProcessed: number;
   imagesSkipped: number;
   imagesFailed: number;
+  deletionsSucceeded: number;
+  deletionsFailed: number;
   totalBytesBefore: number;
   totalBytesAfter: number;
   lastUpdated: string;
@@ -71,7 +73,7 @@ const DRY_RUN = false; // Set to true to preview without making changes
 const WEBP_QUALITY = 80; // Quality setting (0-100)
 const DELAY_BETWEEN_FACILITIES_MS = 500; // Delay between facilities
 const DELAY_BETWEEN_IMAGES_MS = 200; // Delay between images
-const TEST_LIMIT: number | null = 150; // Set to a number to test on limited facilities
+const TEST_LIMIT: number | null = null; // Set to a number to test on limited facilities
 
 // Helper functions
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -79,7 +81,12 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 function loadProgress(): ProgressState {
   if (fs.existsSync(PROGRESS_FILE)) {
     const data = fs.readFileSync(PROGRESS_FILE, "utf-8");
-    return JSON.parse(data);
+    const progress = JSON.parse(data);
+    // Add new fields if they don't exist (for backwards compatibility)
+    if (progress.deletionsSucceeded === undefined)
+      progress.deletionsSucceeded = 0;
+    if (progress.deletionsFailed === undefined) progress.deletionsFailed = 0;
+    return progress;
   }
   return {
     processedCount: 0,
@@ -91,6 +98,8 @@ function loadProgress(): ProgressState {
     imagesProcessed: 0,
     imagesSkipped: 0,
     imagesFailed: 0,
+    deletionsSucceeded: 0,
+    deletionsFailed: 0,
     totalBytesBefore: 0,
     totalBytesAfter: 0,
     lastUpdated: new Date().toISOString(),
@@ -234,26 +243,12 @@ async function compressImageToWebP(imageBuffer: Buffer): Promise<{
 async function uploadCompressedImage(
   originalPath: string,
   compressedBuffer: Buffer,
-): Promise<string | null> {
+): Promise<{ url: string | null; deletionSucceeded: boolean }> {
   try {
     // Generate new path with .webp extension
     const newPath = originalPath.replace(/\.(jpg|jpeg|png|webp)$/i, ".webp");
 
-    // Delete old file first (if different from new path)
-    if (originalPath !== newPath) {
-      const { error: deleteError } = await supabaseAdmin.storage
-        .from(STORAGE_BUCKET)
-        .remove([originalPath]);
-
-      if (deleteError) {
-        console.log(
-          `     ⚠️  Warning: Could not delete old file: ${deleteError.message}`,
-        );
-        // Continue anyway - we'll overwrite with the new file
-      }
-    }
-
-    // Upload compressed image
+    // Upload compressed image first
     const { error } = await supabaseAdmin.storage
       .from(STORAGE_BUCKET)
       .upload(newPath, compressedBuffer, {
@@ -263,7 +258,7 @@ async function uploadCompressedImage(
 
     if (error) {
       console.log(`     ⚠️  Upload error: ${error.message}`);
-      return null;
+      return { url: null, deletionSucceeded: false };
     }
 
     // Get new public URL
@@ -271,10 +266,27 @@ async function uploadCompressedImage(
       .from(STORAGE_BUCKET)
       .getPublicUrl(newPath);
 
-    return urlData.publicUrl;
+    // Now delete old file (only if upload succeeded and files are different)
+    let deletionSucceeded = true;
+    if (originalPath !== newPath) {
+      const { error: deleteError } = await supabaseAdmin.storage
+        .from(STORAGE_BUCKET)
+        .remove([originalPath]);
+
+      if (deleteError) {
+        console.log(
+          `     ❌  Deletion FAILED for ${originalPath}: ${deleteError.message}`,
+        );
+        deletionSucceeded = false;
+      } else {
+        console.log(`     ✓ Deleted original: ${originalPath}`);
+      }
+    }
+
+    return { url: urlData.publicUrl, deletionSucceeded };
   } catch (error: any) {
     console.log(`     ⚠️  Exception during upload: ${error.message}`);
-    return null;
+    return { url: null, deletionSucceeded: false };
   }
 }
 
@@ -363,9 +375,12 @@ async function processImage(
     return { success: true, newUrl: imageUrl, originalSize, compressedSize };
   }
 
-  // Upload compressed image
-  const newUrl = await uploadCompressedImage(storagePath, compressedBuffer);
-  if (!newUrl) {
+  // Upload compressed image and delete original
+  const uploadResult = await uploadCompressedImage(
+    storagePath,
+    compressedBuffer,
+  );
+  if (!uploadResult.url) {
     progress.imagesFailed++;
     progress.errors.push({
       facility_id: facilityId,
@@ -377,10 +392,24 @@ async function processImage(
     return { success: false };
   }
 
-  console.log(`     ✓ Uploaded: ${newUrl.substring(newUrl.length - 40)}`);
+  // Track deletion success/failure
+  if (uploadResult.deletionSucceeded) {
+    progress.deletionsSucceeded++;
+  } else {
+    progress.deletionsFailed++;
+  }
+
+  console.log(
+    `     ✓ Uploaded: ${uploadResult.url.substring(uploadResult.url.length - 40)}`,
+  );
   progress.imagesProcessed++;
 
-  return { success: true, newUrl, originalSize, compressedSize };
+  return {
+    success: true,
+    newUrl: uploadResult.url,
+    originalSize,
+    compressedSize,
+  };
 }
 
 /**
@@ -509,6 +538,8 @@ function printProgressSummary(
   console.log(`   Images Processed: ${progress.imagesProcessed}`);
   console.log(`   Images Skipped: ${progress.imagesSkipped}`);
   console.log(`   Images Failed: ${progress.imagesFailed}`);
+  console.log(`   Deletions Succeeded: ${progress.deletionsSucceeded}`);
+  console.log(`   Deletions Failed: ${progress.deletionsFailed}`);
   console.log("   " + "-".repeat(68));
   console.log(`   Original Size: ${formatBytes(progress.totalBytesBefore)}`);
   console.log(`   Compressed Size: ${formatBytes(progress.totalBytesAfter)}`);
@@ -625,6 +656,8 @@ async function compressFacilityPhotos() {
   console.log(`   Images Processed: ${progress.imagesProcessed}`);
   console.log(`   Images Skipped: ${progress.imagesSkipped}`);
   console.log(`   Images Failed: ${progress.imagesFailed}`);
+  console.log(`   Deletions Succeeded: ${progress.deletionsSucceeded}`);
+  console.log(`   Deletions Failed: ${progress.deletionsFailed}`);
   console.log("   " + "-".repeat(68));
   console.log(
     `   Original Total Size: ${formatBytes(progress.totalBytesBefore)}`,
@@ -659,6 +692,29 @@ async function compressFacilityPhotos() {
 
   console.log("\n✅ All facility photos have been compressed!");
   console.log("=".repeat(70));
+
+  // Warn about deletion failures
+  if (progress.deletionsFailed > 0) {
+    console.log("\n⚠️  IMPORTANT: Deletion Failures Detected!");
+    console.log(
+      `   ${progress.deletionsFailed} original files could not be deleted.`,
+    );
+    console.log("   This means your storage has BOTH old and new files.");
+    console.log("\n   Possible causes:");
+    console.log("   • Storage RLS policies blocking deletions");
+    console.log("   • Permission issues");
+    console.log("   • Temporary S3 errors");
+    console.log("\n   Next steps:");
+    console.log("   1. Check Supabase Storage policies");
+    console.log("   2. Verify service role key has delete permissions");
+    console.log("   3. Wait 24 hours for storage metrics to update");
+    console.log("   4. Run a cleanup script to remove orphaned originals");
+  } else {
+    console.log("\n✅ All original files deleted successfully!");
+    console.log(
+      "   Note: Storage dashboard may take up to 24 hours to reflect space savings.",
+    );
+  }
 
   if (DRY_RUN) {
     console.log("\n🔍 This was a DRY RUN. No changes were made.");

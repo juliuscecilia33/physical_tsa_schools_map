@@ -1,8 +1,8 @@
 {
-  "processedCount": 100,
-  "successCount": 84,
-  "failedCount": 16,
-  "skippedCount": 2,
+  "processedCount": 145,
+  "successCount": 126,
+  "failedCount": 18,
+  "skippedCount": 6,
   "processedFacilityIds": [
     "2651e40a-b22d-4b23-9fd7-8ff121dfdd25",
     "c675e478-4ccb-45bb-ba28-300715a96376",
@@ -87,15 +87,58 @@
     "c6f6d870-dc85-41aa-a5c7-47eba9f85c2e",
     "9831f2ff-e8e6-4697-8add-fa2ee4befc7f",
     "a58460ea-ff38-447f-abe3-02fe39bc26c0",
-    "5a7453eb-48fc-48e2-84fe-9b302eec6895"
+    "5a7453eb-48fc-48e2-84fe-9b302eec6895",
+    "0b9ea830-b6bc-4061-a104-c2a8b1c7029d",
+    "7fb70c47-098c-4cec-89f4-6e993c736f8e",
+    "7b313408-ec07-473b-bd81-3275b5aa1133",
+    "9da72b69-e678-461f-b7cb-51ebcc73c6f9",
+    "f607a601-5d32-4d13-8205-b84e6f24d260",
+    "96516c17-a49b-480c-ab72-6c292755249e",
+    "2d9a31bd-6311-4c7f-a12f-7291ad33c843",
+    "147ed943-b826-4f18-b8f6-fa03964ae65c",
+    "efc76463-341c-42f3-927e-d00c4c3956d2",
+    "b7e27373-0051-4aa7-a4e7-1a359035feaa",
+    "def57f8e-5145-417e-a4c0-5a96276daed1",
+    "32b0767d-b637-467a-8164-9e0ac169a0d6",
+    "dee53e62-f661-4a93-a98b-83c881dfe215",
+    "9069e0dc-ab07-42a3-b8d4-06761cc44066",
+    "41380d8d-eabc-4302-96bc-8c905a5d0230",
+    "6dff51c0-19c2-46f2-a098-b95c63dc3901",
+    "8735fe20-f80e-4368-9854-11961d8d4395",
+    "a19a8e76-20b7-4ef1-89e1-9d421c8038ab",
+    "0996d9a4-a77a-43a0-8f6f-0dd57d7415fd",
+    "9ff865c1-9d72-42d7-a5f1-6f08c0c2082e",
+    "47b74f06-c910-4588-a3dc-4863d9f11fdd",
+    "4dd078e5-3ec7-47a4-acd8-788f1b26cdbf",
+    "2ba9ff50-c9e8-4323-95e9-697dd2cacf35",
+    "678343f0-680d-45af-a465-e906706b9cfc",
+    "bf6573b9-33de-434c-89ed-5a3a4413876a",
+    "cecc8176-0411-464d-b3a6-e5efe5fd8009",
+    "a039d3a3-6e3c-4605-8ebb-127e5fce6094",
+    "4bd36c67-caf7-43eb-8468-c89709e6b919",
+    "4bff42c3-e038-4de3-be1d-612b55b49f96",
+    "8fcaba5d-5a6e-4aab-8d0e-fccafcd97aec",
+    "64400c69-419c-424a-bc5f-9c84003b0b24",
+    "ffc35cde-326e-43a3-a343-37e27b17635d",
+    "da8e7939-068f-4828-b9e3-89b3944e47f4",
+    "19162125-f3f3-49f0-ac2d-a4d79a512d52",
+    "5009e271-4bb6-4cab-8dba-3de6b181e71e",
+    "0094035b-3f2f-4c1d-9612-a3ce77c2f3d5",
+    "c1e49062-8637-4ee1-9886-738016a9d7b0",
+    "2caa664a-f8de-4184-b70a-3342795b69f5",
+    "83b41b43-ef14-4924-a0d0-7e4c1996abf0",
+    "c173d86e-b193-48fd-aa22-887ca7abe75e",
+    "e90879ba-80c8-40d0-80ba-d13848f60f91",
+    "f05168ff-a89c-478d-ad71-6b48a543b403",
+    "67de375a-4867-4d53-9011-7f9c5c4c0a66"
   ],
-  "lastProcessedIndex": 101,
-  "imagesProcessed": 3586,
+  "lastProcessedIndex": 149,
+  "imagesProcessed": 5072,
   "imagesSkipped": 0,
-  "imagesFailed": 32,
-  "totalBytesBefore": 8242256328,
-  "totalBytesAfter": 3258682196,
-  "lastUpdated": "2026-03-02T04:11:40.358Z",
+  "imagesFailed": 38,
+  "totalBytesBefore": 11951864766,
+  "totalBytesAfter": 4734073054,
+  "lastUpdated": "2026-03-02T05:30:20.795Z",
   "errors": [
     {
       "facility_id": "c8861bb6-f825-4d28-a60f-695b1edfef7b",
@@ -320,6 +363,50 @@
       "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cb68b5bd-4d95-4613-b57d-9758eed1196b/1772302249680_30.jpg",
       "error": "Failed to compress image",
       "timestamp": "2026-03-02T04:02:01.285Z"
+    },
+    {
+      "facility_id": "0ebed2fd-094b-4ffb-9d22-ab053a662eb6",
+      "facility_name": "Riverside Community Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/0ebed2fd-094b-4ffb-9d22-ab053a662eb6/1772320585019_2.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-02T04:24:39.407Z"
+    },
+    {
+      "facility_id": "8e7c9712-2cd5-4de0-af89-eb7bb81043be",
+      "facility_name": "Dan Law Field at Rip Griffin Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/8e7c9712-2cd5-4de0-af89-eb7bb81043be/1772319040753_7.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-02T04:43:14.112Z"
+    },
+    {
+      "facility_id": "8e7c9712-2cd5-4de0-af89-eb7bb81043be",
+      "facility_name": "Dan Law Field at Rip Griffin Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/8e7c9712-2cd5-4de0-af89-eb7bb81043be/1772319044543_8.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-02T04:43:24.827Z"
+    },
+    {
+      "facility_id": "8e7c9712-2cd5-4de0-af89-eb7bb81043be",
+      "facility_name": "Dan Law Field at Rip Griffin Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/8e7c9712-2cd5-4de0-af89-eb7bb81043be/1772319064009_19.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-02T04:44:05.361Z"
+    },
+    {
+      "facility_id": "8e7c9712-2cd5-4de0-af89-eb7bb81043be",
+      "facility_name": "Dan Law Field at Rip Griffin Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/8e7c9712-2cd5-4de0-af89-eb7bb81043be/1772319102229_34.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-02T04:45:17.066Z"
+    },
+    {
+      "facility_id": "8e7c9712-2cd5-4de0-af89-eb7bb81043be",
+      "facility_name": "Dan Law Field at Rip Griffin Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/8e7c9712-2cd5-4de0-af89-eb7bb81043be/1772319104348_36.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-02T04:45:20.642Z"
     }
-  ]
+  ],
+  "deletionsSucceeded": 1446,
+  "deletionsFailed": 0
 }
