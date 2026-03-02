@@ -1,8 +1,8 @@
 {
-  "processedCount": 145,
-  "successCount": 126,
-  "failedCount": 18,
-  "skippedCount": 6,
+  "processedCount": 174,
+  "successCount": 153,
+  "failedCount": 20,
+  "skippedCount": 7,
   "processedFacilityIds": [
     "2651e40a-b22d-4b23-9fd7-8ff121dfdd25",
     "c675e478-4ccb-45bb-ba28-300715a96376",
@@ -130,15 +130,42 @@
     "c173d86e-b193-48fd-aa22-887ca7abe75e",
     "e90879ba-80c8-40d0-80ba-d13848f60f91",
     "f05168ff-a89c-478d-ad71-6b48a543b403",
-    "67de375a-4867-4d53-9011-7f9c5c4c0a66"
+    "67de375a-4867-4d53-9011-7f9c5c4c0a66",
+    "8cc987d9-5bbb-495d-bcb5-c7e7a906e1e8",
+    "9da26c85-532d-492f-932e-1bdcede6053b",
+    "76ba2075-720b-4576-ab6b-c6d83ea606a4",
+    "cb55205e-825e-4f42-8d3d-df01fe11bd06",
+    "eed0d4f9-5c75-425f-85e7-61d8d3050eef",
+    "578de981-6862-431f-b90c-483ddbc4ab2a",
+    "d23b8798-6a96-4d48-9eb7-27ae24fd1ded",
+    "8b39b33e-0abd-41b8-8791-cef356f400e7",
+    "1c3d6042-c4e1-4ff4-b588-6b26191e4c89",
+    "fa36520d-e13e-4adb-92f1-67edec9c9a80",
+    "86abd130-853d-4980-ac5b-24f3310c8e80",
+    "108bb916-20c0-4498-917b-56b4f7774638",
+    "e74769d4-1626-42f2-95df-fade1ba15fcc",
+    "e9506376-d0e7-4158-aaff-777d337746c0",
+    "704ff161-3162-49c4-8b81-2f3f2f941436",
+    "51a199e8-9618-4b88-9304-7b1a64b83151",
+    "121ec787-03cc-4976-879d-62ea471317f6",
+    "c0b053ac-97d2-401b-9e5e-97fe10cffe10",
+    "6c047f4f-b8bd-4538-be82-e26c580358fa",
+    "81647d16-10a5-460b-a2e7-c50e2e2f5ae6",
+    "a0753b42-b3a2-4c88-894c-52003a5e58af",
+    "37767ad0-76e5-45b5-af54-2aa9dd96972f",
+    "61557bca-df19-4438-900f-02d823715438",
+    "003a36ec-1c0f-408d-90c0-ed1e5f4e8e5a",
+    "fc532b1a-0967-473f-b460-3e1b8b4af60f",
+    "b61ef75e-8ce9-44f3-a59f-629de5e686a6",
+    "ca975917-475d-4803-9bda-8bebb99e5544"
   ],
-  "lastProcessedIndex": 149,
-  "imagesProcessed": 5072,
+  "lastProcessedIndex": 179,
+  "imagesProcessed": 6093,
   "imagesSkipped": 0,
-  "imagesFailed": 38,
-  "totalBytesBefore": 11951864766,
-  "totalBytesAfter": 4734073054,
-  "lastUpdated": "2026-03-02T05:30:20.795Z",
+  "imagesFailed": 40,
+  "totalBytesBefore": 14544344324,
+  "totalBytesAfter": 5800804346,
+  "lastUpdated": "2026-03-02T06:16:09.155Z",
   "errors": [
     {
       "facility_id": "c8861bb6-f825-4d28-a60f-695b1edfef7b",
@@ -405,8 +432,22 @@
       "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/8e7c9712-2cd5-4de0-af89-eb7bb81043be/1772319104348_36.jpg",
       "error": "Failed to compress image",
       "timestamp": "2026-03-02T04:45:20.642Z"
+    },
+    {
+      "facility_id": "f5ca71bd-7e78-4622-b8b7-f1ee6938f29f",
+      "facility_name": "McPherson Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/f5ca71bd-7e78-4622-b8b7-f1ee6938f29f/1772213327023_18.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-02T05:47:59.891Z"
+    },
+    {
+      "facility_id": "f0950ef3-5377-4b9b-b5e5-9fc860a4436b",
+      "facility_name": "Arden Terrace Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/f0950ef3-5377-4b9b-b5e5-9fc860a4436b/1772304684067_5.jpg",
+      "error": "Failed to upload compressed image",
+      "timestamp": "2026-03-02T06:05:47.521Z"
     }
   ],
-  "deletionsSucceeded": 1446,
+  "deletionsSucceeded": 2467,
   "deletionsFailed": 0
 }
