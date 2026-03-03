@@ -31,7 +31,7 @@ function getDispositionColor(disposition: string | undefined): string {
 }
 
 interface CloseCallsListProps {
-  onCallClick?: (callId: string) => void;
+  onCallClick?: (callId: string, leadId: string | null) => void;
 }
 
 export function CloseCallsList({ onCallClick }: CloseCallsListProps) {
@@ -176,7 +176,7 @@ export function CloseCallsList({ onCallClick }: CloseCallsListProps) {
           {calls.map((call) => (
             <div
               key={call.id}
-              onClick={() => onCallClick?.(call.id)}
+              onClick={() => onCallClick?.(call.id, call.lead_id || null)}
               className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer"
             >
               <div className="flex items-start gap-3">

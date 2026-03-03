@@ -23,7 +23,7 @@ import {
 
 interface CloseCallsTableProps {
   calls: CloseCallActivity[];
-  onCallClick?: (callId: string) => void;
+  onCallClick?: (callId: string, leadId: string | null) => void;
   isLoading?: boolean;
   isSidebarOpen: boolean;
   setIsSidebarOpen: (open: boolean) => void;
@@ -725,7 +725,7 @@ export function CloseCallsTable({ calls, onCallClick, isLoading, isSidebarOpen, 
                 return (
                   <tr
                     key={call.id}
-                    onClick={() => onCallClick?.(call.id)}
+                    onClick={() => onCallClick?.(call.id, call.lead_id || null)}
                     className="hover:bg-gray-50 transition-colors cursor-pointer"
                   >
                     {/* Date/Time */}
