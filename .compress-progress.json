@@ -1,7 +1,7 @@
 {
-  "processedCount": 1117,
-  "successCount": 958,
-  "failedCount": 164,
+  "processedCount": 1152,
+  "successCount": 988,
+  "failedCount": 169,
   "skippedCount": 17,
   "processedFacilityIds": [
     "2651e40a-b22d-4b23-9fd7-8ff121dfdd25",
@@ -964,15 +964,45 @@
     "b22891fa-87d4-4ea4-953e-4a5e1cb9c980",
     "2f5a2ddf-a35c-4a34-b910-f605b9e00365",
     "858642b5-3e20-47e6-8b40-85dcff500d0b",
-    "4bb9bddc-de60-4bc7-bbc8-6dd0b7fbbb07"
+    "4bb9bddc-de60-4bc7-bbc8-6dd0b7fbbb07",
+    "48742214-a4f1-4cbe-8885-8ce279d22463",
+    "4848ba1c-2900-4e3f-a7a1-089958504eab",
+    "23cc6586-44d5-4dce-b617-735d0a982038",
+    "991d6f85-40fb-435d-98ca-9b7ea493daa0",
+    "77150705-fafb-4a95-8615-31949649cf1b",
+    "214c29c1-af9a-4451-b4e5-423ba923bbed",
+    "dafd9934-896f-4c5c-b97a-9f7fbe315542",
+    "73e02521-67ce-4c04-9a79-55f6d85da581",
+    "14fc658c-3918-4f45-9ba9-384dc2dc7aef",
+    "bb5c52c8-234d-4c92-8a56-231d78fba1e1",
+    "01705ea4-686c-4836-8773-39c2b662c9ac",
+    "bd62382f-ff99-4c68-9acf-2960ed3e3a34",
+    "37197224-80ef-48af-a4a6-f822533168d6",
+    "add68279-4173-4b1c-b8fd-7b7eeea54432",
+    "f99aa5ee-7823-49b3-85b6-c24aa82e855e",
+    "c4c86b40-adae-4178-8f5f-fdfb666ee911",
+    "2009a17f-1099-4f08-a513-5f5b0b7ebf25",
+    "197d938f-d654-49d5-96f6-1ecf135b05d2",
+    "36ee300d-8d16-4da2-a3fa-8874b824b2f0",
+    "d36664ac-2f2c-4e03-b7ff-9165371a25b9",
+    "42823bc8-a074-44ae-b36a-c689c7e4fee8",
+    "61820495-6539-4766-b2d1-9b0917af3728",
+    "723c1530-871f-471a-b4ad-212acb40d3c0",
+    "e5029d7d-dfac-4a6e-84e2-6316bec971ad",
+    "9a3eb4de-ee39-4898-bffc-fba87cfe1217",
+    "f35d308f-50f1-4b27-8cd7-3d4dab8b7f79",
+    "9296069c-79d4-400e-a87e-5f5ff743690d",
+    "e544ad38-0821-4cc6-82a9-c5d8fcfe6950",
+    "0b515da8-50a6-42ae-a5da-2c9a30b7f722",
+    "b7f34222-1137-4611-ac49-a3bba8ae7ae1"
   ],
-  "lastProcessedIndex": 1130,
-  "imagesProcessed": 38652,
+  "lastProcessedIndex": 1165,
+  "imagesProcessed": 39995,
   "imagesSkipped": 39,
-  "imagesFailed": 445,
-  "totalBytesBefore": 92875988154,
-  "totalBytesAfter": 37076202658,
-  "lastUpdated": "2026-03-03T17:43:30.556Z",
+  "imagesFailed": 450,
+  "totalBytesBefore": 96410393786,
+  "totalBytesAfter": 38436823294,
+  "lastUpdated": "2026-03-03T18:44:07.312Z",
   "errors": [
     {
       "facility_id": "c8861bb6-f825-4d28-a60f-695b1edfef7b",
@@ -4088,8 +4118,43 @@
       "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/55e65e4b-d4fa-4fd2-837f-18e7443361ca/1772058670801_24.jpg",
       "error": "Failed to download image",
       "timestamp": "2026-03-03T17:17:23.370Z"
+    },
+    {
+      "facility_id": "e662ce9c-b181-41b9-9985-aebc05abe4bb",
+      "facility_name": "Victoria Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/e662ce9c-b181-41b9-9985-aebc05abe4bb/1772046260472_31.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T18:04:01.906Z"
+    },
+    {
+      "facility_id": "ef6c990a-67c6-4846-b271-f82bc9672612",
+      "facility_name": "Sport Unit Benito Juárez",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/ef6c990a-67c6-4846-b271-f82bc9672612/1772054957592_8.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T18:27:10.661Z"
+    },
+    {
+      "facility_id": "3d30cf12-fd4e-4d5b-8cd8-cc0c2a38f6cd",
+      "facility_name": "Cleburne State Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/3d30cf12-fd4e-4d5b-8cd8-cc0c2a38f6cd/1772249429600_16.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T18:34:03.959Z"
+    },
+    {
+      "facility_id": "09482542-1026-42bb-a0d5-456b5d875012",
+      "facility_name": "Thrush Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/09482542-1026-42bb-a0d5-456b5d875012/1772249821905_15.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T18:35:55.398Z"
+    },
+    {
+      "facility_id": "56227eed-5ea4-48f2-a750-b0d2a71323ba",
+      "facility_name": "Heroes Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/56227eed-5ea4-48f2-a750-b0d2a71323ba/1772054083233_30.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T18:43:44.563Z"
     }
   ],
-  "deletionsSucceeded": 35018,
+  "deletionsSucceeded": 36361,
   "deletionsFailed": 8
 }

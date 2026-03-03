@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 import { FacilityTag } from '@/types/facility';
 
 /**
@@ -7,6 +7,8 @@ import { FacilityTag } from '@/types/facility';
  * Returns all tags regardless of whether they're assigned to any facilities
  */
 async function fetchAllTags(): Promise<FacilityTag[]> {
+  const supabase = createClient();
+
   const { data, error } = await supabase
     .from('facility_tags')
     .select('id, name, color, description, created_at, updated_at')

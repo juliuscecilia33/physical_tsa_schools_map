@@ -13,11 +13,10 @@ import {
   Save,
   Loader2,
   AlertCircle,
-  Sparkles,
   Search,
   Building2,
 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { FacilityTag } from "@/types/facility";
 import { getAllSportTypes } from "@/constants/sportKeywords";
@@ -73,6 +72,7 @@ export default function AddFacilitySidebar({
   onSuccess,
 }: AddFacilitySidebarProps) {
   const queryClient = useQueryClient();
+  const supabase = createClient();
 
   // Form state
   const [formData, setFormData] = useState<FormData>({
@@ -160,11 +160,6 @@ export default function AddFacilitySidebar({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
-  const handleGeneratePlaceId = () => {
-    const timestamp = Date.now();
-    const random = Math.random().toString(36).substring(2, 9);
-    setFormData({ ...formData, place_id: `custom_${timestamp}_${random}` });
-  };
 
   const handleToggleSportType = (sportType: string) => {
     setSelectedSportTypes((prev) =>
@@ -198,10 +193,16 @@ export default function AddFacilitySidebar({
     const details = await facilitySearch.selectPrediction(prediction);
 
     if (details) {
-      // Auto-fill all form fields with data from Google Places
+      // Smart name detection: only use if it's not just the address
+      // Leave blank if name is just the street address
+      const isNameJustAddress =
+        details.address.toLowerCase().includes(details.name.toLowerCase()) ||
+        details.name.toLowerCase().includes(details.address.toLowerCase()) ||
+        /^\d+\s/.test(details.name); // Starts with number (likely street address)
+
       setFormData({
         place_id: details.placeId,
-        name: details.name,
+        name: isNameJustAddress ? "" : details.name, // Smart auto-fill
         address: details.address,
         phone: details.phone || "",
         website: details.website || "",
@@ -218,7 +219,7 @@ export default function AddFacilitySidebar({
 
   const validateForm = (): string | null => {
     if (!formData.place_id.trim()) {
-      return "Place ID is required (click Generate Place ID)";
+      return "Place ID is required (search and select a facility from Google Places)";
     }
     if (!formData.name.trim()) {
       return "Facility name is required";
@@ -517,36 +518,6 @@ export default function AddFacilitySidebar({
 
           {/* Divider */}
           <div className="border-t border-slate-200"></div>
-
-          {/* Place ID Generator */}
-          <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">
-              Place ID <span className="text-red-500">*</span>
-            </label>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={formData.place_id}
-                onChange={(e) =>
-                  setFormData({ ...formData, place_id: e.target.value })
-                }
-                placeholder="Click button to generate..."
-                className="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                readOnly
-              />
-              <button
-                type="button"
-                onClick={handleGeneratePlaceId}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors flex items-center gap-2"
-              >
-                <Sparkles className="w-4 h-4" />
-                Generate
-              </button>
-            </div>
-            <p className="mt-1 text-xs text-slate-500">
-              Auto-generate a unique identifier for this facility
-            </p>
-          </div>
 
           {/* Facility Details */}
           <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3">

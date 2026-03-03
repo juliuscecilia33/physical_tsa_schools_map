@@ -9,6 +9,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { getJson } from "serpapi";
 import axios from "axios";
+import sharp from "sharp";
 import { SPORT_KEYWORDS, findMatchingKeywords } from "@/constants/sportKeywords";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -24,6 +25,7 @@ const SERPAPI_TAG_ID = "e326fe36-5536-4209-87ed-f99528e1d1ee"; // "Scraped by Se
 const MAX_PHOTOS = 40;
 const MAX_REVIEWS = 58;
 const DELAY_MS = 500;
+const WEBP_QUALITY = 80; // WebP compression quality (0-100)
 
 // Interfaces
 export interface EnrichmentOptions {
@@ -69,6 +71,59 @@ interface Review {
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
+ * Format bytes for logging
+ */
+function formatBytes(bytes: number): string {
+  if (bytes === 0) return "0 Bytes";
+  const k = 1024;
+  const sizes = ["Bytes", "KB", "MB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+}
+
+/**
+ * Calculate compression ratio for logging
+ */
+function calculateCompressionRatio(before: number, after: number): string {
+  if (before === 0) return "0%";
+  const ratio = ((before - after) / before) * 100;
+  return ratio.toFixed(1) + "%";
+}
+
+/**
+ * Compress image to WebP format using Sharp
+ */
+async function compressImageToWebP(imageBuffer: Buffer): Promise<{
+  buffer: Buffer;
+  originalSize: number;
+  compressedSize: number;
+} | null> {
+  try {
+    const originalSize = imageBuffer.length;
+
+    // Compress to WebP with specified quality
+    const compressedBuffer = await sharp(imageBuffer)
+      .webp({ quality: WEBP_QUALITY })
+      .toBuffer();
+
+    const compressedSize = compressedBuffer.length;
+
+    console.log(
+      `     ✓ Compressed: ${formatBytes(originalSize)} → ${formatBytes(compressedSize)} (${calculateCompressionRatio(originalSize, compressedSize)} reduction)`
+    );
+
+    return {
+      buffer: compressedBuffer,
+      originalSize,
+      compressedSize,
+    };
+  } catch (error: any) {
+    console.log(`     ⚠️  Compression error: ${error.message}`);
+    return null;
+  }
+}
+
+/**
  * Download image from URL and return as Buffer
  */
 async function downloadImage(url: string): Promise<Buffer | null> {
@@ -88,7 +143,7 @@ async function downloadImage(url: string): Promise<Buffer | null> {
 }
 
 /**
- * Upload image to Supabase Storage
+ * Upload image to Supabase Storage (with WebP compression)
  */
 async function uploadImageToStorage(
   facilityId: string,
@@ -97,29 +152,29 @@ async function uploadImageToStorage(
   originalUrl: string
 ): Promise<string | null> {
   try {
-    const urlExtension = originalUrl.match(/\.(jpg|jpeg|png|webp)(\?|$)/i);
-    const extension = urlExtension ? urlExtension[1].toLowerCase() : "jpg";
+    // Compress image to WebP before uploading
+    const compressed = await compressImageToWebP(imageBuffer);
 
+    if (!compressed) {
+      console.log(`     ⚠️  Failed to compress image, skipping upload`);
+      return null;
+    }
+
+    const { buffer: compressedBuffer } = compressed;
+
+    // Always use .webp extension for compressed images
     const timestamp = Date.now();
-    const filename = `${facilityId}/${timestamp}_${index}.${extension}`;
+    const filename = `${facilityId}/${timestamp}_${index}.webp`;
 
-    const contentTypeMap: { [key: string]: string } = {
-      jpg: "image/jpeg",
-      jpeg: "image/jpeg",
-      png: "image/png",
-      webp: "image/webp",
-    };
-    const contentType = contentTypeMap[extension] || "image/jpeg";
-
-    const { data, error } = await supabaseAdmin.storage
+    const { error } = await supabaseAdmin.storage
       .from(STORAGE_BUCKET)
-      .upload(filename, imageBuffer, {
-        contentType,
+      .upload(filename, compressedBuffer, {
+        contentType: "image/webp",
         upsert: false,
       });
 
     if (error) {
-      console.log(`Upload error: ${error.message}`);
+      console.log(`     ⚠️  Upload error: ${error.message}`);
       return null;
     }
 
@@ -129,7 +184,7 @@ async function uploadImageToStorage(
 
     return urlData.publicUrl;
   } catch (error: any) {
-    console.log(`Exception during upload: ${error.message}`);
+    console.log(`     ⚠️  Exception during upload: ${error.message}`);
     return null;
   }
 }
