@@ -14,11 +14,14 @@ import {
   Loader2,
   AlertCircle,
   Sparkles,
+  Search,
+  Building2,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useQueryClient } from "@tanstack/react-query";
 import { FacilityTag } from "@/types/facility";
 import { getAllSportTypes } from "@/constants/sportKeywords";
+import { useFacilitySearch } from "@/hooks/useFacilitySearch";
 
 interface AddFacilitySidebarProps {
   isOpen: boolean;
@@ -103,6 +106,10 @@ export default function AddFacilitySidebar({
   // Available sport types
   const allSportTypes = getAllSportTypes();
 
+  // Google Places Search
+  const [searchInput, setSearchInput] = useState("");
+  const facilitySearch = useFacilitySearch();
+
   // Fetch all tags on mount
   useEffect(() => {
     const fetchTags = async () => {
@@ -147,7 +154,10 @@ export default function AddFacilitySidebar({
       setEnrichmentProgress(null);
       setShowTagSection(false);
       setShowSportTypeDropdown(false);
+      setSearchInput("");
+      facilitySearch.clear();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   const handleGeneratePlaceId = () => {
@@ -180,6 +190,30 @@ export default function AddFacilitySidebar({
 
   const handleRemoveNote = (index: number) => {
     setNotes((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSelectFacility = async (
+    prediction: import("@/hooks/useFacilitySearch").FacilityPrediction
+  ) => {
+    const details = await facilitySearch.selectPrediction(prediction);
+
+    if (details) {
+      // Auto-fill all form fields with data from Google Places
+      setFormData({
+        place_id: details.placeId,
+        name: details.name,
+        address: details.address,
+        phone: details.phone || "",
+        website: details.website || "",
+        location: {
+          lat: details.latitude,
+          lng: details.longitude,
+        },
+      });
+
+      // Clear search input
+      setSearchInput("");
+    }
   };
 
   const validateForm = (): string | null => {
@@ -373,6 +407,116 @@ export default function AddFacilitySidebar({
               </div>
             </motion.div>
           )}
+
+          {/* Google Places Search */}
+          {!facilitySearch.hasApiKey ? (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+              <p className="text-sm text-yellow-800">
+                <strong>Google Places API key not configured.</strong> Search
+                is disabled. Please add NEXT_PUBLIC_GOOGLE_PLACES_API_KEY to
+                your environment variables.
+              </p>
+            </div>
+          ) : (
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                <Search className="w-4 h-4" />
+                Search for Facility
+              </label>
+              <p className="text-xs text-slate-500 mb-3">
+                Search by facility name or address to auto-fill details
+              </p>
+
+              <div className="relative">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                  <input
+                    type="text"
+                    value={searchInput}
+                    onChange={(e) => {
+                      setSearchInput(e.target.value);
+                      facilitySearch.handleInputChange(e.target.value);
+                    }}
+                    onKeyDown={(e) => {
+                      facilitySearch.handleKeyDown(e);
+                      if (
+                        e.key === "Enter" &&
+                        facilitySearch.selectedIndex >= 0 &&
+                        facilitySearch.predictions[
+                          facilitySearch.selectedIndex
+                        ]
+                      ) {
+                        e.preventDefault();
+                        handleSelectFacility(
+                          facilitySearch.predictions[
+                            facilitySearch.selectedIndex
+                          ]
+                        );
+                      }
+                    }}
+                    onBlur={facilitySearch.closePredictions}
+                    placeholder="e.g., Dynamic Prep, DBAT, Lifetime Fitness..."
+                    className="w-full pl-10 pr-10 py-3 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  {facilitySearch.isLoading && (
+                    <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-600 animate-spin" />
+                  )}
+                </div>
+
+                {/* Autocomplete Dropdown */}
+                <AnimatePresence>
+                  {facilitySearch.isOpen &&
+                    facilitySearch.predictions.length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute z-50 w-full mt-2 bg-white border border-slate-300 rounded-xl shadow-lg max-h-80 overflow-y-auto"
+                      >
+                        {facilitySearch.predictions.map((prediction, index) => (
+                          <button
+                            key={prediction.placeId}
+                            type="button"
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              handleSelectFacility(prediction);
+                            }}
+                            className={`w-full px-4 py-3 text-left hover:bg-blue-50 transition-colors border-b border-slate-100 last:border-b-0 ${
+                              index === facilitySearch.selectedIndex
+                                ? "bg-blue-50"
+                                : ""
+                            }`}
+                          >
+                            <div className="flex items-start gap-3">
+                              <Building2 className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-semibold text-slate-900 truncate">
+                                  {prediction.mainText}
+                                </p>
+                                <p className="text-xs text-slate-500 truncate">
+                                  {prediction.secondaryText}
+                                </p>
+                              </div>
+                            </div>
+                          </button>
+                        ))}
+                      </motion.div>
+                    )}
+                </AnimatePresence>
+              </div>
+
+              {/* Search hint */}
+              {searchInput && !facilitySearch.isLoading && facilitySearch.predictions.length === 0 && facilitySearch.isOpen === false && (
+                <p className="text-xs text-slate-500 mt-2">
+                  No results found. Try a different search term or fill the form manually below.
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Divider */}
+          <div className="border-t border-slate-200"></div>
 
           {/* Place ID Generator */}
           <div>

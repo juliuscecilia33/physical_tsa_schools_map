@@ -1,0 +1,32 @@
+{
+  "processedCount": 5,
+  "successCount": 0,
+  "failedCount": 5,
+  "skippedCount": 0,
+  "processedPlaceIds": [
+    "ChIJ8VsZFjcXOIYR7ADc_wS0tx4",
+    "ChIJCQJXqITpQIYRlFewL4fW2xg",
+    "ChIJPZweWM6RVoYR3gTHoj2SqiE",
+    "ChIJE2X3uq-HXIYRhdS2AB2b74c",
+    "ChIJ896QqO_RRIYRVZX_Xwn9neI"
+  ],
+  "lastProcessedIndex": 4,
+  "apiCallsUsed": 3,
+  "totalCost": 0.0007189499999999999,
+  "totalEmailsFound": 0,
+  "lastUpdated": "2026-03-03T01:44:42.455Z",
+  "errors": [
+    {
+      "place_id": "ChIJCQJXqITpQIYRlFewL4fW2xg",
+      "name": "Joe K. Butler Sports Complex",
+      "error": "Could not fetch any content from website",
+      "timestamp": "2026-03-03T01:44:22.543Z"
+    },
+    {
+      "place_id": "ChIJ896QqO_RRIYRVZX_Xwn9neI",
+      "name": "Chisholm Valley Park",
+      "error": "Could not fetch any content from website",
+      "timestamp": "2026-03-03T01:44:42.455Z"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
-  "processedCount": 696,
-  "successCount": 602,
-  "failedCount": 91,
+  "processedCount": 1117,
+  "successCount": 958,
+  "failedCount": 164,
   "skippedCount": 17,
   "processedFacilityIds": [
     "2651e40a-b22d-4b23-9fd7-8ff121dfdd25",
@@ -608,15 +608,371 @@
     "50e00208-e81c-42e1-ad2e-b64bbc76972b",
     "726fb39b-6132-482a-abe2-b0e099e82017",
     "6ae4f372-06b2-4af8-b5f5-e16d7069561e",
-    "ab68e4ff-6e61-48fe-ba6e-0c23c2293d37"
+    "ab68e4ff-6e61-48fe-ba6e-0c23c2293d37",
+    "eebd2859-3ff7-4b07-8ab2-e49c9e3efe26",
+    "90edb63b-c1fc-4bec-a5ee-7f2d964e8992",
+    "f982c0e1-e020-48b9-a4cc-ba1ce8faddd9",
+    "5ef53f71-add3-43e3-afe7-89191b70faf9",
+    "5dd70379-ffb3-488c-8206-ea876f9c6cba",
+    "ecbd46cb-4d47-423a-854e-bfe50d0576d5",
+    "a2459b57-4967-4cbe-85d8-0c8c3fd81822",
+    "e3ffa231-74af-4ef5-bc69-8f2dcdbca1b1",
+    "e223305f-1eb7-45eb-b845-3f42d03af972",
+    "1418da30-e81c-4bde-a86f-ba48ed8d09b0",
+    "cfde42e5-4481-48e5-a602-8cb968a8ed27",
+    "2fc040a7-169d-4aa1-813e-1cb7d7f048ad",
+    "5bd382a0-2e93-4c56-b6b6-0ab39d20f7d0",
+    "0944ab9b-1174-41dd-a5a7-c3cfd4a0657f",
+    "e75e1080-7801-453c-b12d-0b55a951c484",
+    "003d38e1-ae8a-499d-b0f7-51a10484d5ef",
+    "494de1c3-bde5-4f1a-9f89-937137c7cf29",
+    "0e930a30-e2fc-4e1b-a6e7-1f8b02cef8d5",
+    "a8b86451-6f00-4f2e-833f-04cf2dd146dd",
+    "88a601b2-ca7c-4499-b208-19bdd92c4f8a",
+    "03ce0395-847f-42e9-b48d-bacb2d8f6e57",
+    "a7d62f3c-69fd-4028-b7f9-2ec801db4a0b",
+    "dd6953c8-e0da-404d-b806-4bf2f3038cc8",
+    "b9ca9bdb-d47b-4a4e-bd31-44d7ca99e99d",
+    "6c972a93-7f55-4a80-a944-1a60abd4163b",
+    "db6414d4-7af8-43d7-ae34-0fd3efbe9102",
+    "84df826b-7226-4749-b7d2-01013284a560",
+    "057f1750-e70b-4226-a519-60da32ac43ee",
+    "77acb1c0-f399-482c-9e91-3bfa80f7d9c7",
+    "f2243ed8-f41b-4501-b842-dc5f9480f283",
+    "6fef534b-989a-40ef-bc6d-18c3ec97031b",
+    "bbb6c6ff-c597-4673-9140-0a47662729be",
+    "06e21f44-5978-4d87-b5cd-61862156e74d",
+    "9efe8832-1915-4196-990c-b4bb4dc1b51f",
+    "448740a1-2034-475e-8c5f-8cf264b3c7e5",
+    "bc525269-a399-49b6-bee5-857af3c2b17c",
+    "dde94d7e-b1e5-44e6-aeee-053dfa4d0418",
+    "d0529049-6243-4deb-a389-68b4fbad41a1",
+    "fd85e3ed-2d68-4493-b630-f016d9f4719b",
+    "5cef8054-676b-420e-8396-6157907fe5be",
+    "f59a21e7-86bf-462b-90e1-6c745976999e",
+    "8175facc-6777-421a-9629-232245fc943f",
+    "823fa81f-05ef-4123-8b2c-e17c908468eb",
+    "64035a45-d680-4879-8794-70bed1e2f151",
+    "0ee642b0-acc6-4206-a032-5fdf904534d4",
+    "4a95ecbd-041b-41cf-8f85-48ce676f8dfb",
+    "1b7067c4-30fb-4b30-9cdd-f0078f7784ba",
+    "4146c6c1-9f57-411b-8f20-861e28c10839",
+    "6e0b98a2-b3a9-4fc6-b60d-fcd41410fd9a",
+    "a39a84a4-84cf-4790-a21e-8f942d352488",
+    "464f93c8-3d87-4334-a775-89481537fd1a",
+    "0be875dc-3534-4b45-b9bb-ee8532221b41",
+    "3342ee5d-06c0-4f52-b374-82cea0b73f08",
+    "a2809f82-fdae-4364-8660-c536a5be040a",
+    "f3ddc7c9-b19b-4d07-aeb4-9af789e093c9",
+    "f0299306-f2b7-4150-87e7-df0c1867643a",
+    "cc66a158-8a6b-475b-bcaa-4674e83782e7",
+    "92306f8f-3fe7-4fce-a0ae-b6a200a090b2",
+    "7449781b-ab4b-4aa0-b864-cf4c6383a63c",
+    "bd5084c8-0155-47f1-8160-2dc7fa2e77ba",
+    "87dd18ae-f43b-4dba-9071-433637d68303",
+    "288da328-c1e5-471b-b333-981ff1892ee2",
+    "da818b4d-9d6b-4861-b637-dc7a5322064b",
+    "fe379bf6-00a7-499c-8696-8c9e1fdb23a4",
+    "2c617036-87d9-42f1-be54-1bc0ff04af12",
+    "b8418fa5-c05c-43fa-9bff-9af7a222d6c6",
+    "84002d51-afbc-41d6-97a8-7c3896a89c18",
+    "bddd526f-73e7-4d8b-8250-0da25927fe38",
+    "dba309e6-1cb5-442a-9907-0827cb6669f7",
+    "a35e803d-f422-45cb-be3c-d99b1685ccdf",
+    "9dd4b483-4cfd-4f4a-97e2-0fc5ebb85062",
+    "4f9588dc-d069-48b2-96da-fda52cc6d298",
+    "85fcfaf0-0d82-41d6-a546-2254066b60b0",
+    "eb40bf68-4732-4fa6-b8a4-239dceb2e8c7",
+    "a8dc1923-3ed3-4260-8fce-5d00ecdda968",
+    "e72b9243-0953-4099-a78a-4ddb7811712f",
+    "2356d86d-fd3d-4776-ac91-c0298fd47ff4",
+    "3009c578-3ff5-4d31-871a-76864f5d9a85",
+    "4fc828c9-9e4a-450e-9f2d-88ad4d0a1afc",
+    "af23a91a-b942-4a27-886b-a007b8c3f034",
+    "a95f9628-9490-45cf-b7db-a024438f64aa",
+    "dc555c57-2fe9-48a7-b8a5-3bf5203d791c",
+    "d02aa082-43e4-4f0d-b2cf-ba49608aa557",
+    "7993c313-f6b8-4e8c-85ab-03c2772f32c3",
+    "f4af2b5d-6aeb-4bdc-a461-1d40ce92d34b",
+    "ac867741-ead7-4604-a6c1-1156a04ab267",
+    "dc2941ef-355a-43ff-aaed-00a0c54474ed",
+    "737ff7b8-4573-4876-b342-932535985479",
+    "d0f7c0b3-19df-4f1e-b150-1134b508b0e3",
+    "99e1d60a-c06c-49b6-8473-b7f0b15bddf8",
+    "89b591df-9ad4-4093-869b-f399c04df63f",
+    "47012502-845e-4da1-bf82-a8426957fc81",
+    "9eaf5bd1-060d-4bd1-924f-544af5bac2b2",
+    "a8bcacc7-3c66-423a-91b2-a4cbbabe79ae",
+    "22c5b8c2-d376-462b-965f-637b6faa49d7",
+    "a0d7ac17-3d18-43e0-955b-a0aa09d48b1f",
+    "706a0e3b-0c89-4f7b-9756-d5fddaf798c6",
+    "022b1740-0144-4ca7-852d-a8bee77aa86f",
+    "78b82f4a-312e-4842-a348-d1e01856eb0b",
+    "42a296c5-b79d-42ef-b7f6-0ad3e3a94911",
+    "a69acecb-20bb-4605-b94a-ccc8a6a8d9e0",
+    "3617f12d-4158-4345-95bb-b1a4a7fb637a",
+    "cbc25b29-36da-4d72-84ce-b4acea57f8a5",
+    "5d061f96-71ab-48f9-97bc-7deb4b353465",
+    "71d11897-1928-4260-ac6b-d018ded47ddb",
+    "655e4b0c-4a69-449c-875b-5fac66f7f412",
+    "e4e7e633-0623-48e8-ac46-a8428aeb2dd3",
+    "dc3e6930-aeef-4fc7-ad34-624d520b8297",
+    "a705d1a4-bfe7-4655-a937-fd54bf446887",
+    "0cc3a780-9806-456f-856a-7d3c5c371d52",
+    "afaaa267-e5e0-4ae4-a9e9-0685263ae326",
+    "b4302be2-1a24-470c-83d2-1b5c93fd69fa",
+    "6baa6880-ea8d-4900-a54c-a1bc0f638fb9",
+    "957fba69-9693-4fb0-a098-8f9295709156",
+    "1e3c48f7-54cc-42bb-806c-2260a5a1ea26",
+    "37a9af27-4a1d-49d7-9599-58364b2c8227",
+    "9f9187f3-cd61-4272-a681-89e73da4d3c2",
+    "8f8300db-d407-4ec3-b23b-cce8e2231dc2",
+    "2c85f981-cbf7-4ab3-9b68-4a77320ce5d5",
+    "8616bddb-3f57-477a-a112-d7eceab52bad",
+    "f44cb7e3-75e4-4c6c-b1f8-229e7efe4d11",
+    "52bf121b-1d13-4d74-ad51-2b63ce2a87f2",
+    "4e9efb98-a385-4a61-98f2-4d79b723ec06",
+    "1696c603-81c1-4b7e-b1e5-dcc1bfcf121a",
+    "98ad308a-e3e6-4fa0-b512-b2f8c5be3ab5",
+    "d0c2cd35-4c21-48dc-8b85-0e806655f5cc",
+    "a2cc38cd-f687-444f-83d3-c4bc272033df",
+    "eb1a18c6-dbf4-4e15-99c2-6c7898ae172f",
+    "ec4b786b-5c81-410e-9bf9-976b296fd7d9",
+    "dd9c21a7-02b3-43e6-b9e7-139c65ca2d4f",
+    "4a8ba4ab-7326-4091-a93f-0ae0fb7e10c1",
+    "c9af0925-9e0e-4c94-9156-28a318f828fb",
+    "62aa9994-e693-42e8-9d22-6ba4b890ed5d",
+    "e329f897-0510-4aa5-bbf2-f11dca38e512",
+    "4225f4d7-9b49-457a-bb96-b9d7e22abe66",
+    "358dfcb3-5e3f-407f-963f-88e6f01cdacb",
+    "c5c7705b-b575-49fa-847e-6848e6c291d7",
+    "6c427939-bbb3-47a2-9afc-186c02a99701",
+    "c1481c34-e717-4e5d-98cd-78f9c0af7ba5",
+    "d26e793b-36f5-4284-8614-6a19ce021359",
+    "e16d1a23-4429-4a2b-939e-b2b48b2b502e",
+    "4ebbe186-9f7c-4b99-b695-ad732ce88f62",
+    "663d7da0-6820-4ffa-83a5-7793a31cfeff",
+    "20879c72-fcb1-45b0-a23e-1454064a9f7a",
+    "bd8f4efa-2a0b-454b-9da0-db64588af761",
+    "820b6b87-c006-41bf-a6fe-0a5d7029f01f",
+    "e8fbc860-4dab-4e72-bc2c-edaa060d26b6",
+    "fbf67ce9-b590-4197-b8a5-2b8c3fa4cd0a",
+    "9eb00855-8fb0-4737-af6b-0f76e7770863",
+    "ff69040c-ab9d-4eef-b9cb-d3e3a30b7d9a",
+    "309e6631-2061-4d5f-bee0-2b37cc385ba7",
+    "b92d0c6b-9e63-4458-a3b9-b2d84277f6bb",
+    "d2d9da75-05bf-4bab-8841-fb5f8c7bfc74",
+    "670f842b-bb27-4b61-9c5f-7fab4661071e",
+    "cb37375f-166c-407c-aabb-6611ef1160fe",
+    "341f8561-c9bf-4a28-b824-eb284e5de90b",
+    "494edd3a-851a-44d0-a9cb-ace35155b52e",
+    "d7663d4c-8db2-4bb3-8480-5a23d625006d",
+    "b3ca3281-3527-429a-8c15-f5f4470d645a",
+    "c1c7ec58-598f-4cf5-9b2a-2b95c1dc6759",
+    "af056fa2-aeaf-4c01-aa19-e353b0676789",
+    "2d3ed074-ddc5-42e1-bebb-4f008fdee969",
+    "dc4f3fc8-89d2-453e-a748-bc71c2a2459f",
+    "58500cfa-d1a4-48cc-b83b-2020c8fb7a8f",
+    "1ce37ee4-a820-459b-a6ec-d59ab6a0fd33",
+    "dbb773f1-e421-4560-bf9d-ab0b828b733c",
+    "f2b2ecbf-6389-4360-a922-2090cadca1d5",
+    "086708e3-13f5-4fff-91cf-b0b2267b4bf4",
+    "e5e8f27f-1e99-4362-965a-45cf9a4a107b",
+    "f4660cac-0cab-4f15-91e9-8ce2d53782c9",
+    "a73ac49f-8ba2-461d-89a3-4e1e0d8798ac",
+    "48df20ca-162d-4f1b-a33b-d7c9e2a25623",
+    "18b769f5-842a-4eca-85d3-fb147f497a03",
+    "dc2ab005-5d80-4f08-9fee-ef15c9198508",
+    "35bf8ca6-c570-4600-bd0f-9ae06ee8b21a",
+    "2e040614-d910-432f-bdd8-c0181cd2ab25",
+    "99cb29b2-0725-4cca-9cd5-ace50452ac39",
+    "63395524-85ea-40d8-a13e-ec8aaf9f7237",
+    "6d49f7e4-4eba-40c2-8ee8-b45722c79d07",
+    "ba51fd01-40e6-48ac-bcd1-7292dfbe5523",
+    "e5a11075-298d-459a-a9ae-99e37167c022",
+    "edf338df-9817-4aae-9012-6e81b00f37cf",
+    "75143494-7795-44ab-b325-b4e60cbee343",
+    "5a0f8064-53bf-4314-884c-d7276404b133",
+    "76f3d9b3-02fe-4607-a596-467d5ac5665a",
+    "0d9f4165-4c12-4fff-9447-b1e04c278352",
+    "96b13c14-17f7-4446-b123-85dc04b9cead",
+    "dd5c859d-7f56-467e-b452-0b9a60dd6cbb",
+    "747a8cb8-1dd0-46f1-95ca-a604c0505c64",
+    "0834b7c2-1abb-42bd-9a9e-b28dbf8c5b1a",
+    "b19952c0-73c3-4c7f-a15f-52a7989c0cf2",
+    "2c1dea10-b096-4436-b64e-a1b66d493150",
+    "6124b3df-60c0-4dc7-92d0-6e22f028c4cb",
+    "27a4514d-441a-4fe6-a192-6a457a2ddc7f",
+    "b96e33b6-89c8-4a4b-9851-bdadb93875bf",
+    "fdf3a60c-5f4c-48e4-b193-7524071f72b5",
+    "ffccc66f-646b-4462-9f85-591af1ec3bef",
+    "70da64d9-c504-4c71-ae0d-59176a1fb83f",
+    "056d7976-6aba-47ff-a16c-9034e94fbe7c",
+    "83596fe0-6357-4e89-af75-06b2312b8db8",
+    "2548f207-fd52-4205-94f4-8775581c75bc",
+    "1267f85e-e99e-480b-b341-8ba530e22d47",
+    "ca971f35-2b52-49e6-b4a3-039c9d6d0502",
+    "61bb5b07-5c48-4868-9c08-6c620cbfdf69",
+    "ee6b3bae-272b-42a2-878f-380610a8df5f",
+    "a4a8dbd2-755e-415d-8ca3-d60436e2ba93",
+    "e373d977-e4f6-46f0-8562-5815b44e8eb6",
+    "d759d08b-6bcf-4310-839e-5da34238408e",
+    "476b6a3a-500c-4032-8c48-68cf631c17b8",
+    "a44fafef-9836-4710-87ed-8b25ef3e5b2a",
+    "11ce67af-d196-4785-8685-6724e6d5da1a",
+    "3ec98249-e9d4-43f4-800d-5cf7d3d465a1",
+    "6d587aff-e056-4b19-bf2a-18aa00c78ae9",
+    "9b2ee590-365f-477e-b859-48bd43a01a07",
+    "00889f6e-17a9-4bf8-9f3b-19d3e0bb61ad",
+    "beb783ac-24a7-4449-8b17-4dc8699e78c5",
+    "58629e17-4687-4456-8fc1-6c8394dbd9ac",
+    "fee4d459-4abf-4d0f-8103-61ba090c757d",
+    "0c8ff5e7-7f0c-4679-932d-b72c028ec828",
+    "ea5eec68-33a7-4cb3-973f-992eb01ef94b",
+    "10d0ec18-65da-4a23-b1c3-d2b8eccf9452",
+    "ad2f517f-b382-4b5d-a544-88073804ccd9",
+    "cf02d894-b8d4-483d-b738-d82083d1fe6b",
+    "17caf641-cc5c-439a-b4e6-2912bd51a275",
+    "e56a26c5-7c9f-41f3-b6b0-f8558a83b9a6",
+    "2b329cb9-4fa4-473f-b809-7022ba417008",
+    "8f58bb1f-c9bf-414e-9155-b39318887d14",
+    "60dba49c-06ec-4623-81d2-fcdd3e7ee6b3",
+    "81969596-18e9-4141-a0c6-a786231d6664",
+    "6e2f1b03-c494-4d63-8af9-3bdceb9cae45",
+    "ab9234b3-8049-486c-857b-60846be67230",
+    "a3c30f1c-4f87-428d-842c-9ca2f73d01e2",
+    "9e4182e0-82ee-4ebb-be7a-a4004f36ec97",
+    "2991c1fb-703d-4959-af0c-24011c9a5572",
+    "fa5cee99-362e-4e25-a8f1-b834ed1a1e0e",
+    "9efe6937-a357-4ca7-ab33-ad8a77c6fe7d",
+    "6a8be366-5810-45f1-b235-75331712424a",
+    "b0433bfd-970e-4baf-83e5-a61d228ecc02",
+    "e3dd5243-1c17-457f-a064-8388cd56c97e",
+    "cc8fab28-4d57-4e7c-9c90-253d012f5206",
+    "09a383c6-5e87-4ff7-8e73-a0e987698bd8",
+    "19408416-4173-49c1-b323-58ae38d527a0",
+    "4779b598-d319-4652-bc25-651518a145c2",
+    "71262ce8-e1ef-4a5d-83fd-00d40d755701",
+    "09a2e37b-aae5-467e-a381-ac3aa8373ec5",
+    "a4fe6df9-a918-4460-a5b7-684167e062c1",
+    "22e21a4b-17e1-45fb-a314-6ef7aee98e0e",
+    "4228ad28-1d27-48d0-b088-8380f325e2c4",
+    "79878874-f19b-456e-a1fe-81b63e4869fd",
+    "7b4bdb85-c147-4b55-bf88-d9b2bb9bea54",
+    "e64d10f0-8f1c-438a-9053-1b7c45ceae83",
+    "e44255aa-1f59-4dce-b840-101e2b18caea",
+    "d794c4d9-d5e8-4485-b40f-e9f3ac4b9997",
+    "247ebefc-0526-4c0c-a08f-fcd7f2d73ca1",
+    "3e59ff3c-e770-4579-920e-0e5b319b04c6",
+    "c3fecf19-6902-4cfe-bcae-bc290a6fabe9",
+    "142e17da-1676-4a76-a861-a3e67bb92085",
+    "074a2191-2c96-400e-bc52-f093ee3297d8",
+    "a51cfaac-9567-49b9-8de0-59fc683922c9",
+    "efceeb8e-479d-45b6-a47a-2ed994b265c6",
+    "01a50cf1-48da-433f-a49a-55ece892f8e5",
+    "544895dc-9aa0-4f43-9558-96ab9131879a",
+    "9f3030eb-4233-405d-9a02-4f494aba6653",
+    "6df39a0c-e54a-4b5d-921a-3060cda60f91",
+    "d369546d-8b96-4b83-b2c9-675e5f7f21c4",
+    "7e54ad6e-c2a2-4756-89f2-5ad23c7208a5",
+    "67ce4028-9c1f-43c3-a5ee-a18861eaec50",
+    "d8779f9f-0c14-4603-bc55-70eb680686b8",
+    "b0b5911d-bf9e-41f4-bdb6-5a41f317d012",
+    "be87665d-0e0d-4cfb-907d-b3ad508cff4e",
+    "10a66d0f-c09b-4cfb-8a96-879c4f00ec7f",
+    "9c9bb411-1524-4faa-90a9-efdcd96c8755",
+    "3d5ba84a-88be-4c1c-91c7-17d4403bc76d",
+    "42678e4b-78a0-454e-9180-37d86bbde2a0",
+    "3e39c1cd-0341-4525-a24f-607d3852f570",
+    "ef5e58cf-f66b-4c3d-903b-0857ee28a804",
+    "5bd49032-1afe-443f-8a68-979e6ead0bf5",
+    "7d55b1f6-adf7-4b67-8526-2a5410bc2baa",
+    "eee8c723-b5a0-4279-8792-ca163ce18910",
+    "87140294-ceb9-457a-9200-b952a101eb64",
+    "f9654b13-bc38-4a7e-b17f-0949bf951012",
+    "5716237b-9492-483d-b91b-a75251caf77c",
+    "d1bf8b2b-37c6-41a0-8d59-1ced63655c73",
+    "5c3e96c2-dbae-44f4-9f31-7e42d9195d2d",
+    "af38a8dd-2153-4b96-b55d-278abb824036",
+    "e0d754ef-b0e2-4aba-870f-906d385112a7",
+    "ea2b233b-9685-4861-8fce-5291d7b3e414",
+    "d4e38d1a-974d-44a7-9dd3-44caa4705604",
+    "2f6facf3-2056-4eea-8c69-1fc3790a853d",
+    "49c49870-1837-4531-8467-f6b67db57c03",
+    "c39bb9fe-6519-4988-b892-3a24850bd247",
+    "05791afc-8561-41d0-9684-db10b3eb61a5",
+    "a9cbf411-d7b7-4b85-9f2a-fc96951406ae",
+    "3509b6ba-bc46-4235-8ec0-22c52ba874ad",
+    "a253b05f-da41-40e0-84e5-06c162b4ade8",
+    "9a53454f-bad3-4bf3-a308-c45ae6b2589a",
+    "e86c7910-c4bf-47ea-8241-838bb5b1d6b7",
+    "3f455162-fe98-4add-8b84-5d2ad9cadcca",
+    "34e135d2-e105-45bf-892a-1b113bf8d67d",
+    "8b3551dd-ead1-4e75-9f3c-76c99dd4d485",
+    "9b341c1b-a920-4232-91d3-934f94ac8c03",
+    "bce3aef2-8825-4d7e-a631-2fbb98b5189c",
+    "ba31833a-7679-411c-95c1-19c265c12119",
+    "db16db08-29dc-4316-9fcd-bb8582f399fa",
+    "a8298133-3387-4930-85f6-154bf96200eb",
+    "7e4f3e51-0417-467b-9504-6b6166851741",
+    "5bd689d1-02b6-41f9-a642-933e4b9b937c",
+    "8fac83ed-d236-47fa-9122-871ce0da2208",
+    "2df610dc-0652-4971-8bd3-632e548f36d0",
+    "86ba82ee-7270-4e61-b7c4-fb8e3e8a0078",
+    "e90351fb-6358-4886-90c7-420168cf9b2e",
+    "781cbb3b-c69d-4f86-8dd4-f4b3fce3eb7e",
+    "d653e206-b2d2-424d-8ee2-0df86efea3a4",
+    "13a833b3-16eb-41ad-b52a-4d226dc04ca7",
+    "da822408-ef3d-4733-82ce-90fc7cc1adc9",
+    "ac2ed76c-6648-4204-b44d-6ef70df0e6f3",
+    "102b7e64-8f07-4e0c-bdf6-e862e6d94557",
+    "49c229b2-ee23-44d4-af11-6b93d6814fdd",
+    "1cbd33af-7fc6-44c9-8584-46da211fac62",
+    "ef6a445e-14c8-425f-99e8-653334265a11",
+    "0c9a1c56-affa-4ffb-957d-06269290f75f",
+    "d3c9449c-da70-4a88-beb4-075ef2272143",
+    "ce5bb908-343c-4b64-9be2-f767d20f3e61",
+    "6486b167-be3c-4da5-b5c9-5a31b2ffba43",
+    "65104b21-300d-4e67-a5e5-7b7fd132f6cf",
+    "96f2e020-0c63-4b52-be79-12f82c5d01b4",
+    "439a45fd-0291-4fd2-973f-91bf33c46b46",
+    "e8a71d14-f542-44e3-83b0-25abdf74fc73",
+    "119964cc-ca49-4ff7-9b1e-55a3ae81ecf1",
+    "c7dba7e2-d788-4ab1-90c1-f8b628342110",
+    "1786e4f3-9f94-4d66-92bb-ded1d802794d",
+    "45d530dd-43e8-4029-b46a-36737ed2373c",
+    "cf815feb-89c2-4104-be4a-5561356ed90f",
+    "c2983f48-5a4b-4c89-bf7d-f2465569e1af",
+    "19b008c7-e3cc-4319-8d33-349a0765387d",
+    "1f4c62e8-262d-4996-9e97-d7fa96a82d29",
+    "8e20b832-c5b2-4d33-b3ce-10c1f2c4b5a1",
+    "3784fbfa-ec27-4f49-b0e3-566bbf97340c",
+    "3522edba-cb7d-4e98-bd15-52eb19d6b7ed",
+    "da0c3a08-aa69-465f-b6b3-709d990b4d79",
+    "dd1e93cc-9d8b-4be5-9502-c763e032e274",
+    "b025c3b8-65cb-4da7-b945-13646a7f4a51",
+    "2e6abe9a-89b1-48ad-99ef-7eca0e6771a5",
+    "b32f5daf-0e2e-473e-a9b4-4872a915257b",
+    "1730a46a-1ec1-48e8-946b-6badcd163543",
+    "db5e81d2-4997-4977-b443-908a29fe5f56",
+    "57ba5f4e-8a2e-49b2-a6ec-34b6112dfba1",
+    "c16f933f-0fcd-4542-b2e6-e9b103e3c01e",
+    "a61f1744-415b-4396-8eaf-5738d23e4c20",
+    "d762b65c-e100-44a4-9953-2696d4ed58f2",
+    "1cf7ab60-0bb4-49da-8817-017e46cf3898",
+    "5dadf7c0-a739-488a-9cb8-631bdb860aa4",
+    "b22891fa-87d4-4ea4-953e-4a5e1cb9c980",
+    "2f5a2ddf-a35c-4a34-b910-f605b9e00365",
+    "858642b5-3e20-47e6-8b40-85dcff500d0b",
+    "4bb9bddc-de60-4bc7-bbc8-6dd0b7fbbb07"
   ],
-  "lastProcessedIndex": 709,
-  "imagesProcessed": 23286,
+  "lastProcessedIndex": 1130,
+  "imagesProcessed": 38652,
   "imagesSkipped": 39,
-  "imagesFailed": 130,
-  "totalBytesBefore": 55391059960,
-  "totalBytesAfter": 22243870754,
-  "lastUpdated": "2026-03-03T01:15:22.326Z",
+  "imagesFailed": 445,
+  "totalBytesBefore": 92875988154,
+  "totalBytesAfter": 37076202658,
+  "lastUpdated": "2026-03-03T17:43:30.556Z",
   "errors": [
     {
       "facility_id": "c8861bb6-f825-4d28-a60f-695b1edfef7b",
@@ -1527,8 +1883,2213 @@
       "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/19c5ddd7-82c2-4a0f-9548-890f2dc9f301/1772223957766_24.jpg",
       "error": "Failed to compress image",
       "timestamp": "2026-03-03T01:14:30.186Z"
+    },
+    {
+      "facility_id": "feb3ea1e-3d17-404f-8a31-1b9b5a15cf59",
+      "facility_name": "Fire Station Skate Plaza",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/feb3ea1e-3d17-404f-8a31-1b9b5a15cf59/1772238100102_24.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T01:29:03.147Z"
+    },
+    {
+      "facility_id": "15012d36-7ac7-47d8-a9b9-5489ea952b57",
+      "facility_name": "Pickrell Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/15012d36-7ac7-47d8-a9b9-5489ea952b57/1772055040991_28.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T01:37:52.386Z"
+    },
+    {
+      "facility_id": "e445ced0-2cba-45be-afc9-759e15abc2d1",
+      "facility_name": "Wildcat Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/e445ced0-2cba-45be-afc9-759e15abc2d1/1772224244603_8.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T01:40:12.190Z"
+    },
+    {
+      "facility_id": "074515b8-54ca-4152-93e2-1f0d9ff5fdfc",
+      "facility_name": "Wells Point Sports Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/074515b8-54ca-4152-93e2-1f0d9ff5fdfc/1772238525665_32.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T01:43:06.772Z"
+    },
+    {
+      "facility_id": "d5ff63fb-1d98-43ad-9171-b63108084c43",
+      "facility_name": "Five Mile Dam Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d5ff63fb-1d98-43ad-9171-b63108084c43/1772055632166_8.jpg",
+      "error": "Failed to upload compressed image",
+      "timestamp": "2026-03-03T01:59:23.693Z"
+    },
+    {
+      "facility_id": "d5ff63fb-1d98-43ad-9171-b63108084c43",
+      "facility_name": "Five Mile Dam Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d5ff63fb-1d98-43ad-9171-b63108084c43/1772055633131_9.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:15.452Z"
+    },
+    {
+      "facility_id": "d5ff63fb-1d98-43ad-9171-b63108084c43",
+      "facility_name": "Five Mile Dam Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d5ff63fb-1d98-43ad-9171-b63108084c43/1772055634573_10.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:15.658Z"
+    },
+    {
+      "facility_id": "d5ff63fb-1d98-43ad-9171-b63108084c43",
+      "facility_name": "Five Mile Dam Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d5ff63fb-1d98-43ad-9171-b63108084c43/1772055635830_11.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:15.863Z"
+    },
+    {
+      "facility_id": "d5ff63fb-1d98-43ad-9171-b63108084c43",
+      "facility_name": "Five Mile Dam Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d5ff63fb-1d98-43ad-9171-b63108084c43/1772055637412_12.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:16.071Z"
+    },
+    {
+      "facility_id": "d5ff63fb-1d98-43ad-9171-b63108084c43",
+      "facility_name": "Five Mile Dam Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d5ff63fb-1d98-43ad-9171-b63108084c43/1772055638459_13.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:16.279Z"
+    },
+    {
+      "facility_id": "d5ff63fb-1d98-43ad-9171-b63108084c43",
+      "facility_name": "Five Mile Dam Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d5ff63fb-1d98-43ad-9171-b63108084c43/1772055639481_14.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:16.484Z"
+    },
+    {
+      "facility_id": "d5ff63fb-1d98-43ad-9171-b63108084c43",
+      "facility_name": "Five Mile Dam Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d5ff63fb-1d98-43ad-9171-b63108084c43/1772055641096_15.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:16.692Z"
+    },
+    {
+      "facility_id": "d5ff63fb-1d98-43ad-9171-b63108084c43",
+      "facility_name": "Five Mile Dam Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d5ff63fb-1d98-43ad-9171-b63108084c43/1772055642493_16.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:16.897Z"
+    },
+    {
+      "facility_id": "d5ff63fb-1d98-43ad-9171-b63108084c43",
+      "facility_name": "Five Mile Dam Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d5ff63fb-1d98-43ad-9171-b63108084c43/1772055643905_17.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:17.104Z"
+    },
+    {
+      "facility_id": "d5ff63fb-1d98-43ad-9171-b63108084c43",
+      "facility_name": "Five Mile Dam Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d5ff63fb-1d98-43ad-9171-b63108084c43/1772055645383_18.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:17.309Z"
+    },
+    {
+      "facility_id": "d5ff63fb-1d98-43ad-9171-b63108084c43",
+      "facility_name": "Five Mile Dam Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d5ff63fb-1d98-43ad-9171-b63108084c43/1772055647154_19.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:17.517Z"
+    },
+    {
+      "facility_id": "d5ff63fb-1d98-43ad-9171-b63108084c43",
+      "facility_name": "Five Mile Dam Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d5ff63fb-1d98-43ad-9171-b63108084c43/1772055648105_20.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:17.720Z"
+    },
+    {
+      "facility_id": "d5ff63fb-1d98-43ad-9171-b63108084c43",
+      "facility_name": "Five Mile Dam Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d5ff63fb-1d98-43ad-9171-b63108084c43/1772055649257_21.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:17.924Z"
+    },
+    {
+      "facility_id": "d5ff63fb-1d98-43ad-9171-b63108084c43",
+      "facility_name": "Five Mile Dam Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d5ff63fb-1d98-43ad-9171-b63108084c43/1772055650459_22.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:18.128Z"
+    },
+    {
+      "facility_id": "d5ff63fb-1d98-43ad-9171-b63108084c43",
+      "facility_name": "Five Mile Dam Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d5ff63fb-1d98-43ad-9171-b63108084c43/1772055651594_23.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:18.332Z"
+    },
+    {
+      "facility_id": "d5ff63fb-1d98-43ad-9171-b63108084c43",
+      "facility_name": "Five Mile Dam Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d5ff63fb-1d98-43ad-9171-b63108084c43/1772055652929_24.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:18.537Z"
+    },
+    {
+      "facility_id": "d5ff63fb-1d98-43ad-9171-b63108084c43",
+      "facility_name": "Five Mile Dam Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d5ff63fb-1d98-43ad-9171-b63108084c43/1772055653979_25.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:18.743Z"
+    },
+    {
+      "facility_id": "d5ff63fb-1d98-43ad-9171-b63108084c43",
+      "facility_name": "Five Mile Dam Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d5ff63fb-1d98-43ad-9171-b63108084c43/1772055655348_26.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:18.951Z"
+    },
+    {
+      "facility_id": "d5ff63fb-1d98-43ad-9171-b63108084c43",
+      "facility_name": "Five Mile Dam Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d5ff63fb-1d98-43ad-9171-b63108084c43/1772055657387_27.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:19.158Z"
+    },
+    {
+      "facility_id": "d5ff63fb-1d98-43ad-9171-b63108084c43",
+      "facility_name": "Five Mile Dam Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d5ff63fb-1d98-43ad-9171-b63108084c43/1772055658454_28.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:19.363Z"
+    },
+    {
+      "facility_id": "d5ff63fb-1d98-43ad-9171-b63108084c43",
+      "facility_name": "Five Mile Dam Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d5ff63fb-1d98-43ad-9171-b63108084c43/1772055659579_29.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:19.570Z"
+    },
+    {
+      "facility_id": "d5ff63fb-1d98-43ad-9171-b63108084c43",
+      "facility_name": "Five Mile Dam Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d5ff63fb-1d98-43ad-9171-b63108084c43/1772055661287_30.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:19.778Z"
+    },
+    {
+      "facility_id": "d5ff63fb-1d98-43ad-9171-b63108084c43",
+      "facility_name": "Five Mile Dam Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d5ff63fb-1d98-43ad-9171-b63108084c43/1772055662853_31.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:19.986Z"
+    },
+    {
+      "facility_id": "d5ff63fb-1d98-43ad-9171-b63108084c43",
+      "facility_name": "Five Mile Dam Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d5ff63fb-1d98-43ad-9171-b63108084c43/1772055664903_32.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:20.194Z"
+    },
+    {
+      "facility_id": "d5ff63fb-1d98-43ad-9171-b63108084c43",
+      "facility_name": "Five Mile Dam Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d5ff63fb-1d98-43ad-9171-b63108084c43/1772055665882_33.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:20.401Z"
+    },
+    {
+      "facility_id": "d5ff63fb-1d98-43ad-9171-b63108084c43",
+      "facility_name": "Five Mile Dam Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d5ff63fb-1d98-43ad-9171-b63108084c43/1772055666860_34.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:20.605Z"
+    },
+    {
+      "facility_id": "d5ff63fb-1d98-43ad-9171-b63108084c43",
+      "facility_name": "Five Mile Dam Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d5ff63fb-1d98-43ad-9171-b63108084c43/1772055672287_36.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:20.812Z"
+    },
+    {
+      "facility_id": "d5ff63fb-1d98-43ad-9171-b63108084c43",
+      "facility_name": "Five Mile Dam Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d5ff63fb-1d98-43ad-9171-b63108084c43/1772055673927_37.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:21.019Z"
+    },
+    {
+      "facility_id": "d5ff63fb-1d98-43ad-9171-b63108084c43",
+      "facility_name": "Five Mile Dam Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d5ff63fb-1d98-43ad-9171-b63108084c43/1772055675121_38.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:21.227Z"
+    },
+    {
+      "facility_id": "d5ff63fb-1d98-43ad-9171-b63108084c43",
+      "facility_name": "Five Mile Dam Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d5ff63fb-1d98-43ad-9171-b63108084c43/1772055676189_39.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:21.434Z"
+    },
+    {
+      "facility_id": "28f3d102-cab2-46e4-8bd3-13727e3df8f3",
+      "facility_name": "Crossroads SportsCenter",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/28f3d102-cab2-46e4-8bd3-13727e3df8f3/1772224229971_0.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:21.951Z"
+    },
+    {
+      "facility_id": "28f3d102-cab2-46e4-8bd3-13727e3df8f3",
+      "facility_name": "Crossroads SportsCenter",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/28f3d102-cab2-46e4-8bd3-13727e3df8f3/1772224230855_1.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:22.158Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055901200_0.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:22.670Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055902612_1.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:22.875Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055903475_2.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:23.084Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055910191_4.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:23.292Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055911209_5.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:23.497Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055912734_6.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:23.703Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055913911_7.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:23.908Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055914941_8.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:24.116Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055916094_9.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:24.323Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055917088_10.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:24.531Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055918478_11.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:24.738Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055919507_12.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:24.944Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055920472_13.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:25.152Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055921643_14.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:25.359Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055923167_15.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:25.565Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055924271_16.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:25.769Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055925375_17.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:25.976Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055926779_18.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:26.183Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055928267_19.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:26.391Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055929383_20.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:26.599Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055930244_21.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:26.803Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055931273_22.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:27.011Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055932589_23.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:27.220Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055933790_24.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:27.426Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055935551_25.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:27.634Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055936938_26.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:27.841Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055937885_27.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:28.050Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055939263_28.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:28.258Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055940515_29.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:28.465Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055941994_30.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:28.674Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055943583_31.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:28.882Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055944703_32.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:29.092Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055945739_33.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:29.300Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055946935_34.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:29.507Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055948123_35.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:29.714Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055949433_36.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:29.920Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055951065_37.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:30.128Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055952517_38.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:30.336Z"
+    },
+    {
+      "facility_id": "741046cc-c7d7-48dc-b517-1f32a848ccac",
+      "facility_name": "Converse North Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/741046cc-c7d7-48dc-b517-1f32a848ccac/1772055953974_39.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:30.543Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772055976145_0.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:31.054Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772055977377_1.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:31.261Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772055978685_2.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:31.465Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772055980031_3.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:31.674Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772055981370_4.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:31.883Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772055982427_5.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:32.092Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772055983678_6.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:32.301Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772055984590_7.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:32.505Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772055985822_8.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:32.711Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772055986897_9.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:32.919Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772055987801_10.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:33.126Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772055989190_11.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:33.335Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772055990259_12.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:33.542Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772055991126_13.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:33.750Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772055992362_14.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:33.956Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772055993426_15.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:34.165Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772055994737_16.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:34.373Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772055995871_17.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:00:34.582Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772055997712_18.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:16:35.619Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772055998771_19.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:16:35.822Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772055999954_20.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:16:36.028Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772056000943_21.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:16:36.243Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772056001853_22.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:16:36.449Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772056002881_23.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:16:36.655Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772056003873_24.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:16:36.862Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772056005291_25.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:16:37.070Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772056006641_26.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:16:37.278Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772056007562_27.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:16:37.487Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772056008549_28.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:16:37.694Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772056009898_29.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:16:37.902Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772056011152_30.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:16:38.111Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772056012227_31.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:16:38.317Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772056013599_32.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:16:38.524Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772056014499_33.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:16:38.730Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772056015406_34.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:16:38.933Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772056016111_35.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:16:39.142Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772056017445_36.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:16:39.348Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772056018527_37.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:16:39.557Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772056020610_38.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:16:39.766Z"
+    },
+    {
+      "facility_id": "af36b733-81b4-449e-8765-eb8ff77d8ee4",
+      "facility_name": "Ernesto Gamez Cascade Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af36b733-81b4-449e-8765-eb8ff77d8ee4/1772056021619_39.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:16:39.975Z"
+    },
+    {
+      "facility_id": "56a8bc09-1967-42d2-ba6e-5b5b32a4e556",
+      "facility_name": "Level Up Golf",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/56a8bc09-1967-42d2-ba6e-5b5b32a4e556/1772223932859_0.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:16:40.492Z"
+    },
+    {
+      "facility_id": "56a8bc09-1967-42d2-ba6e-5b5b32a4e556",
+      "facility_name": "Level Up Golf",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/56a8bc09-1967-42d2-ba6e-5b5b32a4e556/1772223934694_1.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:33:39.624Z"
+    },
+    {
+      "facility_id": "56a8bc09-1967-42d2-ba6e-5b5b32a4e556",
+      "facility_name": "Level Up Golf",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/56a8bc09-1967-42d2-ba6e-5b5b32a4e556/1772223935652_2.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:33:39.831Z"
+    },
+    {
+      "facility_id": "56a8bc09-1967-42d2-ba6e-5b5b32a4e556",
+      "facility_name": "Level Up Golf",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/56a8bc09-1967-42d2-ba6e-5b5b32a4e556/1772223939642_4.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:33:40.044Z"
+    },
+    {
+      "facility_id": "56a8bc09-1967-42d2-ba6e-5b5b32a4e556",
+      "facility_name": "Level Up Golf",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/56a8bc09-1967-42d2-ba6e-5b5b32a4e556/1772223940602_5.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:33:40.250Z"
+    },
+    {
+      "facility_id": "56a8bc09-1967-42d2-ba6e-5b5b32a4e556",
+      "facility_name": "Level Up Golf",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/56a8bc09-1967-42d2-ba6e-5b5b32a4e556/1772223945286_7.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:33:40.457Z"
+    },
+    {
+      "facility_id": "56a8bc09-1967-42d2-ba6e-5b5b32a4e556",
+      "facility_name": "Level Up Golf",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/56a8bc09-1967-42d2-ba6e-5b5b32a4e556/1772223946641_8.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:33:40.664Z"
+    },
+    {
+      "facility_id": "56a8bc09-1967-42d2-ba6e-5b5b32a4e556",
+      "facility_name": "Level Up Golf",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/56a8bc09-1967-42d2-ba6e-5b5b32a4e556/1772223947575_9.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:33:40.871Z"
+    },
+    {
+      "facility_id": "56a8bc09-1967-42d2-ba6e-5b5b32a4e556",
+      "facility_name": "Level Up Golf",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/56a8bc09-1967-42d2-ba6e-5b5b32a4e556/1772223949853_10.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:33:41.080Z"
+    },
+    {
+      "facility_id": "56a8bc09-1967-42d2-ba6e-5b5b32a4e556",
+      "facility_name": "Level Up Golf",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/56a8bc09-1967-42d2-ba6e-5b5b32a4e556/1772223953765_12.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:33:41.287Z"
+    },
+    {
+      "facility_id": "56a8bc09-1967-42d2-ba6e-5b5b32a4e556",
+      "facility_name": "Level Up Golf",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/56a8bc09-1967-42d2-ba6e-5b5b32a4e556/1772223955692_13.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:33:41.493Z"
+    },
+    {
+      "facility_id": "56a8bc09-1967-42d2-ba6e-5b5b32a4e556",
+      "facility_name": "Level Up Golf",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/56a8bc09-1967-42d2-ba6e-5b5b32a4e556/1772223957311_14.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:33:41.700Z"
+    },
+    {
+      "facility_id": "56a8bc09-1967-42d2-ba6e-5b5b32a4e556",
+      "facility_name": "Level Up Golf",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/56a8bc09-1967-42d2-ba6e-5b5b32a4e556/1772223959798_15.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:33:41.906Z"
+    },
+    {
+      "facility_id": "56a8bc09-1967-42d2-ba6e-5b5b32a4e556",
+      "facility_name": "Level Up Golf",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/56a8bc09-1967-42d2-ba6e-5b5b32a4e556/1772223960969_16.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:33:42.112Z"
+    },
+    {
+      "facility_id": "56a8bc09-1967-42d2-ba6e-5b5b32a4e556",
+      "facility_name": "Level Up Golf",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/56a8bc09-1967-42d2-ba6e-5b5b32a4e556/1772223962573_17.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:33:42.319Z"
+    },
+    {
+      "facility_id": "56a8bc09-1967-42d2-ba6e-5b5b32a4e556",
+      "facility_name": "Level Up Golf",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/56a8bc09-1967-42d2-ba6e-5b5b32a4e556/1772223964680_18.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:33:42.526Z"
+    },
+    {
+      "facility_id": "56a8bc09-1967-42d2-ba6e-5b5b32a4e556",
+      "facility_name": "Level Up Golf",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/56a8bc09-1967-42d2-ba6e-5b5b32a4e556/1772223967217_19.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:33:42.734Z"
+    },
+    {
+      "facility_id": "56a8bc09-1967-42d2-ba6e-5b5b32a4e556",
+      "facility_name": "Level Up Golf",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/56a8bc09-1967-42d2-ba6e-5b5b32a4e556/1772223968363_20.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:33:42.942Z"
+    },
+    {
+      "facility_id": "56a8bc09-1967-42d2-ba6e-5b5b32a4e556",
+      "facility_name": "Level Up Golf",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/56a8bc09-1967-42d2-ba6e-5b5b32a4e556/1772223969430_21.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:33:43.148Z"
+    },
+    {
+      "facility_id": "56a8bc09-1967-42d2-ba6e-5b5b32a4e556",
+      "facility_name": "Level Up Golf",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/56a8bc09-1967-42d2-ba6e-5b5b32a4e556/1772223970598_22.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:33:43.358Z"
+    },
+    {
+      "facility_id": "56a8bc09-1967-42d2-ba6e-5b5b32a4e556",
+      "facility_name": "Level Up Golf",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/56a8bc09-1967-42d2-ba6e-5b5b32a4e556/1772223972108_23.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:33:43.565Z"
+    },
+    {
+      "facility_id": "56a8bc09-1967-42d2-ba6e-5b5b32a4e556",
+      "facility_name": "Level Up Golf",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/56a8bc09-1967-42d2-ba6e-5b5b32a4e556/1772223973919_24.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:33:43.775Z"
+    },
+    {
+      "facility_id": "56a8bc09-1967-42d2-ba6e-5b5b32a4e556",
+      "facility_name": "Level Up Golf",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/56a8bc09-1967-42d2-ba6e-5b5b32a4e556/1772223975234_25.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:33:43.983Z"
+    },
+    {
+      "facility_id": "8d1d5408-7ce0-4527-922b-619a523af63a",
+      "facility_name": "Dill Dinkers Pickleball",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/8d1d5408-7ce0-4527-922b-619a523af63a/1772223991440_0.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:33:44.499Z"
+    },
+    {
+      "facility_id": "8d1d5408-7ce0-4527-922b-619a523af63a",
+      "facility_name": "Dill Dinkers Pickleball",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/8d1d5408-7ce0-4527-922b-619a523af63a/1772223992614_1.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:18.066Z"
+    },
+    {
+      "facility_id": "8d1d5408-7ce0-4527-922b-619a523af63a",
+      "facility_name": "Dill Dinkers Pickleball",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/8d1d5408-7ce0-4527-922b-619a523af63a/1772223994913_2.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:18.271Z"
+    },
+    {
+      "facility_id": "8d1d5408-7ce0-4527-922b-619a523af63a",
+      "facility_name": "Dill Dinkers Pickleball",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/8d1d5408-7ce0-4527-922b-619a523af63a/1772223997045_3.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:18.478Z"
+    },
+    {
+      "facility_id": "8d1d5408-7ce0-4527-922b-619a523af63a",
+      "facility_name": "Dill Dinkers Pickleball",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/8d1d5408-7ce0-4527-922b-619a523af63a/1772223998099_4.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:18.687Z"
+    },
+    {
+      "facility_id": "8d1d5408-7ce0-4527-922b-619a523af63a",
+      "facility_name": "Dill Dinkers Pickleball",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/8d1d5408-7ce0-4527-922b-619a523af63a/1772223999358_5.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:18.895Z"
+    },
+    {
+      "facility_id": "8d1d5408-7ce0-4527-922b-619a523af63a",
+      "facility_name": "Dill Dinkers Pickleball",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/8d1d5408-7ce0-4527-922b-619a523af63a/1772224000731_6.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:19.101Z"
+    },
+    {
+      "facility_id": "8d1d5408-7ce0-4527-922b-619a523af63a",
+      "facility_name": "Dill Dinkers Pickleball",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/8d1d5408-7ce0-4527-922b-619a523af63a/1772224001941_7.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:19.308Z"
+    },
+    {
+      "facility_id": "8d1d5408-7ce0-4527-922b-619a523af63a",
+      "facility_name": "Dill Dinkers Pickleball",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/8d1d5408-7ce0-4527-922b-619a523af63a/1772224003798_8.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:19.515Z"
+    },
+    {
+      "facility_id": "8d1d5408-7ce0-4527-922b-619a523af63a",
+      "facility_name": "Dill Dinkers Pickleball",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/8d1d5408-7ce0-4527-922b-619a523af63a/1772224005043_9.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:19.720Z"
+    },
+    {
+      "facility_id": "cb5c0957-0758-41da-ae30-391ee62e603d",
+      "facility_name": "Wilkerson-Greines Activities Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cb5c0957-0758-41da-ae30-391ee62e603d/1772223552906_0.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:20.235Z"
+    },
+    {
+      "facility_id": "cb5c0957-0758-41da-ae30-391ee62e603d",
+      "facility_name": "Wilkerson-Greines Activities Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cb5c0957-0758-41da-ae30-391ee62e603d/1772223554355_1.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:20.442Z"
+    },
+    {
+      "facility_id": "cb5c0957-0758-41da-ae30-391ee62e603d",
+      "facility_name": "Wilkerson-Greines Activities Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cb5c0957-0758-41da-ae30-391ee62e603d/1772223555593_2.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:20.649Z"
+    },
+    {
+      "facility_id": "cb5c0957-0758-41da-ae30-391ee62e603d",
+      "facility_name": "Wilkerson-Greines Activities Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cb5c0957-0758-41da-ae30-391ee62e603d/1772223556982_3.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:20.856Z"
+    },
+    {
+      "facility_id": "cb5c0957-0758-41da-ae30-391ee62e603d",
+      "facility_name": "Wilkerson-Greines Activities Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cb5c0957-0758-41da-ae30-391ee62e603d/1772223557957_4.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:21.065Z"
+    },
+    {
+      "facility_id": "cb5c0957-0758-41da-ae30-391ee62e603d",
+      "facility_name": "Wilkerson-Greines Activities Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cb5c0957-0758-41da-ae30-391ee62e603d/1772223558940_5.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:21.273Z"
+    },
+    {
+      "facility_id": "cb5c0957-0758-41da-ae30-391ee62e603d",
+      "facility_name": "Wilkerson-Greines Activities Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cb5c0957-0758-41da-ae30-391ee62e603d/1772223560286_6.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:21.480Z"
+    },
+    {
+      "facility_id": "cb5c0957-0758-41da-ae30-391ee62e603d",
+      "facility_name": "Wilkerson-Greines Activities Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cb5c0957-0758-41da-ae30-391ee62e603d/1772223566356_7.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:21.686Z"
+    },
+    {
+      "facility_id": "cb5c0957-0758-41da-ae30-391ee62e603d",
+      "facility_name": "Wilkerson-Greines Activities Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cb5c0957-0758-41da-ae30-391ee62e603d/1772223567733_8.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:21.892Z"
+    },
+    {
+      "facility_id": "cb5c0957-0758-41da-ae30-391ee62e603d",
+      "facility_name": "Wilkerson-Greines Activities Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cb5c0957-0758-41da-ae30-391ee62e603d/1772223568849_9.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:22.101Z"
+    },
+    {
+      "facility_id": "cb5c0957-0758-41da-ae30-391ee62e603d",
+      "facility_name": "Wilkerson-Greines Activities Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cb5c0957-0758-41da-ae30-391ee62e603d/1772223570004_10.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:22.307Z"
+    },
+    {
+      "facility_id": "cb5c0957-0758-41da-ae30-391ee62e603d",
+      "facility_name": "Wilkerson-Greines Activities Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cb5c0957-0758-41da-ae30-391ee62e603d/1772223571489_11.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:22.517Z"
+    },
+    {
+      "facility_id": "cb5c0957-0758-41da-ae30-391ee62e603d",
+      "facility_name": "Wilkerson-Greines Activities Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cb5c0957-0758-41da-ae30-391ee62e603d/1772223572417_12.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:22.723Z"
+    },
+    {
+      "facility_id": "cb5c0957-0758-41da-ae30-391ee62e603d",
+      "facility_name": "Wilkerson-Greines Activities Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cb5c0957-0758-41da-ae30-391ee62e603d/1772223573337_13.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:22.928Z"
+    },
+    {
+      "facility_id": "cb5c0957-0758-41da-ae30-391ee62e603d",
+      "facility_name": "Wilkerson-Greines Activities Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cb5c0957-0758-41da-ae30-391ee62e603d/1772223574115_14.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:23.134Z"
+    },
+    {
+      "facility_id": "cb5c0957-0758-41da-ae30-391ee62e603d",
+      "facility_name": "Wilkerson-Greines Activities Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cb5c0957-0758-41da-ae30-391ee62e603d/1772223574930_15.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:23.341Z"
+    },
+    {
+      "facility_id": "cb5c0957-0758-41da-ae30-391ee62e603d",
+      "facility_name": "Wilkerson-Greines Activities Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cb5c0957-0758-41da-ae30-391ee62e603d/1772223575848_16.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:23.570Z"
+    },
+    {
+      "facility_id": "cb5c0957-0758-41da-ae30-391ee62e603d",
+      "facility_name": "Wilkerson-Greines Activities Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cb5c0957-0758-41da-ae30-391ee62e603d/1772223577302_17.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:23.775Z"
+    },
+    {
+      "facility_id": "cb5c0957-0758-41da-ae30-391ee62e603d",
+      "facility_name": "Wilkerson-Greines Activities Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cb5c0957-0758-41da-ae30-391ee62e603d/1772223578451_18.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:23.979Z"
+    },
+    {
+      "facility_id": "cb5c0957-0758-41da-ae30-391ee62e603d",
+      "facility_name": "Wilkerson-Greines Activities Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cb5c0957-0758-41da-ae30-391ee62e603d/1772223579615_19.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:24.081Z"
+    },
+    {
+      "facility_id": "cb5c0957-0758-41da-ae30-391ee62e603d",
+      "facility_name": "Wilkerson-Greines Activities Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cb5c0957-0758-41da-ae30-391ee62e603d/1772223580910_20.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:24.290Z"
+    },
+    {
+      "facility_id": "cb5c0957-0758-41da-ae30-391ee62e603d",
+      "facility_name": "Wilkerson-Greines Activities Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cb5c0957-0758-41da-ae30-391ee62e603d/1772223582188_21.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:24.497Z"
+    },
+    {
+      "facility_id": "cb5c0957-0758-41da-ae30-391ee62e603d",
+      "facility_name": "Wilkerson-Greines Activities Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cb5c0957-0758-41da-ae30-391ee62e603d/1772223583602_22.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:24.701Z"
+    },
+    {
+      "facility_id": "cb5c0957-0758-41da-ae30-391ee62e603d",
+      "facility_name": "Wilkerson-Greines Activities Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cb5c0957-0758-41da-ae30-391ee62e603d/1772223584858_23.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:24.907Z"
+    },
+    {
+      "facility_id": "cb5c0957-0758-41da-ae30-391ee62e603d",
+      "facility_name": "Wilkerson-Greines Activities Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cb5c0957-0758-41da-ae30-391ee62e603d/1772223586481_24.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:25.115Z"
+    },
+    {
+      "facility_id": "cb5c0957-0758-41da-ae30-391ee62e603d",
+      "facility_name": "Wilkerson-Greines Activities Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cb5c0957-0758-41da-ae30-391ee62e603d/1772223587995_25.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:25.320Z"
+    },
+    {
+      "facility_id": "cb5c0957-0758-41da-ae30-391ee62e603d",
+      "facility_name": "Wilkerson-Greines Activities Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cb5c0957-0758-41da-ae30-391ee62e603d/1772223589331_26.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:25.525Z"
+    },
+    {
+      "facility_id": "cb5c0957-0758-41da-ae30-391ee62e603d",
+      "facility_name": "Wilkerson-Greines Activities Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cb5c0957-0758-41da-ae30-391ee62e603d/1772223590504_27.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:25.731Z"
+    },
+    {
+      "facility_id": "cb5c0957-0758-41da-ae30-391ee62e603d",
+      "facility_name": "Wilkerson-Greines Activities Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cb5c0957-0758-41da-ae30-391ee62e603d/1772223591867_28.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:25.935Z"
+    },
+    {
+      "facility_id": "cb5c0957-0758-41da-ae30-391ee62e603d",
+      "facility_name": "Wilkerson-Greines Activities Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cb5c0957-0758-41da-ae30-391ee62e603d/1772223593152_29.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:26.143Z"
+    },
+    {
+      "facility_id": "cb5c0957-0758-41da-ae30-391ee62e603d",
+      "facility_name": "Wilkerson-Greines Activities Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cb5c0957-0758-41da-ae30-391ee62e603d/1772223594166_30.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:26.350Z"
+    },
+    {
+      "facility_id": "cb5c0957-0758-41da-ae30-391ee62e603d",
+      "facility_name": "Wilkerson-Greines Activities Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cb5c0957-0758-41da-ae30-391ee62e603d/1772223595200_31.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:43:26.559Z"
+    },
+    {
+      "facility_id": "cf5cff21-f351-4027-b714-3a22e8c5dede",
+      "facility_name": "Revolution Soccer Complex",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cf5cff21-f351-4027-b714-3a22e8c5dede/1772222819159_5.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T02:53:39.330Z"
+    },
+    {
+      "facility_id": "8dfd7a0c-7cbb-4459-9ca5-7a68534a5eb5",
+      "facility_name": "Capistrano Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/8dfd7a0c-7cbb-4459-9ca5-7a68534a5eb5/1772221750494_31.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T02:59:49.891Z"
+    },
+    {
+      "facility_id": "33273904-a426-4910-8fe2-cd1351e38909",
+      "facility_name": "Windlands Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/33273904-a426-4910-8fe2-cd1351e38909/1772221910007_8.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T03:00:31.616Z"
+    },
+    {
+      "facility_id": "a6b4102d-deb1-4dd4-900f-6ecd9456f32d",
+      "facility_name": "DATCU Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/a6b4102d-deb1-4dd4-900f-6ecd9456f32d/1772056875937_4.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T03:02:09.775Z"
+    },
+    {
+      "facility_id": "120c4637-cf3b-4398-9c98-bdd28b31620b",
+      "facility_name": "Sherwood Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/120c4637-cf3b-4398-9c98-bdd28b31620b/1772057905651_31.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T03:24:46.835Z"
+    },
+    {
+      "facility_id": "8108e125-e4bb-464b-b8d5-e13a67d74b7a",
+      "facility_name": "First Baptist Church, McDonald Activity Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/8108e125-e4bb-464b-b8d5-e13a67d74b7a/1772238804791_9.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T03:50:24.487Z"
+    },
+    {
+      "facility_id": "153cd333-1e3a-4f0b-834c-42fea38242f7",
+      "facility_name": "Mark McGrath Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/153cd333-1e3a-4f0b-834c-42fea38242f7/1772059562500_14.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T03:56:11.581Z"
+    },
+    {
+      "facility_id": "48849746-2472-4bcf-a625-6379f8ba417d",
+      "facility_name": "Mountain Peak Community Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/48849746-2472-4bcf-a625-6379f8ba417d/1772239032771_33.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T04:08:05.751Z"
+    },
+    {
+      "facility_id": "74208e67-85eb-4bf3-af66-6913945b344f",
+      "facility_name": "Brownfield Cubs Football Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/74208e67-85eb-4bf3-af66-6913945b344f/1772339832076_1.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T04:17:26.559Z"
+    },
+    {
+      "facility_id": "8c8b7c6a-bff9-418c-81b9-279672dafd68",
+      "facility_name": "Jake's Hilltop Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/8c8b7c6a-bff9-418c-81b9-279672dafd68/1772225105244_39.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T04:20:37.617Z"
+    },
+    {
+      "facility_id": "312d9e60-f116-40ac-9bde-fa3a3bd27222",
+      "facility_name": "Campbell Green Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/312d9e60-f116-40ac-9bde-fa3a3bd27222/1772061707727_3.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T04:34:55.417Z"
+    },
+    {
+      "facility_id": "312d9e60-f116-40ac-9bde-fa3a3bd27222",
+      "facility_name": "Campbell Green Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/312d9e60-f116-40ac-9bde-fa3a3bd27222/1772061728108_20.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T04:35:39.786Z"
+    },
+    {
+      "facility_id": "58c664d9-aa6c-4f4c-a0f4-0d09dff5cd51",
+      "facility_name": "Casa Linda Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/58c664d9-aa6c-4f4c-a0f4-0d09dff5cd51/1772225376162_39.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T04:38:33.388Z"
+    },
+    {
+      "facility_id": "c6c7f132-c7ca-419a-aedf-de0f6693aa7a",
+      "facility_name": "Harlingen Sports Complex",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/c6c7f132-c7ca-419a-aedf-de0f6693aa7a/1772061932298_2.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T04:42:11.084Z"
+    },
+    {
+      "facility_id": "c6c7f132-c7ca-419a-aedf-de0f6693aa7a",
+      "facility_name": "Harlingen Sports Complex",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/c6c7f132-c7ca-419a-aedf-de0f6693aa7a/1772061955390_23.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T04:42:59.941Z"
+    },
+    {
+      "facility_id": "c621a3f9-10f9-4d0b-acee-0c040824e3a8",
+      "facility_name": "John Lyons Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/c621a3f9-10f9-4d0b-acee-0c040824e3a8/1772062307474_36.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T04:47:04.547Z"
+    },
+    {
+      "facility_id": "cfcac8d3-49a6-4972-bee8-e1b53c6a8d6b",
+      "facility_name": "Oppose Gravity Performance Training",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cfcac8d3-49a6-4972-bee8-e1b53c6a8d6b/1772063118327_33.jpg",
+      "error": "Failed to upload compressed image",
+      "timestamp": "2026-03-03T05:08:58.081Z"
+    },
+    {
+      "facility_id": "af717774-8b6b-4983-8e44-3cbf1a0c885a",
+      "facility_name": "Hurst Athletic Complex",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af717774-8b6b-4983-8e44-3cbf1a0c885a/1772063223215_10.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T05:09:42.683Z"
+    },
+    {
+      "facility_id": "743e013c-053f-4cec-8901-18d4cefa142e",
+      "facility_name": "Mistletoe Hill Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/743e013c-053f-4cec-8901-18d4cefa142e/1772248847410_3.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T05:29:50.312Z"
+    },
+    {
+      "facility_id": "da4bc628-15c7-40e3-89ef-50003cc348d4",
+      "facility_name": "Clay Madsen Recreation Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/da4bc628-15c7-40e3-89ef-50003cc348d4/1772064974658_4.jpg",
+      "error": "Failed to upload compressed image",
+      "timestamp": "2026-03-03T06:38:36.973Z"
+    },
+    {
+      "facility_id": "54b0e275-c03e-456e-a22f-46ff49af36a0",
+      "facility_name": "Al Ruschhaupt Soccer Complex Phase 1",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/54b0e275-c03e-456e-a22f-46ff49af36a0/1772226275786_35.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T07:23:30.447Z"
+    },
+    {
+      "facility_id": "f7770bb5-07df-4959-9a18-9debe01801c3",
+      "facility_name": "Marcus Park Recreation Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/f7770bb5-07df-4959-9a18-9debe01801c3/1772340765688_34.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T07:56:57.709Z"
+    },
+    {
+      "facility_id": "ef1c6f05-5996-4d02-b7a3-8f33b2f3cf81",
+      "facility_name": "IOOF Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/ef1c6f05-5996-4d02-b7a3-8f33b2f3cf81/1772067132179_4.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T07:57:26.937Z"
+    },
+    {
+      "facility_id": "462aa442-d128-458c-85e2-493ee1d9f708",
+      "facility_name": "Hurst Community Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/462aa442-d128-458c-85e2-493ee1d9f708/1772066246188_30.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T08:37:17.357Z"
+    },
+    {
+      "facility_id": "9a4f504d-8c38-49e5-99f7-047ec536b0f1",
+      "facility_name": "Brentwood Neighborhood Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/9a4f504d-8c38-49e5-99f7-047ec536b0f1/1772066733066_32.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T08:44:43.891Z"
+    },
+    {
+      "facility_id": "351b7f8d-9d49-4ada-b3e0-a39e555fbb0d",
+      "facility_name": "Crunch Fitness - East Plano",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/351b7f8d-9d49-4ada-b3e0-a39e555fbb0d/1772081243754_11.jpg",
+      "error": "Failed to upload compressed image",
+      "timestamp": "2026-03-03T09:28:53.768Z"
+    },
+    {
+      "facility_id": "351b7f8d-9d49-4ada-b3e0-a39e555fbb0d",
+      "facility_name": "Crunch Fitness - East Plano",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/351b7f8d-9d49-4ada-b3e0-a39e555fbb0d/1772081272725_36.jpg",
+      "error": "Failed to upload compressed image",
+      "timestamp": "2026-03-03T09:45:37.344Z"
+    },
+    {
+      "facility_id": "74e0fac6-46b7-4f82-b097-b0e89e4e6003",
+      "facility_name": "Emmitt Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/74e0fac6-46b7-4f82-b097-b0e89e4e6003/1772081561806_28.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T10:04:58.313Z"
+    },
+    {
+      "facility_id": "6b6f30a1-f35b-4074-b471-5de19d25e89e",
+      "facility_name": "Pearland Recreation Center & Natatorium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/6b6f30a1-f35b-4074-b471-5de19d25e89e/1772082616041_5.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T10:25:52.314Z"
+    },
+    {
+      "facility_id": "02c2b2af-c3d1-4f1f-a1be-fa37376ef401",
+      "facility_name": "SAISD Sports Complex",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/02c2b2af-c3d1-4f1f-a1be-fa37376ef401/1772082814030_2.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T10:28:22.788Z"
+    },
+    {
+      "facility_id": "8adb0f7f-cf14-45da-b3a6-19bd3cf75130",
+      "facility_name": "Black Iron Athletics",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/8adb0f7f-cf14-45da-b3a6-19bd3cf75130/1772227297065_7.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T10:44:39.790Z"
+    },
+    {
+      "facility_id": "ff904dd8-7f85-4006-b189-bea02c684198",
+      "facility_name": "Breckinridge Park Playground",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/ff904dd8-7f85-4006-b189-bea02c684198/1772227582937_28.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T11:03:24.785Z"
+    },
+    {
+      "facility_id": "222f335d-0609-4125-b11a-4e460d62dd52",
+      "facility_name": "Georgetown Recreation Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/222f335d-0609-4125-b11a-4e460d62dd52/1772085298073_17.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T11:29:49.873Z"
+    },
+    {
+      "facility_id": "222f335d-0609-4125-b11a-4e460d62dd52",
+      "facility_name": "Georgetown Recreation Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/222f335d-0609-4125-b11a-4e460d62dd52/1772085315212_31.jpg",
+      "error": "Failed to upload compressed image",
+      "timestamp": "2026-03-03T11:47:00.116Z"
+    },
+    {
+      "facility_id": "b2d4c0cf-4eb6-4f78-849f-5713cdd141eb",
+      "facility_name": "Brownwood Coliseum",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/b2d4c0cf-4eb6-4f78-849f-5713cdd141eb/1772249359595_4.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T11:57:46.974Z"
+    },
+    {
+      "facility_id": "dec24bda-2e37-4554-b70a-f4dc98d0f98e",
+      "facility_name": "Pennington Field",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/dec24bda-2e37-4554-b70a-f4dc98d0f98e/1772087065030_14.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T12:14:54.009Z"
+    },
+    {
+      "facility_id": "dec24bda-2e37-4554-b70a-f4dc98d0f98e",
+      "facility_name": "Pennington Field",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/dec24bda-2e37-4554-b70a-f4dc98d0f98e/1772087069651_18.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T12:15:04.300Z"
+    },
+    {
+      "facility_id": "d98da456-9677-4f95-b8c8-bb743782ce6d",
+      "facility_name": "Fitness 1440 Odessa",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d98da456-9677-4f95-b8c8-bb743782ce6d/1772228101013_6.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T12:24:17.796Z"
+    },
+    {
+      "facility_id": "9a16c311-bc52-444d-963d-ef6a819bfa86",
+      "facility_name": "Darryl & Lori Schroeder Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/9a16c311-bc52-444d-963d-ef6a819bfa86/1772228396785_32.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T12:52:24.901Z"
+    },
+    {
+      "facility_id": "e586d27f-d5d5-41ee-96e4-353e0e392dbc",
+      "facility_name": "Bill Allen Memorial Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/e586d27f-d5d5-41ee-96e4-353e0e392dbc/1772088993527_23.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T12:53:56.706Z"
+    },
+    {
+      "facility_id": "0d762d5e-13f7-4cb8-8644-647933bbffc5",
+      "facility_name": "Moody Community Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/0d762d5e-13f7-4cb8-8644-647933bbffc5/1772089060297_16.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T12:57:16.897Z"
+    },
+    {
+      "facility_id": "e451c600-d4f9-4372-bf7d-93d31cba7a07",
+      "facility_name": "John Porter Sports Complex",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/e451c600-d4f9-4372-bf7d-93d31cba7a07/1772090110839_34.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T13:19:23.915Z"
+    },
+    {
+      "facility_id": "24bb9e94-baa4-4c02-89a4-2842492f88fe",
+      "facility_name": "Charles H. Haws Athletic Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/24bb9e94-baa4-4c02-89a4-2842492f88fe/1772339365693_29.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T13:28:45.545Z"
+    },
+    {
+      "facility_id": "555ece29-483c-4d6d-ac88-e267abdc82b1",
+      "facility_name": "Hancock Recreation Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/555ece29-483c-4d6d-ac88-e267abdc82b1/1772243144917_10.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T13:51:03.986Z"
+    },
+    {
+      "facility_id": "fd2e4b28-c08e-4017-bcc0-15897660a1ca",
+      "facility_name": "Ford Arena Softball And Baseball Fields",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/fd2e4b28-c08e-4017-bcc0-15897660a1ca/1772229173540_0.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T13:57:43.297Z"
+    },
+    {
+      "facility_id": "fd2e4b28-c08e-4017-bcc0-15897660a1ca",
+      "facility_name": "Ford Arena Softball And Baseball Fields",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/fd2e4b28-c08e-4017-bcc0-15897660a1ca/1772229207584_30.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T13:58:57.185Z"
+    },
+    {
+      "facility_id": "a0d4c76c-99e0-4246-9b19-40a151d7bf22",
+      "facility_name": "San Juan Municipal Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/a0d4c76c-99e0-4246-9b19-40a151d7bf22/1772127249027_14.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T14:03:33.481Z"
+    },
+    {
+      "facility_id": "355e3717-ee3f-42c6-ad29-fa4e0221fa86",
+      "facility_name": "Port Neches - Groves High School Football and Track Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/355e3717-ee3f-42c6-ad29-fa4e0221fa86/1772229676527_33.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T14:35:29.426Z"
+    },
+    {
+      "facility_id": "f345db48-047c-4b5f-8ed6-d8e2514a1877",
+      "facility_name": "Hidden Gym",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/f345db48-047c-4b5f-8ed6-d8e2514a1877/1772341655781_28.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T14:47:52.985Z"
+    },
+    {
+      "facility_id": "e9538b1f-be60-4206-adc2-23a11338dac4",
+      "facility_name": "Memorial Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/e9538b1f-be60-4206-adc2-23a11338dac4/1772139824183_2.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T15:07:59.458Z"
+    },
+    {
+      "facility_id": "06b9de5c-5ab3-4696-a78e-85fbfd55fe0c",
+      "facility_name": "Mike Myers Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/06b9de5c-5ab3-4696-a78e-85fbfd55fe0c/1772140596830_31.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T15:20:22.651Z"
+    },
+    {
+      "facility_id": "7801e00c-3086-4b7f-b0a2-b82a42c7e291",
+      "facility_name": "Golden Triangle Veterans Memorial Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/7801e00c-3086-4b7f-b0a2-b82a42c7e291/1772230865560_34.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T15:44:50.325Z"
+    },
+    {
+      "facility_id": "b6e89a3b-a136-409f-a184-8e80794c771b",
+      "facility_name": "Harlingen Soccer Complex",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/b6e89a3b-a136-409f-a184-8e80794c771b/1772230899181_10.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T15:48:44.646Z"
+    },
+    {
+      "facility_id": "cacc4273-38c1-4440-910a-afc7559a9747",
+      "facility_name": "Amarillo Netplex",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cacc4273-38c1-4440-910a-afc7559a9747/1772249197357_34.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T15:52:58.933Z"
+    },
+    {
+      "facility_id": "e576962a-1fae-4e49-aac0-a04be230c722",
+      "facility_name": "Crawford Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/e576962a-1fae-4e49-aac0-a04be230c722/1772144796011_25.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T16:06:37.130Z"
+    },
+    {
+      "facility_id": "183ed658-1fc5-452e-8a44-66f12f6905f9",
+      "facility_name": "Valley Creek Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/183ed658-1fc5-452e-8a44-66f12f6905f9/1772054763936_4.jpg",
+      "error": "Failed to upload compressed image",
+      "timestamp": "2026-03-03T16:27:13.202Z"
+    },
+    {
+      "facility_id": "183ed658-1fc5-452e-8a44-66f12f6905f9",
+      "facility_name": "Valley Creek Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/183ed658-1fc5-452e-8a44-66f12f6905f9/1772054765107_5.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:27:13.416Z"
+    },
+    {
+      "facility_id": "183ed658-1fc5-452e-8a44-66f12f6905f9",
+      "facility_name": "Valley Creek Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/183ed658-1fc5-452e-8a44-66f12f6905f9/1772054766526_6.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:27:13.621Z"
+    },
+    {
+      "facility_id": "183ed658-1fc5-452e-8a44-66f12f6905f9",
+      "facility_name": "Valley Creek Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/183ed658-1fc5-452e-8a44-66f12f6905f9/1772054767616_7.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:27:13.827Z"
+    },
+    {
+      "facility_id": "183ed658-1fc5-452e-8a44-66f12f6905f9",
+      "facility_name": "Valley Creek Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/183ed658-1fc5-452e-8a44-66f12f6905f9/1772054768767_8.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:27:14.032Z"
+    },
+    {
+      "facility_id": "183ed658-1fc5-452e-8a44-66f12f6905f9",
+      "facility_name": "Valley Creek Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/183ed658-1fc5-452e-8a44-66f12f6905f9/1772054769869_9.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:27:14.237Z"
+    },
+    {
+      "facility_id": "183ed658-1fc5-452e-8a44-66f12f6905f9",
+      "facility_name": "Valley Creek Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/183ed658-1fc5-452e-8a44-66f12f6905f9/1772054770845_10.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:27:14.443Z"
+    },
+    {
+      "facility_id": "183ed658-1fc5-452e-8a44-66f12f6905f9",
+      "facility_name": "Valley Creek Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/183ed658-1fc5-452e-8a44-66f12f6905f9/1772054771960_11.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:27:14.649Z"
+    },
+    {
+      "facility_id": "183ed658-1fc5-452e-8a44-66f12f6905f9",
+      "facility_name": "Valley Creek Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/183ed658-1fc5-452e-8a44-66f12f6905f9/1772054773027_12.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:27:14.855Z"
+    },
+    {
+      "facility_id": "183ed658-1fc5-452e-8a44-66f12f6905f9",
+      "facility_name": "Valley Creek Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/183ed658-1fc5-452e-8a44-66f12f6905f9/1772054774630_13.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:27:15.061Z"
+    },
+    {
+      "facility_id": "183ed658-1fc5-452e-8a44-66f12f6905f9",
+      "facility_name": "Valley Creek Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/183ed658-1fc5-452e-8a44-66f12f6905f9/1772054775575_14.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:27:15.266Z"
+    },
+    {
+      "facility_id": "183ed658-1fc5-452e-8a44-66f12f6905f9",
+      "facility_name": "Valley Creek Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/183ed658-1fc5-452e-8a44-66f12f6905f9/1772054776755_15.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:27:15.472Z"
+    },
+    {
+      "facility_id": "183ed658-1fc5-452e-8a44-66f12f6905f9",
+      "facility_name": "Valley Creek Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/183ed658-1fc5-452e-8a44-66f12f6905f9/1772054777756_16.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:27:15.679Z"
+    },
+    {
+      "facility_id": "183ed658-1fc5-452e-8a44-66f12f6905f9",
+      "facility_name": "Valley Creek Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/183ed658-1fc5-452e-8a44-66f12f6905f9/1772054779169_17.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:27:15.883Z"
+    },
+    {
+      "facility_id": "183ed658-1fc5-452e-8a44-66f12f6905f9",
+      "facility_name": "Valley Creek Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/183ed658-1fc5-452e-8a44-66f12f6905f9/1772054780733_18.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:27:16.090Z"
+    },
+    {
+      "facility_id": "183ed658-1fc5-452e-8a44-66f12f6905f9",
+      "facility_name": "Valley Creek Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/183ed658-1fc5-452e-8a44-66f12f6905f9/1772054781754_19.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:27:16.298Z"
+    },
+    {
+      "facility_id": "183ed658-1fc5-452e-8a44-66f12f6905f9",
+      "facility_name": "Valley Creek Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/183ed658-1fc5-452e-8a44-66f12f6905f9/1772054782659_20.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:27:16.504Z"
+    },
+    {
+      "facility_id": "183ed658-1fc5-452e-8a44-66f12f6905f9",
+      "facility_name": "Valley Creek Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/183ed658-1fc5-452e-8a44-66f12f6905f9/1772054783469_21.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:27:16.709Z"
+    },
+    {
+      "facility_id": "183ed658-1fc5-452e-8a44-66f12f6905f9",
+      "facility_name": "Valley Creek Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/183ed658-1fc5-452e-8a44-66f12f6905f9/1772054784354_22.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:27:16.913Z"
+    },
+    {
+      "facility_id": "183ed658-1fc5-452e-8a44-66f12f6905f9",
+      "facility_name": "Valley Creek Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/183ed658-1fc5-452e-8a44-66f12f6905f9/1772054785219_23.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:27:17.117Z"
+    },
+    {
+      "facility_id": "183ed658-1fc5-452e-8a44-66f12f6905f9",
+      "facility_name": "Valley Creek Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/183ed658-1fc5-452e-8a44-66f12f6905f9/1772054786175_24.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:27:17.324Z"
+    },
+    {
+      "facility_id": "183ed658-1fc5-452e-8a44-66f12f6905f9",
+      "facility_name": "Valley Creek Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/183ed658-1fc5-452e-8a44-66f12f6905f9/1772054787751_25.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:27:17.532Z"
+    },
+    {
+      "facility_id": "183ed658-1fc5-452e-8a44-66f12f6905f9",
+      "facility_name": "Valley Creek Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/183ed658-1fc5-452e-8a44-66f12f6905f9/1772054788934_26.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:27:17.738Z"
+    },
+    {
+      "facility_id": "183ed658-1fc5-452e-8a44-66f12f6905f9",
+      "facility_name": "Valley Creek Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/183ed658-1fc5-452e-8a44-66f12f6905f9/1772054789898_27.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:27:17.945Z"
+    },
+    {
+      "facility_id": "183ed658-1fc5-452e-8a44-66f12f6905f9",
+      "facility_name": "Valley Creek Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/183ed658-1fc5-452e-8a44-66f12f6905f9/1772054791100_28.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:27:18.151Z"
+    },
+    {
+      "facility_id": "183ed658-1fc5-452e-8a44-66f12f6905f9",
+      "facility_name": "Valley Creek Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/183ed658-1fc5-452e-8a44-66f12f6905f9/1772054792334_29.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:27:18.358Z"
+    },
+    {
+      "facility_id": "183ed658-1fc5-452e-8a44-66f12f6905f9",
+      "facility_name": "Valley Creek Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/183ed658-1fc5-452e-8a44-66f12f6905f9/1772054793865_30.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:27:18.564Z"
+    },
+    {
+      "facility_id": "183ed658-1fc5-452e-8a44-66f12f6905f9",
+      "facility_name": "Valley Creek Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/183ed658-1fc5-452e-8a44-66f12f6905f9/1772054795052_31.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:27:18.770Z"
+    },
+    {
+      "facility_id": "183ed658-1fc5-452e-8a44-66f12f6905f9",
+      "facility_name": "Valley Creek Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/183ed658-1fc5-452e-8a44-66f12f6905f9/1772054796190_32.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:27:18.977Z"
+    },
+    {
+      "facility_id": "183ed658-1fc5-452e-8a44-66f12f6905f9",
+      "facility_name": "Valley Creek Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/183ed658-1fc5-452e-8a44-66f12f6905f9/1772054797678_33.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:27:19.183Z"
+    },
+    {
+      "facility_id": "183ed658-1fc5-452e-8a44-66f12f6905f9",
+      "facility_name": "Valley Creek Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/183ed658-1fc5-452e-8a44-66f12f6905f9/1772054799305_34.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:27:19.389Z"
+    },
+    {
+      "facility_id": "183ed658-1fc5-452e-8a44-66f12f6905f9",
+      "facility_name": "Valley Creek Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/183ed658-1fc5-452e-8a44-66f12f6905f9/1772054800958_35.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:27:19.596Z"
+    },
+    {
+      "facility_id": "183ed658-1fc5-452e-8a44-66f12f6905f9",
+      "facility_name": "Valley Creek Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/183ed658-1fc5-452e-8a44-66f12f6905f9/1772054802302_36.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:27:19.802Z"
+    },
+    {
+      "facility_id": "183ed658-1fc5-452e-8a44-66f12f6905f9",
+      "facility_name": "Valley Creek Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/183ed658-1fc5-452e-8a44-66f12f6905f9/1772054803302_37.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:27:20.008Z"
+    },
+    {
+      "facility_id": "183ed658-1fc5-452e-8a44-66f12f6905f9",
+      "facility_name": "Valley Creek Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/183ed658-1fc5-452e-8a44-66f12f6905f9/1772054804277_38.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:27:20.212Z"
+    },
+    {
+      "facility_id": "183ed658-1fc5-452e-8a44-66f12f6905f9",
+      "facility_name": "Valley Creek Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/183ed658-1fc5-452e-8a44-66f12f6905f9/1772054805433_39.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:27:20.415Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125625901_0.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:44:38.665Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125627662_1.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:44:38.870Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125628768_2.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:44:39.078Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125629801_3.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:44:39.281Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125630684_4.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:44:39.484Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125631453_5.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:44:39.687Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125632260_6.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:44:39.891Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125633457_7.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:44:40.098Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125634486_8.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:44:40.305Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125635357_9.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:44:40.511Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125636778_10.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:44:40.725Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125637666_11.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:44:40.931Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125639210_12.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:44:41.135Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125640336_13.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:44:41.342Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125641660_14.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:44:41.546Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125642899_15.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:44:41.750Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125644136_16.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:44:41.954Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125645550_17.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:44:42.160Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125646566_18.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:44:42.363Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125647430_19.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:44:42.569Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125648632_20.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:44:42.773Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125650012_21.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:44:42.980Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125651530_22.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:44:43.188Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125652836_23.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:44:43.394Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125653770_24.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T16:44:43.599Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125654774_25.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T17:01:23.183Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125655867_26.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T17:01:23.429Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125657163_27.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T17:01:23.644Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125658067_28.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T17:01:23.847Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125659101_29.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T17:01:24.053Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125659940_30.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T17:01:24.258Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125661019_31.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T17:01:24.461Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125662086_32.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T17:01:24.666Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125663300_33.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T17:01:24.869Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125664633_34.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T17:01:25.092Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125665758_35.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T17:01:25.298Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125666968_36.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T17:01:25.504Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125667856_37.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T17:01:25.711Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125669713_38.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T17:01:25.924Z"
+    },
+    {
+      "facility_id": "eef6d37e-cb39-41cf-948b-633563b0cff1",
+      "facility_name": "Cimarron Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/eef6d37e-cb39-41cf-948b-633563b0cff1/1772125671403_39.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T17:01:26.130Z"
+    },
+    {
+      "facility_id": "9425514a-66c6-4dc6-9712-89ed53e65b86",
+      "facility_name": "TDECU Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/9425514a-66c6-4dc6-9712-89ed53e65b86/1772048683306_16.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T17:04:12.975Z"
+    },
+    {
+      "facility_id": "9e34257c-5b00-4dd5-b69b-c8f6648da386",
+      "facility_name": "DHR Health Sports & Wellness Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/9e34257c-5b00-4dd5-b69b-c8f6648da386/1772337393851_12.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T17:05:41.252Z"
+    },
+    {
+      "facility_id": "55e65e4b-d4fa-4fd2-837f-18e7443361ca",
+      "facility_name": "Bulverde Community Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/55e65e4b-d4fa-4fd2-837f-18e7443361ca/1772058670801_24.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T17:17:23.370Z"
     }
   ],
-  "deletionsSucceeded": 19654,
-  "deletionsFailed": 6
+  "deletionsSucceeded": 35018,
+  "deletionsFailed": 8
 }
