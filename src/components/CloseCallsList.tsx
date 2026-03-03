@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useCloseCalls } from '@/hooks/useCloseCRM';
-import { Phone, PhoneIncoming, PhoneOutgoing, Play, Clock, ChevronLeft, ChevronRight, LayoutGrid, Table } from 'lucide-react';
+import { Phone, PhoneIncoming, PhoneOutgoing, Play, Clock, ChevronLeft, ChevronRight, LayoutGrid, Table, Filter } from 'lucide-react';
 import { CloseCallsTable } from './CloseCallsTable';
 
 function formatDuration(seconds: number | undefined): string {
@@ -37,6 +37,10 @@ interface CloseCallsListProps {
 export function CloseCallsList({ onCallClick }: CloseCallsListProps) {
   // View mode state (table or card)
   const [viewMode, setViewMode] = useState<'table' | 'card'>('table');
+
+  // Sidebar and filter state
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [activeFilterCount, setActiveFilterCount] = useState(0);
 
   // Load view preference from localStorage on mount
   useEffect(() => {
@@ -112,38 +116,60 @@ export function CloseCallsList({ onCallClick }: CloseCallsListProps) {
           )}
         </h3>
 
-        {/* View Toggle */}
-        <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+        {/* Filters and View Toggle */}
+        <div className="flex items-center gap-3">
           <button
-            onClick={() => handleViewChange('table')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-              viewMode === 'table'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-            title="Table view"
+            onClick={() => setIsSidebarOpen(true)}
+            className="inline-flex items-center gap-2 px-4 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
           >
-            <Table className="w-4 h-4" />
-            Table
+            <Filter className="w-4 h-4" />
+            Filters
+            {activeFilterCount > 0 && (
+              <span className="inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold text-white bg-blue-600 rounded-full">
+                {activeFilterCount}
+              </span>
+            )}
           </button>
-          <button
-            onClick={() => handleViewChange('card')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-              viewMode === 'card'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-            title="Card view"
-          >
-            <LayoutGrid className="w-4 h-4" />
-            Cards
-          </button>
+
+          <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+            <button
+              onClick={() => handleViewChange('table')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                viewMode === 'table'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+              title="Table view"
+            >
+              <Table className="w-4 h-4" />
+              Table
+            </button>
+            <button
+              onClick={() => handleViewChange('card')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                viewMode === 'card'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+              title="Card view"
+            >
+              <LayoutGrid className="w-4 h-4" />
+              Cards
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Conditional view rendering */}
       {viewMode === 'table' ? (
-        <CloseCallsTable calls={calls} onCallClick={onCallClick} isLoading={false} />
+        <CloseCallsTable
+          calls={calls}
+          onCallClick={onCallClick}
+          isLoading={false}
+          isSidebarOpen={isSidebarOpen}
+          setIsSidebarOpen={setIsSidebarOpen}
+          onFilterCountChange={setActiveFilterCount}
+        />
       ) : (
         /* Card view */
         <div className="space-y-2">

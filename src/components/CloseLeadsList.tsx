@@ -1,7 +1,7 @@
 'use client';
 
 import { useCloseLeads, useCloseLeadStatuses } from '@/hooks/useCloseCRM';
-import { Building2, ExternalLink, ChevronLeft, ChevronRight, LayoutGrid, Table } from 'lucide-react';
+import { Building2, ExternalLink, ChevronLeft, ChevronRight, LayoutGrid, Table, Filter } from 'lucide-react';
 import { useMemo, useState, useEffect } from 'react';
 import { CloseLeadsTable } from './CloseLeadsTable';
 
@@ -12,6 +12,10 @@ interface CloseLeadsListProps {
 export function CloseLeadsList({ onLeadClick }: CloseLeadsListProps) {
   // View mode state (table or grid)
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
+
+  // Sidebar and filter state
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [activeFilterCount, setActiveFilterCount] = useState(0);
 
   // Load view preference from localStorage on mount
   useEffect(() => {
@@ -91,32 +95,47 @@ export function CloseLeadsList({ onLeadClick }: CloseLeadsListProps) {
           Leads {totalLeads > 0 && `(${startIndex}-${endIndex}${hasMore ? '+' : ''})`}
         </h3>
 
-        {/* View Toggle */}
-        <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+        {/* Filters and View Toggle */}
+        <div className="flex items-center gap-3">
           <button
-            onClick={() => handleViewChange('table')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-              viewMode === 'table'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-            title="Table view"
+            onClick={() => setIsSidebarOpen(true)}
+            className="inline-flex items-center gap-2 px-4 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
           >
-            <Table className="w-4 h-4" />
-            Table
+            <Filter className="w-4 h-4" />
+            Filters
+            {activeFilterCount > 0 && (
+              <span className="inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold text-white bg-blue-600 rounded-full">
+                {activeFilterCount}
+              </span>
+            )}
           </button>
-          <button
-            onClick={() => handleViewChange('grid')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-              viewMode === 'grid'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-            title="Grid view"
-          >
-            <LayoutGrid className="w-4 h-4" />
-            Grid
-          </button>
+
+          <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+            <button
+              onClick={() => handleViewChange('table')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                viewMode === 'table'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+              title="Table view"
+            >
+              <Table className="w-4 h-4" />
+              Table
+            </button>
+            <button
+              onClick={() => handleViewChange('grid')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                viewMode === 'grid'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+              title="Grid view"
+            >
+              <LayoutGrid className="w-4 h-4" />
+              Grid
+            </button>
+          </div>
         </div>
       </div>
 
@@ -127,6 +146,9 @@ export function CloseLeadsList({ onLeadClick }: CloseLeadsListProps) {
           statusMap={statusMap}
           onLeadClick={onLeadClick}
           isLoading={false}
+          isSidebarOpen={isSidebarOpen}
+          setIsSidebarOpen={setIsSidebarOpen}
+          onFilterCountChange={setActiveFilterCount}
         />
       ) : (
         /* Grid of lead cards */

@@ -1,7 +1,7 @@
 {
-  "processedCount": 1267,
-  "successCount": 1087,
-  "failedCount": 185,
+  "processedCount": 1278,
+  "successCount": 1095,
+  "failedCount": 188,
   "skippedCount": 17,
   "processedFacilityIds": [
     "2651e40a-b22d-4b23-9fd7-8ff121dfdd25",
@@ -1093,15 +1093,23 @@
     "033688a5-00a3-4835-a9e4-e3c03f5748ab",
     "8421353a-b63c-49a3-b7b1-8e3b2f84a6ae",
     "84095943-39c9-4fc6-a1f3-a509bc880362",
-    "11fb7da5-f3d3-4a6d-9d1e-4b381561d0fb"
+    "11fb7da5-f3d3-4a6d-9d1e-4b381561d0fb",
+    "749503d6-9d9f-4b7b-a7c5-d2e4b1b7e8cf",
+    "cd1ff539-15f1-4aa7-8e42-0f3a1441025c",
+    "8a2ebced-0bb2-41bd-8749-0bda2b4912fb",
+    "7f6de12f-548a-4ee8-94e0-fe7e4302245a",
+    "a8a18807-074f-4338-b6e6-0af3cd48fa2e",
+    "67482bd6-d300-497d-8814-e53ae8d6f9a8",
+    "de6d4512-b0b8-4a3c-ac27-186cfaee95a2",
+    "9a7ad76b-5e6c-48af-a045-35bb36791fa1"
   ],
-  "lastProcessedIndex": 1280,
-  "imagesProcessed": 44348,
+  "lastProcessedIndex": 1291,
+  "imagesProcessed": 44745,
   "imagesSkipped": 39,
-  "imagesFailed": 477,
-  "totalBytesBefore": 107376944572,
-  "totalBytesAfter": 42848620472,
-  "lastUpdated": "2026-03-03T22:15:12.438Z",
+  "imagesFailed": 481,
+  "totalBytesBefore": 108462720505,
+  "totalBytesAfter": 43262266794,
+  "lastUpdated": "2026-03-03T22:39:42.884Z",
   "errors": [
     {
       "facility_id": "c8861bb6-f825-4d28-a60f-695b1edfef7b",
@@ -4441,8 +4449,36 @@
       "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/81afb78c-083f-47ec-a4c0-ac7c4fc521c1/1772129829069_30.jpg",
       "error": "Failed to compress image",
       "timestamp": "2026-03-03T22:13:42.554Z"
+    },
+    {
+      "facility_id": "8c5cecca-fb63-40db-bd0c-a267c2f9bd11",
+      "facility_name": "Jerry Shaffer Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/8c5cecca-fb63-40db-bd0c-a267c2f9bd11/1772246969258_9.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T22:15:36.657Z"
+    },
+    {
+      "facility_id": "b454c6fb-b424-4614-b8a0-ae2891dfda9a",
+      "facility_name": "E.H. Hanby Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/b454c6fb-b424-4614-b8a0-ae2891dfda9a/1772138046640_35.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T22:23:26.950Z"
+    },
+    {
+      "facility_id": "22c92fca-547b-499c-b98a-8ce0fba84aa1",
+      "facility_name": "Canyon Lake Gorge",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/22c92fca-547b-499c-b98a-8ce0fba84aa1/1772137746889_28.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T22:31:46.975Z"
+    },
+    {
+      "facility_id": "22c92fca-547b-499c-b98a-8ce0fba84aa1",
+      "facility_name": "Canyon Lake Gorge",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/22c92fca-547b-499c-b98a-8ce0fba84aa1/1772137754946_30.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T22:31:50.997Z"
     }
   ],
-  "deletionsSucceeded": 40714,
+  "deletionsSucceeded": 41111,
   "deletionsFailed": 8
 }

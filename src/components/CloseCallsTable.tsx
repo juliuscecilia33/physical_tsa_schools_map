@@ -17,12 +17,16 @@ import {
   ArrowDown,
   Voicemail,
   DollarSign,
+  X,
 } from 'lucide-react';
 
 interface CloseCallsTableProps {
   calls: CloseCallActivity[];
   onCallClick?: (callId: string) => void;
   isLoading?: boolean;
+  isSidebarOpen: boolean;
+  setIsSidebarOpen: (open: boolean) => void;
+  onFilterCountChange?: (count: number) => void;
 }
 
 type SortField =
@@ -90,7 +94,7 @@ interface EnrichedCall extends CloseCallActivity {
   contact_name?: string;
 }
 
-export function CloseCallsTable({ calls, onCallClick, isLoading }: CloseCallsTableProps) {
+export function CloseCallsTable({ calls, onCallClick, isLoading, isSidebarOpen, setIsSidebarOpen, onFilterCountChange }: CloseCallsTableProps) {
   const [sortField, setSortField] = useState<SortField | null>('date');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [searchTerm, setSearchTerm] = useState('');
@@ -341,6 +345,33 @@ export function CloseCallsTable({ calls, onCallClick, isLoading }: CloseCallsTab
     dateFrom ||
     dateTo;
 
+  // Count active filters for badge
+  const activeFilterCount = [
+    searchTerm,
+    directionFilter !== 'all',
+    dispositionFilter !== 'all',
+    userFilter !== 'all',
+    recordingFilter !== 'all',
+    dateFrom,
+    dateTo,
+  ].filter(Boolean).length;
+
+  // Notify parent of filter count changes
+  useEffect(() => {
+    onFilterCountChange?.(activeFilterCount);
+  }, [activeFilterCount, onFilterCountChange]);
+
+  // Handle ESC key to close sidebar
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isSidebarOpen) {
+        setIsSidebarOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [isSidebarOpen, setIsSidebarOpen]);
+
   const setDateRange = (range: string) => {
     const now = new Date();
     switch (range) {
@@ -368,175 +399,211 @@ export function CloseCallsTable({ calls, onCallClick, isLoading }: CloseCallsTab
     }
   };
 
-  if (isLoading || loadingLeads) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-      </div>
-    );
-  }
+  // Skeleton row component
+  const SkeletonRow = () => (
+    <tr className="border-b border-gray-100">
+      <td className="px-4 py-3"><div className="h-4 bg-gray-200 rounded animate-pulse w-24"></div></td>
+      <td className="px-4 py-3"><div className="h-4 bg-gray-200 rounded animate-pulse w-20"></div></td>
+      <td className="px-4 py-3"><div className="h-4 bg-gray-200 rounded animate-pulse w-32"></div></td>
+      <td className="px-4 py-3"><div className="h-4 bg-gray-200 rounded animate-pulse w-28"></div></td>
+      <td className="px-4 py-3"><div className="h-4 bg-gray-200 rounded animate-pulse w-16"></div></td>
+      <td className="px-4 py-3"><div className="h-4 bg-gray-200 rounded animate-pulse w-20"></div></td>
+      <td className="px-4 py-3"><div className="h-4 bg-gray-200 rounded animate-pulse w-24"></div></td>
+      <td className="px-4 py-3"><div className="h-4 bg-gray-200 rounded animate-pulse w-12"></div></td>
+      <td className="px-4 py-3"><div className="h-4 bg-gray-200 rounded animate-pulse w-8"></div></td>
+      <td className="px-4 py-3"><div className="h-4 bg-gray-200 rounded animate-pulse w-16"></div></td>
+    </tr>
+  );
 
   return (
     <div className="space-y-4">
-      {/* Search and Filters */}
-      <div className="bg-gray-50 rounded-lg border border-gray-200 p-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-          {/* Search */}
-          <div>
-            <label htmlFor="search" className="block text-xs font-medium text-gray-700 mb-1">
-              Search
-            </label>
-            <input
-              id="search"
-              type="text"
-              placeholder="Phone, notes, contact..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+      {/* Results Count */}
+      <div className="text-sm text-gray-600">
+        Showing {filteredAndSortedCalls.length} of {enrichedCalls.length} calls
+      </div>
 
-          {/* Direction Filter */}
-          <div>
-            <label htmlFor="direction" className="block text-xs font-medium text-gray-700 mb-1">
-              Direction
-            </label>
-            <select
-              id="direction"
-              value={directionFilter}
-              onChange={(e) => setDirectionFilter(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+      {/* Backdrop Overlay */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 transition-opacity"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
+      {/* Filters Sidebar */}
+      <div
+        className={`fixed top-0 right-0 h-full w-96 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out ${
+          isSidebarOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
+        <div className="flex flex-col h-full">
+          {/* Sidebar Header */}
+          <div className="flex items-center justify-between p-4 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
+            <button
+              onClick={() => setIsSidebarOpen(false)}
+              className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
             >
-              <option value="all">All Directions</option>
-              <option value="inbound">Inbound</option>
-              <option value="outbound">Outbound</option>
-            </select>
+              <X className="w-5 h-5" />
+            </button>
           </div>
 
-          {/* Disposition Filter */}
-          <div>
-            <label htmlFor="disposition" className="block text-xs font-medium text-gray-700 mb-1">
-              Disposition
-            </label>
-            <select
-              id="disposition"
-              value={dispositionFilter}
-              onChange={(e) => setDispositionFilter(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="all">All Dispositions</option>
-              {uniqueDispositions.map((disp) => (
-                <option key={disp} value={disp}>
-                  {disp.replace('-', ' ')}
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* Sidebar Content */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {/* Search */}
+            <div>
+              <label htmlFor="search" className="block text-xs font-medium text-gray-700 mb-1">
+                Search
+              </label>
+              <input
+                id="search"
+                type="text"
+                placeholder="Phone, notes, contact..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
 
-          {/* User Filter */}
-          <div>
-            <label htmlFor="user" className="block text-xs font-medium text-gray-700 mb-1">
-              User/Agent
-            </label>
-            <select
-              id="user"
-              value={userFilter}
-              onChange={(e) => setUserFilter(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="all">All Users</option>
-              {uniqueUsers.map((user) => (
-                <option key={user} value={user}>
-                  {user}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Recording Filter */}
-          <div>
-            <label htmlFor="recording" className="block text-xs font-medium text-gray-700 mb-1">
-              Recording
-            </label>
-            <select
-              id="recording"
-              value={recordingFilter}
-              onChange={(e) => setRecordingFilter(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="all">All</option>
-              <option value="recording">Has Recording</option>
-              <option value="voicemail">Has Voicemail</option>
-              <option value="none">No Recording</option>
-            </select>
-          </div>
-
-          {/* Date From */}
-          <div>
-            <label htmlFor="dateFrom" className="block text-xs font-medium text-gray-700 mb-1">
-              Date From
-            </label>
-            <input
-              id="dateFrom"
-              type="date"
-              value={dateFrom}
-              onChange={(e) => setDateFrom(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          {/* Date To */}
-          <div>
-            <label htmlFor="dateTo" className="block text-xs font-medium text-gray-700 mb-1">
-              Date To
-            </label>
-            <input
-              id="dateTo"
-              type="date"
-              value={dateTo}
-              onChange={(e) => setDateTo(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          {/* Date Range Presets */}
-          <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Quick Range</label>
-            <div className="flex gap-1">
-              <button
-                onClick={() => setDateRange('today')}
-                className="px-2 py-1.5 text-xs bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+            {/* Direction Filter */}
+            <div>
+              <label htmlFor="direction" className="block text-xs font-medium text-gray-700 mb-1">
+                Direction
+              </label>
+              <select
+                id="direction"
+                value={directionFilter}
+                onChange={(e) => setDirectionFilter(e.target.value)}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                Today
-              </button>
-              <button
-                onClick={() => setDateRange('7days')}
-                className="px-2 py-1.5 text-xs bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+                <option value="all">All Directions</option>
+                <option value="inbound">Inbound</option>
+                <option value="outbound">Outbound</option>
+              </select>
+            </div>
+
+            {/* Disposition Filter */}
+            <div>
+              <label htmlFor="disposition" className="block text-xs font-medium text-gray-700 mb-1">
+                Disposition
+              </label>
+              <select
+                id="disposition"
+                value={dispositionFilter}
+                onChange={(e) => setDispositionFilter(e.target.value)}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                7d
-              </button>
-              <button
-                onClick={() => setDateRange('30days')}
-                className="px-2 py-1.5 text-xs bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+                <option value="all">All Dispositions</option>
+                {uniqueDispositions.map((disp) => (
+                  <option key={disp} value={disp}>
+                    {disp.replace('-', ' ')}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* User Filter */}
+            <div>
+              <label htmlFor="user" className="block text-xs font-medium text-gray-700 mb-1">
+                User/Agent
+              </label>
+              <select
+                id="user"
+                value={userFilter}
+                onChange={(e) => setUserFilter(e.target.value)}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                30d
-              </button>
+                <option value="all">All Users</option>
+                {uniqueUsers.map((user) => (
+                  <option key={user} value={user}>
+                    {user}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Recording Filter */}
+            <div>
+              <label htmlFor="recording" className="block text-xs font-medium text-gray-700 mb-1">
+                Recording
+              </label>
+              <select
+                id="recording"
+                value={recordingFilter}
+                onChange={(e) => setRecordingFilter(e.target.value)}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="all">All</option>
+                <option value="recording">Has Recording</option>
+                <option value="voicemail">Has Voicemail</option>
+                <option value="none">No Recording</option>
+              </select>
+            </div>
+
+            {/* Date From */}
+            <div>
+              <label htmlFor="dateFrom" className="block text-xs font-medium text-gray-700 mb-1">
+                Date From
+              </label>
+              <input
+                id="dateFrom"
+                type="date"
+                value={dateFrom}
+                onChange={(e) => setDateFrom(e.target.value)}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            {/* Date To */}
+            <div>
+              <label htmlFor="dateTo" className="block text-xs font-medium text-gray-700 mb-1">
+                Date To
+              </label>
+              <input
+                id="dateTo"
+                type="date"
+                value={dateTo}
+                onChange={(e) => setDateTo(e.target.value)}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            {/* Date Range Presets */}
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">Quick Range</label>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setDateRange('today')}
+                  className="flex-1 px-3 py-2 text-xs bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+                >
+                  Today
+                </button>
+                <button
+                  onClick={() => setDateRange('7days')}
+                  className="flex-1 px-3 py-2 text-xs bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+                >
+                  7 days
+                </button>
+                <button
+                  onClick={() => setDateRange('30days')}
+                  className="flex-1 px-3 py-2 text-xs bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+                >
+                  30 days
+                </button>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Clear Filters and Results */}
-        <div className="mt-3 flex items-center justify-between">
-          <div className="text-sm text-gray-600">
-            Showing {filteredAndSortedCalls.length} of {enrichedCalls.length} calls
-          </div>
+          {/* Sidebar Footer */}
           {hasActiveFilters && (
-            <button
-              onClick={clearFilters}
-              className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-            >
-              Clear all filters
-            </button>
+            <div className="p-4 border-t border-gray-200">
+              <button
+                onClick={clearFilters}
+                className="w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
+              >
+                Clear all filters
+              </button>
+            </div>
           )}
         </div>
       </div>
@@ -631,7 +698,10 @@ export function CloseCallsTable({ calls, onCallClick, isLoading }: CloseCallsTab
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {filteredAndSortedCalls.length === 0 ? (
+            {isLoading || loadingLeads ? (
+              // Show 15 skeleton rows while loading
+              Array.from({ length: 15 }).map((_, index) => <SkeletonRow key={index} />)
+            ) : filteredAndSortedCalls.length === 0 ? (
               <tr>
                 <td colSpan={10} className="px-4 py-8 text-center text-gray-500">
                   No calls found matching your filters
