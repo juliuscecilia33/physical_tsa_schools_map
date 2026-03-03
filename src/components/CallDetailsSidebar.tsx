@@ -268,7 +268,7 @@ export function CallDetailsSidebar({ callId, onClose }: CallDetailsSidebarProps)
                         <div className="text-sm">
                           <span className="text-gray-600">Cost: </span>
                           <span className="font-medium text-gray-900">
-                            ${(call.cost / 100).toFixed(2)}
+                            ${(parseInt(call.cost || '0') / 100).toFixed(2)}
                           </span>
                         </div>
                       </div>

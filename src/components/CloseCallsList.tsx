@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCloseCalls } from '@/hooks/useCloseCRM';
-import { Phone, PhoneIncoming, PhoneOutgoing, Play, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Phone, PhoneIncoming, PhoneOutgoing, Play, Clock, ChevronLeft, ChevronRight, LayoutGrid, Table } from 'lucide-react';
+import { CloseCallsTable } from './CloseCallsTable';
 
 function formatDuration(seconds: number | undefined): string {
   if (!seconds) return 'N/A';
@@ -34,6 +35,27 @@ interface CloseCallsListProps {
 }
 
 export function CloseCallsList({ onCallClick }: CloseCallsListProps) {
+  // View mode state (table or card)
+  const [viewMode, setViewMode] = useState<'table' | 'card'>('table');
+
+  // Load view preference from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedView = localStorage.getItem('calls-view-mode');
+      if (savedView === 'table' || savedView === 'card') {
+        setViewMode(savedView);
+      }
+    }
+  }, []);
+
+  // Save view preference to localStorage when it changes
+  const handleViewChange = (mode: 'table' | 'card') => {
+    setViewMode(mode);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('calls-view-mode', mode);
+    }
+  };
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 50;
@@ -83,105 +105,139 @@ export function CloseCallsList({ onCallClick }: CloseCallsListProps) {
         <h3 className="text-lg font-semibold flex items-center gap-2">
           <Phone className="w-5 h-5" />
           Calls {totalCalls > 0 && `(${startIndex}-${endIndex}${hasMore ? '+' : ''})`}
+          {callsWithRecordings > 0 && viewMode === 'card' && (
+            <span className="text-sm font-normal text-gray-600">
+              ({callsWithRecordings} with recordings)
+            </span>
+          )}
         </h3>
-        {callsWithRecordings > 0 && (
-          <span className="text-sm text-gray-600">
-            {callsWithRecordings} with recordings
-          </span>
-        )}
+
+        {/* View Toggle */}
+        <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+          <button
+            onClick={() => handleViewChange('table')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+              viewMode === 'table'
+                ? 'bg-white text-gray-900 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+            title="Table view"
+          >
+            <Table className="w-4 h-4" />
+            Table
+          </button>
+          <button
+            onClick={() => handleViewChange('card')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+              viewMode === 'card'
+                ? 'bg-white text-gray-900 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+            title="Card view"
+          >
+            <LayoutGrid className="w-4 h-4" />
+            Cards
+          </button>
+        </div>
       </div>
 
-      <div className="space-y-2">
-        {calls.map((call) => (
-          <div
-            key={call.id}
-            onClick={() => onCallClick?.(call.id)}
-            className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer"
-          >
-            <div className="flex items-start gap-3">
-              {/* Direction Icon */}
-              <div className="mt-1">
-                {call.direction === 'inbound' ? (
-                  <PhoneIncoming className="w-5 h-5 text-blue-600" />
-                ) : (
-                  <PhoneOutgoing className="w-5 h-5 text-green-600" />
-                )}
-              </div>
-
-              {/* Call Details */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-medium text-gray-900 capitalize">
-                    {call.direction} Call
-                  </span>
-                  {call.phone && (
-                    <span className="text-sm text-gray-600">{call.phone}</span>
-                  )}
-                  {call.disposition && (
-                    <span
-                      className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getDispositionColor(
-                        call.disposition
-                      )}`}
-                    >
-                      {call.disposition.replace('-', ' ')}
-                    </span>
+      {/* Conditional view rendering */}
+      {viewMode === 'table' ? (
+        <CloseCallsTable calls={calls} onCallClick={onCallClick} isLoading={false} />
+      ) : (
+        /* Card view */
+        <div className="space-y-2">
+          {calls.map((call) => (
+            <div
+              key={call.id}
+              onClick={() => onCallClick?.(call.id)}
+              className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer"
+            >
+              <div className="flex items-start gap-3">
+                {/* Direction Icon */}
+                <div className="mt-1">
+                  {call.direction === 'inbound' ? (
+                    <PhoneIncoming className="w-5 h-5 text-blue-600" />
+                  ) : (
+                    <PhoneOutgoing className="w-5 h-5 text-green-600" />
                   )}
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3 mt-2 text-sm text-gray-600">
-                  {call.duration !== undefined && (
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-4 h-4" />
-                      {formatDuration(call.duration)}
+                {/* Call Details */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-medium text-gray-900 capitalize">
+                      {call.direction} Call
                     </span>
+                    {call.phone && (
+                      <span className="text-sm text-gray-600">{call.phone}</span>
+                    )}
+                    {call.disposition && (
+                      <span
+                        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getDispositionColor(
+                          call.disposition
+                        )}`}
+                      >
+                        {call.disposition.replace('-', ' ')}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-3 mt-2 text-sm text-gray-600">
+                    {call.duration !== undefined && (
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-4 h-4" />
+                        {formatDuration(call.duration)}
+                      </span>
+                    )}
+                    <span className="text-xs text-gray-400">
+                      {new Date(call.date_created).toLocaleString()}
+                    </span>
+                    {call.user_name && (
+                      <span className="text-xs text-gray-500">by {call.user_name}</span>
+                    )}
+                  </div>
+
+                  {call.note && (
+                    <p className="mt-2 text-sm text-gray-700 line-clamp-2">{call.note}</p>
                   )}
-                  <span className="text-xs text-gray-400">
-                    {new Date(call.date_created).toLocaleString()}
-                  </span>
-                  {call.user_name && (
-                    <span className="text-xs text-gray-500">by {call.user_name}</span>
+
+                  {/* Recording Link */}
+                  {call.recording_url && (
+                    <div className="mt-3 pt-3 border-t border-gray-100">
+                      <a
+                        href={call.recording_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 font-medium"
+                      >
+                        <Play className="w-4 h-4" />
+                        Play Recording
+                      </a>
+                    </div>
+                  )}
+
+                  {call.voicemail_url && (
+                    <div className="mt-2">
+                      <a
+                        href={call.voicemail_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="inline-flex items-center gap-2 text-sm text-purple-600 hover:text-purple-800 font-medium"
+                      >
+                        <Play className="w-4 h-4" />
+                        Play Voicemail
+                      </a>
+                    </div>
                   )}
                 </div>
-
-                {call.note && (
-                  <p className="mt-2 text-sm text-gray-700 line-clamp-2">{call.note}</p>
-                )}
-
-                {/* Recording Link */}
-                {call.recording_url && (
-                  <div className="mt-3 pt-3 border-t border-gray-100">
-                    <a
-                      href={call.recording_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                      className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 font-medium"
-                    >
-                      <Play className="w-4 h-4" />
-                      Play Recording
-                    </a>
-                  </div>
-                )}
-
-                {call.voicemail_url && (
-                  <div className="mt-2">
-                    <a
-                      href={call.voicemail_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                      className="inline-flex items-center gap-2 text-sm text-purple-600 hover:text-purple-800 font-medium"
-                    >
-                      <Play className="w-4 h-4" />
-                      Play Voicemail
-                    </a>
-                  </div>
-                )}
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Pagination Controls */}
       {totalCalls > 0 && (

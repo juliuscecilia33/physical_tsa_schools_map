@@ -99,14 +99,22 @@ export interface CloseCallActivity {
   disposition?: 'answered' | 'no-answer' | 'vm-answer' | 'vm-left' | 'busy' | 'blocked' | 'error' | 'abandoned';
   call_method?: 'regular' | 'power' | 'predictive';
   duration?: number;
-  cost?: number;
+  cost?: string;
   phone?: string;
+  remote_phone?: string;
+  remote_phone_formatted?: string;
+  local_phone?: string;
+  local_phone_formatted?: string;
   note?: string;
   note_html?: string;
   recording_url?: string;
   voicemail_url?: string;
+  recording_duration?: number;
+  voicemail_duration?: number;
+  has_recording?: boolean;
   recording_transcript?: CloseCallTranscript;
   voicemail_transcript?: CloseCallTranscript;
+  contact_id?: string;
 }
 
 export interface CloseCallTranscript {
