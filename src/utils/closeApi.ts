@@ -151,7 +151,12 @@ export class CloseApiClient {
    * GET /contact/
    */
   async getContacts(params: CloseQueryParams = {}): Promise<CloseContactsResponse> {
-    const queryString = this.buildQueryString(params);
+    // Explicitly request fields including lead_id to ensure company association is available
+    const enrichedParams = {
+      ...params,
+      _fields: 'id,name,title,lead_id,emails,phones,date_created,date_updated,organization_id',
+    };
+    const queryString = this.buildQueryString(enrichedParams);
     return this.request<CloseContactsResponse>(`/contact/${queryString}`);
   }
 

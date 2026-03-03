@@ -1,7 +1,7 @@
 {
-  "processedCount": 1239,
-  "successCount": 1065,
-  "failedCount": 179,
+  "processedCount": 1250,
+  "successCount": 1074,
+  "failedCount": 181,
   "skippedCount": 17,
   "processedFacilityIds": [
     "2651e40a-b22d-4b23-9fd7-8ff121dfdd25",
@@ -1071,15 +1071,24 @@
     "390354b2-925d-4abc-ada5-badc373c419d",
     "be1d98b2-723d-48d7-b7ab-99edda2425e9",
     "4753ee6d-0345-4623-ab3b-59f3bc97289b",
-    "c8505aec-412a-4ad9-9a2e-bd7d1e0c9640"
+    "c8505aec-412a-4ad9-9a2e-bd7d1e0c9640",
+    "0320e2b5-eced-4e5b-83ee-db2e75a58fb4",
+    "eb09d935-9d1b-4b7a-b023-e2ff4a725995",
+    "e55c0efd-f505-4637-b256-a19158053fb9",
+    "cfbf83bc-c763-46eb-af97-755d6047f44a",
+    "b252846e-b71b-4309-be30-e1d331ed6e15",
+    "7dd05595-9f5f-482a-9f53-4a323e3cc08e",
+    "e05df67c-2482-4a28-961b-a8856d34f62d",
+    "de793a6d-8785-4ad5-81fd-9c962547de6a",
+    "22382597-87d9-4702-8c64-c43b7a8a4ba5"
   ],
-  "lastProcessedIndex": 1252,
-  "imagesProcessed": 43300,
+  "lastProcessedIndex": 1263,
+  "imagesProcessed": 43730,
   "imagesSkipped": 39,
-  "imagesFailed": 466,
-  "totalBytesBefore": 104744548977,
-  "totalBytesAfter": 41792436384,
-  "lastUpdated": "2026-03-03T21:23:09.312Z",
+  "imagesFailed": 469,
+  "totalBytesBefore": 105776075283,
+  "totalBytesAfter": 42216674058,
+  "lastUpdated": "2026-03-03T21:44:20.831Z",
   "errors": [
     {
       "facility_id": "c8861bb6-f825-4d28-a60f-695b1edfef7b",
@@ -4342,8 +4351,29 @@
       "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/f8187722-8c00-4c55-87a5-d42621db293a/1772250393171_25.jpg",
       "error": "Failed to download image",
       "timestamp": "2026-03-03T20:57:37.351Z"
+    },
+    {
+      "facility_id": "5dd778f1-9ac1-4201-ad00-d8dd62710262",
+      "facility_name": "P.E. Shotwell Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/5dd778f1-9ac1-4201-ad00-d8dd62710262/1772088249530_16.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T21:38:03.303Z"
+    },
+    {
+      "facility_id": "5dd778f1-9ac1-4201-ad00-d8dd62710262",
+      "facility_name": "P.E. Shotwell Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/5dd778f1-9ac1-4201-ad00-d8dd62710262/1772088271175_37.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T21:38:57.770Z"
+    },
+    {
+      "facility_id": "fba9b259-d669-42b1-ba2c-e5b99c8c9c4d",
+      "facility_name": "Javelina Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/fba9b259-d669-42b1-ba2c-e5b99c8c9c4d/1772131057777_29.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T21:42:21.583Z"
     }
   ],
-  "deletionsSucceeded": 39666,
+  "deletionsSucceeded": 40096,
   "deletionsFailed": 8
 }
