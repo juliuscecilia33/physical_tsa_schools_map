@@ -310,12 +310,13 @@ export default function AddFacilitySidebar({
         if (notesError) throw notesError;
       }
 
-      // Optional SerpAPI Enrichment
+      // Optional SerpAPI Enrichment with SSE progress
       if (enableSerpApiEnrichment && formData.location) {
         setEnrichmentProgress("🔄 Starting SerpAPI enrichment...");
 
         try {
-          const enrichmentResponse = await fetch("/api/enrich-facility", {
+          // Use fetch with SSE handling
+          const response = await fetch("/api/enrich-facility", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -328,18 +329,61 @@ export default function AddFacilitySidebar({
             }),
           });
 
-          const enrichmentResult = await enrichmentResponse.json();
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
 
-          if (enrichmentResult.success) {
-            setEnrichmentProgress(
-              `✅ Enrichment complete! ${enrichmentResult.photosUploaded} photos, ${enrichmentResult.reviewsCollected} reviews collected`
-            );
-            // Wait a moment to show the success message
+          // Read SSE stream
+          const reader = response.body?.getReader();
+          const decoder = new TextDecoder();
+
+          if (reader) {
+            let buffer = "";
+
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+
+              buffer += decoder.decode(value, { stream: true });
+              const lines = buffer.split("\n\n");
+              buffer = lines.pop() || "";
+
+              for (const line of lines) {
+                if (line.trim()) {
+                  const eventLines = line.split("\n");
+                  let eventType = "";
+                  let dataStr = "";
+
+                  for (const eventLine of eventLines) {
+                    if (eventLine.startsWith("event: ")) {
+                      eventType = eventLine.substring(7).trim();
+                    } else if (eventLine.startsWith("data: ")) {
+                      dataStr = eventLine.substring(6).trim();
+                    }
+                  }
+
+                  if (eventType && dataStr) {
+                    const data = JSON.parse(dataStr);
+
+                    if (eventType === "progress") {
+                      setEnrichmentProgress(data.message);
+                    } else if (eventType === "complete") {
+                      setEnrichmentProgress(
+                        `✅ Enrichment complete! ${data.photosUploaded} photos, ${data.reviewsCollected} reviews collected`
+                      );
+                    } else if (eventType === "error") {
+                      console.error("Enrichment error:", data.error);
+                      setEnrichmentProgress(
+                        "⚠️ Enrichment failed, but facility was created"
+                      );
+                    }
+                  }
+                }
+              }
+            }
+
+            // Wait a moment to show the final message
             await new Promise((resolve) => setTimeout(resolve, 1500));
-          } else {
-            console.error("Enrichment failed:", enrichmentResult.error);
-            setEnrichmentProgress("⚠️ Enrichment failed, but facility was created");
-            await new Promise((resolve) => setTimeout(resolve, 2000));
           }
         } catch (enrichError) {
           console.error("Enrichment error:", enrichError);
@@ -348,10 +392,14 @@ export default function AddFacilitySidebar({
         }
       }
 
-      // Invalidate queries to refresh facility list
+      // Invalidate all facility queries to fetch fresh data from DB
+      // This ensures both the map and sidebar show SerpAPI photos/reviews
       queryClient.invalidateQueries({ queryKey: ["facilities"] });
+      queryClient.invalidateQueries({
+        queryKey: ["facility", "full", facility.place_id],
+      });
 
-      // Success callback
+      // Success callback - opens facility details sidebar
       onSuccess(facility.place_id);
       onClose();
     } catch (error: any) {

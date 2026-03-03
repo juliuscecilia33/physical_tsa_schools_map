@@ -1,7 +1,7 @@
 {
-  "processedCount": 1152,
-  "successCount": 988,
-  "failedCount": 169,
+  "processedCount": 1160,
+  "successCount": 995,
+  "failedCount": 170,
   "skippedCount": 17,
   "processedFacilityIds": [
     "2651e40a-b22d-4b23-9fd7-8ff121dfdd25",
@@ -994,15 +994,22 @@
     "9296069c-79d4-400e-a87e-5f5ff743690d",
     "e544ad38-0821-4cc6-82a9-c5d8fcfe6950",
     "0b515da8-50a6-42ae-a5da-2c9a30b7f722",
-    "b7f34222-1137-4611-ac49-a3bba8ae7ae1"
+    "b7f34222-1137-4611-ac49-a3bba8ae7ae1",
+    "d3aee9de-eeab-4fd8-aac8-2fc6fe1c9bb5",
+    "81a69db9-be10-4f3c-a8f2-57f2b5559589",
+    "63f74c95-672a-4c2d-bdb1-aee204f115c1",
+    "4e84d90f-05ae-4742-9625-98138c3fd330",
+    "34fb5691-a52c-4f9d-9e79-9357f0f41dca",
+    "f6cce1c2-cd56-4398-bfb5-8bd5cef2ee7b",
+    "2d4b6e45-0ecf-4b58-8265-801c838d6a66"
   ],
-  "lastProcessedIndex": 1165,
-  "imagesProcessed": 39995,
+  "lastProcessedIndex": 1173,
+  "imagesProcessed": 40289,
   "imagesSkipped": 39,
-  "imagesFailed": 450,
-  "totalBytesBefore": 96410393786,
-  "totalBytesAfter": 38436823294,
-  "lastUpdated": "2026-03-03T18:44:07.312Z",
+  "imagesFailed": 451,
+  "totalBytesBefore": 97184225676,
+  "totalBytesAfter": 38729955850,
+  "lastUpdated": "2026-03-03T18:57:07.774Z",
   "errors": [
     {
       "facility_id": "c8861bb6-f825-4d28-a60f-695b1edfef7b",
@@ -4153,8 +4160,15 @@
       "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/56227eed-5ea4-48f2-a750-b0d2a71323ba/1772054083233_30.jpg",
       "error": "Failed to download image",
       "timestamp": "2026-03-03T18:43:44.563Z"
+    },
+    {
+      "facility_id": "945a35ca-22da-4ff3-9a80-1ab81df1fc49",
+      "facility_name": "The Nelson Golf and Sports Club",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/945a35ca-22da-4ff3-9a80-1ab81df1fc49/1772245550028_38.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T18:51:57.922Z"
     }
   ],
-  "deletionsSucceeded": 36361,
+  "deletionsSucceeded": 36655,
   "deletionsFailed": 8
 }
