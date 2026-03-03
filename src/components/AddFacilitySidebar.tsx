@@ -392,9 +392,16 @@ export default function AddFacilitySidebar({
         }
       }
 
-      // Invalidate all facility queries to fetch fresh data from DB
-      // This ensures both the map and sidebar show SerpAPI photos/reviews
-      queryClient.invalidateQueries({ queryKey: ["facilities"] });
+      // Refetch facility queries and WAIT for completion
+      // This ensures map has fresh data before navigation
+      await queryClient.refetchQueries({
+        queryKey: ["facilities"]
+      });
+
+      // Small buffer to ensure data is fully propagated
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      // Also invalidate individual facility cache for fresh details
       queryClient.invalidateQueries({
         queryKey: ["facility", "full", facility.place_id],
       });
