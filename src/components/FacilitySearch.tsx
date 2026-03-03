@@ -184,13 +184,13 @@ export default function FacilitySearch({
           >
             <div className="relative">
               <motion.div
-                className={`bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl transition-all duration-300 border ${
+                className={`bg-white/95 backdrop-blur-xl rounded-2xl shadow-sm transition-all duration-300 border ${
                   isFocused
-                    ? "ring-2 ring-[#004aad]/50 shadow-[#004aad]/20 border-[#004aad]/30"
+                    ? "ring-2 ring-[#004aad]/50 border-[#004aad]/30"
                     : "border-[#E8E9EB] hover:border-gray-300/50"
                 }`}
               >
-                <div className="flex items-center gap-4 px-6 py-2">
+                <div className="flex items-center gap-4 px-4 py-1">
                   <Search
                     className={`w-6 h-6 flex-shrink-0 transition-colors duration-300 ${
                       isFocused ? "text-[#004aad]" : "text-gray-400"
@@ -203,7 +203,7 @@ export default function FacilitySearch({
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onFocus={() => setIsFocused(true)}
                     placeholder="Search facilities, sports, or location..."
-                    className="flex-1 text-base text-gray-900 placeholder:text-gray-400 bg-transparent focus:outline-none font-medium"
+                    className="flex-1 text-sm text-gray-900 placeholder:text-gray-400 bg-transparent focus:outline-none font-medium"
                   />
                   {searchQuery ? (
                     <motion.button

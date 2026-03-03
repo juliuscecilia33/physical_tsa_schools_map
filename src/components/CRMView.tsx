@@ -29,6 +29,8 @@ import CRMFacilityDetailsSidebar from "./CRMFacilityDetailsSidebar";
 import SportFacilitiesSidebar from "./SportFacilitiesSidebar";
 import AddFacilitySidebar from "./AddFacilitySidebar";
 import { SkeletonTableRows } from "./SkeletonTableRow";
+import FacilitySearch from "./FacilitySearch";
+import { Facility } from "@/types/facility";
 import {
   BarChart,
   Bar,
@@ -637,6 +639,11 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
     router.push(`/?focus=${placeId}`);
   };
 
+  // Handler for facility selection from search
+  const handleSearchSelect = (facility: Facility) => {
+    handleOpenDetails(facility.place_id);
+  };
+
   // Handler to open sport facilities sidebar
   const handleSportClick = (sport: string) => {
     setIsFiltersSidebarOpen(false); // Close filters sidebar
@@ -865,6 +872,10 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
                 </div>
 
                 <div className="flex items-center gap-3 w-full sm:w-auto">
+                  <FacilitySearch
+                    facilities={facilities as unknown as Facility[]}
+                    onSelectFacility={handleSearchSelect}
+                  />
                   <button
                     onClick={() => setIsFiltersSidebarOpen(true)}
                     className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-xl border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition-colors shadow-sm active:bg-slate-100 relative"
