@@ -1,7 +1,7 @@
 {
-  "processedCount": 1213,
-  "successCount": 1041,
-  "failedCount": 177,
+  "processedCount": 1239,
+  "successCount": 1065,
+  "failedCount": 179,
   "skippedCount": 17,
   "processedFacilityIds": [
     "2651e40a-b22d-4b23-9fd7-8ff121dfdd25",
@@ -1047,15 +1047,39 @@
     "2e583372-b2e5-4d6b-9e67-ddd672cafcf8",
     "9a2dfd8c-2dce-4db2-80ea-1c89e5005c5c",
     "f47364f7-2f4b-47fa-8ae4-8136848b475f",
-    "26cec334-cdf7-4b7f-832f-7bd3767e7724"
+    "26cec334-cdf7-4b7f-832f-7bd3767e7724",
+    "434bbdf1-8400-4d02-afaf-9e3345afcba3",
+    "83ba0d0b-5712-45c0-a906-6f8cabf622ca",
+    "8a2f96e8-7ff4-4e58-9aa0-ea4c0c879dd4",
+    "ea0522d0-2533-482a-828e-48c859d902fc",
+    "c7d11c53-49b6-4950-abd2-f9da73bc04b0",
+    "b43b4625-9f04-4379-86ca-89e5f5e10a17",
+    "ee7cd2c4-b168-45bd-8120-9a6775825b13",
+    "effdb793-838b-419b-aed1-7ca597e70bdc",
+    "568b3bf0-47bc-42f3-8beb-5240f0570d5c",
+    "fdc82942-f950-4f1d-adde-c9c132364f74",
+    "9b625cae-9596-42e4-aa8a-9e182f7a7b4e",
+    "42019e6e-77f1-420a-ab2b-46db716e694e",
+    "3c8436ad-acb9-452c-a437-2896b13b2b86",
+    "61fd77db-3416-42ad-b6b2-8993629f514a",
+    "0656f718-1b79-408a-83b4-c40bf87f5162",
+    "f2635a18-2ecd-46ea-be07-a31918a376d2",
+    "cc07ce3f-79ba-4371-af23-fe437d908ae4",
+    "97d70823-5e3d-44ab-a693-e1e3f104a968",
+    "b7d0a257-ea33-42a1-a7ac-b47ed5825ac2",
+    "6782781c-ade5-436b-8e9f-82f2fe577343",
+    "390354b2-925d-4abc-ada5-badc373c419d",
+    "be1d98b2-723d-48d7-b7ab-99edda2425e9",
+    "4753ee6d-0345-4623-ab3b-59f3bc97289b",
+    "c8505aec-412a-4ad9-9a2e-bd7d1e0c9640"
   ],
-  "lastProcessedIndex": 1226,
-  "imagesProcessed": 42297,
+  "lastProcessedIndex": 1252,
+  "imagesProcessed": 43300,
   "imagesSkipped": 39,
-  "imagesFailed": 464,
-  "totalBytesBefore": 102438173700,
-  "totalBytesAfter": 40853418912,
-  "lastUpdated": "2026-03-03T20:34:49.646Z",
+  "imagesFailed": 466,
+  "totalBytesBefore": 104744548977,
+  "totalBytesAfter": 41792436384,
+  "lastUpdated": "2026-03-03T21:23:09.312Z",
   "errors": [
     {
       "facility_id": "c8861bb6-f825-4d28-a60f-695b1edfef7b",
@@ -4304,8 +4328,22 @@
       "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/73d9b311-a27c-40fc-9203-e029ff1b195e/1772065774346_36.jpg",
       "error": "Failed to download image",
       "timestamp": "2026-03-03T20:20:12.598Z"
+    },
+    {
+      "facility_id": "c99b35b9-82a7-4cac-afa2-66e6ff4b94e0",
+      "facility_name": "Barnett Sports Complex",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/c99b35b9-82a7-4cac-afa2-66e6ff4b94e0/1772083926263_31.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T20:51:07.032Z"
+    },
+    {
+      "facility_id": "f8187722-8c00-4c55-87a5-d42621db293a",
+      "facility_name": "Classen-Steubing Ranch Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/f8187722-8c00-4c55-87a5-d42621db293a/1772250393171_25.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T20:57:37.351Z"
     }
   ],
-  "deletionsSucceeded": 38663,
+  "deletionsSucceeded": 39666,
   "deletionsFailed": 8
 }

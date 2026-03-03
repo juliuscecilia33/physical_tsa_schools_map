@@ -50,6 +50,7 @@ export interface CloseLead {
 // Contact types
 export interface CloseContact {
   id: string;
+  lead_id?: string;
   name?: string;
   title?: string;
   emails?: CloseEmail[];
@@ -58,6 +59,7 @@ export interface CloseContact {
   updated_by?: string;
   date_created: string;
   date_updated: string;
+  organization_id?: string;
 }
 
 export interface CloseEmail {
@@ -106,15 +108,28 @@ export interface CloseCallActivity {
 }
 
 export interface CloseCallTranscript {
+  id?: string;
+  has_speaker_labels?: boolean;
   speakers: {
-    id: string;
-    name: string;
+    speaker_label: string;
+    speaker_side: 'contact' | 'close-user';
+    talk_time?: number;
+    talk_percentage?: number;
   }[];
   utterances: {
-    speaker_id: string;
+    speaker_label: string;
+    speaker_side: 'contact' | 'close-user';
     start: number;
+    end: number;
     text: string;
+    words?: {
+      text: string;
+      start: number;
+      end: number;
+    }[];
   }[];
+  summary_text?: string;
+  summary_html?: string;
 }
 
 // Email Thread types
@@ -222,6 +237,7 @@ export interface CloseQueryParams {
 export type CloseUsersResponse = ClosePaginatedResponse<CloseUser>;
 export type CloseLeadsResponse = ClosePaginatedResponse<CloseLead>;
 export type CloseLeadStatusesResponse = ClosePaginatedResponse<CloseLeadStatus>;
+export type CloseContactsResponse = ClosePaginatedResponse<CloseContact>;
 export type CloseCallsResponse = ClosePaginatedResponse<CloseCallActivity>;
 export type CloseEmailsResponse = ClosePaginatedResponse<CloseEmailThread>;
 export type CloseNotesResponse = ClosePaginatedResponse<CloseNoteActivity>;

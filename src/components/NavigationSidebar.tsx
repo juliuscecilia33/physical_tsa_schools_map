@@ -59,7 +59,7 @@ export default function NavigationSidebar() {
       initial={{ x: -80 }}
       animate={{ x: 0 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
-      className="fixed left-0 top-0 h-screen w-16 bg-gray-100 border-r border-gray-200 flex flex-col items-center z-50"
+      className="fixed left-0 top-0 h-screen w-16 bg-gray-100 border-r border-gray-200 flex flex-col items-center z-30"
     >
       {/* Logo at top */}
       <div className="w-full py-6 px-2">

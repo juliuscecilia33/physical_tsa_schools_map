@@ -134,12 +134,8 @@ function FacilityTable({
             <th className="px-5 py-4 font-semibold text-slate-600">
               Contact Info
             </th>
-            <th className="px-5 py-4 font-semibold text-slate-600">
-              Sports
-            </th>
-            <th className="px-5 py-4 font-semibold text-slate-600">
-              Tags
-            </th>
+            <th className="px-5 py-4 font-semibold text-slate-600">Sports</th>
+            <th className="px-5 py-4 font-semibold text-slate-600">Tags</th>
             <th className="px-5 py-4 font-semibold text-slate-600 text-right">
               Metrics
             </th>
@@ -154,169 +150,177 @@ function FacilityTable({
           ) : (
             <AnimatePresence>
               {facilities.map((facility, index) => (
-              <motion.tr
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-                key={facility.place_id}
-                onClick={() => onOpenDetails(facility.place_id)}
-                className="hover:bg-slate-50/60 transition-colors group cursor-pointer"
-              >
-                <td className="px-5 py-4 align-top min-w-[200px]">
-                  <div className="font-semibold text-slate-800 mb-1 group-hover:text-blue-600 transition-colors">
-                    {facility.name}
-                  </div>
-                  <div
-                    className="text-xs text-slate-500 line-clamp-1 max-w-[250px]"
-                    title={facility.address}
-                  >
-                    {facility.address}
-                  </div>
-                  {facility.has_notes && (
-                    <span className="mt-2 inline-flex items-center gap-1 text-[10px] text-amber-700 bg-amber-50 border border-amber-200/50 px-2 py-1 rounded-md font-semibold uppercase tracking-wider">
-                      <FileText className="h-3 w-3" />
-                      Has Notes
-                    </span>
-                  )}
-                </td>
-
-                <td className="px-4 py-3 align-top text-xs text-gray-600 space-y-1.5 min-w-[150px]">
-                  {facility.phone ? (
-                    <div className="flex items-center gap-1.5">
-                      <Phone className="h-3.5 w-3.5 text-gray-400" />
-                      <span className="tabular-nums font-medium">
-                        {facility.phone}
-                      </span>
+                <motion.tr
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  key={facility.place_id}
+                  onClick={() => onOpenDetails(facility.place_id)}
+                  className="hover:bg-slate-50/60 transition-colors group cursor-pointer"
+                >
+                  <td className="px-5 py-4 align-top min-w-[200px]">
+                    <div className="font-semibold text-slate-800 mb-1 group-hover:text-blue-600 transition-colors">
+                      {facility.name}
                     </div>
-                  ) : (
-                    <div className="text-gray-400 italic">No phone</div>
-                  )}
-                  {facility.website ? (
-                    <div className="flex items-center gap-1.5">
-                      <Globe className="h-3.5 w-3.5 text-gray-400" />
-                      <a
-                        href={facility.website}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-blue-600 hover:text-blue-700 font-medium truncate max-w-[180px] transition-colors"
-                      >
-                        {new URL(facility.website).hostname.replace("www.", "")}
-                      </a>
+                    <div
+                      className="text-xs text-slate-500 line-clamp-1 max-w-[250px]"
+                      title={facility.address}
+                    >
+                      {facility.address}
                     </div>
-                  ) : (
-                    <div className="text-gray-400 italic">No website</div>
-                  )}
-                </td>
-
-                <td className="px-4 py-3 align-top min-w-[180px]">
-                  <div className="flex flex-wrap gap-1.5">
-                    {facility.identified_sports
-                      ?.filter((sport) => {
-                        const score = facility.sport_metadata?.[sport]?.score ?? 0;
-                        return score >= 40;
-                      })
-                      .map((sport) => (
-                        <span
-                          key={sport}
-                          className="text-[10px] bg-blue-50 text-blue-700 font-semibold px-2 py-0.5 rounded uppercase tracking-wide border border-blue-100"
-                        >
-                          {sport}
-                        </span>
-                      ))}
-                    {(!facility.identified_sports ||
-                      facility.identified_sports.length === 0 ||
-                      facility.identified_sports.filter(
-                        (sport) => (facility.sport_metadata?.[sport]?.score ?? 0) >= 40
-                      ).length === 0) && (
-                      <span className="text-xs text-gray-400 italic">
-                        No sports
+                    {facility.has_notes && (
+                      <span className="mt-2 inline-flex items-center gap-1 text-[10px] text-amber-700 bg-amber-50 border border-amber-200/50 px-2 py-1 rounded-md font-semibold uppercase tracking-wider">
+                        <FileText className="h-3 w-3" />
+                        Has Notes
                       </span>
                     )}
-                  </div>
-                </td>
+                  </td>
 
-                <td className="px-4 py-3 align-top min-w-[180px]">
-                  {facility.tags && facility.tags.length > 0 ? (
-                    <div className="flex flex-wrap gap-1.5">
-                      {facility.tags.map((tag) => (
-                        <span
-                          key={tag.id}
-                          className="text-[10px] font-semibold px-2 py-0.5 rounded border uppercase tracking-wide"
-                          style={{
-                            backgroundColor: `${tag.color}15`,
-                            borderColor: `${tag.color}30`,
-                            color: tag.color,
-                          }}
-                        >
-                          {tag.name}
+                  <td className="px-4 py-3 align-top text-xs text-gray-600 space-y-1.5 min-w-[150px]">
+                    {facility.phone ? (
+                      <div className="flex items-center gap-1.5">
+                        <Phone className="h-3.5 w-3.5 text-gray-400" />
+                        <span className="tabular-nums font-medium">
+                          {facility.phone}
                         </span>
-                      ))}
-                    </div>
-                  ) : (
-                    <span className="text-xs text-gray-400 italic">No tags</span>
-                  )}
-                </td>
+                      </div>
+                    ) : (
+                      <div className="text-gray-400 italic">No phone</div>
+                    )}
+                    {facility.website ? (
+                      <div className="flex items-center gap-1.5">
+                        <Globe className="h-3.5 w-3.5 text-gray-400" />
+                        <a
+                          href={facility.website}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-blue-600 hover:text-blue-700 font-medium truncate max-w-[180px] transition-colors"
+                        >
+                          {new URL(facility.website).hostname.replace(
+                            "www.",
+                            "",
+                          )}
+                        </a>
+                      </div>
+                    ) : (
+                      <div className="text-gray-400 italic">No website</div>
+                    )}
+                  </td>
 
-                <td className="px-5 py-4 align-top text-right min-w-[120px]">
-                  <div className="flex flex-col items-end gap-1.5 text-xs">
-                    <div className="flex items-center gap-1.5" title="Rating">
-                      <span className="font-bold tabular-nums text-slate-800 text-sm">
-                        {facility.rating || "N/A"}
-                      </span>
-                      <Star className="h-4 w-4 text-amber-400 fill-amber-400" />
+                  <td className="px-4 py-3 align-top min-w-[180px]">
+                    <div className="flex flex-wrap gap-1.5">
+                      {facility.identified_sports
+                        ?.filter((sport) => {
+                          const score =
+                            facility.sport_metadata?.[sport]?.score ?? 0;
+                          return score >= 40;
+                        })
+                        .map((sport) => (
+                          <span
+                            key={sport}
+                            className="text-[10px] bg-blue-50 text-blue-700 font-semibold px-2 py-0.5 rounded uppercase tracking-wide border border-blue-100"
+                          >
+                            {sport}
+                          </span>
+                        ))}
+                      {(!facility.identified_sports ||
+                        facility.identified_sports.length === 0 ||
+                        facility.identified_sports.filter(
+                          (sport) =>
+                            (facility.sport_metadata?.[sport]?.score ?? 0) >=
+                            40,
+                        ).length === 0) && (
+                        <span className="text-xs text-gray-400 italic">
+                          No sports
+                        </span>
+                      )}
                     </div>
-                    <div className="text-slate-500 font-medium tabular-nums">
-                      {facility.user_ratings_total?.toLocaleString() || 0}{" "}
-                      reviews
-                    </div>
-                    <div className="flex items-center gap-1.5 text-slate-500 mt-0.5 font-medium">
-                      <Camera className="h-4 w-4" />
-                      <span className="tabular-nums">
-                        {(facility.photo_references?.length || 0) +
-                          (facility.additional_photos_count || 0)}{" "}
-                        photos
-                      </span>
-                    </div>
-                  </div>
-                </td>
+                  </td>
 
-                <td className="px-5 py-4 align-middle text-right">
-                  <div className="flex items-center justify-end gap-2">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onViewOnMap(facility.place_id);
-                      }}
-                      title="View on Map"
-                      className="p-2 rounded-lg border border-slate-200 text-slate-700 bg-white hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/20 active:bg-slate-100 cursor-pointer"
-                    >
-                      <MapIcon className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onOpenDetails(facility.place_id);
-                      }}
-                      title="View Details"
-                      className="p-2 rounded-lg border border-slate-200 text-slate-700 bg-white hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/20 active:bg-slate-100 cursor-pointer"
-                    >
-                      <Eye className="h-4 w-4" />
-                    </button>
-                  </div>
-                </td>
-              </motion.tr>
-            ))}
-            {facilities.length === 0 && !isLoading && (
-              <tr>
-                <td
-                  colSpan={6}
-                  className="px-4 py-12 text-center text-gray-500 text-sm"
-                >
-                  No facilities found.
-                </td>
-              </tr>
-            )}
-          </AnimatePresence>
+                  <td className="px-4 py-3 align-top min-w-[180px]">
+                    {facility.tags && facility.tags.length > 0 ? (
+                      <div className="flex flex-wrap gap-1.5">
+                        {facility.tags.map((tag) => (
+                          <span
+                            key={tag.id}
+                            className="text-[10px] font-semibold px-2 py-0.5 rounded border uppercase tracking-wide"
+                            style={{
+                              backgroundColor: `${tag.color}15`,
+                              borderColor: `${tag.color}30`,
+                              color: tag.color,
+                            }}
+                          >
+                            {tag.name}
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <span className="text-xs text-gray-400 italic">
+                        No tags
+                      </span>
+                    )}
+                  </td>
+
+                  <td className="px-5 py-4 align-top text-right min-w-[120px]">
+                    <div className="flex flex-col items-end gap-1.5 text-xs">
+                      <div className="flex items-center gap-1.5" title="Rating">
+                        <span className="font-bold tabular-nums text-slate-800 text-sm">
+                          {facility.rating || "N/A"}
+                        </span>
+                        <Star className="h-4 w-4 text-amber-400 fill-amber-400" />
+                      </div>
+                      <div className="text-slate-500 font-medium tabular-nums">
+                        {facility.user_ratings_total?.toLocaleString() || 0}{" "}
+                        reviews
+                      </div>
+                      <div className="flex items-center gap-1.5 text-slate-500 mt-0.5 font-medium">
+                        <Camera className="h-4 w-4" />
+                        <span className="tabular-nums">
+                          {(facility.photo_references?.length || 0) +
+                            (facility.additional_photos_count || 0)}{" "}
+                          photos
+                        </span>
+                      </div>
+                    </div>
+                  </td>
+
+                  <td className="px-5 py-4 align-middle text-right">
+                    <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onViewOnMap(facility.place_id);
+                        }}
+                        title="View on Map"
+                        className="p-2 rounded-lg border border-slate-200 text-slate-700 bg-white hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/20 active:bg-slate-100 cursor-pointer"
+                      >
+                        <MapIcon className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onOpenDetails(facility.place_id);
+                        }}
+                        title="View Details"
+                        className="p-2 rounded-lg border border-slate-200 text-slate-700 bg-white hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/20 active:bg-slate-100 cursor-pointer"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </td>
+                </motion.tr>
+              ))}
+              {facilities.length === 0 && !isLoading && (
+                <tr>
+                  <td
+                    colSpan={6}
+                    className="px-4 py-12 text-center text-gray-500 text-sm"
+                  >
+                    No facilities found.
+                  </td>
+                </tr>
+              )}
+            </AnimatePresence>
           )}
         </tbody>
         <tfoot>
@@ -481,7 +485,10 @@ function AnalyticsView({
           </p>
         </div>
 
-        <ResponsiveContainer width="100%" height={Math.max(400, chartData.length * 35)}>
+        <ResponsiveContainer
+          width="100%"
+          height={Math.max(400, chartData.length * 35)}
+        >
           <BarChart
             data={chartData}
             layout="vertical"
@@ -542,9 +549,7 @@ function AnalyticsView({
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-xs text-slate-500 uppercase tracking-wider border-b border-slate-200/60 bg-slate-50/50">
-                <th className="px-6 py-4 font-semibold text-slate-600">
-                  Rank
-                </th>
+                <th className="px-6 py-4 font-semibold text-slate-600">Rank</th>
                 <th className="px-6 py-4 font-semibold text-slate-600">
                   Sport
                 </th>
@@ -623,9 +628,12 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
   const [itemsPerPage, setItemsPerPage] = useState(100);
   const [isFiltersSidebarOpen, setIsFiltersSidebarOpen] = useState(false);
   const [filters, setFilters] = useState<FilterState>(loadFiltersFromStorage);
-  const [selectedFacilityId, setSelectedFacilityId] = useState<string | null>(null);
+  const [selectedFacilityId, setSelectedFacilityId] = useState<string | null>(
+    null,
+  );
   const [selectedSport, setSelectedSport] = useState<string | null>(null);
-  const [isAddFacilitySidebarOpen, setIsAddFacilitySidebarOpen] = useState(false);
+  const [isAddFacilitySidebarOpen, setIsAddFacilitySidebarOpen] =
+    useState(false);
   const { setLoadingComplete } = useLoading();
   const router = useRouter();
 
@@ -670,8 +678,8 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
         new Map<string, FacilityLightweight>(
           facilities
             .filter((f) => f.identified_sports?.includes(selectedSport))
-            .map((facility) => [facility.place_id, facility])
-        ).values()
+            .map((facility) => [facility.place_id, facility]),
+        ).values(),
       )
     : [];
 
@@ -693,9 +701,7 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
 
   // Extract unique sports from facilities
   const availableSports = Array.from(
-    new Set(
-      facilities.flatMap((f) => f.identified_sports || [])
-    )
+    new Set(facilities.flatMap((f) => f.identified_sports || [])),
   ).sort();
 
   // Apply all filters
@@ -710,7 +716,7 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
     // Sports filter
     if (filters.selectedSports.length > 0) {
       const hasSport = filters.selectedSports.some((sport) =>
-        facility.identified_sports?.includes(sport)
+        facility.identified_sports?.includes(sport),
       );
       if (!hasSport) return false;
     }
@@ -740,7 +746,7 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
     if (filters.selectedTags.length > 0) {
       const facilityTagIds = facility.tags?.map((t) => t.id) || [];
       const hasTag = filters.selectedTags.some((tagId) =>
-        facilityTagIds.includes(tagId)
+        facilityTagIds.includes(tagId),
       );
       if (!hasTag) return false;
     }
@@ -784,10 +790,14 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
   // Show error state (only for critical errors, not for loading)
   if (isError && !isPriorityLoading) {
     return (
-      <div className={`w-full min-h-screen bg-white font-poppins text-slate-900 ${!isVisible ? 'hidden' : ''} flex items-center justify-center`}>
+      <div
+        className={`w-full min-h-screen bg-white font-poppins text-slate-900 ${!isVisible ? "hidden" : ""} flex items-center justify-center`}
+      >
         <div className="text-center">
-          <div className="text-red-600 text-xl mb-4">❌ Error loading facilities</div>
-          <p className="text-gray-600">{error?.message || 'Unknown error'}</p>
+          <div className="text-red-600 text-xl mb-4">
+            ❌ Error loading facilities
+          </div>
+          <p className="text-gray-600">{error?.message || "Unknown error"}</p>
         </div>
       </div>
     );
@@ -795,10 +805,13 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
 
   // Determine if we should show loading state
   const isLoadingData = isPriorityLoading;
-  const showSkeletonRows = isLoadingData || (isBackgroundLoading && facilities.length === 0);
+  const showSkeletonRows =
+    isLoadingData || (isBackgroundLoading && facilities.length === 0);
 
   return (
-    <div className={`w-full min-h-screen bg-white font-poppins text-slate-900 ${!isVisible ? 'hidden' : ''}`}>
+    <div
+      className={`w-full min-h-screen bg-white font-poppins text-slate-900 ${!isVisible ? "hidden" : ""}`}
+    >
       {/* Filters Sidebar */}
       <FiltersSidebar
         isOpen={isFiltersSidebarOpen}
@@ -861,7 +874,8 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
                     <div className="text-sm text-slate-600 font-medium">
                       <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg border border-blue-200">
                         <Filter className="h-3.5 w-3.5" />
-                        {activeFilterCount} active filter{activeFilterCount !== 1 ? 's' : ''}
+                        {activeFilterCount} active filter
+                        {activeFilterCount !== 1 ? "s" : ""}
                       </span>
                     </div>
                   )}
@@ -912,13 +926,15 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-200">
                   {/* Results Info */}
                   <div className="text-sm text-slate-600 font-medium">
-                    Showing {startIndex + 1}-{Math.min(endIndex, filteredFacilities.length)} of {filteredFacilities.length} facilities
+                    Showing {startIndex + 1}-
+                    {Math.min(endIndex, filteredFacilities.length)} of{" "}
+                    {filteredFacilities.length} facilities
                   </div>
 
                   {/* Page Controls */}
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                       disabled={currentPage === 1}
                       className="flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white"
                     >
@@ -927,11 +943,20 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
                     </button>
 
                     <div className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700">
-                      Page <span className="font-bold text-slate-900">{currentPage}</span> of <span className="font-bold text-slate-900">{totalPages}</span>
+                      Page{" "}
+                      <span className="font-bold text-slate-900">
+                        {currentPage}
+                      </span>{" "}
+                      of{" "}
+                      <span className="font-bold text-slate-900">
+                        {totalPages}
+                      </span>
                     </div>
 
                     <button
-                      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                      onClick={() =>
+                        setCurrentPage((p) => Math.min(totalPages, p + 1))
+                      }
                       disabled={currentPage === totalPages}
                       className="flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg border border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white"
                     >
@@ -942,7 +967,10 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
 
                   {/* Items per page selector */}
                   <div className="flex items-center gap-2 text-sm">
-                    <label htmlFor="itemsPerPage" className="text-slate-600 font-medium">
+                    <label
+                      htmlFor="itemsPerPage"
+                      className="text-slate-600 font-medium"
+                    >
                       Per page:
                     </label>
                     <select
@@ -986,7 +1014,8 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
             <div className="text-center">
               <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-slate-50 border border-slate-100 mb-6 shadow-sm">
                 {(() => {
-                  const TabIcon = TABS.find((t) => t.id === activeTab)?.icon || BarChart3;
+                  const TabIcon =
+                    TABS.find((t) => t.id === activeTab)?.icon || BarChart3;
                   return <TabIcon className="h-10 w-10 text-slate-400" />;
                 })()}
               </div>

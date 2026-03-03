@@ -3,6 +3,7 @@ import type {
   CloseUsersResponse,
   CloseLeadsResponse,
   CloseLeadStatusesResponse,
+  CloseContactsResponse,
   CloseCallsResponse,
   CloseEmailsResponse,
   CloseQueryParams,
@@ -139,6 +140,27 @@ export class CloseApiClient {
    */
   async getLead(leadId: string): Promise<any> {
     return this.request(`/lead/${leadId}/`);
+  }
+
+  // ============================================
+  // Contact Endpoints
+  // ============================================
+
+  /**
+   * List contacts with optional filtering
+   * GET /contact/
+   */
+  async getContacts(params: CloseQueryParams = {}): Promise<CloseContactsResponse> {
+    const queryString = this.buildQueryString(params);
+    return this.request<CloseContactsResponse>(`/contact/${queryString}`);
+  }
+
+  /**
+   * Get a specific contact by ID
+   * GET /contact/{id}/
+   */
+  async getContact(contactId: string): Promise<any> {
+    return this.request(`/contact/${contactId}/`);
   }
 
   // ============================================

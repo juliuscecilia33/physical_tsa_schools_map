@@ -3,6 +3,7 @@ import type {
   CloseUser,
   CloseLead,
   CloseLeadStatus,
+  CloseContact,
   CloseCallActivity,
   CloseEmailThread,
   CloseQueryParams,
@@ -199,6 +200,65 @@ export function useCloseLeadActivities(
 }
 
 // ============================================
+// Contacts
+// ============================================
+
+/**
+ * Get contacts with optional filtering
+ */
+export function useCloseContacts(params?: CloseQueryParams): UseQueryResult<{
+  contacts: CloseContact[];
+  hasMore: boolean;
+}> {
+  return useQuery({
+    queryKey: ['close', 'contacts', params],
+    queryFn: async () => {
+      const searchParams = new URLSearchParams();
+      if (params?._limit) searchParams.append('_limit', params._limit.toString());
+      if (params?._skip) searchParams.append('_skip', params._skip.toString());
+      if (params?.lead_id) searchParams.append('lead_id', params.lead_id);
+
+      const response = await fetch(`/api/close/contacts?${searchParams.toString()}`);
+      const data: CloseApiResponse<CloseContact[]> = await response.json();
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to fetch contacts');
+      }
+      return {
+        contacts: data.data,
+        hasMore: data.has_more || false,
+      };
+    },
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 5 * 60 * 1000, // 5 minutes
+  });
+}
+
+/**
+ * Get a single contact by ID with full details and activities
+ */
+export function useCloseContact(contactId: string | null): UseQueryResult<
+  CloseContact & { activities?: any[] }
+> {
+  return useQuery({
+    queryKey: ['close', 'contact', contactId],
+    queryFn: async () => {
+      if (!contactId) {
+        throw new Error('Contact ID is required');
+      }
+      const response = await fetch(`/api/close/contacts/${contactId}`);
+      const data: CloseApiResponse<CloseContact & { activities?: any[] }> = await response.json();
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to fetch contact');
+      }
+      return data.data;
+    },
+    enabled: !!contactId, // Only run query if contactId is provided
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
+  });
+}
+
+// ============================================
 // Call Activities
 // ============================================
 
@@ -232,6 +292,29 @@ export function useCloseCalls(params?: CloseQueryParams): UseQueryResult<{
     },
     staleTime: 1 * 60 * 1000, // 1 minute
     gcTime: 5 * 60 * 1000, // 5 minutes
+  });
+}
+
+/**
+ * Get a single call by ID with full details including transcript
+ */
+export function useCloseCall(callId: string | null): UseQueryResult<CloseCallActivity> {
+  return useQuery({
+    queryKey: ['close', 'call', callId],
+    queryFn: async () => {
+      if (!callId) {
+        throw new Error('Call ID is required');
+      }
+      const response = await fetch(`/api/close/calls/${callId}`);
+      const data: CloseApiResponse<CloseCallActivity> = await response.json();
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to fetch call');
+      }
+      return data.data;
+    },
+    enabled: !!callId, // Only run query if callId is provided
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 }
 

@@ -6,21 +6,27 @@ import { CloseUsersList } from './CloseUsersList';
 import { CloseLeadsList } from './CloseLeadsList';
 import { CloseCallsList } from './CloseCallsList';
 import { CloseEmailsList } from './CloseEmailsList';
+import { CloseContactsList } from './CloseContactsList';
 import { LeadDetailsSidebar } from './LeadDetailsSidebar';
-import { User, Building2, Phone, Mail, CheckCircle, XCircle } from 'lucide-react';
+import { CallDetailsSidebar } from './CallDetailsSidebar';
+import { ContactDetailsSidebar } from './ContactDetailsSidebar';
+import { User, Building2, Phone, Mail, Users, CheckCircle, XCircle } from 'lucide-react';
 
-type Tab = 'users' | 'leads' | 'calls' | 'emails';
+type Tab = 'leads' | 'calls' | 'emails' | 'contacts' | 'users';
 
 export function CloseCRMExplorer() {
-  const [activeTab, setActiveTab] = useState<Tab>('users');
+  const [activeTab, setActiveTab] = useState<Tab>('leads');
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
+  const [selectedCallId, setSelectedCallId] = useState<string | null>(null);
+  const [selectedContactId, setSelectedContactId] = useState<string | null>(null);
   const { data: currentUser, isLoading: authLoading, error: authError } = useCloseUser();
 
   const tabs = [
-    { id: 'users' as Tab, label: 'Users', icon: User },
     { id: 'leads' as Tab, label: 'Leads', icon: Building2 },
     { id: 'calls' as Tab, label: 'Calls', icon: Phone },
     { id: 'emails' as Tab, label: 'Emails', icon: Mail },
+    { id: 'contacts' as Tab, label: 'Contacts', icon: Users },
+    { id: 'users' as Tab, label: 'Users', icon: User },
   ];
 
   return (
@@ -91,12 +97,17 @@ export function CloseCRMExplorer() {
 
           {/* Tab Content */}
           <div className="p-6">
-            {activeTab === 'users' && <CloseUsersList />}
             {activeTab === 'leads' && (
               <CloseLeadsList onLeadClick={(leadId) => setSelectedLeadId(leadId)} />
             )}
-            {activeTab === 'calls' && <CloseCallsList />}
+            {activeTab === 'calls' && (
+              <CloseCallsList onCallClick={(callId) => setSelectedCallId(callId)} />
+            )}
             {activeTab === 'emails' && <CloseEmailsList />}
+            {activeTab === 'contacts' && (
+              <CloseContactsList onContactClick={(contactId) => setSelectedContactId(contactId)} />
+            )}
+            {activeTab === 'users' && <CloseUsersList />}
           </div>
         </div>
       )}
@@ -105,6 +116,22 @@ export function CloseCRMExplorer() {
       <LeadDetailsSidebar
         leadId={selectedLeadId}
         onClose={() => setSelectedLeadId(null)}
+      />
+
+      {/* Call Details Sidebar */}
+      <CallDetailsSidebar
+        callId={selectedCallId}
+        onClose={() => setSelectedCallId(null)}
+      />
+
+      {/* Contact Details Sidebar */}
+      <ContactDetailsSidebar
+        contactId={selectedContactId}
+        onClose={() => setSelectedContactId(null)}
+        onLeadClick={(leadId) => {
+          setSelectedContactId(null);
+          setSelectedLeadId(leadId);
+        }}
       />
     </div>
   );

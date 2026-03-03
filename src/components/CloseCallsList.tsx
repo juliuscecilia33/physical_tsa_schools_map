@@ -1,7 +1,8 @@
 'use client';
 
+import { useState } from 'react';
 import { useCloseCalls } from '@/hooks/useCloseCRM';
-import { Phone, PhoneIncoming, PhoneOutgoing, Play, Clock } from 'lucide-react';
+import { Phone, PhoneIncoming, PhoneOutgoing, Play, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 
 function formatDuration(seconds: number | undefined): string {
   if (!seconds) return 'N/A';
@@ -28,8 +29,27 @@ function getDispositionColor(disposition: string | undefined): string {
   }
 }
 
-export function CloseCallsList() {
-  const { data, isLoading, error } = useCloseCalls({ _limit: 50 });
+interface CloseCallsListProps {
+  onCallClick?: (callId: string) => void;
+}
+
+export function CloseCallsList({ onCallClick }: CloseCallsListProps) {
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 50;
+  const skip = (currentPage - 1) * itemsPerPage;
+
+  // Fetch calls with server-side pagination
+  const { data, isLoading, error } = useCloseCalls({
+    _limit: itemsPerPage,
+    _skip: skip,
+  });
+
+  const calls = data?.calls || [];
+  const hasMore = data?.hasMore || false;
+  const totalCalls = calls.length;
+  const startIndex = skip + 1;
+  const endIndex = skip + totalCalls;
 
   if (isLoading) {
     return (
@@ -47,7 +67,7 @@ export function CloseCallsList() {
     );
   }
 
-  if (!data?.calls || data.calls.length === 0) {
+  if (!calls || calls.length === 0) {
     return (
       <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
         <p className="text-gray-600 text-sm">No calls found</p>
@@ -55,14 +75,14 @@ export function CloseCallsList() {
     );
   }
 
-  const callsWithRecordings = data.calls.filter((c) => c.recording_url).length;
+  const callsWithRecordings = calls.filter((c) => c.recording_url).length;
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold flex items-center gap-2">
           <Phone className="w-5 h-5" />
-          Calls ({data.calls.length})
+          Calls {totalCalls > 0 && `(${startIndex}-${endIndex}${hasMore ? '+' : ''})`}
         </h3>
         {callsWithRecordings > 0 && (
           <span className="text-sm text-gray-600">
@@ -72,10 +92,11 @@ export function CloseCallsList() {
       </div>
 
       <div className="space-y-2">
-        {data.calls.map((call) => (
+        {calls.map((call) => (
           <div
             key={call.id}
-            className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            onClick={() => onCallClick?.(call.id)}
+            className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer"
           >
             <div className="flex items-start gap-3">
               {/* Direction Icon */}
@@ -133,6 +154,7 @@ export function CloseCallsList() {
                       href={call.recording_url}
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
                       className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 font-medium"
                     >
                       <Play className="w-4 h-4" />
@@ -147,6 +169,7 @@ export function CloseCallsList() {
                       href={call.voicemail_url}
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
                       className="inline-flex items-center gap-2 text-sm text-purple-600 hover:text-purple-800 font-medium"
                     >
                       <Play className="w-4 h-4" />
@@ -160,9 +183,39 @@ export function CloseCallsList() {
         ))}
       </div>
 
-      {data.hasMore && (
-        <div className="text-center p-2 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-sm text-blue-700">More calls available (pagination not implemented)</p>
+      {/* Pagination Controls */}
+      {totalCalls > 0 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-gray-200">
+          {/* Results info */}
+          <div className="text-sm text-gray-600 font-medium">
+            Showing {startIndex}-{endIndex} {hasMore && 'of many more'} calls
+          </div>
+
+          {/* Page controls */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg border border-gray-200 text-gray-700 bg-white hover:bg-gray-50 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Previous
+            </button>
+
+            <div className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700">
+              Page <span className="font-bold text-gray-900">{currentPage}</span>
+              {hasMore && <span className="text-gray-500">(more available)</span>}
+            </div>
+
+            <button
+              onClick={() => setCurrentPage((p) => p + 1)}
+              disabled={!hasMore}
+              className="flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-lg border border-gray-200 text-gray-700 bg-white hover:bg-gray-50 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white"
+            >
+              Next
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       )}
     </div>
