@@ -10,7 +10,7 @@ import { CloseContactsList } from './CloseContactsList';
 import { LeadDetailsSidebar } from './LeadDetailsSidebar';
 import { CallDetailsSidebar } from './CallDetailsSidebar';
 import { ContactDetailsSidebar } from './ContactDetailsSidebar';
-import { User, Building2, Phone, Mail, Users, CheckCircle, XCircle } from 'lucide-react';
+import { User, Building2, Phone, Mail, Users, CheckCircle, XCircle, X } from 'lucide-react';
 
 type Tab = 'leads' | 'calls' | 'emails' | 'contacts' | 'users';
 
@@ -19,7 +19,20 @@ export function CloseCRMExplorer() {
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
   const [selectedCallId, setSelectedCallId] = useState<string | null>(null);
   const [selectedContactId, setSelectedContactId] = useState<string | null>(null);
+  const [isDismissed, setIsDismissed] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('close-crm-auth-dismissed') === 'true';
+    }
+    return false;
+  });
   const { data: currentUser, isLoading: authLoading, error: authError } = useCloseUser();
+
+  const handleDismiss = () => {
+    setIsDismissed(true);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('close-crm-auth-dismissed', 'true');
+    }
+  };
 
   const tabs = [
     { id: 'leads' as Tab, label: 'Leads', icon: Building2 },
@@ -32,37 +45,36 @@ export function CloseCRMExplorer() {
   return (
     <div className="space-y-4">
       {/* Authentication Status */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
-        <h2 className="text-xl font-bold mb-3">Close CRM Integration</h2>
-
-        {authLoading ? (
-          <div className="flex items-center gap-2 text-gray-600">
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
-            <span className="text-sm">Verifying authentication...</span>
-          </div>
-        ) : authError ? (
-          <div className="flex items-center gap-2 text-red-600">
-            <XCircle className="w-5 h-5" />
-            <div>
-              <p className="text-sm font-medium">Authentication Failed</p>
-              <p className="text-xs text-red-500 mt-1">{authError.message}</p>
+      {!isDismissed && (
+        <div className="bg-white rounded-lg border border-gray-200 p-4 relative">
+          <button
+            onClick={handleDismiss}
+            className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition-colors"
+            aria-label="Dismiss"
+          >
+            <X className="w-4 h-4" />
+          </button>
+          {authLoading ? (
+            <div className="flex items-center gap-2 text-gray-600">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
+              <span className="text-sm">Verifying authentication...</span>
             </div>
-          </div>
-        ) : currentUser ? (
-          <div className="flex items-center gap-2 text-green-600">
-            <CheckCircle className="w-5 h-5" />
-            <div>
+          ) : authError ? (
+            <div className="flex items-center gap-2 text-red-600">
+              <XCircle className="w-5 h-5" />
+              <div>
+                <p className="text-sm font-medium">Authentication Failed</p>
+                <p className="text-xs text-red-500 mt-1">{authError.message}</p>
+              </div>
+            </div>
+          ) : currentUser ? (
+            <div className="flex items-center gap-2 text-green-600">
+              <CheckCircle className="w-5 h-5" />
               <p className="text-sm font-medium">Connected to Close CRM</p>
-              <p className="text-xs text-gray-600 mt-1">
-                Authenticated as {currentUser.first_name} {currentUser.last_name} ({currentUser.email})
-              </p>
-              <p className="text-xs text-gray-400 mt-1">
-                Organization ID: {currentUser.organization_id}
-              </p>
             </div>
-          </div>
-        ) : null}
-      </div>
+          ) : null}
+        </div>
+      )}
 
       {/* Tabs */}
       {!authError && (

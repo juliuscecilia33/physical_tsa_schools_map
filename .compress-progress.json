@@ -1,7 +1,7 @@
 {
-  "processedCount": 1250,
-  "successCount": 1074,
-  "failedCount": 181,
+  "processedCount": 1259,
+  "successCount": 1082,
+  "failedCount": 182,
   "skippedCount": 17,
   "processedFacilityIds": [
     "2651e40a-b22d-4b23-9fd7-8ff121dfdd25",
@@ -1080,15 +1080,23 @@
     "7dd05595-9f5f-482a-9f53-4a323e3cc08e",
     "e05df67c-2482-4a28-961b-a8856d34f62d",
     "de793a6d-8785-4ad5-81fd-9c962547de6a",
-    "22382597-87d9-4702-8c64-c43b7a8a4ba5"
+    "22382597-87d9-4702-8c64-c43b7a8a4ba5",
+    "610580c7-12ea-494b-b6db-f49b300c1d4c",
+    "253a33e3-4f24-469c-ade7-33b17de17655",
+    "518d08fd-a858-4209-b6f1-f292a27bcec0",
+    "dda565f7-70ef-4afa-b809-14b5547430ef",
+    "16170a2f-c132-49bc-a948-a52c794ba546",
+    "8cbf025b-6ece-4983-9233-1cabe9db07a0",
+    "9a37a952-f3f4-442c-a882-1a07925b0418",
+    "21112dde-ed70-42c9-910a-59219cb1f501"
   ],
-  "lastProcessedIndex": 1263,
-  "imagesProcessed": 43730,
+  "lastProcessedIndex": 1272,
+  "imagesProcessed": 44083,
   "imagesSkipped": 39,
-  "imagesFailed": 469,
-  "totalBytesBefore": 105776075283,
-  "totalBytesAfter": 42216674058,
-  "lastUpdated": "2026-03-03T21:44:20.831Z",
+  "imagesFailed": 472,
+  "totalBytesBefore": 106769912172,
+  "totalBytesAfter": 42598499256,
+  "lastUpdated": "2026-03-03T22:03:12.632Z",
   "errors": [
     {
       "facility_id": "c8861bb6-f825-4d28-a60f-695b1edfef7b",
@@ -4372,8 +4380,29 @@
       "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/fba9b259-d669-42b1-ba2c-e5b99c8c9c4d/1772131057777_29.jpg",
       "error": "Failed to compress image",
       "timestamp": "2026-03-03T21:42:21.583Z"
+    },
+    {
+      "facility_id": "1b4da1bc-25bc-41ac-9193-f7e2d3882bb4",
+      "facility_name": "Tarleton Memorial Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/1b4da1bc-25bc-41ac-9193-f7e2d3882bb4/1772091111014_18.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T21:50:24.177Z"
+    },
+    {
+      "facility_id": "1b4da1bc-25bc-41ac-9193-f7e2d3882bb4",
+      "facility_name": "Tarleton Memorial Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/1b4da1bc-25bc-41ac-9193-f7e2d3882bb4/1772091119537_24.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T21:50:42.249Z"
+    },
+    {
+      "facility_id": "1b4da1bc-25bc-41ac-9193-f7e2d3882bb4",
+      "facility_name": "Tarleton Memorial Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/1b4da1bc-25bc-41ac-9193-f7e2d3882bb4/1772091131187_31.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T21:51:11.381Z"
     }
   ],
-  "deletionsSucceeded": 40096,
+  "deletionsSucceeded": 40449,
   "deletionsFailed": 8
 }

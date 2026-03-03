@@ -36,8 +36,10 @@ export interface CloseLead {
   status_label?: string;
   description?: string;
   url?: string;
+  html_url?: string;
   organization_id: string;
   contacts?: CloseContact[];
+  opportunities?: CloseOpportunity[];
   created_by?: string;
   updated_by?: string;
   date_created: string;
@@ -180,6 +182,7 @@ export interface CloseOpportunity {
   lead_id: string;
   status_id: string;
   status_label?: string;
+  status_display_name?: string;
   status_type?: 'active' | 'won' | 'lost';
   confidence?: number;
   value?: number;

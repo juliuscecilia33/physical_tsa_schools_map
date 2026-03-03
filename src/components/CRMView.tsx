@@ -48,7 +48,7 @@ const cn = (...classes: (string | undefined | null | false)[]) =>
 const TABS = [
   { id: "facilities", label: "Facilities", icon: Building2 },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
-  { id: "users", label: "Users", icon: Users },
+  { id: "close", label: "Close", icon: Users },
   { id: "settings", label: "Settings", icon: Settings },
 ];
 
@@ -998,7 +998,7 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
             isLoading={showSkeletonRows}
             onSportClick={handleSportClick}
           />
-        ) : activeTab === "users" ? (
+        ) : activeTab === "close" ? (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
