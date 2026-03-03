@@ -31,6 +31,7 @@ import AddFacilitySidebar from "./AddFacilitySidebar";
 import { SkeletonTableRows } from "./SkeletonTableRow";
 import FacilitySearch from "./FacilitySearch";
 import { Facility } from "@/types/facility";
+import { CloseCRMExplorer } from "./CloseCRMExplorer";
 import {
   BarChart,
   Bar,
@@ -969,6 +970,13 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
             isLoading={showSkeletonRows}
             onSportClick={handleSportClick}
           />
+        ) : activeTab === "users" ? (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <CloseCRMExplorer />
+          </motion.div>
         ) : (
           <motion.div
             initial={{ opacity: 0 }}

@@ -1,7 +1,7 @@
 {
-  "processedCount": 1185,
-  "successCount": 1018,
-  "failedCount": 172,
+  "processedCount": 1213,
+  "successCount": 1041,
+  "failedCount": 177,
   "skippedCount": 17,
   "processedFacilityIds": [
     "2651e40a-b22d-4b23-9fd7-8ff121dfdd25",
@@ -1024,15 +1024,38 @@
     "0ca97170-7629-431a-8b8d-d9191eb20510",
     "618c6084-9055-428a-9f43-e4f52335493d",
     "c04fe971-4434-4996-a7d3-74c17d15f550",
-    "36975c20-d2dd-4224-9a08-3c65acb6acea"
+    "36975c20-d2dd-4224-9a08-3c65acb6acea",
+    "4ba27492-1fc2-46d1-ad58-819b289d6ad8",
+    "d96ec87c-1bf9-4d58-a9ed-9ba74b2d6b17",
+    "50aa2238-f73b-4da5-9f74-9d43b86c741a",
+    "91bee96a-cf00-4a0a-bd28-1812be66acac",
+    "0da2a76b-db0f-4d30-a104-fc38916c6f3c",
+    "a823c42d-2dc5-4276-9b97-77dbcbc29566",
+    "5dadc0cf-bb82-4dbd-a174-d9a7d9a44721",
+    "c2b9f2c0-e388-450d-ba91-726b7cba1930",
+    "67c4b7aa-a437-47d3-9574-684c384978c6",
+    "76634c92-8401-49af-b0cb-d5c1874f0937",
+    "945df288-a39c-477a-82c2-fd3af3eb588e",
+    "524560af-865a-4177-8954-c7fd18114c1e",
+    "ba1a31bb-3047-4d60-9b07-161b62642c9b",
+    "6ca5d887-11b5-463f-a734-adfd21581b46",
+    "0e3dd775-56a7-4878-9d68-eab9dde2672d",
+    "937fbf7f-21e5-488d-99d6-3f105308be48",
+    "c1b502a9-a571-4496-9d11-190910915b65",
+    "b609aac2-634d-49c9-a8f0-6609df1b60fd",
+    "673392f2-7569-4ec5-9957-7d22e8972d31",
+    "2e583372-b2e5-4d6b-9e67-ddd672cafcf8",
+    "9a2dfd8c-2dce-4db2-80ea-1c89e5005c5c",
+    "f47364f7-2f4b-47fa-8ae4-8136848b475f",
+    "26cec334-cdf7-4b7f-832f-7bd3767e7724"
   ],
-  "lastProcessedIndex": 1198,
-  "imagesProcessed": 41266,
+  "lastProcessedIndex": 1226,
+  "imagesProcessed": 42297,
   "imagesSkipped": 39,
-  "imagesFailed": 459,
-  "totalBytesBefore": 99491356801,
-  "totalBytesAfter": 39619802598,
-  "lastUpdated": "2026-03-03T19:46:10.457Z",
+  "imagesFailed": 464,
+  "totalBytesBefore": 102438173700,
+  "totalBytesAfter": 40853418912,
+  "lastUpdated": "2026-03-03T20:34:49.646Z",
   "errors": [
     {
       "facility_id": "c8861bb6-f825-4d28-a60f-695b1edfef7b",
@@ -4246,8 +4269,43 @@
       "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/e98b9e3d-af32-463c-bf68-d68938ece5df/1772250030058_33.jpg",
       "error": "Failed to compress image",
       "timestamp": "2026-03-03T19:18:09.179Z"
+    },
+    {
+      "facility_id": "d51d7b54-3da6-44ab-8177-66a2c3c38cb6",
+      "facility_name": "Virginia Weaver Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d51d7b54-3da6-44ab-8177-66a2c3c38cb6/1772064948297_37.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T19:51:47.389Z"
+    },
+    {
+      "facility_id": "aeffb36d-7a80-4d1e-92be-c9b1f59e3688",
+      "facility_name": "Veterans Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/aeffb36d-7a80-4d1e-92be-c9b1f59e3688/1772063387388_35.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T19:56:56.176Z"
+    },
+    {
+      "facility_id": "af581ea8-e45f-466c-a762-d422ce94d26d",
+      "facility_name": "Eastham Thomason Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/af581ea8-e45f-466c-a762-d422ce94d26d/1772066140490_11.jpg",
+      "error": "Failed to upload compressed image",
+      "timestamp": "2026-03-03T20:09:08.202Z"
+    },
+    {
+      "facility_id": "f4d583cf-7f2c-427f-911d-3b4b491fa2cc",
+      "facility_name": "D1 Training Mesquite",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/f4d583cf-7f2c-427f-911d-3b4b491fa2cc/1772066466247_31.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T20:11:48.876Z"
+    },
+    {
+      "facility_id": "73d9b311-a27c-40fc-9203-e029ff1b195e",
+      "facility_name": "Veterans Memorial Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/73d9b311-a27c-40fc-9203-e029ff1b195e/1772065774346_36.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T20:20:12.598Z"
     }
   ],
-  "deletionsSucceeded": 37632,
+  "deletionsSucceeded": 38663,
   "deletionsFailed": 8
 }
