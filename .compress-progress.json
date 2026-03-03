@@ -1,8 +1,8 @@
 {
-  "processedCount": 675,
-  "successCount": 586,
-  "failedCount": 87,
-  "skippedCount": 16,
+  "processedCount": 696,
+  "successCount": 602,
+  "failedCount": 91,
+  "skippedCount": 17,
   "processedFacilityIds": [
     "2651e40a-b22d-4b23-9fd7-8ff121dfdd25",
     "c675e478-4ccb-45bb-ba28-300715a96376",
@@ -591,15 +591,32 @@
     "8e2380d5-f1c4-4b83-b3db-dc274b594035",
     "3f120f4c-3c4e-4a09-b86e-a878e6bb4306",
     "4cf70bd5-a1e6-4a08-9e2c-3277d71cffc9",
-    "681ab0ab-7694-448d-b886-d81ad7dd9c55"
+    "681ab0ab-7694-448d-b886-d81ad7dd9c55",
+    "63fbad1e-34c8-4f5b-9dbd-213bcda25e47",
+    "e3159731-4f4a-474a-873b-501fbe252a4e",
+    "2db990ed-b722-4f16-ac92-afb6dceab804",
+    "62f1e853-4c49-452e-a3b8-d8be844d999f",
+    "7a28c6af-793c-43b3-b9f2-c37aecc44962",
+    "9d689e05-43ea-4114-8144-8d8e94995245",
+    "3d1b07f1-7395-447c-809e-52799182fb9b",
+    "8b3ef87f-0e9e-4812-8602-635092552491",
+    "e86b59f3-8584-4fbc-b499-6840238e31e0",
+    "ecd9f55a-fbfa-417a-9aa9-1afc3e9d70f0",
+    "6418ec15-60db-458a-96d4-cc00b9dfb9b7",
+    "919b05d6-2666-4c2d-aeea-093c18c89647",
+    "241453bf-3446-4a25-9986-3fc9b92377f7",
+    "50e00208-e81c-42e1-ad2e-b64bbc76972b",
+    "726fb39b-6132-482a-abe2-b0e099e82017",
+    "6ae4f372-06b2-4af8-b5f5-e16d7069561e",
+    "ab68e4ff-6e61-48fe-ba6e-0c23c2293d37"
   ],
-  "lastProcessedIndex": 688,
-  "imagesProcessed": 22754,
+  "lastProcessedIndex": 709,
+  "imagesProcessed": 23286,
   "imagesSkipped": 39,
-  "imagesFailed": 126,
-  "totalBytesBefore": 54039868590,
-  "totalBytesAfter": 21678695950,
-  "lastUpdated": "2026-03-03T00:51:43.258Z",
+  "imagesFailed": 130,
+  "totalBytesBefore": 55391059960,
+  "totalBytesAfter": 22243870754,
+  "lastUpdated": "2026-03-03T01:15:22.326Z",
   "errors": [
     {
       "facility_id": "c8861bb6-f825-4d28-a60f-695b1edfef7b",
@@ -1482,8 +1499,36 @@
       "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/5b8100e5-1f3d-4f5d-a3eb-0ae5790ed855/1772046402446_23.jpg",
       "error": "Failed to download image",
       "timestamp": "2026-03-03T00:19:57.636Z"
+    },
+    {
+      "facility_id": "7208d0f1-9acf-47cd-8b12-6fba2bd596e4",
+      "facility_name": "Pickle Mania",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/7208d0f1-9acf-47cd-8b12-6fba2bd596e4/1772223409165_9.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T01:08:47.620Z"
+    },
+    {
+      "facility_id": "ea9f145d-e8b5-492c-8644-5bb7b6540ea7",
+      "facility_name": "Lion’s Club Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/ea9f145d-e8b5-492c-8644-5bb7b6540ea7/1772338955450_39.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T01:11:12.856Z"
+    },
+    {
+      "facility_id": "7f8122e1-e9d8-4721-8ebe-9ce2d03b844f",
+      "facility_name": "Timbers Nature Preserve",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/7f8122e1-e9d8-4721-8ebe-9ce2d03b844f/1772237373045_24.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T01:12:31.989Z"
+    },
+    {
+      "facility_id": "19c5ddd7-82c2-4a0f-9548-890f2dc9f301",
+      "facility_name": "Spirit Park Playground",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/19c5ddd7-82c2-4a0f-9548-890f2dc9f301/1772223957766_24.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T01:14:30.186Z"
     }
   ],
-  "deletionsSucceeded": 19122,
+  "deletionsSucceeded": 19654,
   "deletionsFailed": 6
 }

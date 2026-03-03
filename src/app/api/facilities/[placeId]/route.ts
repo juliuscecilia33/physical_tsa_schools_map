@@ -4,7 +4,6 @@ import { Facility } from "@/types/facility";
 
 // Initialize direct Postgres connection (bypasses REST API)
 const sql = postgres(process.env.DATABASE_URL!, {
-  prepare: false,
   ssl: { rejectUnauthorized: false },
   max: 10, // Connection pool size for serverless
 });

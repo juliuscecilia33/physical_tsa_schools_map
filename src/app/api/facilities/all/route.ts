@@ -4,7 +4,6 @@ import { FacilityLightweight } from "@/types/facility";
 
 // Initialize direct Postgres connection (bypasses REST API 1000-row limit)
 const sql = postgres(process.env.DATABASE_URL!, {
-  prepare: false,
   ssl: { rejectUnauthorized: false },
   max: 10, // Connection pool size for serverless
 });
