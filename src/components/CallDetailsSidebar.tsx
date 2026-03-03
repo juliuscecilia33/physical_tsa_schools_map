@@ -377,80 +377,98 @@ export function CallDetailsSidebar({ callId, leadId, onClose }: CallDetailsSideb
                   })()}
 
                   {/* Call Details Section */}
-                  <div className="bg-gray-50 rounded-lg p-5 space-y-4">
-                    <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider flex items-center gap-2">
-                      <Phone className="w-4 h-4" />
-                      Call Details
-                    </h3>
+                  {(() => {
+                    // Check if we have any valid data to show in Call Details
+                    const hasValidDate = call.date_created && !isNaN(new Date(call.date_created).getTime());
+                    const hasCallDetails =
+                      call.disposition ||
+                      call.duration !== undefined ||
+                      hasValidDate ||
+                      call.call_method ||
+                      call.cost !== undefined ||
+                      call.user_name;
 
-                    {/* Disposition Badge */}
-                    {call.disposition && (
-                      <div>
-                        <span
-                          className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getDispositionColor(
-                            call.disposition
-                          )}`}
-                        >
-                          {call.disposition.replace('-', ' ')}
-                        </span>
-                      </div>
-                    )}
+                    if (!hasCallDetails) return null;
 
-                    {/* Duration */}
-                    {call.duration !== undefined && (
-                      <div className="flex items-center gap-3">
-                        <Clock className="w-4 h-4 text-gray-400" />
-                        <div className="text-sm">
-                          <span className="text-gray-600">Duration: </span>
-                          <span className="font-medium text-gray-900">
-                            {formatDuration(call.duration)}
-                          </span>
-                        </div>
-                      </div>
-                    )}
+                    return (
+                      <div className="bg-gray-50 rounded-lg p-5 space-y-4">
+                        <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider flex items-center gap-2">
+                          <Phone className="w-4 h-4" />
+                          Call Details
+                        </h3>
 
-                    {/* Date/Time */}
-                    <div className="flex items-center gap-3">
-                      <Calendar className="w-4 h-4 text-gray-400" />
-                      <div className="text-sm text-gray-700">
-                        {new Date(call.date_created).toLocaleString()}
-                      </div>
-                    </div>
+                        {/* Disposition Badge */}
+                        {call.disposition && (
+                          <div>
+                            <span
+                              className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getDispositionColor(
+                                call.disposition
+                              )}`}
+                            >
+                              {call.disposition.replace('-', ' ')}
+                            </span>
+                          </div>
+                        )}
 
-                    {/* Call Method */}
-                    {call.call_method && (
-                      <div className="text-sm">
-                        <span className="text-gray-600">Method: </span>
-                        <span className="font-medium text-gray-900 capitalize">
-                          {call.call_method.replace('_', ' ')}
-                        </span>
-                      </div>
-                    )}
+                        {/* Duration */}
+                        {call.duration !== undefined && (
+                          <div className="flex items-center gap-3">
+                            <Clock className="w-4 h-4 text-gray-400" />
+                            <div className="text-sm">
+                              <span className="text-gray-600">Duration: </span>
+                              <span className="font-medium text-gray-900">
+                                {formatDuration(call.duration)}
+                              </span>
+                            </div>
+                          </div>
+                        )}
 
-                    {/* Cost */}
-                    {call.cost !== undefined && (
-                      <div className="flex items-center gap-3">
-                        <DollarSign className="w-4 h-4 text-gray-400" />
-                        <div className="text-sm">
-                          <span className="text-gray-600">Cost: </span>
-                          <span className="font-medium text-gray-900">
-                            ${(parseInt(call.cost || '0') / 100).toFixed(2)}
-                          </span>
-                        </div>
-                      </div>
-                    )}
+                        {/* Date/Time */}
+                        {hasValidDate && (
+                          <div className="flex items-center gap-3">
+                            <Calendar className="w-4 h-4 text-gray-400" />
+                            <div className="text-sm text-gray-700">
+                              {new Date(call.date_created).toLocaleString()}
+                            </div>
+                          </div>
+                        )}
 
-                    {/* User */}
-                    {call.user_name && (
-                      <div className="flex items-center gap-3">
-                        <User className="w-4 h-4 text-gray-400" />
-                        <div className="text-sm">
-                          <span className="text-gray-600">Made by: </span>
-                          <span className="font-medium text-gray-900">{call.user_name}</span>
-                        </div>
+                        {/* Call Method */}
+                        {call.call_method && (
+                          <div className="text-sm">
+                            <span className="text-gray-600">Method: </span>
+                            <span className="font-medium text-gray-900 capitalize">
+                              {call.call_method.replace('_', ' ')}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Cost */}
+                        {call.cost !== undefined && (
+                          <div className="flex items-center gap-3">
+                            <DollarSign className="w-4 h-4 text-gray-400" />
+                            <div className="text-sm">
+                              <span className="text-gray-600">Cost: </span>
+                              <span className="font-medium text-gray-900">
+                                ${(parseInt(call.cost || '0') / 100).toFixed(2)}
+                              </span>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* User */}
+                        {call.user_name && (
+                          <div className="flex items-center gap-3">
+                            <User className="w-4 h-4 text-gray-400" />
+                            <div className="text-sm">
+                              <span className="text-gray-600">Made by: </span>
+                              <span className="font-medium text-gray-900">{call.user_name}</span>
+                            </div>
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
+                    );
+                  })()}
 
                   {/* Notes Section */}
                   {call.note && (
