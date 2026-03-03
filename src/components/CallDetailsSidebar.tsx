@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X,
@@ -16,6 +17,8 @@ import {
   AlertCircle,
   MapPin,
   ExternalLink,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import { useCloseCall, useCloseLead, useCloseUser, useCloseCalls } from '@/hooks/useCloseCRM';
 
@@ -106,6 +109,8 @@ export function CallDetailsSidebar({ callId, leadId, onClose }: CallDetailsSideb
   const { data: relatedCallsData } = useCloseCalls(
     call?.lead_id ? { lead_id: call.lead_id, _limit: 10 } : undefined
   );
+
+  const [isSummaryExpanded, setIsSummaryExpanded] = useState(false);
 
   const isOpen = !!callId;
 
@@ -327,17 +332,49 @@ export function CallDetailsSidebar({ callId, leadId, onClose }: CallDetailsSideb
                   </div>
 
                   {/* Call Summary Section */}
-                  {call.recording_transcript?.summary_text && (
-                    <div className="bg-white border border-gray-200 rounded-lg p-5 space-y-3">
-                      <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider flex items-center gap-2">
-                        <FileText className="w-4 h-4" />
-                        Call Summary
-                      </h3>
-                      <div className="space-y-2">
-                        {renderFormattedSummary(call.recording_transcript.summary_text)}
+                  {call.recording_transcript?.summary_text && (() => {
+                    const fullSummary = renderFormattedSummary(call.recording_transcript.summary_text);
+                    const previewLength = 3; // Show first 3 elements in preview
+                    const summaryPreview = fullSummary.slice(0, previewLength);
+                    const hasMore = fullSummary.length > previewLength;
+
+                    return (
+                      <div className="bg-white border border-gray-200 rounded-lg p-5 space-y-3">
+                        <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider flex items-center gap-2">
+                          <FileText className="w-4 h-4" />
+                          Call Summary
+                        </h3>
+                        <div className="space-y-2">
+                          <div className={`overflow-hidden transition-all duration-300 ${
+                            isSummaryExpanded ? 'max-h-[5000px]' : 'max-h-[300px]'
+                          }`}>
+                            {isSummaryExpanded ? fullSummary : summaryPreview}
+                            {!isSummaryExpanded && hasMore && (
+                              <div className="mt-2 text-gray-400 text-sm">...</div>
+                            )}
+                          </div>
+                          {hasMore && (
+                            <button
+                              onClick={() => setIsSummaryExpanded(!isSummaryExpanded)}
+                              className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors mt-3"
+                            >
+                              {isSummaryExpanded ? (
+                                <>
+                                  <ChevronUp className="w-4 h-4" />
+                                  Show less
+                                </>
+                              ) : (
+                                <>
+                                  <ChevronDown className="w-4 h-4" />
+                                  Show more
+                                </>
+                              )}
+                            </button>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    );
+                  })()}
 
                   {/* Call Details Section */}
                   <div className="bg-gray-50 rounded-lg p-5 space-y-4">

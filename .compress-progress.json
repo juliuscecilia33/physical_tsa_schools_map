@@ -1,7 +1,7 @@
 {
-  "processedCount": 1310,
+  "processedCount": 1311,
   "successCount": 1125,
-  "failedCount": 190,
+  "failedCount": 191,
   "skippedCount": 17,
   "processedFacilityIds": [
     "2651e40a-b22d-4b23-9fd7-8ff121dfdd25",
@@ -1133,13 +1133,13 @@
     "2608af55-85a9-4e8e-a4bc-6d79d0a7d07b",
     "02fe080c-32c1-4356-93b0-37cbc5286be7"
   ],
-  "lastProcessedIndex": 1323,
-  "imagesProcessed": 45916,
+  "lastProcessedIndex": 1324,
+  "imagesProcessed": 45955,
   "imagesSkipped": 39,
-  "imagesFailed": 483,
-  "totalBytesBefore": 111400311739,
-  "totalBytesAfter": 44487835344,
-  "lastUpdated": "2026-03-03T23:46:15.083Z",
+  "imagesFailed": 484,
+  "totalBytesBefore": 111455566617,
+  "totalBytesAfter": 44506435202,
+  "lastUpdated": "2026-03-03T23:53:28.713Z",
   "errors": [
     {
       "facility_id": "c8861bb6-f825-4d28-a60f-695b1edfef7b",
@@ -4521,8 +4521,15 @@
       "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/c04b9f9a-b2d6-4b27-b2cf-f8c7753d0b1e/1772144391059_38.jpg",
       "error": "Failed to compress image",
       "timestamp": "2026-03-03T22:54:44.161Z"
+    },
+    {
+      "facility_id": "4ae443c9-198a-4434-b838-c779af977390",
+      "facility_name": "Rolling Hills Soccer Complex",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4ae443c9-198a-4434-b838-c779af977390/1772147812638_29.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T23:52:59.317Z"
     }
   ],
-  "deletionsSucceeded": 42282,
+  "deletionsSucceeded": 42321,
   "deletionsFailed": 8
 }
