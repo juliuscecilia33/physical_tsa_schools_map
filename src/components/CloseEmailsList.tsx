@@ -6,7 +6,7 @@ import { Mail, ArrowDownToLine, ArrowUpFromLine, LayoutGrid, Table, Filter } fro
 import { CloseEmailsTable } from './CloseEmailsTable';
 
 interface CloseEmailsListProps {
-  onEmailClick?: (emailThreadId: string) => void;
+  onEmailClick?: (emailThreadId: string, leadId: string | null) => void;
 }
 
 export function CloseEmailsList({ onEmailClick }: CloseEmailsListProps) {
@@ -151,7 +151,7 @@ export function CloseEmailsList({ onEmailClick }: CloseEmailsListProps) {
             return (
               <div
                 key={email.id}
-                onClick={() => onEmailClick?.(email.id)}
+                onClick={() => onEmailClick?.(email.id, email.lead_id || null)}
                 className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer"
               >
                 <div className="flex items-start gap-3">

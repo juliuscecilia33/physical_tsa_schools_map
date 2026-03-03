@@ -24,12 +24,14 @@ import {
   Eye,
   Copy,
   Check,
+  MapPin,
 } from 'lucide-react';
 import { useCloseEmail, useCloseLead } from '@/hooks/useCloseCRM';
 import { CloseEmailActivity, CloseEmailAttachment } from '@/types/close';
 
 interface EmailDetailsSidebarProps {
   emailThreadId: string | null;
+  leadId?: string | null;
   onClose: () => void;
 }
 
@@ -407,9 +409,9 @@ function EmailCard({ email, isExpanded, onToggle, index, total }: EmailCardProps
   );
 }
 
-export function EmailDetailsSidebar({ emailThreadId, onClose }: EmailDetailsSidebarProps) {
+export function EmailDetailsSidebar({ emailThreadId, leadId, onClose }: EmailDetailsSidebarProps) {
   const { data: emailThread, isLoading: emailLoading, error: emailError } = useCloseEmail(emailThreadId);
-  const { data: lead } = useCloseLead(emailThread?.lead_id || null);
+  const { data: lead, isLoading: leadLoading, error: leadError } = useCloseLead(leadId || emailThread?.lead_id || null);
 
   const [expandedEmailIndex, setExpandedEmailIndex] = useState(0); // Expand most recent by default
 
@@ -588,37 +590,57 @@ export function EmailDetailsSidebar({ emailThreadId, onClose }: EmailDetailsSide
                   </div>
 
                   {/* Related Lead Section */}
-                  {lead && (
-                    <div className="bg-white border border-gray-200 rounded-lg p-5 space-y-3">
-                      <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider flex items-center gap-2">
-                        <Building2 className="w-4 h-4" />
-                        Related Lead
-                      </h3>
+                  <div className="bg-white border border-gray-200 rounded-lg p-5 space-y-3">
+                    <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider flex items-center gap-2">
+                      <Building2 className="w-4 h-4" />
+                      Lead Information
+                    </h3>
 
-                      <div>
-                        <p className="font-medium text-gray-900 text-base">
-                          {lead.display_name || lead.name}
-                        </p>
+                    {leadLoading ? (
+                      <div className="space-y-3">
+                        <div className="h-5 bg-gray-200 rounded animate-pulse w-3/4"></div>
+                        <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2"></div>
+                        <div className="h-4 bg-gray-200 rounded animate-pulse w-2/3"></div>
+                      </div>
+                    ) : leadError ? (
+                      <div className="flex items-start gap-2 text-red-600">
+                        <AlertCircle className="w-4 h-4 mt-0.5" />
+                        <div className="text-sm">
+                          <p className="font-medium">Failed to load lead information</p>
+                          <p className="text-xs text-red-500 mt-1">{leadError.message}</p>
+                        </div>
+                      </div>
+                    ) : lead ? (
+                      <div className="space-y-3">
+                        <div>
+                          <p className="font-medium text-gray-900 text-base">{lead.display_name || lead.name}</p>
+                          {lead.status_label && (
+                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mt-2">
+                              {lead.status_label}
+                            </span>
+                          )}
+                        </div>
 
-                        {lead.status_label && (
-                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mt-2">
-                            {lead.status_label}
-                          </span>
+                        {lead.addresses && lead.addresses.length > 0 && lead.addresses[0].address_1 && (
+                          <div className="flex items-start gap-3">
+                            <MapPin className="w-4 h-4 text-gray-400 mt-0.5" />
+                            <div className="text-sm text-gray-700">
+                              {lead.addresses[0].address_1}
+                              {lead.addresses[0].city && (
+                                <div>
+                                  {lead.addresses[0].city}
+                                  {lead.addresses[0].state && `, ${lead.addresses[0].state}`}
+                                  {lead.addresses[0].zipcode && ` ${lead.addresses[0].zipcode}`}
+                                </div>
+                              )}
+                            </div>
+                          </div>
                         )}
 
-                        {lead.addresses && lead.addresses.length > 0 && lead.addresses[0].city && (
-                          <p className="text-sm text-gray-600 mt-2">
-                            {lead.addresses[0].city}
-                            {lead.addresses[0].state && `, ${lead.addresses[0].state}`}
-                          </p>
-                        )}
-
-                        {lead.contacts && lead.contacts.length > 0 && (
-                          <div className="mt-3 pt-3 border-t border-gray-200">
-                            <p className="text-xs text-gray-500 mb-2">Primary Contact</p>
-                            <p className="text-sm font-medium text-gray-900">
-                              {lead.contacts[0].name}
-                            </p>
+                        {lead.contacts && lead.contacts.length > 0 && lead.contacts[0] && (
+                          <div className="pt-2 border-t border-gray-200">
+                            <p className="text-xs text-gray-500 mb-1">Primary Contact</p>
+                            <p className="text-sm font-medium text-gray-900">{lead.contacts[0].name}</p>
                             {lead.contacts[0].emails && lead.contacts[0].emails.length > 0 && (
                               <a
                                 href={`mailto:${lead.contacts[0].emails[0].email}`}
@@ -630,20 +652,24 @@ export function EmailDetailsSidebar({ emailThreadId, onClose }: EmailDetailsSide
                           </div>
                         )}
 
-                        {lead.html_url && (
+                        <div className="pt-2">
                           <a
-                            href={lead.html_url}
+                            href={`https://app.close.com/lead/${leadId || emailThread?.lead_id}/`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 hover:underline mt-3"
+                            className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 hover:underline"
                           >
-                            View Lead in Close
+                            View in Close CRM
                             <ExternalLink className="w-3 h-3" />
                           </a>
-                        )}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    ) : (leadId || emailThread?.lead_id) ? (
+                      <p className="text-sm text-gray-500 italic">No lead data available</p>
+                    ) : (
+                      <p className="text-sm text-gray-500 italic">No lead associated with this email</p>
+                    )}
+                  </div>
 
                   {/* Actions Section */}
                   <div className="flex gap-3">

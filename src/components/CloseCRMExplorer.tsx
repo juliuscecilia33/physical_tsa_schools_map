@@ -21,6 +21,7 @@ export function CloseCRMExplorer() {
   const [selectedCallId, setSelectedCallId] = useState<string | null>(null);
   const [selectedCallLeadId, setSelectedCallLeadId] = useState<string | null>(null);
   const [selectedEmailThreadId, setSelectedEmailThreadId] = useState<string | null>(null);
+  const [selectedEmailLeadId, setSelectedEmailLeadId] = useState<string | null>(null);
   const [selectedContactId, setSelectedContactId] = useState<string | null>(null);
   const [isDismissed, setIsDismissed] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
@@ -122,7 +123,10 @@ export function CloseCRMExplorer() {
               }} />
             )}
             {activeTab === 'emails' && (
-              <CloseEmailsList onEmailClick={(emailThreadId) => setSelectedEmailThreadId(emailThreadId)} />
+              <CloseEmailsList onEmailClick={(emailThreadId, leadId) => {
+                setSelectedEmailThreadId(emailThreadId);
+                setSelectedEmailLeadId(leadId || null);
+              }} />
             )}
             {activeTab === 'contacts' && (
               <CloseContactsList onContactClick={(contactId) => setSelectedContactId(contactId)} />
@@ -161,7 +165,11 @@ export function CloseCRMExplorer() {
       {/* Email Details Sidebar */}
       <EmailDetailsSidebar
         emailThreadId={selectedEmailThreadId}
-        onClose={() => setSelectedEmailThreadId(null)}
+        leadId={selectedEmailLeadId}
+        onClose={() => {
+          setSelectedEmailThreadId(null);
+          setSelectedEmailLeadId(null);
+        }}
       />
     </div>
   );

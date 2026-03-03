@@ -20,7 +20,7 @@ import {
 
 interface CloseEmailsTableProps {
   emails: CloseEmailThread[];
-  onEmailClick?: (emailThreadId: string) => void;
+  onEmailClick?: (emailThreadId: string, leadId: string | null) => void;
   isLoading?: boolean;
   isSidebarOpen: boolean;
   setIsSidebarOpen: (open: boolean) => void;
@@ -675,7 +675,7 @@ export function CloseEmailsTable({
                 return (
                   <tr
                     key={email.id}
-                    onClick={() => onEmailClick?.(email.id)}
+                    onClick={() => onEmailClick?.(email.id, email.lead_id || null)}
                     className="hover:bg-gray-50 transition-colors cursor-pointer"
                   >
                     {/* Date/Time */}
