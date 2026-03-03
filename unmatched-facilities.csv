@@ -1,9 +1,6 @@
 CSV Row,Facility Name,Address,City,Reason
-18,"Gym Jitsu","1108 N Greenville Ave, Suite 103, Allen, TX, 75002","Allen","Could not fetch place details"
-19," Indoor Pickleball now","13005 Harmon Rd, Fort Worth 76177","Fort Worth","No Google Places match"
 21,"Hill County Elite Athletics","14101 West US Highway 290, Austin, Texas 78737","Austin","No Google Places match"
 22,"Hill County Elite Cheer","10020 Darden Hill Road Bldg 12 & 13, Austin, Texas 78737","Austin","No Google Places match"
-23,"Frontier Martial arts","4620 US Hwy 377 S. Krugerville, TX 76227","Krugerville","No Google Places match"
 25,"Kims USA","2150 Willow Grove Dr, Lewisville, Texas 75067","Lewisville","No Google Places match"
 26,"Hitting Horizon/El Paso Border Youth Athletic Association","381 S. Darrington STE A, Horizon City, TX 79928","Horizon","No Google Places match"
 27,"Supreme Athletics","8755 West Lane, Magnolia, TX 77354","Magnolia","No Google Places match"

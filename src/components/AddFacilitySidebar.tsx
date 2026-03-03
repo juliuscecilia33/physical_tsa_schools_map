@@ -108,6 +108,8 @@ export default function AddFacilitySidebar({
 
   // Google Places Search
   const [searchInput, setSearchInput] = useState("");
+  const [facilityDetails, setFacilityDetails] =
+    useState<import("@/hooks/useFacilitySearch").FacilityDetails | null>(null);
   const facilitySearch = useFacilitySearch();
 
   // Fetch all tags on mount
@@ -193,6 +195,9 @@ export default function AddFacilitySidebar({
     const details = await facilitySearch.selectPrediction(prediction);
 
     if (details) {
+      // Store full facility details for later use in facility insert
+      setFacilityDetails(details);
+
       // Smart name detection: only use if it's not just the address
       // Leave blank if name is just the street address
       const isNameJustAddress =
@@ -274,6 +279,13 @@ export default function AddFacilitySidebar({
           phone: formData.phone || null,
           website: formData.website || null,
           sport_types: selectedSportTypes,
+          // Google Places API data
+          rating: facilityDetails?.rating || null,
+          user_ratings_total: facilityDetails?.user_ratings_total || null,
+          business_status: facilityDetails?.business_status || null,
+          opening_hours: facilityDetails?.opening_hours || null,
+          reviews: facilityDetails?.reviews || null,
+          photo_references: facilityDetails?.photo_references || null,
         })
         .select()
         .single();

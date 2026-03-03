@@ -1,7 +1,7 @@
 {
-  "processedCount": 1168,
-  "successCount": 1003,
-  "failedCount": 170,
+  "processedCount": 1179,
+  "successCount": 1012,
+  "failedCount": 172,
   "skippedCount": 17,
   "processedFacilityIds": [
     "2651e40a-b22d-4b23-9fd7-8ff121dfdd25",
@@ -1009,15 +1009,24 @@
     "022d46f8-2d58-44d3-a7da-71db0f8a817b",
     "999f7ff2-a230-4f0f-8819-fef32b6bb161",
     "497498b2-bf24-4724-a0b1-a70253a7918c",
-    "13931c6e-2a20-454f-8a3d-4fe793be4682"
+    "13931c6e-2a20-454f-8a3d-4fe793be4682",
+    "b3c240a4-8433-4e81-9fec-b991094f10c5",
+    "72571d3f-5b89-487c-9957-247f7536bcd3",
+    "e4e7f0d5-562f-4f40-a097-737b7cee555b",
+    "0da8c15e-c85e-4a33-a8e7-fbee84a8937a",
+    "87e3de91-ee58-4811-9733-fea07fdf8a4a",
+    "0ff0f77a-9383-4de8-a162-737482e91932",
+    "2e1f03c9-b236-4f6d-9520-ec5d8e53b1fe",
+    "87c2444b-a0e8-4de0-8235-e9451c289782",
+    "57400178-081d-481e-9d86-831469b32208"
   ],
-  "lastProcessedIndex": 1181,
-  "imagesProcessed": 40607,
+  "lastProcessedIndex": 1192,
+  "imagesProcessed": 41035,
   "imagesSkipped": 39,
-  "imagesFailed": 451,
-  "totalBytesBefore": 97874843001,
-  "totalBytesAfter": 38985175536,
-  "lastUpdated": "2026-03-03T19:11:02.358Z",
+  "imagesFailed": 459,
+  "totalBytesBefore": 98974423105,
+  "totalBytesAfter": 39402259896,
+  "lastUpdated": "2026-03-03T19:34:48.012Z",
   "errors": [
     {
       "facility_id": "c8861bb6-f825-4d28-a60f-695b1edfef7b",
@@ -4175,8 +4184,64 @@
       "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/945a35ca-22da-4ff3-9a80-1ab81df1fc49/1772245550028_38.jpg",
       "error": "Failed to compress image",
       "timestamp": "2026-03-03T18:51:57.922Z"
+    },
+    {
+      "facility_id": "9103b06a-1e3e-4d27-b950-0125071af9e0",
+      "facility_name": "McAllen Performing Arts Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/9103b06a-1e3e-4d27-b950-0125071af9e0/1772245649148_14.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-03T19:15:21.293Z"
+    },
+    {
+      "facility_id": "e98b9e3d-af32-463c-bf68-d68938ece5df",
+      "facility_name": "Don Sanders Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/e98b9e3d-af32-463c-bf68-d68938ece5df/1772249987194_3.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T19:16:36.406Z"
+    },
+    {
+      "facility_id": "e98b9e3d-af32-463c-bf68-d68938ece5df",
+      "facility_name": "Don Sanders Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/e98b9e3d-af32-463c-bf68-d68938ece5df/1772249991224_6.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T19:16:43.383Z"
+    },
+    {
+      "facility_id": "e98b9e3d-af32-463c-bf68-d68938ece5df",
+      "facility_name": "Don Sanders Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/e98b9e3d-af32-463c-bf68-d68938ece5df/1772249997518_12.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T19:16:56.566Z"
+    },
+    {
+      "facility_id": "e98b9e3d-af32-463c-bf68-d68938ece5df",
+      "facility_name": "Don Sanders Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/e98b9e3d-af32-463c-bf68-d68938ece5df/1772249999587_14.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T19:16:59.784Z"
+    },
+    {
+      "facility_id": "e98b9e3d-af32-463c-bf68-d68938ece5df",
+      "facility_name": "Don Sanders Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/e98b9e3d-af32-463c-bf68-d68938ece5df/1772250020702_25.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T19:17:49.794Z"
+    },
+    {
+      "facility_id": "e98b9e3d-af32-463c-bf68-d68938ece5df",
+      "facility_name": "Don Sanders Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/e98b9e3d-af32-463c-bf68-d68938ece5df/1772250027525_31.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T19:18:05.554Z"
+    },
+    {
+      "facility_id": "e98b9e3d-af32-463c-bf68-d68938ece5df",
+      "facility_name": "Don Sanders Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/e98b9e3d-af32-463c-bf68-d68938ece5df/1772250030058_33.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T19:18:09.179Z"
     }
   ],
-  "deletionsSucceeded": 36973,
+  "deletionsSucceeded": 37401,
   "deletionsFailed": 8
 }

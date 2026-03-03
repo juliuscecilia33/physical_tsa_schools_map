@@ -31,6 +31,21 @@ export interface FacilityDetails {
   longitude: number;
   phone?: string;
   website?: string;
+  rating?: number;
+  user_ratings_total?: number;
+  business_status?: string;
+  opening_hours?: {
+    open_now?: boolean;
+    weekday_text?: string[];
+  };
+  reviews?: Array<{
+    author_name: string;
+    rating: number;
+    text: string;
+    time: number;
+    relative_time_description: string;
+  }>;
+  photo_references?: string[];
 }
 
 // Google Places API (New) response types
@@ -59,6 +74,24 @@ interface PlaceDetailsResponse {
   nationalPhoneNumber?: string;
   internationalPhoneNumber?: string;
   websiteUri?: string;
+  rating?: number;
+  userRatingCount?: number;
+  businessStatus?: string;
+  currentOpeningHours?: {
+    openNow?: boolean;
+    weekdayDescriptions?: string[];
+  };
+  reviews?: Array<{
+    authorAttribution?: { displayName?: string };
+    rating?: number;
+    text?: { text?: string };
+    originalText?: { text?: string };
+    publishTime?: string;
+    relativePublishTimeDescription?: string;
+  }>;
+  photos?: Array<{
+    name: string;
+  }>;
 }
 
 // ============================================================================
@@ -136,7 +169,7 @@ async function fetchFacilityDetails(
           "Content-Type": "application/json",
           "X-Goog-Api-Key": API_KEY,
           "X-Goog-FieldMask":
-            "displayName,formattedAddress,location,addressComponents,nationalPhoneNumber,internationalPhoneNumber,websiteUri",
+            "displayName,formattedAddress,location,addressComponents,nationalPhoneNumber,internationalPhoneNumber,websiteUri,rating,userRatingCount,businessStatus,currentOpeningHours,reviews,photos",
         },
       }
     );
@@ -179,6 +212,25 @@ async function fetchFacilityDetails(
       longitude: data.location.longitude,
       phone: data.nationalPhoneNumber || data.internationalPhoneNumber,
       website: data.websiteUri,
+      rating: data.rating,
+      user_ratings_total: data.userRatingCount,
+      business_status: data.businessStatus,
+      opening_hours: data.currentOpeningHours
+        ? {
+            open_now: data.currentOpeningHours.openNow,
+            weekday_text: data.currentOpeningHours.weekdayDescriptions,
+          }
+        : undefined,
+      reviews: data.reviews?.slice(0, 5).map((r) => ({
+        author_name: r.authorAttribution?.displayName || "Anonymous",
+        rating: r.rating || 0,
+        text: r.text?.text || r.originalText?.text || "",
+        time: r.publishTime
+          ? new Date(r.publishTime).getTime() / 1000
+          : Date.now() / 1000,
+        relative_time_description: r.relativePublishTimeDescription || "",
+      })),
+      photo_references: data.photos?.slice(0, 10).map((p) => p.name),
     };
   } catch (error) {
     console.error("[FacilitySearch] Place details fetch error:", error);
