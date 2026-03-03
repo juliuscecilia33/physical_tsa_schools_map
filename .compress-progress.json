@@ -1,6 +1,6 @@
 {
-  "processedCount": 1179,
-  "successCount": 1012,
+  "processedCount": 1180,
+  "successCount": 1013,
   "failedCount": 172,
   "skippedCount": 17,
   "processedFacilityIds": [
@@ -1018,15 +1018,16 @@
     "0ff0f77a-9383-4de8-a162-737482e91932",
     "2e1f03c9-b236-4f6d-9520-ec5d8e53b1fe",
     "87c2444b-a0e8-4de0-8235-e9451c289782",
-    "57400178-081d-481e-9d86-831469b32208"
+    "57400178-081d-481e-9d86-831469b32208",
+    "b7dd11ad-5a24-42b8-801c-700e29f86b7e"
   ],
-  "lastProcessedIndex": 1192,
-  "imagesProcessed": 41035,
+  "lastProcessedIndex": 1193,
+  "imagesProcessed": 41073,
   "imagesSkipped": 39,
   "imagesFailed": 459,
-  "totalBytesBefore": 98974423105,
-  "totalBytesAfter": 39402259896,
-  "lastUpdated": "2026-03-03T19:34:48.012Z",
+  "totalBytesBefore": 99097742119,
+  "totalBytesAfter": 39456643970,
+  "lastUpdated": "2026-03-03T19:36:42.145Z",
   "errors": [
     {
       "facility_id": "c8861bb6-f825-4d28-a60f-695b1edfef7b",
@@ -4242,6 +4243,6 @@
       "timestamp": "2026-03-03T19:18:09.179Z"
     }
   ],
-  "deletionsSucceeded": 37401,
+  "deletionsSucceeded": 37439,
   "deletionsFailed": 8
 }
