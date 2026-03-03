@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Facility } from "@/types/facility";
 
@@ -40,6 +39,47 @@ async function fetchFacilitiesExcludingTags(
   };
 }
 
+// Fetch all background facilities in batches (used by React Query)
+async function fetchAllBackgroundFacilities(
+  excludeTagIds: string[],
+  signal?: AbortSignal
+): Promise<Facility[]> {
+  const batchSize = 1000;
+  let offset = 0;
+  let allFacilities: Facility[] = [];
+
+  while (true) {
+    if (signal?.aborted) {
+      throw new Error('Background loading aborted');
+    }
+
+    const { facilities, hasMore } = await fetchFacilitiesExcludingTags(
+      excludeTagIds,
+      offset,
+      batchSize
+    );
+
+    allFacilities = [...allFacilities, ...facilities];
+
+    console.log(
+      `Background batch loaded: ${facilities.length} facilities (offset: ${offset})`
+    );
+
+    if (!hasMore) {
+      console.log(
+        `Background loading complete. Total: ${allFacilities.length} facilities`
+      );
+      break;
+    }
+
+    offset += batchSize;
+    // Add small delay between batches to not overwhelm the server
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+
+  return allFacilities;
+}
+
 export interface UseFacilitiesReturn {
   facilities: Facility[];
   priorityFacilities: Facility[];
@@ -57,11 +97,6 @@ export interface UseFacilitiesReturn {
  * Phase 2: Background batch loading (excluding SerpAPI tag)
  */
 export function useFacilities(): UseFacilitiesReturn {
-  const [backgroundFacilities, setBackgroundFacilities] = useState<Facility[]>([]);
-  const [isBackgroundLoading, setIsBackgroundLoading] = useState(false);
-  const [backgroundLoadingComplete, setBackgroundLoadingComplete] = useState(false);
-  const backgroundAbortController = useRef<AbortController | null>(null);
-
   // Phase 1: Fetch SerpAPI-tagged facilities immediately (priority load)
   const {
     data: priorityFacilities = [],
@@ -76,64 +111,24 @@ export function useFacilities(): UseFacilitiesReturn {
   });
 
   // Phase 2: Background batch loading of remaining facilities (excluding SerpAPI tag)
-  useEffect(() => {
-    // Only start background loading after priority facilities are loaded
-    if (!isPriorityLoading && !backgroundLoadingComplete) {
-      setIsBackgroundLoading(true);
-      backgroundAbortController.current = new AbortController();
-
-      const batchSize = 1000;
-      let offset = 0;
-      let allBackgroundFacilities: Facility[] = [];
-
-      const fetchNextBatch = async () => {
-        try {
-          if (backgroundAbortController.current?.signal.aborted) {
-            return;
-          }
-
-          const { facilities, hasMore } = await fetchFacilitiesExcludingTags(
-            [SERPAPI_TAG_ID],
-            offset,
-            batchSize
-          );
-
-          allBackgroundFacilities = [...allBackgroundFacilities, ...facilities];
-          setBackgroundFacilities(allBackgroundFacilities);
-
-          console.log(
-            `Background batch loaded: ${facilities.length} facilities (offset: ${offset})`
-          );
-
-          if (hasMore && !backgroundAbortController.current?.signal.aborted) {
-            offset += batchSize;
-            // Add small delay between batches to not overwhelm the server
-            setTimeout(fetchNextBatch, 100);
-          } else {
-            setIsBackgroundLoading(false);
-            setBackgroundLoadingComplete(true);
-            console.log(
-              `Background loading complete. Total: ${allBackgroundFacilities.length} facilities`
-            );
-          }
-        } catch (error) {
-          console.error('Background loading error:', error);
-          setIsBackgroundLoading(false);
-          // Don't set backgroundLoadingComplete, so user still has priority facilities
-        }
-      };
-
-      fetchNextBatch();
-
-      // Cleanup on unmount
-      return () => {
-        backgroundAbortController.current?.abort();
-      };
-    }
-  }, [isPriorityLoading, backgroundLoadingComplete]);
+  // React Query will automatically dedupe this across multiple component instances
+  const {
+    data: backgroundFacilities = [],
+    isLoading: isBackgroundLoading,
+    isSuccess: isBackgroundLoadingSuccess,
+  } = useQuery({
+    queryKey: ['facilities', 'background'],
+    queryFn: ({ signal }) => fetchAllBackgroundFacilities([SERPAPI_TAG_ID], signal),
+    enabled: !isPriorityLoading, // Only start after priority load completes
+    staleTime: Infinity,
+    gcTime: Infinity,
+  });
 
   // Merge priority and background facilities
   const facilities = [...priorityFacilities, ...backgroundFacilities];
+
+  // Derive backgroundLoadingComplete from query success state
+  const backgroundLoadingComplete = isBackgroundLoadingSuccess;
 
   return {
     facilities,

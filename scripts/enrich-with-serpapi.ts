@@ -4,6 +4,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as dotenv from "dotenv";
 import axios from "axios";
+import sharp from "sharp";
 
 // Load environment variables
 dotenv.config({ path: path.join(__dirname, "../.env.local") });
@@ -146,7 +147,7 @@ async function downloadImage(url: string): Promise<Buffer | null> {
 }
 
 /**
- * Upload image to Supabase Storage
+ * Upload image to Supabase Storage with WebP compression
  * Returns the public URL if successful, null otherwise
  */
 async function uploadImageToStorage(
@@ -156,28 +157,20 @@ async function uploadImageToStorage(
   originalUrl: string,
 ): Promise<string | null> {
   try {
-    // Extract file extension from URL or default to jpg
-    const urlExtension = originalUrl.match(/\.(jpg|jpeg|png|webp)(\?|$)/i);
-    const extension = urlExtension ? urlExtension[1].toLowerCase() : "jpg";
+    // Compress to WebP format (80% quality, same as compress-facility-photos.ts)
+    const compressedBuffer = await sharp(imageBuffer)
+      .webp({ quality: 80 })
+      .toBuffer();
 
-    // Generate unique filename: {facility_id}/{timestamp}_{index}.{ext}
+    // Generate unique filename with .webp extension
     const timestamp = Date.now();
-    const filename = `${facilityId}/${timestamp}_${index}.${extension}`;
-
-    // Determine content type
-    const contentTypeMap: { [key: string]: string } = {
-      jpg: "image/jpeg",
-      jpeg: "image/jpeg",
-      png: "image/png",
-      webp: "image/webp",
-    };
-    const contentType = contentTypeMap[extension] || "image/jpeg";
+    const filename = `${facilityId}/${timestamp}_${index}.webp`;
 
     // Upload to Supabase Storage
     const { data, error } = await supabaseAdmin.storage
       .from(STORAGE_BUCKET)
-      .upload(filename, imageBuffer, {
-        contentType,
+      .upload(filename, compressedBuffer, {
+        contentType: "image/webp",
         upsert: false, // Don't overwrite existing files
       });
 
