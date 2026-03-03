@@ -1,7 +1,7 @@
 {
-  "processedCount": 1278,
-  "successCount": 1095,
-  "failedCount": 188,
+  "processedCount": 1289,
+  "successCount": 1104,
+  "failedCount": 190,
   "skippedCount": 17,
   "processedFacilityIds": [
     "2651e40a-b22d-4b23-9fd7-8ff121dfdd25",
@@ -1101,15 +1101,24 @@
     "a8a18807-074f-4338-b6e6-0af3cd48fa2e",
     "67482bd6-d300-497d-8814-e53ae8d6f9a8",
     "de6d4512-b0b8-4a3c-ac27-186cfaee95a2",
-    "9a7ad76b-5e6c-48af-a045-35bb36791fa1"
+    "9a7ad76b-5e6c-48af-a045-35bb36791fa1",
+    "e7c7492e-1cbc-42a4-a942-f19843773b94",
+    "e76b9a63-516e-491b-afe6-cbaaac514e7f",
+    "942eb17f-ac00-4685-8db5-12c9831dc1ed",
+    "6ad12e98-3360-488e-a4aa-11ad66c3830e",
+    "e683ed1a-e9ca-462f-9981-a4634cdaaafa",
+    "ede0a4d1-26bf-42f3-9ca5-2980aceb18ed",
+    "9d7d9cf5-5485-4bee-a14f-41381b8b4196",
+    "d6b81948-bc2b-40cb-8454-9c93229cc190",
+    "ae048195-ee43-4b9f-b5f1-dcd99971dabb"
   ],
-  "lastProcessedIndex": 1291,
-  "imagesProcessed": 44745,
+  "lastProcessedIndex": 1302,
+  "imagesProcessed": 45152,
   "imagesSkipped": 39,
-  "imagesFailed": 481,
-  "totalBytesBefore": 108462720505,
-  "totalBytesAfter": 43262266794,
-  "lastUpdated": "2026-03-03T22:39:42.884Z",
+  "imagesFailed": 483,
+  "totalBytesBefore": 109442096252,
+  "totalBytesAfter": 43716099240,
+  "lastUpdated": "2026-03-03T22:59:58.379Z",
   "errors": [
     {
       "facility_id": "c8861bb6-f825-4d28-a60f-695b1edfef7b",
@@ -4477,8 +4486,22 @@
       "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/22c92fca-547b-499c-b98a-8ce0fba84aa1/1772137754946_30.jpg",
       "error": "Failed to compress image",
       "timestamp": "2026-03-03T22:31:50.997Z"
+    },
+    {
+      "facility_id": "0df55f91-35f2-4795-9cdc-603318aa3ca9",
+      "facility_name": "Pavo Real Recreation Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/0df55f91-35f2-4795-9cdc-603318aa3ca9/1772140877587_12.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T22:43:34.888Z"
+    },
+    {
+      "facility_id": "c04b9f9a-b2d6-4b27-b2cf-f8c7753d0b1e",
+      "facility_name": "Tierra Verde Golf Club",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/c04b9f9a-b2d6-4b27-b2cf-f8c7753d0b1e/1772144391059_38.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-03T22:54:44.161Z"
     }
   ],
-  "deletionsSucceeded": 41111,
+  "deletionsSucceeded": 41518,
   "deletionsFailed": 8
 }

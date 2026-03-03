@@ -143,18 +143,118 @@ export interface CloseCallTranscript {
 }
 
 // Email Thread types
+export interface CloseEmailParticipant {
+  email: string;
+  name?: string;
+}
+
+export interface CloseEmailEnvelope {
+  from?: CloseEmailParticipant[];
+  sender?: CloseEmailParticipant[];
+  to?: CloseEmailParticipant[];
+  cc?: CloseEmailParticipant[];
+  bcc?: CloseEmailParticipant[];
+  reply_to?: CloseEmailParticipant[];
+  date?: string;
+  in_reply_to?: string | null;
+  message_id?: string;
+  subject?: string;
+  is_autoreply?: boolean;
+}
+
+export interface CloseEmailAttachment {
+  size: number;
+  content_type: string;
+  filename: string;
+  content_id?: string | null;
+  inline_only: boolean;
+  url: string;
+  thumbnail_url?: string;
+}
+
+export interface CloseEmailActivity {
+  id: string;
+  _type?: string;
+  user_id?: string;
+  user_name?: string;
+  lead_id?: string;
+  contact_id?: string | null;
+  thread_id?: string;
+  organization_id?: string;
+  email_account_id?: string;
+  body_preview?: string;
+  date_sent?: string | null;
+  activity_at?: string;
+  opens_summary?: any;
+  to?: string[];
+  has_attachments?: boolean;
+  date_created: string;
+  date_updated: string;
+  bcc?: string[];
+  status?: string;
+  cc?: string[];
+  subject?: string;
+  send_as_id?: string | null;
+  direction?: 'incoming' | 'outgoing';
+  sender?: string;
+  envelope?: CloseEmailEnvelope;
+  body_text?: string;
+  body_html?: string;
+  body_text_quoted?: Array<{
+    text: string;
+    expand: boolean;
+  }>;
+  attachments?: CloseEmailAttachment[];
+  opens?: any[];
+  message_ids?: string[];
+  references?: string[];
+  in_reply_to_id?: string | null;
+  template_id?: string | null;
+  template_name?: string | null;
+  sequence_id?: string | null;
+  sequence_name?: string | null;
+  sequence_subscription_id?: string | null;
+  bulk_email_action_id?: string | null;
+  created_by?: string | null;
+  created_by_name?: string | null;
+  updated_by?: string | null;
+  updated_by_name?: string | null;
+  users?: string[];
+  has_reply?: boolean;
+  send_attempts?: any[];
+}
+
 export interface CloseEmailThread {
   id: string;
+  _type?: string;
   lead_id: string;
+  contact_id?: string | null;
   user_id: string;
   user_name?: string;
-  subject?: string;
+  activity_at?: string;
+  latest_normalized_subject?: string;
+  subject?: string; // Legacy field, kept for backward compatibility
   date_created: string;
   date_updated: string;
   status?: string;
-  direction?: 'inbound' | 'outbound';
+  direction?: 'incoming' | 'outgoing';
   preview?: string;
   snippet?: string;
+  participants?: CloseEmailParticipant[];
+  users?: string[];
+  latest_emails?: CloseEmailActivity[]; // From list endpoint
+  emails?: CloseEmailActivity[]; // Full array from detail endpoint
+  n_emails?: number;
+  organization_id?: string;
+  created_by?: string | null;
+  created_by_name?: string | null;
+  updated_by?: string | null;
+  updated_by_name?: string | null;
+  summary?: string | null;
+  importance?: {
+    type: string;
+    reason: string;
+  };
 }
 
 // Note Activity types

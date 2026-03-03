@@ -323,6 +323,29 @@ export function useCloseCall(callId: string | null): UseQueryResult<CloseCallAct
 // ============================================
 
 /**
+ * Get a single email thread by ID with full details
+ */
+export function useCloseEmail(emailThreadId: string | null): UseQueryResult<CloseEmailThread> {
+  return useQuery({
+    queryKey: ['close', 'email', emailThreadId],
+    queryFn: async () => {
+      if (!emailThreadId) {
+        throw new Error('Email thread ID is required');
+      }
+      const response = await fetch(`/api/close/emails/${emailThreadId}`);
+      const data: CloseApiResponse<CloseEmailThread> = await response.json();
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to fetch email thread');
+      }
+      return data.data;
+    },
+    enabled: !!emailThreadId, // Only run query if emailThreadId is provided
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
+  });
+}
+
+/**
  * Get email threads with optional filtering
  */
 export function useCloseEmails(params?: CloseQueryParams): UseQueryResult<{

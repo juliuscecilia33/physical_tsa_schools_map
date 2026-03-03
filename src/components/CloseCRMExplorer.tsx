@@ -10,6 +10,7 @@ import { CloseContactsList } from './CloseContactsList';
 import { LeadDetailsSidebar } from './LeadDetailsSidebar';
 import { CallDetailsSidebar } from './CallDetailsSidebar';
 import { ContactDetailsSidebar } from './ContactDetailsSidebar';
+import { EmailDetailsSidebar } from './EmailDetailsSidebar';
 import { User, Building2, Phone, Mail, Users, CheckCircle, XCircle, X } from 'lucide-react';
 
 type Tab = 'leads' | 'calls' | 'emails' | 'contacts' | 'users';
@@ -18,6 +19,7 @@ export function CloseCRMExplorer() {
   const [activeTab, setActiveTab] = useState<Tab>('leads');
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
   const [selectedCallId, setSelectedCallId] = useState<string | null>(null);
+  const [selectedEmailThreadId, setSelectedEmailThreadId] = useState<string | null>(null);
   const [selectedContactId, setSelectedContactId] = useState<string | null>(null);
   const [isDismissed, setIsDismissed] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
@@ -115,7 +117,9 @@ export function CloseCRMExplorer() {
             {activeTab === 'calls' && (
               <CloseCallsList onCallClick={(callId) => setSelectedCallId(callId)} />
             )}
-            {activeTab === 'emails' && <CloseEmailsList />}
+            {activeTab === 'emails' && (
+              <CloseEmailsList onEmailClick={(emailThreadId) => setSelectedEmailThreadId(emailThreadId)} />
+            )}
             {activeTab === 'contacts' && (
               <CloseContactsList onContactClick={(contactId) => setSelectedContactId(contactId)} />
             )}
@@ -144,6 +148,12 @@ export function CloseCRMExplorer() {
           setSelectedContactId(null);
           setSelectedLeadId(leadId);
         }}
+      />
+
+      {/* Email Details Sidebar */}
+      <EmailDetailsSidebar
+        emailThreadId={selectedEmailThreadId}
+        onClose={() => setSelectedEmailThreadId(null)}
       />
     </div>
   );
