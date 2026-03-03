@@ -1,4 +1,4 @@
-import { useQuery, UseQueryResult } from '@tanstack/react-query';
+import { useQuery, useQueries, UseQueryResult } from '@tanstack/react-query';
 import type {
   CloseUser,
   CloseLead,
@@ -153,6 +153,29 @@ export function useCloseLead(leadId: string | null): UseQueryResult<CloseLead> {
     enabled: !!leadId, // Only run query if leadId is provided
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
+  });
+}
+
+/**
+ * Get multiple leads by their IDs (batch fetching with caching)
+ * Uses React Query's useQueries for parallel fetching with automatic deduplication
+ */
+export function useCloseLeadsBatch(leadIds: string[]) {
+  return useQueries({
+    queries: leadIds.map((leadId) => ({
+      queryKey: ['close', 'lead', leadId],
+      queryFn: async () => {
+        const response = await fetch(`/api/close/leads/${leadId}`);
+        const data: CloseApiResponse<CloseLead> = await response.json();
+        if (!data.success) {
+          throw new Error(data.error || 'Failed to fetch lead');
+        }
+        return data.data;
+      },
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes
+      enabled: !!leadId,
+    })),
   });
 }
 

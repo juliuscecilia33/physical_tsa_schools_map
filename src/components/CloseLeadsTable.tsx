@@ -38,6 +38,38 @@ type SortField =
   | "updated";
 type SortDirection = "asc" | "desc" | null;
 
+// Utility function to format phone numbers
+function formatPhoneNumber(phoneNumber: string | undefined | null): string {
+  if (!phoneNumber) return "";
+
+  // Remove all non-digit characters
+  const cleaned = phoneNumber.replace(/\D/g, "");
+
+  // Check if it's a US/Canada number (starts with 1 and has 11 digits)
+  if (cleaned.length === 11 && cleaned.startsWith("1")) {
+    const areaCode = cleaned.substring(1, 4);
+    const firstPart = cleaned.substring(4, 7);
+    const secondPart = cleaned.substring(7, 11);
+    return `(${areaCode}) ${firstPart}-${secondPart}`;
+  }
+
+  // Check if it's a US/Canada number without country code (10 digits)
+  if (cleaned.length === 10) {
+    const areaCode = cleaned.substring(0, 3);
+    const firstPart = cleaned.substring(3, 6);
+    const secondPart = cleaned.substring(6, 10);
+    return `(${areaCode}) ${firstPart}-${secondPart}`;
+  }
+
+  // For international numbers or other formats, return with country code
+  if (cleaned.length > 11) {
+    return `+${cleaned}`;
+  }
+
+  // If we can't format it, return original
+  return phoneNumber;
+}
+
 export function CloseLeadsTable({
   leads,
   statusMap,
@@ -564,7 +596,7 @@ export function CloseLeadsTable({
                             className="flex items-center gap-1.5 text-blue-600 hover:text-blue-800 hover:underline w-fit"
                           >
                             <Phone className="w-3 h-3" />
-                            <span className="text-xs">{primaryPhone}</span>
+                            <span className="text-xs">{formatPhoneNumber(primaryPhone)}</span>
                           </a>
                         )}
                         {lead.contacts && lead.contacts.length > 1 && (

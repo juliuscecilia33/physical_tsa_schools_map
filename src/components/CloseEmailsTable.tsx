@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useEffect } from 'react';
 import { CloseEmailThread } from '@/types/close';
+import { useCloseLeadsBatch } from '@/hooks/useCloseCRM';
 import {
   Mail,
   ArrowDownToLine,
@@ -75,69 +76,47 @@ export function CloseEmailsTable({
   const [attachmentFilter, setAttachmentFilter] = useState<string>('all');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
-  const [enrichedEmails, setEnrichedEmails] = useState<EnrichedEmailThread[]>([]);
-  const [loadingLeads, setLoadingLeads] = useState(false);
 
-  // Fetch lead data for emails
-  useEffect(() => {
-    async function fetchLeadData() {
-      if (emails.length === 0) return;
+  // Extract unique lead IDs from emails
+  const uniqueLeadIds = useMemo(
+    () => [...new Set(emails.map((e) => e.lead_id).filter(Boolean) as string[])],
+    [emails]
+  );
 
-      setLoadingLeads(true);
-      try {
-        // Extract unique lead IDs
-        const leadIds = [...new Set(emails.map((e) => e.lead_id).filter(Boolean))];
+  // Fetch lead data using React Query batch hook
+  const leadQueries = useCloseLeadsBatch(uniqueLeadIds);
 
-        if (leadIds.length === 0) {
-          setEnrichedEmails(emails);
-          return;
-        }
+  // Build enriched emails from cached query results
+  const enrichedEmails = useMemo(() => {
+    const leadsMap = new Map();
 
-        // Fetch leads data
-        const leadsPromises = leadIds.map(async (leadId) => {
-          try {
-            const response = await fetch(`/api/close/leads/${leadId}`);
-            if (!response.ok) return null;
-            const data = await response.json();
-            return data.success ? data.data : null;
-          } catch {
-            return null;
-          }
-        });
-
-        const leadsData = await Promise.all(leadsPromises);
-        const leadsMap = new Map(
-          leadsData.filter(Boolean).map((lead) => [lead.id, lead])
-        );
-
-        // Enrich emails with lead data
-        const enriched = emails.map((email) => {
-          const lead = email.lead_id ? leadsMap.get(email.lead_id) : null;
-
-          // Try to find contact from participants
-          const participantEmail = email.participants?.[0]?.email;
-          const contact = lead?.contacts?.find((c: any) =>
-            c.emails?.some((e: any) => e.email === participantEmail)
-          );
-
-          return {
-            ...email,
-            lead_name: lead?.display_name || lead?.name,
-            contact_name: contact?.name || email.participants?.[0]?.name,
-          };
-        });
-
-        setEnrichedEmails(enriched);
-      } catch (error) {
-        console.error('Error fetching lead data:', error);
-        setEnrichedEmails(emails);
-      } finally {
-        setLoadingLeads(false);
+    // Build map from query results
+    leadQueries.forEach((query, index) => {
+      if (query.data) {
+        leadsMap.set(uniqueLeadIds[index], query.data);
       }
-    }
+    });
 
-    fetchLeadData();
-  }, [emails]);
+    // Enrich emails with lead data
+    return emails.map((email) => {
+      const lead = email.lead_id ? leadsMap.get(email.lead_id) : null;
+
+      // Try to find contact from participants
+      const participantEmail = email.participants?.[0]?.email;
+      const contact = lead?.contacts?.find((c: any) =>
+        c.emails?.some((e: any) => e.email === participantEmail)
+      );
+
+      return {
+        ...email,
+        lead_name: lead?.display_name || lead?.name,
+        contact_name: contact?.name || email.participants?.[0]?.name,
+      } as EnrichedEmailThread;
+    });
+  }, [emails, leadQueries, uniqueLeadIds]);
+
+  // Check if any lead queries are still loading
+  const loadingLeads = leadQueries.some((query) => query.isLoading);
 
   // Extract unique values for filters
   const { uniqueStatuses, uniqueUsers } = useMemo(() => {

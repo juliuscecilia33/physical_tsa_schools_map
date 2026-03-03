@@ -69,8 +69,8 @@ export async function GET(request: NextRequest) {
         date_created: email.date_created,
         date_updated: email.date_updated,
         email,
-        title: email.subject || '(No Subject)',
-        description: email.preview || email.snippet || '',
+        title: email.latest_normalized_subject || email.subject || '(No Subject)',
+        description: email.preview || email.snippet || (email.latest_emails?.[0]?.body_preview) || '',
       })),
       ...notes.map((note: any) => ({
         id: note.id,

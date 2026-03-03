@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useEffect } from 'react';
 import { CloseCallActivity } from '@/types/close';
+import { useCloseLeadsBatch } from '@/hooks/useCloseCRM';
 import {
   Phone,
   PhoneIncoming,
@@ -41,6 +42,37 @@ type SortField =
 type SortDirection = 'asc' | 'desc' | null;
 
 // Utility functions
+function formatPhoneNumber(phoneNumber: string | undefined | null): string {
+  if (!phoneNumber) return "";
+
+  // Remove all non-digit characters
+  const cleaned = phoneNumber.replace(/\D/g, "");
+
+  // Check if it's a US/Canada number (starts with 1 and has 11 digits)
+  if (cleaned.length === 11 && cleaned.startsWith("1")) {
+    const areaCode = cleaned.substring(1, 4);
+    const firstPart = cleaned.substring(4, 7);
+    const secondPart = cleaned.substring(7, 11);
+    return `(${areaCode}) ${firstPart}-${secondPart}`;
+  }
+
+  // Check if it's a US/Canada number without country code (10 digits)
+  if (cleaned.length === 10) {
+    const areaCode = cleaned.substring(0, 3);
+    const firstPart = cleaned.substring(3, 6);
+    const secondPart = cleaned.substring(6, 10);
+    return `(${areaCode}) ${firstPart}-${secondPart}`;
+  }
+
+  // For international numbers or other formats, return with country code
+  if (cleaned.length > 11) {
+    return `+${cleaned}`;
+  }
+
+  // If we can't format it, return original
+  return phoneNumber;
+}
+
 function formatDuration(seconds: number | undefined | null): string {
   if (!seconds || seconds === 0) return '-';
   const mins = Math.floor(seconds / 60);
@@ -104,66 +136,44 @@ export function CloseCallsTable({ calls, onCallClick, isLoading, isSidebarOpen, 
   const [recordingFilter, setRecordingFilter] = useState<string>('all');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
-  const [enrichedCalls, setEnrichedCalls] = useState<EnrichedCall[]>([]);
-  const [loadingLeads, setLoadingLeads] = useState(false);
 
-  // Fetch lead data for calls
-  useEffect(() => {
-    async function fetchLeadData() {
-      if (calls.length === 0) return;
+  // Extract unique lead IDs from calls
+  const uniqueLeadIds = useMemo(
+    () => [...new Set(calls.map((c) => c.lead_id).filter(Boolean) as string[])],
+    [calls]
+  );
 
-      setLoadingLeads(true);
-      try {
-        // Extract unique lead IDs
-        const leadIds = [...new Set(calls.map((c) => c.lead_id).filter(Boolean))];
+  // Fetch lead data using React Query batch hook
+  const leadQueries = useCloseLeadsBatch(uniqueLeadIds);
 
-        if (leadIds.length === 0) {
-          setEnrichedCalls(calls);
-          return;
-        }
+  // Build enriched calls from cached query results
+  const enrichedCalls = useMemo(() => {
+    const leadsMap = new Map();
 
-        // Fetch leads data
-        const leadsPromises = leadIds.map(async (leadId) => {
-          try {
-            const response = await fetch(`/api/close/leads/${leadId}`);
-            if (!response.ok) return null;
-            const data = await response.json();
-            return data.success ? data.data : null;
-          } catch {
-            return null;
-          }
-        });
-
-        const leadsData = await Promise.all(leadsPromises);
-        const leadsMap = new Map(
-          leadsData.filter(Boolean).map((lead) => [lead.id, lead])
-        );
-
-        // Enrich calls with lead data
-        const enriched = calls.map((call) => {
-          const lead = call.lead_id ? leadsMap.get(call.lead_id) : null;
-          const contact = lead?.contacts?.find((c: any) =>
-            c.phones?.some((p: any) => p.phone === call.phone || p.phone === call.remote_phone)
-          );
-
-          return {
-            ...call,
-            lead_name: lead?.display_name || lead?.name,
-            contact_name: contact?.name,
-          };
-        });
-
-        setEnrichedCalls(enriched);
-      } catch (error) {
-        console.error('Error fetching lead data:', error);
-        setEnrichedCalls(calls);
-      } finally {
-        setLoadingLeads(false);
+    // Build map from query results
+    leadQueries.forEach((query, index) => {
+      if (query.data) {
+        leadsMap.set(uniqueLeadIds[index], query.data);
       }
-    }
+    });
 
-    fetchLeadData();
-  }, [calls]);
+    // Enrich calls with lead data
+    return calls.map((call) => {
+      const lead = call.lead_id ? leadsMap.get(call.lead_id) : null;
+      const contact = lead?.contacts?.find((c: any) =>
+        c.phones?.some((p: any) => p.phone === call.phone || p.phone === call.remote_phone)
+      );
+
+      return {
+        ...call,
+        lead_name: lead?.display_name || lead?.name,
+        contact_name: contact?.name,
+      } as EnrichedCall;
+    });
+  }, [calls, leadQueries, uniqueLeadIds]);
+
+  // Check if any lead queries are still loading
+  const loadingLeads = leadQueries.some((query) => query.isLoading);
 
   // Extract unique values for filters
   const { uniqueDispositions, uniqueUsers } = useMemo(() => {
@@ -771,7 +781,7 @@ export function CloseCallsTable({ calls, onCallClick, isLoading, isSidebarOpen, 
                           onClick={(e) => e.stopPropagation()}
                           className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
                         >
-                          {phone}
+                          {formatPhoneNumber(phone)}
                         </a>
                       ) : (
                         <span className="text-xs text-gray-400">-</span>

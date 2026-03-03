@@ -31,7 +31,7 @@ function getActivityIcon(activity: CloseActivity) {
         <PhoneOutgoing className="w-4 h-4" />
       );
     case 'email':
-      return activity.email?.direction === 'inbound' ? (
+      return activity.email?.direction === 'incoming' ? (
         <ArrowDownToLine className="w-4 h-4" />
       ) : (
         <ArrowUpFromLine className="w-4 h-4" />
@@ -178,9 +178,9 @@ function ActivityItem({ activity }: { activity: CloseActivity }) {
             {/* Email details */}
             {activity.type === 'email' && activity.email && (
               <div>
-                {activity.email.subject && (
+                {(activity.email.latest_normalized_subject || activity.email.subject) && (
                   <p className="text-xs font-medium text-gray-700 mb-1">
-                    Subject: {activity.email.subject}
+                    Subject: {activity.email.latest_normalized_subject || activity.email.subject}
                   </p>
                 )}
                 {(activity.email.preview || activity.email.snippet) && (
