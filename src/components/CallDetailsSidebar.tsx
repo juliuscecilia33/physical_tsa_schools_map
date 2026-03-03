@@ -50,6 +50,53 @@ function getDispositionColor(disposition: string | undefined): string {
   }
 }
 
+function renderFormattedSummary(summaryText: string) {
+  const lines = summaryText.split('\n').filter(line => line.trim());
+  const elements: JSX.Element[] = [];
+  let currentList: string[] = [];
+  let key = 0;
+
+  const flushList = () => {
+    if (currentList.length > 0) {
+      elements.push(
+        <ul key={`list-${key++}`} className="list-disc list-inside space-y-1 mb-3">
+          {currentList.map((item, idx) => (
+            <li key={idx} className="text-sm text-gray-700 leading-relaxed">
+              {item}
+            </li>
+          ))}
+        </ul>
+      );
+      currentList = [];
+    }
+  };
+
+  lines.forEach((line) => {
+    if (line.startsWith('###')) {
+      flushList();
+      const heading = line.replace(/^###\s*/, '');
+      elements.push(
+        <h4 key={`heading-${key++}`} className="font-semibold text-gray-900 mt-4 mb-2 text-base">
+          {heading}
+        </h4>
+      );
+    } else if (line.startsWith('-')) {
+      const text = line.replace(/^-\s*/, '');
+      currentList.push(text);
+    } else if (line.trim()) {
+      flushList();
+      elements.push(
+        <p key={`text-${key++}`} className="text-sm text-gray-700 mb-2 leading-relaxed">
+          {line}
+        </p>
+      );
+    }
+  });
+
+  flushList();
+  return elements;
+}
+
 export function CallDetailsSidebar({ callId, leadId, onClose }: CallDetailsSidebarProps) {
   const { data: call, isLoading: callLoading, error: callError } = useCloseCall(callId);
   const { data: lead, isLoading: leadLoading, error: leadError } = useCloseLead(leadId || call?.lead_id || null);
@@ -286,10 +333,8 @@ export function CallDetailsSidebar({ callId, leadId, onClose }: CallDetailsSideb
                         <FileText className="w-4 h-4" />
                         Call Summary
                       </h3>
-                      <div className="prose prose-sm max-w-none">
-                        <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
-                          {call.recording_transcript.summary_text}
-                        </p>
+                      <div className="space-y-2">
+                        {renderFormattedSummary(call.recording_transcript.summary_text)}
                       </div>
                     </div>
                   )}
