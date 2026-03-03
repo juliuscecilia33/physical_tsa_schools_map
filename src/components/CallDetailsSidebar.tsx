@@ -465,27 +465,38 @@ export function CallDetailsSidebar({ callId, leadId, onClose }: CallDetailsSideb
                         <FileText className="w-4 h-4" />
                         Full Transcript
                       </h3>
-                      <div className="space-y-3">
+                      <div className="space-y-4">
                         {call.recording_transcript.utterances.map((utterance, idx) => {
                           const speakerName = getSpeakerName(utterance.speaker_label);
                           const speakerSide = utterance.speaker_side;
+                          const isCloseUser = speakerSide === 'close-user';
+
                           return (
-                            <div key={idx} className="text-sm">
-                              <div className="flex items-center gap-2 mb-1">
-                                <p className={`font-medium ${
-                                  speakerSide === 'close-user'
-                                    ? 'text-blue-700'
-                                    : 'text-gray-900'
-                                }`}>
-                                  {speakerName}
-                                </p>
-                                {speakerSide === 'close-user' && (
-                                  <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
-                                    You
+                            <div
+                              key={idx}
+                              className={`flex ${isCloseUser ? 'justify-end' : 'justify-start'}`}
+                            >
+                              <div className={`max-w-[75%] ${isCloseUser ? 'items-end' : 'items-start'} flex flex-col gap-1`}>
+                                <div className="flex items-center gap-2 px-1">
+                                  <span className="text-xs font-medium text-gray-600">
+                                    {speakerName}
                                   </span>
-                                )}
+                                  {isCloseUser && (
+                                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
+                                      You
+                                    </span>
+                                  )}
+                                </div>
+                                <div
+                                  className={`rounded-2xl px-4 py-3 text-sm shadow-sm ${
+                                    isCloseUser
+                                      ? 'bg-blue-600 text-white rounded-tr-sm'
+                                      : 'bg-gray-100 text-gray-900 rounded-tl-sm'
+                                  }`}
+                                >
+                                  <p className="leading-relaxed">{utterance.text}</p>
+                                </div>
                               </div>
-                              <p className="text-gray-700 pl-4">{utterance.text}</p>
                             </div>
                           );
                         })}
