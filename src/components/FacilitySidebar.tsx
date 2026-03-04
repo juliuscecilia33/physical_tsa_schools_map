@@ -199,7 +199,9 @@ function FacilitySidebarInner({
   const [showAdditionalLeftArrow, setShowAdditionalLeftArrow] = useState(false);
   const [showAdditionalRightArrow, setShowAdditionalRightArrow] =
     useState(false);
-  const reviewImageScrollRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
+  const reviewImageScrollRefs = useRef<{
+    [key: number]: HTMLDivElement | null;
+  }>({});
   const [reviewImageArrowVisibility, setReviewImageArrowVisibility] = useState<{
     [key: number]: { left: boolean; right: boolean };
   }>({});
@@ -306,29 +308,37 @@ function FacilitySidebarInner({
   useEffect(() => {
     // Initial session fetch
     const initSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (session?.user) {
         setCurrentUser({
           id: session.user.id,
           email: session.user.email,
           display_name: session.user.user_metadata?.full_name,
-          avatar_url: session.user.user_metadata?.avatar_url || session.user.user_metadata?.picture,
+          avatar_url:
+            session.user.user_metadata?.avatar_url ||
+            session.user.user_metadata?.picture,
         });
       }
     };
     initSession();
 
     // Listen to auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       // Only update user state if we have a session, or if user explicitly signed out
       if (session?.user) {
         setCurrentUser({
           id: session.user.id,
           email: session.user.email,
           display_name: session.user.user_metadata?.full_name,
-          avatar_url: session.user.user_metadata?.avatar_url || session.user.user_metadata?.picture,
+          avatar_url:
+            session.user.user_metadata?.avatar_url ||
+            session.user.user_metadata?.picture,
         });
-      } else if (_event === 'SIGNED_OUT') {
+      } else if (_event === "SIGNED_OUT") {
         setCurrentUser(null);
       }
     });
@@ -417,7 +427,7 @@ function FacilitySidebarInner({
 
     // Try to optimize Supabase Storage images with transformation API
     // If transformation fails (404), browser will fall back to original URL
-    if (!highRes && baseUrl.includes('supabase.co/storage')) {
+    if (!highRes && baseUrl.includes("supabase.co/storage")) {
       // More aggressive compression for faster preview loading
       // width=280: Match display size exactly (280px × 180px)
       // quality=60: Lower quality but acceptable for thumbnails (~40% smaller files)
@@ -467,7 +477,8 @@ function FacilitySidebarInner({
               reviewIndex: reviewIdx,
               photoIndexInReview: photoIdx,
               reviewUserThumbnail: review.user?.thumbnail,
-              reviewUserName: review.user?.name || review.author_name || "Anonymous",
+              reviewUserName:
+                review.user?.name || review.author_name || "Anonymous",
               reviewRating: review.rating,
             });
           });
@@ -863,7 +874,6 @@ function FacilitySidebarInner({
 
       // Update cache with new tags
       updateFacilityTags(queryClient, facility.place_id, updatedTags);
-
     } catch (error) {
       console.error("Error assigning tag:", error);
       // Revert optimistic update on error
@@ -916,7 +926,6 @@ function FacilitySidebarInner({
       alert("Failed to remove tag. Please try again.");
     }
   };
-
 
   const formatSportType = (type: string) => {
     return type
@@ -1027,7 +1036,10 @@ function FacilitySidebarInner({
   };
 
   // Handle review images scroll
-  const scrollReviewImages = (reviewIndex: number, direction: "left" | "right") => {
+  const scrollReviewImages = (
+    reviewIndex: number,
+    direction: "left" | "right",
+  ) => {
     const ref = reviewImageScrollRefs.current[reviewIndex];
     if (!ref) return;
     const scrollAmount = 200; // Smaller scroll for review images
@@ -1098,7 +1110,8 @@ function FacilitySidebarInner({
     updateAllReviewImageArrows();
 
     // Attach scroll and resize listeners to all review image containers
-    const listeners: Array<{ ref: HTMLDivElement; scrollHandler: () => void }> = [];
+    const listeners: Array<{ ref: HTMLDivElement; scrollHandler: () => void }> =
+      [];
     Object.entries(reviewImageScrollRefs.current).forEach(([key, ref]) => {
       if (ref) {
         const reviewIndex = parseInt(key);
@@ -1146,7 +1159,8 @@ function FacilitySidebarInner({
     } else if (photoViewerSource === "additional") {
       photos = displayFacility?.additional_photos;
     } else if (photoViewerSource === "review") {
-      photos = displayFacility?.additional_reviews?.[selectedReviewIndex]?.images;
+      photos =
+        displayFacility?.additional_reviews?.[selectedReviewIndex]?.images;
     }
     if (!photos) return;
     const totalPhotos = photos.length;
@@ -1251,980 +1265,1303 @@ function FacilitySidebarInner({
         </div>
 
         {/* Content */}
-        <div ref={contentRef} className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
+        <div
+          ref={contentRef}
+          className="flex-1 overflow-y-auto px-6 py-6 space-y-6"
+        >
           <AnimatePresence mode="wait">
-          {viewMode === "facility" ? (
-          <motion.div
-            key="facility-view"
-            initial={{ x: 0, opacity: 1 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: -100, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="space-y-6"
-          >
-          {/* Photos */}
-          {displayFacility.photo_references &&
-          displayFacility.photo_references.length > 0 &&
-          (!displayFacility.serp_scraped ||
-            (displayFacility.additional_photos !== undefined &&
-              displayFacility.additional_photos.length === 0)) ? (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.05 }}
-            >
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-semibold text-slate-700 tracking-wide">
-                  Photos{" "}
-                  <span className="text-slate-500 tabular-nums">
-                    ({displayFacility.photo_references.length})
-                  </span>
-                </h3>
-                <button
-                  onClick={() => setIsPhotosModalOpen(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
-                >
-                  <Maximize2 className="w-3.5 h-3.5" />
-                  Expand
-                </button>
-              </div>
-              <div className="relative group/photos">
-                {/* Left Arrow */}
-                {showLeftArrow && (
-                  <button
-                    onClick={() => scrollPhotos("left")}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-md flex items-center justify-center transition-all opacity-0 group-hover/photos:opacity-100 cursor-pointer"
-                    aria-label="Scroll left"
-                  >
-                    <ChevronLeft className="w-6 h-6 text-slate-700" />
-                  </button>
-                )}
-
-                {/* Right Arrow */}
-                {showRightArrow && (
-                  <button
-                    onClick={() => scrollPhotos("right")}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-md flex items-center justify-center transition-all opacity-0 group-hover/photos:opacity-100 cursor-pointer"
-                    aria-label="Scroll right"
-                  >
-                    <ChevronRight className="w-6 h-6 text-slate-700" />
-                  </button>
-                )}
-
-                {/* Scrollable Photo Container */}
-                <div
-                  ref={photoScrollRef}
-                  className="flex gap-3 overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory"
-                  style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-                >
-                  {displayFacility.photo_references.map((photoRef, idx) => (
-                    <motion.div
-                      key={idx}
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.1 + Math.min(idx * 0.05, 0.5) }}
-                      onClick={() => openPhotoViewer(idx)}
-                      className="relative overflow-hidden rounded-2xl shadow-sm hover:shadow-xl transition-all cursor-pointer flex-shrink-0 snap-start"
-                      style={{ width: "280px", height: "180px" }}
-                    >
-                      {loadingImages[idx] !== false && (
-                        <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />
-                      )}
-                      <img
-                        src={getPhotoUrl(photoRef)}
-                        alt={`${displayFacility.name} photo ${idx + 1}`}
-                        className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
-                        loading={idx < 5 ? "eager" : "lazy"}
-                        onLoadStart={() => handleImageLoadStart(idx)}
-                        onLoad={() => handleImageLoad(idx)}
-                        onError={() => handleImageLoad(idx)}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity" />
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          ) : isLoadingDetails &&
-            displayFacility.total_photo_count &&
-            displayFacility.total_photo_count > 0 ? (
-            // Show skeleton loader when loading and we know photos exist
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.05 }}
-            >
-              <h3 className="text-sm font-medium text-slate-700 tracking-wide mb-3">
-                Scraped Photos{" "}
-                <span className="text-slate-500 tabular-nums">
-                  ({displayFacility.total_photo_count})
-                </span>
-              </h3>
-              <div className="flex gap-3 overflow-x-auto scrollbar-hide">
-                {[1, 2, 3, 4].map((i) => (
-                  <div
-                    key={i}
-                    className="bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 rounded-2xl animate-pulse flex-shrink-0"
-                    style={{ width: "280px", height: "180px" }}
-                  />
-                ))}
-              </div>
-            </motion.div>
-          ) : !displayFacility.serp_scraped ||
-            !displayFacility.additional_photos ||
-            displayFacility.additional_photos.length === 0 ? (
-            <div className="text-center py-12">
-              <Camera className="w-12 h-12 text-slate-400 mx-auto mb-3" />
-              <p className="text-sm text-slate-500">No photos available</p>
-            </div>
-          ) : null}
-
-          {/* Additional Photos from SerpAPI */}
-          {displayFacility.serp_scraped && combinedPhotos.length > 0 && (
-            <>
-              {/* Divider - only show if regular photos were displayed above */}
-              {displayFacility.photo_references &&
-                displayFacility.photo_references.length > 0 && (
-                  <div className="border-t border-slate-200"></div>
-                )}
-
+            {viewMode === "facility" ? (
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.06 }}
+                key="facility-view"
+                initial={{ x: 0, opacity: 1 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: -100, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                className="space-y-6"
               >
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
-                    Scraped Photos ({combinedPhotos.length})
-                  </h3>
-                  <button
-                    onClick={() => setIsAdditionalPhotosModalOpen(true)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
+                {/* Photos */}
+                {displayFacility.photo_references &&
+                displayFacility.photo_references.length > 0 &&
+                (!displayFacility.serp_scraped ||
+                  (displayFacility.additional_photos !== undefined &&
+                    displayFacility.additional_photos.length === 0)) ? (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.05 }}
                   >
-                    <Maximize2 className="w-3.5 h-3.5" />
-                    Expand
-                  </button>
-                </div>
-                <div className="relative group/additional-photos">
-                  {/* Left Arrow */}
-                  {showAdditionalLeftArrow && (
-                    <button
-                      onClick={() => scrollAdditionalPhotos("left")}
-                      className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-md flex items-center justify-center transition-all opacity-0 group-hover/additional-photos:opacity-100 cursor-pointer"
-                      aria-label="Scroll left"
-                    >
-                      <ChevronLeft className="w-6 h-6 text-slate-700" />
-                    </button>
-                  )}
-
-                  {/* Right Arrow */}
-                  {showAdditionalRightArrow && (
-                    <button
-                      onClick={() => scrollAdditionalPhotos("right")}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-md flex items-center justify-center transition-all opacity-0 group-hover/additional-photos:opacity-100 cursor-pointer"
-                      aria-label="Scroll right"
-                    >
-                      <ChevronRight className="w-6 h-6 text-slate-700" />
-                    </button>
-                  )}
-
-                  {/* Scrollable Photo Container */}
-                  <div
-                    ref={additionalPhotoScrollRef}
-                    className="flex gap-3 overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory"
-                    style={{
-                      scrollbarWidth: "none",
-                      msOverflowStyle: "none",
-                    }}
-                  >
-                    {combinedPhotos.map((photo, idx) => (
-                      <motion.div
-                        key={`combined-${idx}`}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{
-                          delay: 0.1 + Math.min(idx * 0.05, 0.5),
-                        }}
-                        onClick={() => {
-                          if (photo.type === "review") {
-                            openReviewPhotoViewer(
-                              photo.reviewIndex!,
-                              photo.photoIndexInReview!,
-                            );
-                          } else {
-                            openPhotoViewer(photo.scrapedIndex!, "additional");
-                          }
-                        }}
-                        className="relative overflow-hidden rounded-2xl shadow-sm hover:shadow-xl transition-all cursor-pointer flex-shrink-0 snap-start"
-                        style={{ width: "280px", height: "180px" }}
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-sm font-semibold text-slate-700 tracking-wide">
+                        Photos{" "}
+                        <span className="text-slate-500 tabular-nums">
+                          ({displayFacility.photo_references.length})
+                        </span>
+                      </h3>
+                      <button
+                        onClick={() => setIsPhotosModalOpen(true)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
                       >
-                        {loadingImages[`combined-${idx}`] !== false && (
-                          <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />
-                        )}
-                        <img
-                          src={photo.url}
-                          alt={`${displayFacility.name} photo ${idx + 1}`}
-                          className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
-                          referrerPolicy="no-referrer"
-                          loading={idx < 5 ? "eager" : "lazy"}
-                          onLoadStart={() =>
-                            handleImageLoadStart(`combined-${idx}`)
-                          }
-                          onLoad={() => handleImageLoad(`combined-${idx}`)}
-                          onError={() => handleImageLoad(`combined-${idx}`)}
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity" />
-                        {photo.type === "scraped" && photo.data?.video && (
-                          <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm rounded-full p-1.5">
-                            <Camera className="w-4 h-4 text-white" />
-                          </div>
-                        )}
-                        {photo.type === "review" && (
-                          <div className="absolute bottom-2 right-2 flex items-center gap-1.5">
-                            {photo.reviewUserThumbnail ? (
+                        <Maximize2 className="w-3.5 h-3.5" />
+                        Expand
+                      </button>
+                    </div>
+                    <div className="relative group/photos">
+                      {/* Left Arrow */}
+                      {showLeftArrow && (
+                        <button
+                          onClick={() => scrollPhotos("left")}
+                          className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-md flex items-center justify-center transition-all opacity-0 group-hover/photos:opacity-100 cursor-pointer"
+                          aria-label="Scroll left"
+                        >
+                          <ChevronLeft className="w-6 h-6 text-slate-700" />
+                        </button>
+                      )}
+
+                      {/* Right Arrow */}
+                      {showRightArrow && (
+                        <button
+                          onClick={() => scrollPhotos("right")}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-md flex items-center justify-center transition-all opacity-0 group-hover/photos:opacity-100 cursor-pointer"
+                          aria-label="Scroll right"
+                        >
+                          <ChevronRight className="w-6 h-6 text-slate-700" />
+                        </button>
+                      )}
+
+                      {/* Scrollable Photo Container */}
+                      <div
+                        ref={photoScrollRef}
+                        className="flex gap-3 overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory"
+                        style={{
+                          scrollbarWidth: "none",
+                          msOverflowStyle: "none",
+                        }}
+                      >
+                        {displayFacility.photo_references.map(
+                          (photoRef, idx) => (
+                            <motion.div
+                              key={idx}
+                              initial={{ opacity: 0, scale: 0.9 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              transition={{
+                                delay: 0.1 + Math.min(idx * 0.05, 0.5),
+                              }}
+                              onClick={() => openPhotoViewer(idx)}
+                              className="relative overflow-hidden rounded-2xl shadow-sm hover:shadow-xl transition-all cursor-pointer flex-shrink-0 snap-start"
+                              style={{ width: "280px", height: "180px" }}
+                            >
+                              {loadingImages[idx] !== false && (
+                                <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />
+                              )}
                               <img
-                                src={photo.reviewUserThumbnail}
-                                alt={photo.reviewUserName}
-                                className="w-8 h-8 rounded-full border-2 border-white shadow-lg object-cover"
-                                referrerPolicy="no-referrer"
+                                src={getPhotoUrl(photoRef)}
+                                alt={`${displayFacility.name} photo ${idx + 1}`}
+                                className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                                loading={idx < 5 ? "eager" : "lazy"}
+                                onLoadStart={() => handleImageLoadStart(idx)}
+                                onLoad={() => handleImageLoad(idx)}
+                                onError={() => handleImageLoad(idx)}
                               />
-                            ) : (
-                              <div className="w-8 h-8 rounded-full border-2 border-white shadow-lg bg-slate-400 flex items-center justify-center text-white text-xs font-semibold">
-                                {photo.reviewUserName?.charAt(0).toUpperCase()}
-                              </div>
-                            )}
-                            {photo.reviewRating && (
-                              <div className="bg-white/95 backdrop-blur-sm rounded-lg px-1.5 py-0.5 shadow-lg flex items-center gap-0.5">
-                                <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                                <span className="text-xs font-semibold text-slate-900">
-                                  {photo.reviewRating.toFixed(1)}
-                                </span>
-                              </div>
-                            )}
-                          </div>
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity" />
+                            </motion.div>
+                          ),
                         )}
-                      </motion.div>
-                    ))}
-                  </div>
-                </div>
-              </motion.div>
-            </>
-          )}
-
-          {/* Divider - only show if photos sections were displayed above */}
-          {((displayFacility.photo_references &&
-            displayFacility.photo_references.length > 0) ||
-            (displayFacility.serp_scraped &&
-              displayFacility.additional_photos &&
-              displayFacility.additional_photos.length > 0)) && (
-            <div className="border-t border-slate-200"></div>
-          )}
-
-          {/* Notes Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.08 }}
-          >
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
-                <StickyNote className="w-4 h-4" />
-                Notes ({notes.length})
-              </h3>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setIsAddNoteModalOpen(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  Add Note
-                </button>
-                {notes.length > 3 && (
-                  <button
-                    onClick={() => setShowAllNotes(!showAllNotes)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
+                      </div>
+                    </div>
+                  </motion.div>
+                ) : isLoadingDetails &&
+                  displayFacility.total_photo_count &&
+                  displayFacility.total_photo_count > 0 ? (
+                  // Show skeleton loader when loading and we know photos exist
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.05 }}
                   >
-                    <ExternalLink className="w-3.5 h-3.5" />
-                    {showAllNotes ? "Show Less" : "See All"}
-                  </button>
-                )}
-              </div>
-            </div>
+                    <h3 className="text-sm font-medium text-slate-700 tracking-wide mb-3">
+                      Scraped Photos{" "}
+                      <span className="text-slate-500 tabular-nums">
+                        ({displayFacility.total_photo_count})
+                      </span>
+                    </h3>
+                    <div className="flex gap-3 overflow-x-auto scrollbar-hide">
+                      {[1, 2, 3, 4].map((i) => (
+                        <div
+                          key={i}
+                          className="bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 rounded-2xl animate-pulse flex-shrink-0"
+                          style={{ width: "280px", height: "180px" }}
+                        />
+                      ))}
+                    </div>
+                  </motion.div>
+                ) : !displayFacility.serp_scraped ||
+                  !displayFacility.additional_photos ||
+                  displayFacility.additional_photos.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Camera className="w-12 h-12 text-slate-400 mx-auto mb-3" />
+                    <p className="text-sm text-slate-500">
+                      No photos available
+                    </p>
+                  </div>
+                ) : null}
 
-            {/* Notes List */}
-            {loadingNotes ? (
-              <div className="text-center py-4">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-              </div>
-            ) : notes.length === 0 ? (
-              <div className="text-center py-6 bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-2xl border border-slate-100">
-                <StickyNote className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-                <p className="text-sm text-slate-500">No notes yet</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {notes
-                  .slice(0, showAllNotes ? notes.length : 3)
-                  .map((note, idx) => (
+                {/* Additional Photos from SerpAPI */}
+                {displayFacility.serp_scraped && combinedPhotos.length > 0 && (
+                  <>
+                    {/* Divider - only show if regular photos were displayed above */}
+                    {displayFacility.photo_references &&
+                      displayFacility.photo_references.length > 0 && (
+                        <div className="border-t border-slate-200"></div>
+                      )}
+
                     <motion.div
-                      key={note.id}
-                      initial={{ opacity: 0, y: 10 }}
+                      initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.1 + idx * 0.05 }}
-                      className="bg-gradient-to-br from-white to-slate-50/50 rounded-2xl p-3 shadow-sm border border-slate-100"
+                      transition={{ delay: 0.06 }}
                     >
-                      <>
-                          {/* Note Text */}
-                          <p className="text-sm text-slate-700 leading-relaxed mb-3 break-words">
-                            <NoteText text={note.note_text} />
-                          </p>
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
+                          Scraped Photos ({combinedPhotos.length})
+                        </h3>
+                        <button
+                          onClick={() => setIsAdditionalPhotosModalOpen(true)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
+                        >
+                          <Maximize2 className="w-3.5 h-3.5" />
+                          Expand
+                        </button>
+                      </div>
+                      <div className="relative group/additional-photos">
+                        {/* Left Arrow */}
+                        {showAdditionalLeftArrow && (
+                          <button
+                            onClick={() => scrollAdditionalPhotos("left")}
+                            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-md flex items-center justify-center transition-all opacity-0 group-hover/additional-photos:opacity-100 cursor-pointer"
+                            aria-label="Scroll left"
+                          >
+                            <ChevronLeft className="w-6 h-6 text-slate-700" />
+                          </button>
+                        )}
 
-                          {/* Assigned Photo */}
-                          {note.assigned_photo && (
-                            <div
+                        {/* Right Arrow */}
+                        {showAdditionalRightArrow && (
+                          <button
+                            onClick={() => scrollAdditionalPhotos("right")}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-md flex items-center justify-center transition-all opacity-0 group-hover/additional-photos:opacity-100 cursor-pointer"
+                            aria-label="Scroll right"
+                          >
+                            <ChevronRight className="w-6 h-6 text-slate-700" />
+                          </button>
+                        )}
+
+                        {/* Scrollable Photo Container */}
+                        <div
+                          ref={additionalPhotoScrollRef}
+                          className="flex gap-3 overflow-x-auto scrollbar-hide scroll-smooth snap-x snap-mandatory"
+                          style={{
+                            scrollbarWidth: "none",
+                            msOverflowStyle: "none",
+                          }}
+                        >
+                          {combinedPhotos.map((photo, idx) => (
+                            <motion.div
+                              key={`combined-${idx}`}
+                              initial={{ opacity: 0, scale: 0.9 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              transition={{
+                                delay: 0.1 + Math.min(idx * 0.05, 0.5),
+                              }}
                               onClick={() => {
-                                if (note.assigned_photo?.type === "review") {
+                                if (photo.type === "review") {
                                   openReviewPhotoViewer(
-                                    note.assigned_photo.reviewIndex!,
-                                    note.assigned_photo.photoIndexInReview!,
+                                    photo.reviewIndex!,
+                                    photo.photoIndexInReview!,
                                   );
-                                } else if (
-                                  note.assigned_photo?.type === "scraped"
-                                ) {
+                                } else {
                                   openPhotoViewer(
-                                    note.assigned_photo.scrapedIndex!,
+                                    photo.scrapedIndex!,
                                     "additional",
                                   );
                                 }
                               }}
-                              className="mb-3 relative flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all cursor-pointer group"
+                              className="relative overflow-hidden rounded-2xl shadow-sm hover:shadow-xl transition-all cursor-pointer flex-shrink-0 snap-start"
+                              style={{ width: "280px", height: "180px" }}
                             >
+                              {loadingImages[`combined-${idx}`] !== false && (
+                                <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />
+                              )}
                               <img
-                                src={
-                                  note.assigned_photo.thumbnail ||
-                                  note.assigned_photo.url
-                                }
-                                alt="Note photo"
-                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                                src={photo.url}
+                                alt={`${displayFacility.name} photo ${idx + 1}`}
+                                className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
                                 referrerPolicy="no-referrer"
+                                loading={idx < 5 ? "eager" : "lazy"}
+                                onLoadStart={() =>
+                                  handleImageLoadStart(`combined-${idx}`)
+                                }
+                                onLoad={() =>
+                                  handleImageLoad(`combined-${idx}`)
+                                }
+                                onError={() =>
+                                  handleImageLoad(`combined-${idx}`)
+                                }
                               />
-                              {note.assigned_photo.type === "review" &&
-                                note.assigned_photo.reviewRating && (
-                                  <div className="absolute bottom-1 right-1 bg-white/95 backdrop-blur-sm rounded px-1 py-0.5 shadow-sm flex items-center gap-0.5">
-                                    <Star className="w-2.5 h-2.5 fill-yellow-400 text-yellow-400" />
-                                    <span className="text-[10px] font-semibold text-slate-900">
-                                      {note.assigned_photo.reviewRating.toFixed(
-                                        1,
-                                      )}
-                                    </span>
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity" />
+                              {photo.type === "scraped" &&
+                                photo.data?.video && (
+                                  <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm rounded-full p-1.5">
+                                    <Camera className="w-4 h-4 text-white" />
                                   </div>
                                 )}
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-1">
-                                <span className="text-white text-[10px] font-medium">
-                                  Click to view
-                                </span>
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Creator Info, Timestamp and Actions */}
-                          <div className="flex items-center justify-between">
-                            {/* Avatar, name, and timestamp in one row */}
-                            <div className="flex items-center gap-2">
-                              {note.created_by ? (
-                                <>
-                                  {/* Avatar */}
-                                  {note.user_avatar_url ? (
+                              {photo.type === "review" && (
+                                <div className="absolute bottom-2 right-2 flex items-center gap-1.5">
+                                  {photo.reviewUserThumbnail ? (
                                     <img
-                                      src={note.user_avatar_url}
-                                      alt={note.user_display_name || "User"}
-                                      className="w-6 h-6 rounded-full"
+                                      src={photo.reviewUserThumbnail}
+                                      alt={photo.reviewUserName}
+                                      className="w-8 h-8 rounded-full border-2 border-white shadow-lg object-cover"
                                       referrerPolicy="no-referrer"
                                     />
                                   ) : (
-                                    <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-semibold">
-                                      {(note.user_display_name?.[0] || "U").toUpperCase()}
+                                    <div className="w-8 h-8 rounded-full border-2 border-white shadow-lg bg-slate-400 flex items-center justify-center text-white text-xs font-semibold">
+                                      {photo.reviewUserName
+                                        ?.charAt(0)
+                                        .toUpperCase()}
                                     </div>
                                   )}
-                                  {/* Display name */}
-                                  <span className="text-xs text-slate-500">
-                                    {note.user_display_name || "User"}
-                                  </span>
-                                  {/* Dot separator */}
-                                  <span className="text-xs text-slate-400">•</span>
-                                  {/* Timestamp */}
-                                  <span className="text-xs text-slate-500">
-                                    {formatRelativeTime(note.created_at)}
-                                    {note.updated_at !== note.created_at && " (edited)"}
-                                  </span>
-                                </>
-                              ) : (
-                                <span className="text-xs text-slate-400 italic">
-                                  Legacy note • {formatRelativeTime(note.created_at)}
-                                </span>
-                              )}
-                            </div>
-
-                            {/* Edit/Delete actions */}
-                            {(currentUser && (note.created_by === currentUser.id || !note.created_by)) && (
-                              <div className="flex gap-2">
-                                  <motion.button
-                                    whileHover={{ scale: 1.1 }}
-                                    whileTap={{ scale: 0.9 }}
-                                    onClick={() => handleStartEdit(note)}
-                                    className="p-1 hover:bg-blue-100 rounded text-blue-600 cursor-pointer"
-                                  >
-                                    <Edit2 className="w-3.5 h-3.5" />
-                                  </motion.button>
-                                  <motion.button
-                                    whileHover={{ scale: 1.1 }}
-                                    whileTap={{ scale: 0.9 }}
-                                    onClick={() => handleDeleteNote(note.id)}
-                                    className="p-1 hover:bg-red-100 rounded text-red-600 cursor-pointer"
-                                  >
-                                    <Trash2 className="w-3.5 h-3.5" />
-                                  </motion.button>
-                                </div>
-                              )}
-                          </div>
-                        </>
-                    </motion.div>
-                  ))}
-              </div>
-            )}
-          </motion.div>
-
-          {/* Divider */}
-          <div className="border-t border-slate-200"></div>
-
-          {/* Tags Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-          >
-            <div className="flex items-center mb-3">
-              <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
-                <Tag className="w-4 h-4" />
-                Tags ({facilityTags.length})
-              </h3>
-            </div>
-
-            {/* Assigned Tags Display */}
-            <div className="flex flex-wrap gap-2">
-              {facilityTags.map((tag, idx) => (
-                <motion.div
-                  key={tag.id}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.1 + idx * 0.05 }}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-all"
-                  style={{
-                    color: tag.color,
-                    borderColor: tag.color,
-                  } as React.CSSProperties}
-                  title={tag.description || tag.name}
-                >
-                  <span>{tag.name}</span>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRemoveTag(tag.id);
-                    }}
-                    className="opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
-                    title="Remove tag"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </motion.div>
-              ))}
-              {/* Inline Add Tag Button */}
-              <motion.button
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.1 + facilityTags.length * 0.05 }}
-                onClick={() => setIsTagManagementModalOpen(true)}
-                disabled={assigningTag}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-600 border-2 border-dashed border-slate-300 hover:border-slate-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-              >
-                <Plus className="w-3 h-3" />
-                <span>Add</span>
-              </motion.button>
-            </div>
-          </motion.div>
-
-          {/* Divider */}
-          <div className="border-t border-slate-200"></div>
-
-          {/* Linked Leads Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.11 }}
-          >
-            <div className="flex items-center mb-3">
-              <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
-                <User className="w-4 h-4" />
-                Linked Leads from Close ({linkedLeads.length})
-              </h3>
-            </div>
-
-            {linkedLeadsLoading ? (
-              <div className="text-center py-4">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-              </div>
-            ) : linkedLeads.length === 0 ? (
-              <div className="text-center py-6 bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-2xl border border-slate-100">
-                <User className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-                <p className="text-sm text-slate-500">
-                  No leads linked to this facility yet
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {linkedLeads.map((link, idx) => {
-                  const getConfidenceBadge = () => {
-                    switch (link.confidence) {
-                      case 5:
-                        return {
-                          label: "High Match",
-                          className:
-                            "bg-gradient-to-r from-green-50 to-green-100 text-green-800 border-green-300",
-                          dotColor: "bg-green-500",
-                        };
-                      case 4:
-                        return {
-                          label: "Name + City",
-                          className:
-                            "bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 border-blue-300",
-                          dotColor: "bg-blue-500",
-                        };
-                      case 3:
-                        return {
-                          label: "Name Match",
-                          className:
-                            "bg-gradient-to-r from-yellow-50 to-yellow-100 text-yellow-800 border-yellow-300",
-                          dotColor: "bg-yellow-500",
-                        };
-                      case 2:
-                        return {
-                          label: "Fuzzy Match",
-                          className:
-                            "bg-gradient-to-r from-orange-50 to-orange-100 text-orange-800 border-orange-300",
-                          dotColor: "bg-orange-500",
-                        };
-                      default:
-                        return {
-                          label: "Match",
-                          className:
-                            "bg-gradient-to-r from-gray-50 to-gray-100 text-gray-800 border-gray-300",
-                          dotColor: "bg-gray-500",
-                        };
-                    }
-                  };
-
-                  const confidenceBadge = getConfidenceBadge();
-
-                  return (
-                    <motion.div
-                      key={link.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: idx * 0.05 }}
-                      className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-white border-2 border-blue-200 shadow-sm"
-                    >
-                      {(() => {
-                        const lead = leadsMap[link.close_lead_id];
-                        const isLoadingLead = leadQueries[idx]?.isLoading;
-
-                        return (
-                          <div className="space-y-2">
-                            {/* Lead Name/Status and Badges */}
-                            <div className="flex items-start justify-between gap-2">
-                              <div className="flex-1">
-                                {isLoadingLead ? (
-                                  <>
-                                    <div className="h-5 w-48 bg-slate-200 rounded animate-pulse mb-2"></div>
-                                    <div className="h-4 w-32 bg-slate-200 rounded animate-pulse"></div>
-                                  </>
-                                ) : lead ? (
-                                  <>
-                                    <h4 className="font-bold text-gray-900 text-sm">
-                                      {lead.display_name || lead.name}
-                                    </h4>
-                                    <div className="flex items-center gap-2 mt-1">
-                                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                        {getStatusLabel(lead.status_id)}
+                                  {photo.reviewRating && (
+                                    <div className="bg-white/95 backdrop-blur-sm rounded-lg px-1.5 py-0.5 shadow-lg flex items-center gap-0.5">
+                                      <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                                      <span className="text-xs font-semibold text-slate-900">
+                                        {photo.reviewRating.toFixed(1)}
                                       </span>
-                                      <span className="text-xs text-gray-500">
-                                        Linked{" "}
-                                        {new Date(
-                                          link.created_at,
-                                        ).toLocaleDateString()}
-                                      </span>
-                                    </div>
-                                  </>
-                                ) : (
-                                  <>
-                                    <h4 className="font-bold text-gray-900 text-sm">
-                                      Lead ID: {link.close_lead_id}
-                                    </h4>
-                                    <p className="text-xs text-gray-500 mt-1">
-                                      Linked on{" "}
-                                      {new Date(
-                                        link.created_at,
-                                      ).toLocaleDateString()}
-                                    </p>
-                                  </>
-                                )}
-                              </div>
-                              <div className="flex flex-col gap-1 items-end">
-                                <span
-                                  className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-xs font-bold border ${confidenceBadge.className}`}
-                                >
-                                  <span
-                                    className={`w-1.5 h-1.5 rounded-full ${confidenceBadge.dotColor}`}
-                                  ></span>
-                                  {confidenceBadge.label}
-                                </span>
-                              </div>
-                            </div>
-
-                            {/* Match Reason */}
-                            <div className="flex items-center gap-2 text-xs text-gray-600">
-                              <span className="font-semibold">Reason:</span>
-                              <span>{link.match_reason}</span>
-                            </div>
-
-                            {/* Actions */}
-                            <div className="pt-2 border-t border-blue-200 flex gap-2">
-                              <button
-                                onClick={() => {
-                                  setSelectedLeadId(link.close_lead_id);
-                                  setViewMode("lead");
-                                }}
-                                disabled={isLoadingLead}
-                                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 hover:border-blue-300 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                              >
-                                <ExternalLink className="w-3 h-3" />
-                                View Details
-                              </button>
-                              <button
-                                onClick={() =>
-                                  handleUnlinkLead(link.id, link.close_lead_id)
-                                }
-                                disabled={deleteLinkMutation.isPending}
-                                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 hover:border-red-300 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                              >
-                                <X className="w-3 h-3" />
-                                {deleteLinkMutation.isPending
-                                  ? "Unlinking..."
-                                  : "Unlink"}
-                              </button>
-                            </div>
-                          </div>
-                        );
-                      })()}
-                    </motion.div>
-                  );
-                })}
-              </div>
-            )}
-          </motion.div>
-
-          {/* Divider */}
-          <div className="border-t border-slate-200"></div>
-
-          {/* Facility Types */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.12 }}
-          >
-            <h3 className="text-sm font-medium text-slate-700 mb-3 tracking-wide">
-              Facility Types
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {displayFacility.sport_types
-                .filter(
-                  (type) =>
-                    ![
-                      "establishment",
-                      "point_of_interest",
-                      "health",
-                      "locality",
-                      "political",
-                      "tourist_attraction",
-                    ].includes(type),
-                )
-                .map((type, idx) => (
-                  <motion.span
-                    key={type}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.1 + idx * 0.05 }}
-                    whileHover={{ scale: 1.05 }}
-                    className="px-3 py-1 bg-white text-blue-600 border border-blue-600 rounded-full text-xs font-medium transition-all cursor-default flex items-center gap-1.5"
-                  >
-                    <span className="text-base">
-                      {FACILITY_TYPE_EMOJIS[type] || "🏢"}
-                    </span>
-                    <span>{formatSportType(type)}</span>
-                  </motion.span>
-                ))}
-            </div>
-          </motion.div>
-
-          {/* Divider */}
-          <div className="border-t border-slate-200"></div>
-
-          {/* Identified Sports with Confidence Scores */}
-          {displayFacility.identified_sports &&
-            displayFacility.identified_sports.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.15 }}
-              >
-                <h3 className="text-sm font-medium text-slate-700 mb-3 tracking-wide flex items-center gap-2">
-                  Sports Scraped
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {displayFacility.identified_sports.map((sport, idx) => {
-                    const metadata = displayFacility.sport_metadata?.[sport];
-                    const score = metadata?.score || 0;
-                    const confidence = metadata?.confidence || "unknown";
-
-                    // Color coding based on confidence
-                    let textColor = "text-slate-700";
-                    let borderColor = "border-slate-300";
-
-                    if (confidence === "high") {
-                      textColor = "text-green-700";
-                      borderColor = "border-green-400";
-                    } else if (confidence === "medium") {
-                      textColor = "text-yellow-700";
-                      borderColor = "border-yellow-400";
-                    } else if (confidence === "low") {
-                      textColor = "text-red-700";
-                      borderColor = "border-red-400";
-                    }
-
-                    // Get confidence icon
-                    let confidenceIcon = "?";
-                    if (confidence === "high") {
-                      confidenceIcon = "✓";
-                    } else if (confidence === "medium") {
-                      confidenceIcon = "~";
-                    } else if (confidence === "low") {
-                      confidenceIcon = "⚠";
-                    }
-
-                    const tooltipContent = metadata
-                      ? `Score: ${score}/100 | Sources: ${metadata.sources.join(", ") || "unknown"}\nKeywords: ${metadata.keywords_matched.join(", ")}\nMatched: "${metadata.matched_text}"`
-                      : "No confidence data available - run audit script";
-
-                    return (
-                      <motion.div
-                        key={sport}
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.12 + idx * 0.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="group relative"
-                        title={tooltipContent}
-                      >
-                        <button
-                          onClick={() => setSelectedSportDetail(sport)}
-                          className={`px-3 py-1 bg-white ${textColor} rounded-full text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5 border ${borderColor}`}
-                        >
-                          <span className="text-lg">
-                            {SPORT_EMOJIS[sport] || "🏅"}
-                          </span>
-                          <span>{sport}</span>
-                          {metadata ? (
-                            <>
-                              <span className="px-1 py-0.5 rounded text-xs font-bold bg-slate-100">
-                                {score}
-                              </span>
-                            </>
-                          ) : (
-                            <span className="text-xs opacity-75">?</span>
-                          )}
-                        </button>
-
-                        {/* Tooltip on hover - appears below badge */}
-                        <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 hidden group-hover:block z-[100] pointer-events-none">
-                          <div className="bg-slate-900 text-white text-xs rounded-xl py-2 px-3 shadow-xl max-w-xs whitespace-pre-wrap">
-                            {/* Arrow pointing up */}
-                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-[-1px]">
-                              <div className="border-8 border-transparent border-b-slate-900"></div>
-                            </div>
-                            {metadata ? (
-                              <>
-                                <div className="font-semibold mb-1">
-                                  Confidence: {score}/100 ({confidence})
-                                </div>
-                                <div className="text-slate-300">
-                                  <div>
-                                    <strong>Sources:</strong>{" "}
-                                    {metadata.sources.join(", ") || "unknown"}
-                                  </div>
-                                  <div>
-                                    <strong>Keywords:</strong>{" "}
-                                    {metadata.keywords_matched.join(", ")}
-                                  </div>
-                                  {metadata.matched_text && (
-                                    <div className="mt-1 italic border-t border-slate-700 pt-1">
-                                      {Array.isArray(metadata.matched_text) ? (
-                                        <div>
-                                          <strong>{metadata.matched_text.length} matching review(s):</strong>
-                                          <div className="mt-1 space-y-2 max-h-40 overflow-y-auto">
-                                            {metadata.matched_text.map((review, idx) => (
-                                              <div key={idx} className="text-slate-300 border-l-2 border-slate-600 pl-2">
-                                                "{review.substring(0, 100)}
-                                                {review.length > 100 ? "..." : ""}"
-                                              </div>
-                                            ))}
-                                          </div>
-                                        </div>
-                                      ) : (
-                                        <>
-                                          "{metadata.matched_text.substring(0, 100)}
-                                          {metadata.matched_text.length > 100 ? "..." : ""}"
-                                        </>
-                                      )}
                                     </div>
                                   )}
                                 </div>
-                              </>
-                            ) : (
-                              <div>
-                                No confidence data available - run audit script
-                              </div>
-                            )}
-                          </div>
+                              )}
+                            </motion.div>
+                          ))}
                         </div>
-                      </motion.div>
-                    );
-                  })}
-                </div>
-              </motion.div>
-            )}
+                      </div>
+                    </motion.div>
+                  </>
+                )}
 
-          {/* Divider */}
-          <div className="border-t border-slate-200"></div>
+                {/* Divider - only show if photos sections were displayed above */}
+                {((displayFacility.photo_references &&
+                  displayFacility.photo_references.length > 0) ||
+                  (displayFacility.serp_scraped &&
+                    displayFacility.additional_photos &&
+                    displayFacility.additional_photos.length > 0)) && (
+                  <div className="border-t border-slate-200"></div>
+                )}
 
-          {/* Contact Information */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.18 }}
-            className="space-y-4"
-          >
-            <h3 className="text-sm font-medium text-slate-700 tracking-wide">
-              Contact Information
-            </h3>
-
-            <div className="space-y-3">
-              <div className="flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors">
-                <MapPin className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                <p className="text-slate-700 text-sm leading-relaxed">
-                  {displayFacility.address}
-                </p>
-              </div>
-
-              {displayFacility.phone && (
-                <motion.a
-                  href={`tel:${displayFacility.phone}`}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-blue-50 transition-colors group"
-                >
-                  <Phone className="w-5 h-5 text-blue-600 group-hover:text-blue-600/80 transition-colors" />
-                  <span className="text-blue-600 group-hover:text-blue-600/80 font-medium text-sm">
-                    {displayFacility.phone}
-                  </span>
-                </motion.a>
-              )}
-
-              {displayFacility.website && (
-                <motion.a
-                  href={displayFacility.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-blue-50 transition-colors group"
-                >
-                  <Globe className="w-5 h-5 text-blue-600 group-hover:text-blue-600/80 transition-colors flex-shrink-0" />
-                  <span className="text-blue-600 group-hover:text-blue-600/80 font-medium text-sm truncate">
-                    {displayFacility.website.replace(/^https?:\/\//, "")}
-                  </span>
-                </motion.a>
-              )}
-
-              {displayFacility.email && displayFacility.email.length > 0 && displayFacility.email.map((emailAddress, idx) => (
-                <motion.a
-                  key={idx}
-                  href={`mailto:${emailAddress}`}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-blue-50 transition-colors group"
-                >
-                  <Mail className="w-5 h-5 text-blue-600 group-hover:text-blue-600/80 transition-colors" />
-                  <span className="text-blue-600 group-hover:text-blue-600/80 font-medium text-sm">
-                    {emailAddress}
-                  </span>
-                </motion.a>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Divider */}
-          <div className="border-t border-slate-200"></div>
-
-          {/* Scraped Reviews from SerpAPI */}
-          {displayFacility.serp_scraped &&
-            displayFacility.additional_reviews &&
-            displayFacility.additional_reviews.length > 0 && (
-              <>
+                {/* Notes Section */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.21 }}
+                  transition={{ delay: 0.08 }}
                 >
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center justify-between mb-3">
                     <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
-                      Scraped Reviews (
-                      {displayFacility.additional_reviews.length})
+                      <StickyNote className="w-4 h-4" />
+                      Notes ({notes.length})
                     </h3>
-                    <button
-                      onClick={() => setIsAdditionalReviewsModalOpen(true)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
-                    >
-                      <Maximize2 className="w-3.5 h-3.5" />
-                      Expand
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setIsAddNoteModalOpen(true)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        Add Note
+                      </button>
+                      {notes.length > 3 && (
+                        <button
+                          onClick={() => setShowAllNotes(!showAllNotes)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                          {showAllNotes ? "Show Less" : "See All"}
+                        </button>
+                      )}
+                    </div>
                   </div>
-                  <div className="space-y-0">
-                    {displayFacility.additional_reviews
-                      .slice(
-                        0,
-                        showAllAdditionalReviews
-                          ? displayFacility.additional_reviews.length
-                          : 10,
-                      )
-                      .map((review, idx) => {
-                        const authorName =
-                          review.user?.name ||
-                          review.author_name ||
-                          "Anonymous";
-                        const reviewText = review.snippet || review.text || "";
-                        const timeDescription =
-                          review.date || review.relative_time_description || "";
+
+                  {/* Notes List */}
+                  {loadingNotes ? (
+                    <div className="text-center py-4">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                    </div>
+                  ) : notes.length === 0 ? (
+                    <div className="text-center py-6 bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-2xl border border-slate-100">
+                      <StickyNote className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                      <p className="text-sm text-slate-500">No notes yet</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {notes
+                        .slice(0, showAllNotes ? notes.length : 3)
+                        .map((note, idx) => (
+                          <motion.div
+                            key={note.id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.1 + idx * 0.05 }}
+                            className="bg-gradient-to-br from-white to-slate-50/50 rounded-2xl p-3 shadow-sm border border-slate-100"
+                          >
+                            <>
+                              {/* Note Text */}
+                              <p className="text-sm text-slate-700 leading-relaxed mb-3 break-words">
+                                <NoteText text={note.note_text} />
+                              </p>
+
+                              {/* Assigned Photo */}
+                              {note.assigned_photo && (
+                                <div
+                                  onClick={() => {
+                                    if (
+                                      note.assigned_photo?.type === "review"
+                                    ) {
+                                      openReviewPhotoViewer(
+                                        note.assigned_photo.reviewIndex!,
+                                        note.assigned_photo.photoIndexInReview!,
+                                      );
+                                    } else if (
+                                      note.assigned_photo?.type === "scraped"
+                                    ) {
+                                      openPhotoViewer(
+                                        note.assigned_photo.scrapedIndex!,
+                                        "additional",
+                                      );
+                                    }
+                                  }}
+                                  className="mb-3 relative flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all cursor-pointer group"
+                                >
+                                  <img
+                                    src={
+                                      note.assigned_photo.thumbnail ||
+                                      note.assigned_photo.url
+                                    }
+                                    alt="Note photo"
+                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                                    referrerPolicy="no-referrer"
+                                  />
+                                  {note.assigned_photo.type === "review" &&
+                                    note.assigned_photo.reviewRating && (
+                                      <div className="absolute bottom-1 right-1 bg-white/95 backdrop-blur-sm rounded px-1 py-0.5 shadow-sm flex items-center gap-0.5">
+                                        <Star className="w-2.5 h-2.5 fill-yellow-400 text-yellow-400" />
+                                        <span className="text-[10px] font-semibold text-slate-900">
+                                          {note.assigned_photo.reviewRating.toFixed(
+                                            1,
+                                          )}
+                                        </span>
+                                      </div>
+                                    )}
+                                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-1">
+                                    <span className="text-white text-[10px] font-medium">
+                                      Click to view
+                                    </span>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Creator Info, Timestamp and Actions */}
+                              <div className="flex items-center justify-between">
+                                {/* Avatar, name, and timestamp in one row */}
+                                <div className="flex items-center gap-2">
+                                  {note.created_by ? (
+                                    <>
+                                      {/* Avatar */}
+                                      {note.user_avatar_url ? (
+                                        <img
+                                          src={note.user_avatar_url}
+                                          alt={note.user_display_name || "User"}
+                                          className="w-6 h-6 rounded-full"
+                                          referrerPolicy="no-referrer"
+                                        />
+                                      ) : (
+                                        <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-semibold">
+                                          {(
+                                            note.user_display_name?.[0] || "U"
+                                          ).toUpperCase()}
+                                        </div>
+                                      )}
+                                      {/* Display name */}
+                                      <span className="text-xs text-slate-500">
+                                        {note.user_display_name || "User"}
+                                      </span>
+                                      {/* Dot separator */}
+                                      <span className="text-xs text-slate-400">
+                                        •
+                                      </span>
+                                      {/* Timestamp */}
+                                      <span className="text-xs text-slate-500">
+                                        {formatRelativeTime(note.created_at)}
+                                        {note.updated_at !== note.created_at &&
+                                          " (edited)"}
+                                      </span>
+                                    </>
+                                  ) : (
+                                    <span className="text-xs text-slate-400 italic">
+                                      Legacy note •{" "}
+                                      {formatRelativeTime(note.created_at)}
+                                    </span>
+                                  )}
+                                </div>
+
+                                {/* Edit/Delete actions */}
+                                {currentUser &&
+                                  (note.created_by === currentUser.id ||
+                                    !note.created_by) && (
+                                    <div className="flex gap-2">
+                                      <motion.button
+                                        whileHover={{ scale: 1.1 }}
+                                        whileTap={{ scale: 0.9 }}
+                                        onClick={() => handleStartEdit(note)}
+                                        className="p-1 hover:bg-blue-100 rounded text-blue-600 cursor-pointer"
+                                      >
+                                        <Edit2 className="w-3.5 h-3.5" />
+                                      </motion.button>
+                                      <motion.button
+                                        whileHover={{ scale: 1.1 }}
+                                        whileTap={{ scale: 0.9 }}
+                                        onClick={() =>
+                                          handleDeleteNote(note.id)
+                                        }
+                                        className="p-1 hover:bg-red-100 rounded text-red-600 cursor-pointer"
+                                      >
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                      </motion.button>
+                                    </div>
+                                  )}
+                              </div>
+                            </>
+                          </motion.div>
+                        ))}
+                    </div>
+                  )}
+                </motion.div>
+
+                {/* Divider */}
+                <div className="border-t border-slate-200"></div>
+
+                {/* Tags Section */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                >
+                  <div className="flex items-center mb-3">
+                    <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
+                      <Tag className="w-4 h-4" />
+                      Tags ({facilityTags.length})
+                    </h3>
+                  </div>
+
+                  {/* Assigned Tags Display */}
+                  <div className="flex flex-wrap gap-2">
+                    {facilityTags.map((tag, idx) => (
+                      <motion.div
+                        key={tag.id}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.1 + idx * 0.05 }}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-all"
+                        style={
+                          {
+                            color: tag.color,
+                            borderColor: tag.color,
+                          } as React.CSSProperties
+                        }
+                        title={tag.description || tag.name}
+                      >
+                        <span>{tag.name}</span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRemoveTag(tag.id);
+                          }}
+                          className="opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
+                          title="Remove tag"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </motion.div>
+                    ))}
+                    {/* Inline Add Tag Button */}
+                    <motion.button
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.1 + facilityTags.length * 0.05 }}
+                      onClick={() => setIsTagManagementModalOpen(true)}
+                      disabled={assigningTag}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-600 border-2 border-dashed border-slate-300 hover:border-slate-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                    >
+                      <Plus className="w-3 h-3" />
+                      <span>Add</span>
+                    </motion.button>
+                  </div>
+                </motion.div>
+
+                {/* Divider */}
+                <div className="border-t border-slate-200"></div>
+
+                {/* Linked Leads Section */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.11 }}
+                >
+                  <div className="flex items-center mb-3">
+                    <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
+                      <User className="w-4 h-4" />
+                      Linked Leads from Close ({linkedLeads.length})
+                    </h3>
+                  </div>
+
+                  {linkedLeadsLoading ? (
+                    <div className="text-center py-4">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                    </div>
+                  ) : linkedLeads.length === 0 ? (
+                    <div className="text-center py-6 bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-2xl border border-slate-100">
+                      <User className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                      <p className="text-sm text-slate-500">
+                        No leads linked to this facility yet
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {linkedLeads.map((link, idx) => {
+                        const getConfidenceBadge = () => {
+                          switch (link.confidence) {
+                            case 5:
+                              return {
+                                label: "High Match",
+                                className:
+                                  "bg-gradient-to-r from-green-50 to-green-100 text-green-800 border-green-300",
+                                dotColor: "bg-green-500",
+                              };
+                            case 4:
+                              return {
+                                label: "Name + City",
+                                className:
+                                  "bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 border-blue-300",
+                                dotColor: "bg-blue-500",
+                              };
+                            case 3:
+                              return {
+                                label: "Name Match",
+                                className:
+                                  "bg-gradient-to-r from-yellow-50 to-yellow-100 text-yellow-800 border-yellow-300",
+                                dotColor: "bg-yellow-500",
+                              };
+                            case 2:
+                              return {
+                                label: "Fuzzy Match",
+                                className:
+                                  "bg-gradient-to-r from-orange-50 to-orange-100 text-orange-800 border-orange-300",
+                                dotColor: "bg-orange-500",
+                              };
+                            default:
+                              return {
+                                label: "Match",
+                                className:
+                                  "bg-gradient-to-r from-gray-50 to-gray-100 text-gray-800 border-gray-300",
+                                dotColor: "bg-gray-500",
+                              };
+                          }
+                        };
+
+                        const confidenceBadge = getConfidenceBadge();
 
                         return (
+                          <motion.div
+                            key={link.id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: idx * 0.05 }}
+                            className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-white border-2 border-blue-200 shadow-sm"
+                          >
+                            {(() => {
+                              const lead = leadsMap[link.close_lead_id];
+                              const isLoadingLead = leadQueries[idx]?.isLoading;
+
+                              return (
+                                <div className="space-y-2">
+                                  {/* Lead Name/Status and Badges */}
+                                  <div className="flex items-start justify-between gap-2">
+                                    <div className="flex-1">
+                                      {isLoadingLead ? (
+                                        <>
+                                          <div className="h-5 w-48 bg-slate-200 rounded animate-pulse mb-2"></div>
+                                          <div className="h-4 w-32 bg-slate-200 rounded animate-pulse"></div>
+                                        </>
+                                      ) : lead ? (
+                                        <>
+                                          <h4 className="font-bold text-gray-900 text-sm">
+                                            {lead.display_name || lead.name}
+                                          </h4>
+                                          <div className="flex items-center gap-2 mt-1">
+                                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                              {getStatusLabel(lead.status_id)}
+                                            </span>
+                                            <span className="text-xs text-gray-500">
+                                              Linked{" "}
+                                              {new Date(
+                                                link.created_at,
+                                              ).toLocaleDateString()}
+                                            </span>
+                                          </div>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <h4 className="font-bold text-gray-900 text-sm">
+                                            Lead ID: {link.close_lead_id}
+                                          </h4>
+                                          <p className="text-xs text-gray-500 mt-1">
+                                            Linked on{" "}
+                                            {new Date(
+                                              link.created_at,
+                                            ).toLocaleDateString()}
+                                          </p>
+                                        </>
+                                      )}
+                                    </div>
+                                    <div className="flex flex-col gap-1 items-end">
+                                      <span
+                                        className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-xs font-bold border ${confidenceBadge.className}`}
+                                      >
+                                        <span
+                                          className={`w-1.5 h-1.5 rounded-full ${confidenceBadge.dotColor}`}
+                                        ></span>
+                                        {confidenceBadge.label}
+                                      </span>
+                                    </div>
+                                  </div>
+
+                                  {/* Actions */}
+                                  <div className="pt-2 border-t border-blue-200 flex gap-2">
+                                    <button
+                                      onClick={() => {
+                                        setSelectedLeadId(link.close_lead_id);
+                                        setViewMode("lead");
+                                      }}
+                                      disabled={isLoadingLead}
+                                      className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 hover:border-blue-300 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                                    >
+                                      <ExternalLink className="w-3 h-3" />
+                                      View Details
+                                    </button>
+                                    <button
+                                      onClick={() =>
+                                        handleUnlinkLead(
+                                          link.id,
+                                          link.close_lead_id,
+                                        )
+                                      }
+                                      disabled={deleteLinkMutation.isPending}
+                                      className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 hover:border-red-300 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                                    >
+                                      <X className="w-3 h-3" />
+                                      {deleteLinkMutation.isPending
+                                        ? "Unlinking..."
+                                        : "Unlink"}
+                                    </button>
+                                  </div>
+                                </div>
+                              );
+                            })()}
+                          </motion.div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </motion.div>
+
+                {/* Divider */}
+                <div className="border-t border-slate-200"></div>
+
+                {/* Facility Types */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.12 }}
+                >
+                  <h3 className="text-sm font-medium text-slate-700 mb-3 tracking-wide">
+                    Facility Types
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {displayFacility.sport_types
+                      .filter(
+                        (type) =>
+                          ![
+                            "establishment",
+                            "point_of_interest",
+                            "health",
+                            "locality",
+                            "political",
+                            "tourist_attraction",
+                          ].includes(type),
+                      )
+                      .map((type, idx) => (
+                        <motion.span
+                          key={type}
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 0.1 + idx * 0.05 }}
+                          whileHover={{ scale: 1.05 }}
+                          className="px-3 py-1 bg-white text-blue-600 border border-blue-600 rounded-full text-xs font-medium transition-all cursor-default flex items-center gap-1.5"
+                        >
+                          <span className="text-base">
+                            {FACILITY_TYPE_EMOJIS[type] || "🏢"}
+                          </span>
+                          <span>{formatSportType(type)}</span>
+                        </motion.span>
+                      ))}
+                  </div>
+                </motion.div>
+
+                {/* Divider */}
+                <div className="border-t border-slate-200"></div>
+
+                {/* Identified Sports with Confidence Scores */}
+                {displayFacility.identified_sports &&
+                  displayFacility.identified_sports.length > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.15 }}
+                    >
+                      <h3 className="text-sm font-medium text-slate-700 mb-3 tracking-wide flex items-center gap-2">
+                        Sports Scraped
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        {displayFacility.identified_sports.map((sport, idx) => {
+                          const metadata =
+                            displayFacility.sport_metadata?.[sport];
+                          const score = metadata?.score || 0;
+                          const confidence = metadata?.confidence || "unknown";
+
+                          // Color coding based on confidence
+                          let textColor = "text-slate-700";
+                          let borderColor = "border-slate-300";
+
+                          if (confidence === "high") {
+                            textColor = "text-green-700";
+                            borderColor = "border-green-400";
+                          } else if (confidence === "medium") {
+                            textColor = "text-yellow-700";
+                            borderColor = "border-yellow-400";
+                          } else if (confidence === "low") {
+                            textColor = "text-red-700";
+                            borderColor = "border-red-400";
+                          }
+
+                          // Get confidence icon
+                          let confidenceIcon = "?";
+                          if (confidence === "high") {
+                            confidenceIcon = "✓";
+                          } else if (confidence === "medium") {
+                            confidenceIcon = "~";
+                          } else if (confidence === "low") {
+                            confidenceIcon = "⚠";
+                          }
+
+                          const tooltipContent = metadata
+                            ? `Score: ${score}/100 | Sources: ${metadata.sources.join(", ") || "unknown"}\nKeywords: ${metadata.keywords_matched.join(", ")}\nMatched: "${metadata.matched_text}"`
+                            : "No confidence data available - run audit script";
+
+                          return (
+                            <motion.div
+                              key={sport}
+                              initial={{ opacity: 0, scale: 0.8 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              transition={{ delay: 0.12 + idx * 0.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              className="group relative"
+                              title={tooltipContent}
+                            >
+                              <button
+                                onClick={() => setSelectedSportDetail(sport)}
+                                className={`px-3 py-1 bg-white ${textColor} rounded-full text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5 border ${borderColor}`}
+                              >
+                                <span className="text-lg">
+                                  {SPORT_EMOJIS[sport] || "🏅"}
+                                </span>
+                                <span>{sport}</span>
+                                {metadata ? (
+                                  <>
+                                    <span className="px-1 py-0.5 rounded text-xs font-bold bg-slate-100">
+                                      {score}
+                                    </span>
+                                  </>
+                                ) : (
+                                  <span className="text-xs opacity-75">?</span>
+                                )}
+                              </button>
+
+                              {/* Tooltip on hover - appears below badge */}
+                              <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 hidden group-hover:block z-[100] pointer-events-none">
+                                <div className="bg-slate-900 text-white text-xs rounded-xl py-2 px-3 shadow-xl max-w-xs whitespace-pre-wrap">
+                                  {/* Arrow pointing up */}
+                                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-[-1px]">
+                                    <div className="border-8 border-transparent border-b-slate-900"></div>
+                                  </div>
+                                  {metadata ? (
+                                    <>
+                                      <div className="font-semibold mb-1">
+                                        Confidence: {score}/100 ({confidence})
+                                      </div>
+                                      <div className="text-slate-300">
+                                        <div>
+                                          <strong>Sources:</strong>{" "}
+                                          {metadata.sources.join(", ") ||
+                                            "unknown"}
+                                        </div>
+                                        <div>
+                                          <strong>Keywords:</strong>{" "}
+                                          {metadata.keywords_matched.join(", ")}
+                                        </div>
+                                        {metadata.matched_text && (
+                                          <div className="mt-1 italic border-t border-slate-700 pt-1">
+                                            {Array.isArray(
+                                              metadata.matched_text,
+                                            ) ? (
+                                              <div>
+                                                <strong>
+                                                  {metadata.matched_text.length}{" "}
+                                                  matching review(s):
+                                                </strong>
+                                                <div className="mt-1 space-y-2 max-h-40 overflow-y-auto">
+                                                  {metadata.matched_text.map(
+                                                    (review, idx) => (
+                                                      <div
+                                                        key={idx}
+                                                        className="text-slate-300 border-l-2 border-slate-600 pl-2"
+                                                      >
+                                                        "
+                                                        {review.substring(
+                                                          0,
+                                                          100,
+                                                        )}
+                                                        {review.length > 100
+                                                          ? "..."
+                                                          : ""}
+                                                        "
+                                                      </div>
+                                                    ),
+                                                  )}
+                                                </div>
+                                              </div>
+                                            ) : (
+                                              <>
+                                                "
+                                                {metadata.matched_text.substring(
+                                                  0,
+                                                  100,
+                                                )}
+                                                {metadata.matched_text.length >
+                                                100
+                                                  ? "..."
+                                                  : ""}
+                                                "
+                                              </>
+                                            )}
+                                          </div>
+                                        )}
+                                      </div>
+                                    </>
+                                  ) : (
+                                    <div>
+                                      No confidence data available - run audit
+                                      script
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </motion.div>
+                          );
+                        })}
+                      </div>
+                    </motion.div>
+                  )}
+
+                {/* Divider */}
+                <div className="border-t border-slate-200"></div>
+
+                {/* Contact Information */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.18 }}
+                  className="space-y-4"
+                >
+                  <h3 className="text-sm font-medium text-slate-700 tracking-wide">
+                    Contact Information
+                  </h3>
+
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors">
+                      <MapPin className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                      <p className="text-slate-700 text-sm leading-relaxed">
+                        {displayFacility.address}
+                      </p>
+                    </div>
+
+                    {displayFacility.phone && (
+                      <motion.a
+                        href={`tel:${displayFacility.phone}`}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="flex items-center gap-3 p-3 rounded-xl hover:bg-blue-50 transition-colors group"
+                      >
+                        <Phone className="w-5 h-5 text-blue-600 group-hover:text-blue-600/80 transition-colors" />
+                        <span className="text-blue-600 group-hover:text-blue-600/80 font-medium text-sm">
+                          {displayFacility.phone}
+                        </span>
+                      </motion.a>
+                    )}
+
+                    {displayFacility.website && (
+                      <motion.a
+                        href={displayFacility.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="flex items-center gap-3 p-3 rounded-xl hover:bg-blue-50 transition-colors group"
+                      >
+                        <Globe className="w-5 h-5 text-blue-600 group-hover:text-blue-600/80 transition-colors flex-shrink-0" />
+                        <span className="text-blue-600 group-hover:text-blue-600/80 font-medium text-sm truncate">
+                          {displayFacility.website.replace(/^https?:\/\//, "")}
+                        </span>
+                      </motion.a>
+                    )}
+
+                    {displayFacility.email &&
+                      displayFacility.email.length > 0 &&
+                      displayFacility.email.map((emailAddress, idx) => (
+                        <motion.a
+                          key={idx}
+                          href={`mailto:${emailAddress}`}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          className="flex items-center gap-3 p-3 rounded-xl hover:bg-blue-50 transition-colors group"
+                        >
+                          <Mail className="w-5 h-5 text-blue-600 group-hover:text-blue-600/80 transition-colors" />
+                          <span className="text-blue-600 group-hover:text-blue-600/80 font-medium text-sm">
+                            {emailAddress}
+                          </span>
+                        </motion.a>
+                      ))}
+                  </div>
+                </motion.div>
+
+                {/* Divider */}
+                <div className="border-t border-slate-200"></div>
+
+                {/* Scraped Reviews from SerpAPI */}
+                {displayFacility.serp_scraped &&
+                  displayFacility.additional_reviews &&
+                  displayFacility.additional_reviews.length > 0 && (
+                    <>
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.21 }}
+                      >
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
+                            Scraped Reviews (
+                            {displayFacility.additional_reviews.length})
+                          </h3>
+                          <button
+                            onClick={() =>
+                              setIsAdditionalReviewsModalOpen(true)
+                            }
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
+                          >
+                            <Maximize2 className="w-3.5 h-3.5" />
+                            Expand
+                          </button>
+                        </div>
+                        <div className="space-y-0">
+                          {displayFacility.additional_reviews
+                            .slice(
+                              0,
+                              showAllAdditionalReviews
+                                ? displayFacility.additional_reviews.length
+                                : 10,
+                            )
+                            .map((review, idx) => {
+                              const authorName =
+                                review.user?.name ||
+                                review.author_name ||
+                                "Anonymous";
+                              const reviewText =
+                                review.snippet || review.text || "";
+                              const timeDescription =
+                                review.date ||
+                                review.relative_time_description ||
+                                "";
+
+                              return (
+                                <motion.div
+                                  key={idx}
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ delay: 0.1 + idx * 0.05 }}
+                                  className={`py-4 ${idx !== 0 ? "border-t border-slate-200" : ""}`}
+                                >
+                                  <div className="flex items-start justify-between mb-3">
+                                    <div className="flex items-center gap-2">
+                                      {review.user?.thumbnail && (
+                                        <img
+                                          src={review.user.thumbnail}
+                                          alt={authorName}
+                                          className="w-8 h-8 rounded-full object-cover"
+                                          referrerPolicy="no-referrer"
+                                        />
+                                      )}
+                                      <div>
+                                        <div className="flex items-center gap-2">
+                                          <span className="font-semibold text-slate-900 text-sm">
+                                            {authorName}
+                                          </span>
+                                          {review.user?.local_guide && (
+                                            <span className="text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">
+                                              Local Guide
+                                            </span>
+                                          )}
+                                        </div>
+                                        {review.user &&
+                                          (review.user.reviews ||
+                                            review.user.photos) && (
+                                            <span className="text-xs text-slate-500">
+                                              {review.user.reviews &&
+                                                `${review.user.reviews} reviews`}
+                                              {review.user.reviews &&
+                                                review.user.photos &&
+                                                " • "}
+                                              {review.user.photos &&
+                                                `${review.user.photos} photos`}
+                                            </span>
+                                          )}
+                                      </div>
+                                    </div>
+                                    <div className="flex flex-col items-end gap-1">
+                                      <div className="flex gap-0.5">
+                                        {renderStars(review.rating)}
+                                      </div>
+                                      {review.likes !== undefined &&
+                                        review.likes > 0 && (
+                                          <span className="text-xs text-slate-500 flex items-center gap-1">
+                                            <span>👍</span>
+                                            <span>{review.likes}</span>
+                                          </span>
+                                        )}
+                                    </div>
+                                  </div>
+                                  <p className="text-sm text-slate-700 leading-relaxed mb-2">
+                                    {reviewText}
+                                  </p>
+
+                                  {/* Review Images */}
+                                  {review.images &&
+                                    review.images.length > 0 && (
+                                      <div className="mb-3 relative group/review-images">
+                                        {/* Left Arrow */}
+                                        {reviewImageArrowVisibility[idx]
+                                          ?.left && (
+                                          <button
+                                            onClick={() =>
+                                              scrollReviewImages(idx, "left")
+                                            }
+                                            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-md flex items-center justify-center transition-all opacity-0 group-hover/review-images:opacity-100 cursor-pointer"
+                                            aria-label="Scroll left"
+                                          >
+                                            <ChevronLeft className="w-6 h-6 text-slate-700" />
+                                          </button>
+                                        )}
+
+                                        {/* Right Arrow */}
+                                        {reviewImageArrowVisibility[idx]
+                                          ?.right && (
+                                          <button
+                                            onClick={() =>
+                                              scrollReviewImages(idx, "right")
+                                            }
+                                            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-md flex items-center justify-center transition-all opacity-0 group-hover/review-images:opacity-100 cursor-pointer"
+                                            aria-label="Scroll right"
+                                          >
+                                            <ChevronRight className="w-6 h-6 text-slate-700" />
+                                          </button>
+                                        )}
+
+                                        <div
+                                          ref={(el) => {
+                                            reviewImageScrollRefs.current[idx] =
+                                              el;
+                                          }}
+                                          className="flex gap-2 overflow-x-auto scrollbar-hide scroll-smooth"
+                                          style={{
+                                            scrollbarWidth: "none",
+                                            msOverflowStyle: "none",
+                                          }}
+                                        >
+                                          {review.images.map(
+                                            (imageUrl, imgIdx) => (
+                                              <div
+                                                key={imgIdx}
+                                                onClick={() =>
+                                                  openReviewPhotoViewer(
+                                                    idx,
+                                                    imgIdx,
+                                                  )
+                                                }
+                                                className="relative flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all cursor-pointer group"
+                                              >
+                                                {loadingImages[
+                                                  `review-${idx}-img-${imgIdx}`
+                                                ] !== false && (
+                                                  <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />
+                                                )}
+                                                <img
+                                                  src={imageUrl}
+                                                  alt={`Review image ${imgIdx + 1}`}
+                                                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                                                  referrerPolicy="no-referrer"
+                                                  loading={
+                                                    idx < 10 ? "eager" : "lazy"
+                                                  }
+                                                  onLoadStart={() =>
+                                                    handleImageLoadStart(
+                                                      `review-${idx}-img-${imgIdx}`,
+                                                    )
+                                                  }
+                                                  onLoad={() =>
+                                                    handleImageLoad(
+                                                      `review-${idx}-img-${imgIdx}`,
+                                                    )
+                                                  }
+                                                  onError={() =>
+                                                    handleImageLoad(
+                                                      `review-${idx}-img-${imgIdx}`,
+                                                    )
+                                                  }
+                                                />
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-1">
+                                                  <span className="text-white text-[10px] font-medium">
+                                                    Click to view
+                                                  </span>
+                                                </div>
+                                              </div>
+                                            ),
+                                          )}
+                                        </div>
+                                      </div>
+                                    )}
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-xs text-slate-500 font-medium">
+                                      {timeDescription}
+                                    </span>
+                                    {review.link && (
+                                      <a
+                                        href={review.link}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors"
+                                      >
+                                        <ExternalLink className="w-3 h-3" />
+                                        View Full
+                                      </a>
+                                    )}
+                                  </div>
+                                </motion.div>
+                              );
+                            })}
+                        </div>
+                        {displayFacility.additional_reviews.length > 10 && (
+                          <motion.button
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 }}
+                            onClick={() =>
+                              setShowAllAdditionalReviews(
+                                !showAllAdditionalReviews,
+                              )
+                            }
+                            className="w-full mt-4 py-3 text-sm font-medium text-blue-600 hover:bg-slate-50 rounded-xl transition-colors border border-slate-200 hover:border-blue-600 cursor-pointer"
+                          >
+                            {showAllAdditionalReviews
+                              ? "Show Less"
+                              : `Show More (${displayFacility.additional_reviews.length - 10} more reviews)`}
+                          </motion.button>
+                        )}
+                      </motion.div>
+
+                      {/* Divider */}
+                      <div className="border-t border-slate-200"></div>
+                    </>
+                  )}
+
+                {/* Reviews */}
+                {!(
+                  displayFacility.serp_scraped &&
+                  displayFacility.additional_reviews &&
+                  displayFacility.additional_reviews.length > 0
+                ) &&
+                  (isLoadingDetails ? (
+                    <div className="space-y-4">
+                      <h3 className="text-sm font-medium text-slate-700 tracking-wide">
+                        Reviews
+                      </h3>
+                      {/* Loading skeleton */}
+                      {[1, 2].map((i) => (
+                        <div
+                          key={i}
+                          className="bg-gradient-to-br from-slate-100 to-slate-50 rounded-2xl p-4 animate-pulse"
+                        >
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="h-4 w-24 bg-slate-300 rounded"></div>
+                            <div className="flex gap-0.5">
+                              {[1, 2, 3, 4, 5].map((j) => (
+                                <div
+                                  key={j}
+                                  className="w-4 h-4 bg-slate-300 rounded"
+                                ></div>
+                              ))}
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <div className="h-3 bg-slate-300 rounded w-full"></div>
+                            <div className="h-3 bg-slate-300 rounded w-5/6"></div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : displayFacility.reviews &&
+                    displayFacility.reviews.length > 0 ? (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                    >
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-sm font-medium text-slate-700 tracking-wide">
+                          Reviews ({displayFacility.reviews.length})
+                        </h3>
+                        <button
+                          onClick={() => setIsReviewsModalOpen(true)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
+                        >
+                          <Maximize2 className="w-3.5 h-3.5" />
+                          Expand
+                        </button>
+                      </div>
+                      <div className="space-y-0">
+                        {displayFacility.reviews.map((review, idx) => (
                           <motion.div
                             key={idx}
                             initial={{ opacity: 0, y: 10 }}
@@ -2232,449 +2569,217 @@ function FacilitySidebarInner({
                             transition={{ delay: 0.1 + idx * 0.05 }}
                             className={`py-4 ${idx !== 0 ? "border-t border-slate-200" : ""}`}
                           >
-                            <div className="flex items-start justify-between mb-3">
-                              <div className="flex items-center gap-2">
-                                {review.user?.thumbnail && (
-                                  <img
-                                    src={review.user.thumbnail}
-                                    alt={authorName}
-                                    className="w-8 h-8 rounded-full object-cover"
-                                    referrerPolicy="no-referrer"
-                                  />
-                                )}
-                                <div>
-                                  <div className="flex items-center gap-2">
-                                    <span className="font-semibold text-slate-900 text-sm">
-                                      {authorName}
-                                    </span>
-                                    {review.user?.local_guide && (
-                                      <span className="text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">
-                                        Local Guide
-                                      </span>
-                                    )}
-                                  </div>
-                                  {review.user &&
-                                    (review.user.reviews ||
-                                      review.user.photos) && (
-                                      <span className="text-xs text-slate-500">
-                                        {review.user.reviews &&
-                                          `${review.user.reviews} reviews`}
-                                        {review.user.reviews &&
-                                          review.user.photos &&
-                                          " • "}
-                                        {review.user.photos &&
-                                          `${review.user.photos} photos`}
-                                      </span>
-                                    )}
-                                </div>
-                              </div>
-                              <div className="flex flex-col items-end gap-1">
-                                <div className="flex gap-0.5">
-                                  {renderStars(review.rating)}
-                                </div>
-                                {review.likes !== undefined &&
-                                  review.likes > 0 && (
-                                    <span className="text-xs text-slate-500 flex items-center gap-1">
-                                      <span>👍</span>
-                                      <span>{review.likes}</span>
-                                    </span>
-                                  )}
+                            <div className="flex items-center justify-between mb-3">
+                              <span className="font-semibold text-slate-900 text-sm">
+                                {review.author_name}
+                              </span>
+                              <div className="flex gap-0.5">
+                                {renderStars(review.rating)}
                               </div>
                             </div>
                             <p className="text-sm text-slate-700 leading-relaxed mb-2">
-                              {reviewText}
+                              {review.text}
                             </p>
-
-                            {/* Review Images */}
-                            {review.images && review.images.length > 0 && (
-                              <div className="mb-3 relative group/review-images">
-                                {/* Left Arrow */}
-                                {reviewImageArrowVisibility[idx]?.left && (
-                                  <button
-                                    onClick={() => scrollReviewImages(idx, "left")}
-                                    className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-md flex items-center justify-center transition-all opacity-0 group-hover/review-images:opacity-100 cursor-pointer"
-                                    aria-label="Scroll left"
-                                  >
-                                    <ChevronLeft className="w-6 h-6 text-slate-700" />
-                                  </button>
-                                )}
-
-                                {/* Right Arrow */}
-                                {reviewImageArrowVisibility[idx]?.right && (
-                                  <button
-                                    onClick={() => scrollReviewImages(idx, "right")}
-                                    className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 hover:bg-white rounded-full shadow-md flex items-center justify-center transition-all opacity-0 group-hover/review-images:opacity-100 cursor-pointer"
-                                    aria-label="Scroll right"
-                                  >
-                                    <ChevronRight className="w-6 h-6 text-slate-700" />
-                                  </button>
-                                )}
-
-                                <div
-                                  ref={(el) => {
-                                    reviewImageScrollRefs.current[idx] = el;
-                                  }}
-                                  className="flex gap-2 overflow-x-auto scrollbar-hide scroll-smooth"
-                                  style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-                                >
-                                  {review.images.map((imageUrl, imgIdx) => (
-                                    <div
-                                      key={imgIdx}
-                                      onClick={() => openReviewPhotoViewer(idx, imgIdx)}
-                                      className="relative flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all cursor-pointer group"
-                                    >
-                                      {loadingImages[
-                                        `review-${idx}-img-${imgIdx}`
-                                      ] !== false && (
-                                        <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />
-                                      )}
-                                      <img
-                                        src={imageUrl}
-                                        alt={`Review image ${imgIdx + 1}`}
-                                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                                        referrerPolicy="no-referrer"
-                                        loading={idx < 10 ? "eager" : "lazy"}
-                                        onLoadStart={() =>
-                                          handleImageLoadStart(
-                                            `review-${idx}-img-${imgIdx}`,
-                                          )
-                                        }
-                                        onLoad={() =>
-                                          handleImageLoad(
-                                            `review-${idx}-img-${imgIdx}`,
-                                          )
-                                        }
-                                        onError={() =>
-                                          handleImageLoad(
-                                            `review-${idx}-img-${imgIdx}`,
-                                          )
-                                        }
-                                      />
-                                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-1">
-                                        <span className="text-white text-[10px] font-medium">
-                                          Click to view
-                                        </span>
-                                      </div>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
-                            <div className="flex items-center justify-between">
-                              <span className="text-xs text-slate-500 font-medium">
-                                {timeDescription}
-                              </span>
-                              {review.link && (
-                                <a
-                                  href={review.link}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors"
-                                >
-                                  <ExternalLink className="w-3 h-3" />
-                                  View Full
-                                </a>
-                              )}
-                            </div>
+                            <span className="text-xs text-slate-500 font-medium">
+                              {review.relative_time_description}
+                            </span>
                           </motion.div>
-                        );
-                      })}
-                  </div>
-                  {displayFacility.additional_reviews.length > 10 && (
-                    <motion.button
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2 }}
-                      onClick={() =>
-                        setShowAllAdditionalReviews(!showAllAdditionalReviews)
-                      }
-                      className="w-full mt-4 py-3 text-sm font-medium text-blue-600 hover:bg-slate-50 rounded-xl transition-colors border border-slate-200 hover:border-blue-600 cursor-pointer"
-                    >
-                      {showAllAdditionalReviews
-                        ? "Show Less"
-                        : `Show More (${displayFacility.additional_reviews.length - 10} more reviews)`}
-                    </motion.button>
-                  )}
-                </motion.div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  ) : (
+                    <div className="text-center py-12">
+                      <MessageSquare className="w-12 h-12 text-slate-400 mx-auto mb-3" />
+                      <p className="text-sm text-slate-500">
+                        No reviews available
+                      </p>
+                    </div>
+                  ))}
 
                 {/* Divider */}
                 <div className="border-t border-slate-200"></div>
-              </>
-            )}
 
-          {/* Reviews */}
-          {!(
-            displayFacility.serp_scraped &&
-            displayFacility.additional_reviews &&
-            displayFacility.additional_reviews.length > 0
-          ) &&
-            (isLoadingDetails ? (
-              <div className="space-y-4">
-                <h3 className="text-sm font-medium text-slate-700 tracking-wide">
-                  Reviews
-                </h3>
-                {/* Loading skeleton */}
-                {[1, 2].map((i) => (
-                  <div
-                    key={i}
-                    className="bg-gradient-to-br from-slate-100 to-slate-50 rounded-2xl p-4 animate-pulse"
+                {/* Opening Hours */}
+                {displayFacility.opening_hours && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.22 }}
+                    className="bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-2xl p-4 shadow-sm"
                   >
                     <div className="flex items-center justify-between mb-3">
-                      <div className="h-4 w-24 bg-slate-300 rounded"></div>
-                      <div className="flex gap-0.5">
-                        {[1, 2, 3, 4, 5].map((j) => (
-                          <div
-                            key={j}
-                            className="w-4 h-4 bg-slate-300 rounded"
-                          ></div>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <div className="h-3 bg-slate-300 rounded w-full"></div>
-                      <div className="h-3 bg-slate-300 rounded w-5/6"></div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : displayFacility.reviews && displayFacility.reviews.length > 0 ? (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-medium text-slate-700 tracking-wide">
-                    Reviews ({displayFacility.reviews.length})
-                  </h3>
-                  <button
-                    onClick={() => setIsReviewsModalOpen(true)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
-                  >
-                    <Maximize2 className="w-3.5 h-3.5" />
-                    Expand
-                  </button>
-                </div>
-                <div className="space-y-0">
-                  {displayFacility.reviews.map((review, idx) => (
-                    <motion.div
-                      key={idx}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.1 + idx * 0.05 }}
-                      className={`py-4 ${idx !== 0 ? "border-t border-slate-200" : ""}`}
-                    >
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="font-semibold text-slate-900 text-sm">
-                          {review.author_name}
+                      <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
+                        <Clock className="w-4 h-4" />
+                        Hours
+                      </h3>
+                      {displayFacility.opening_hours.open_now !== undefined && (
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                            displayFacility.opening_hours.open_now
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {displayFacility.opening_hours.open_now
+                            ? "Open Now"
+                            : "Closed"}
                         </span>
-                        <div className="flex gap-0.5">
-                          {renderStars(review.rating)}
-                        </div>
-                      </div>
-                      <p className="text-sm text-slate-700 leading-relaxed mb-2">
-                        {review.text}
-                      </p>
-                      <span className="text-xs text-slate-500 font-medium">
-                        {review.relative_time_description}
-                      </span>
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
-            ) : (
-              <div className="text-center py-12">
-                <MessageSquare className="w-12 h-12 text-slate-400 mx-auto mb-3" />
-                <p className="text-sm text-slate-500">No reviews available</p>
-              </div>
-            ))}
-
-          {/* Divider */}
-          <div className="border-t border-slate-200"></div>
-
-          {/* Opening Hours */}
-          {displayFacility.opening_hours && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.22 }}
-              className="bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-2xl p-4 shadow-sm"
-            >
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
-                  <Clock className="w-4 h-4" />
-                  Hours
-                </h3>
-                {displayFacility.opening_hours.open_now !== undefined && (
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                      displayFacility.opening_hours.open_now
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
-                    }`}
-                  >
-                    {displayFacility.opening_hours.open_now
-                      ? "Open Now"
-                      : "Closed"}
-                  </span>
-                )}
-              </div>
-              {displayFacility.opening_hours.weekday_text && (
-                <ul className="space-y-2">
-                  {displayFacility.opening_hours.weekday_text.map(
-                    (day, idx) => (
-                      <motion.li
-                        key={idx}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.25 + idx * 0.03 }}
-                        className="text-sm text-slate-700 font-medium"
-                      >
-                        {day}
-                      </motion.li>
-                    ),
-                  )}
-                </ul>
-              )}
-            </motion.div>
-          )}
-          </motion.div>
-          ) : viewMode === "lead" && selectedLead ? (
-          <motion.div
-            key="lead-view"
-            initial={{ x: 100, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: 100, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="space-y-6"
-          >
-            {/* Back Button */}
-            <motion.button
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              onClick={() => {
-                setViewMode("facility");
-                setSelectedLeadId(null);
-              }}
-              className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              Back to Facility
-            </motion.button>
-
-            {/* About Section */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.05 }}
-              className="bg-slate-50 rounded-lg p-5 space-y-4"
-            >
-              <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                <Building2 className="w-4 h-4" />
-                About
-              </h3>
-
-              {selectedLead.description && (
-                <p className="text-sm text-slate-700">
-                  {selectedLead.description}
-                </p>
-              )}
-
-              {/* Address */}
-              {selectedLead.addresses &&
-                selectedLead.addresses.length > 0 && (
-                  <div className="flex items-start gap-3">
-                    <MapPin className="w-4 h-4 text-slate-400 mt-0.5" />
-                    <div className="text-sm text-slate-700">
-                      {selectedLead.addresses[0].address_1}
-                      {selectedLead.addresses[0].address_2 && (
-                        <>, {selectedLead.addresses[0].address_2}</>
-                      )}
-                      {(selectedLead.addresses[0].city ||
-                        selectedLead.addresses[0].state ||
-                        selectedLead.addresses[0].zipcode) && (
-                        <div>
-                          {selectedLead.addresses[0].city}
-                          {selectedLead.addresses[0].state &&
-                            `, ${selectedLead.addresses[0].state}`}
-                          {selectedLead.addresses[0].zipcode &&
-                            ` ${selectedLead.addresses[0].zipcode}`}
-                        </div>
                       )}
                     </div>
-                  </div>
+                    {displayFacility.opening_hours.weekday_text && (
+                      <ul className="space-y-2">
+                        {displayFacility.opening_hours.weekday_text.map(
+                          (day, idx) => (
+                            <motion.li
+                              key={idx}
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: 0.25 + idx * 0.03 }}
+                              className="text-sm text-slate-700 font-medium"
+                            >
+                              {day}
+                            </motion.li>
+                          ),
+                        )}
+                      </ul>
+                    )}
+                  </motion.div>
                 )}
+              </motion.div>
+            ) : viewMode === "lead" && selectedLead ? (
+              <motion.div
+                key="lead-view"
+                initial={{ x: 100, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: 100, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                className="space-y-6"
+              >
+                {/* Back Button */}
+                <motion.button
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  onClick={() => {
+                    setViewMode("facility");
+                    setSelectedLeadId(null);
+                  }}
+                  className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  Back to Facility
+                </motion.button>
 
-              {/* Website */}
-              {selectedLead.url && (
-                <div className="flex items-center gap-3">
-                  <Globe className="w-4 h-4 text-slate-400" />
-                  <a
-                    href={selectedLead.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
-                  >
-                    {selectedLead.url}
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
-                </div>
-              )}
-
-              {/* Dates */}
-              <div className="flex items-center gap-3 text-xs text-slate-500">
-                <Calendar className="w-4 h-4" />
-                <div>
-                  <div>
-                    Created:{" "}
-                    {new Date(
-                      selectedLead.date_created,
-                    ).toLocaleDateString()}
-                  </div>
-                  <div>
-                    Updated:{" "}
-                    {new Date(
-                      selectedLead.date_updated,
-                    ).toLocaleDateString()}
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Contacts Section */}
-            {selectedLead.contacts &&
-              selectedLead.contacts.length > 0 && (
+                {/* About Section */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 }}
-                  className="bg-white border border-slate-200 rounded-lg p-5 space-y-4"
+                  transition={{ delay: 0.05 }}
+                  className="bg-slate-50 rounded-lg p-5 space-y-4"
                 >
                   <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                    <User className="w-4 h-4" />
-                    Contacts ({selectedLead.contacts.length})
+                    <Building2 className="w-4 h-4" />
+                    About
                   </h3>
 
-                  <div className="space-y-4">
-                    {selectedLead.contacts.map((contact) => (
-                      <div
-                        key={contact.id}
-                        className="p-4 bg-slate-50 rounded-lg space-y-2"
-                      >
-                        {contact.name && (
-                          <p className="font-medium text-slate-900">
-                            {contact.name}
-                          </p>
-                        )}
-                        {contact.title && (
-                          <p className="text-sm text-slate-600">
-                            {contact.title}
-                          </p>
-                        )}
+                  {selectedLead.description && (
+                    <p className="text-sm text-slate-700">
+                      {selectedLead.description}
+                    </p>
+                  )}
 
-                        {/* Emails */}
-                        {contact.emails &&
-                          contact.emails.length > 0 && (
+                  {/* Address */}
+                  {selectedLead.addresses &&
+                    selectedLead.addresses.length > 0 && (
+                      <div className="flex items-start gap-3">
+                        <MapPin className="w-4 h-4 text-slate-400 mt-0.5" />
+                        <div className="text-sm text-slate-700">
+                          {selectedLead.addresses[0].address_1}
+                          {selectedLead.addresses[0].address_2 && (
+                            <>, {selectedLead.addresses[0].address_2}</>
+                          )}
+                          {(selectedLead.addresses[0].city ||
+                            selectedLead.addresses[0].state ||
+                            selectedLead.addresses[0].zipcode) && (
+                            <div>
+                              {selectedLead.addresses[0].city}
+                              {selectedLead.addresses[0].state &&
+                                `, ${selectedLead.addresses[0].state}`}
+                              {selectedLead.addresses[0].zipcode &&
+                                ` ${selectedLead.addresses[0].zipcode}`}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                  {/* Website */}
+                  {selectedLead.url && (
+                    <div className="flex items-center gap-3">
+                      <Globe className="w-4 h-4 text-slate-400" />
+                      <a
+                        href={selectedLead.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                      >
+                        {selectedLead.url}
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                  )}
+
+                  {/* Dates */}
+                  <div className="flex items-center gap-3 text-xs text-slate-500">
+                    <Calendar className="w-4 h-4" />
+                    <div>
+                      <div>
+                        Created:{" "}
+                        {new Date(
+                          selectedLead.date_created,
+                        ).toLocaleDateString()}
+                      </div>
+                      <div>
+                        Updated:{" "}
+                        {new Date(
+                          selectedLead.date_updated,
+                        ).toLocaleDateString()}
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Contacts Section */}
+                {selectedLead.contacts && selectedLead.contacts.length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="bg-white border border-slate-200 rounded-lg p-5 space-y-4"
+                  >
+                    <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                      <User className="w-4 h-4" />
+                      Contacts ({selectedLead.contacts.length})
+                    </h3>
+
+                    <div className="space-y-4">
+                      {selectedLead.contacts.map((contact) => (
+                        <div
+                          key={contact.id}
+                          className="p-4 bg-slate-50 rounded-lg space-y-2"
+                        >
+                          {contact.name && (
+                            <p className="font-medium text-slate-900">
+                              {contact.name}
+                            </p>
+                          )}
+                          {contact.title && (
+                            <p className="text-sm text-slate-600">
+                              {contact.title}
+                            </p>
+                          )}
+
+                          {/* Emails */}
+                          {contact.emails && contact.emails.length > 0 && (
                             <div className="space-y-1">
                               {contact.emails.map((email, idx) => (
                                 <div
@@ -2698,9 +2803,8 @@ function FacilitySidebarInner({
                             </div>
                           )}
 
-                        {/* Phones */}
-                        {contact.phones &&
-                          contact.phones.length > 0 && (
+                          {/* Phones */}
+                          {contact.phones && contact.phones.length > 0 && (
                             <div className="space-y-1">
                               {contact.phones.map((phone, idx) => (
                                 <div
@@ -2723,92 +2827,90 @@ function FacilitySidebarInner({
                               ))}
                             </div>
                           )}
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
 
-            {/* Custom Fields */}
-            {selectedLead.custom &&
-              Object.keys(selectedLead.custom).length > 0 && (
+                {/* Custom Fields */}
+                {selectedLead.custom &&
+                  Object.keys(selectedLead.custom).length > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.15 }}
+                      className="bg-white border border-slate-200 rounded-lg p-5 space-y-3"
+                    >
+                      <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider">
+                        Custom Fields
+                      </h3>
+                      <div className="space-y-3">
+                        {Object.entries(selectedLead.custom).map(
+                          ([key, value]) => (
+                            <div
+                              key={key}
+                              className="text-sm"
+                            >
+                              <span className="text-slate-600 font-medium">{key}:</span>
+                              <p className="text-slate-900 mt-1 break-words">
+                                <NoteText text={String(value)} truncateUrls />
+                              </p>
+                            </div>
+                          ),
+                        )}
+                      </div>
+                    </motion.div>
+                  )}
+
+                {/* Activity Timeline */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.15 }}
-                  className="bg-white border border-slate-200 rounded-lg p-5 space-y-3"
+                  transition={{ delay: 0.2 }}
+                  className="bg-white border border-slate-200 rounded-lg p-5"
                 >
-                  <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider">
-                    Custom Fields
+                  <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-4">
+                    Activity Timeline
                   </h3>
-                  <div className="space-y-2">
-                    {Object.entries(selectedLead.custom).map(
-                      ([key, value]) => (
-                        <div
-                          key={key}
-                          className="flex justify-between text-sm"
-                        >
-                          <span className="text-slate-600">{key}:</span>
-                          <span className="text-slate-900 font-medium">
-                            {String(value)}
-                          </span>
-                        </div>
-                      ),
-                    )}
-                  </div>
+                  {selectedLeadActivities && (
+                    <div className="mb-3 flex flex-wrap gap-2 text-xs text-slate-600">
+                      <span>Total: {selectedLeadActivities.count.total}</span>
+                      {selectedLeadActivities.count.calls > 0 && (
+                        <span>
+                          • Calls: {selectedLeadActivities.count.calls}
+                        </span>
+                      )}
+                      {selectedLeadActivities.count.emails > 0 && (
+                        <span>
+                          • Emails: {selectedLeadActivities.count.emails}
+                        </span>
+                      )}
+                      {selectedLeadActivities.count.notes > 0 && (
+                        <span>
+                          • Notes: {selectedLeadActivities.count.notes}
+                        </span>
+                      )}
+                      {selectedLeadActivities.count.tasks > 0 && (
+                        <span>
+                          • Tasks: {selectedLeadActivities.count.tasks}
+                        </span>
+                      )}
+                      {selectedLeadActivities.count.opportunities > 0 && (
+                        <span>
+                          • Opportunities:{" "}
+                          {selectedLeadActivities.count.opportunities}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                  <CloseActivityTimeline
+                    activities={selectedLeadActivities?.activities || []}
+                    isLoading={selectedLeadActivitiesLoading}
+                  />
                 </motion.div>
-              )}
-
-            {/* Activity Timeline */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="bg-white border border-slate-200 rounded-lg p-5"
-            >
-              <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-4">
-                Activity Timeline
-              </h3>
-              {selectedLeadActivities && (
-                <div className="mb-3 flex flex-wrap gap-2 text-xs text-slate-600">
-                  <span>
-                    Total: {selectedLeadActivities.count.total}
-                  </span>
-                  {selectedLeadActivities.count.calls > 0 && (
-                    <span>
-                      • Calls: {selectedLeadActivities.count.calls}
-                    </span>
-                  )}
-                  {selectedLeadActivities.count.emails > 0 && (
-                    <span>
-                      • Emails: {selectedLeadActivities.count.emails}
-                    </span>
-                  )}
-                  {selectedLeadActivities.count.notes > 0 && (
-                    <span>
-                      • Notes: {selectedLeadActivities.count.notes}
-                    </span>
-                  )}
-                  {selectedLeadActivities.count.tasks > 0 && (
-                    <span>
-                      • Tasks: {selectedLeadActivities.count.tasks}
-                    </span>
-                  )}
-                  {selectedLeadActivities.count.opportunities > 0 && (
-                    <span>
-                      • Opportunities:{" "}
-                      {selectedLeadActivities.count.opportunities}
-                    </span>
-                  )}
-                </div>
-              )}
-              <CloseActivityTimeline
-                activities={selectedLeadActivities?.activities || []}
-                isLoading={selectedLeadActivitiesLoading}
-              />
-            </motion.div>
-          </motion.div>
-          ) : null}
+              </motion.div>
+            ) : null}
           </AnimatePresence>
         </div>
 
@@ -3192,7 +3294,8 @@ function FacilitySidebarInner({
             (photoViewerSource === "additional" &&
               displayFacility.additional_photos) ||
             (photoViewerSource === "review" &&
-              displayFacility.additional_reviews?.[selectedReviewIndex]?.images)) &&
+              displayFacility.additional_reviews?.[selectedReviewIndex]
+                ?.images)) &&
           createPortal(
             <motion.div
               initial={{ opacity: 0 }}
@@ -3208,7 +3311,9 @@ function FacilitySidebarInner({
                 } else if (photoViewerSource === "additional") {
                   photos = displayFacility.additional_photos;
                 } else if (photoViewerSource === "review") {
-                  photos = displayFacility.additional_reviews?.[selectedReviewIndex]?.images;
+                  photos =
+                    displayFacility.additional_reviews?.[selectedReviewIndex]
+                      ?.images;
                 }
                 if (!photos) return null;
                 const totalPhotos = photos.length;

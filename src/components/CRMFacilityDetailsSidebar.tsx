@@ -2148,14 +2148,6 @@ export default function CRMFacilityDetailsSidebar({
                                         </div>
                                       </div>
 
-                                      {/* Match Reason */}
-                                      <div className="flex items-center gap-2 text-xs text-gray-600">
-                                        <span className="font-semibold">
-                                          Reason:
-                                        </span>
-                                        <span>{link.match_reason}</span>
-                                      </div>
-
                                       {/* Actions */}
                                       <div className="pt-2 border-t border-blue-200 flex gap-2">
                                         <button
@@ -3054,17 +3046,17 @@ export default function CRMFacilityDetailsSidebar({
                           <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider">
                             Custom Fields
                           </h3>
-                          <div className="space-y-2">
+                          <div className="space-y-3">
                             {Object.entries(selectedLead.custom).map(
                               ([key, value]) => (
                                 <div
                                   key={key}
-                                  className="flex justify-between text-sm"
+                                  className="text-sm"
                                 >
-                                  <span className="text-slate-600">{key}:</span>
-                                  <span className="text-slate-900 font-medium">
-                                    {String(value)}
-                                  </span>
+                                  <span className="text-slate-600 font-medium">{key}:</span>
+                                  <p className="text-slate-900 mt-1 break-words">
+                                    <NoteText text={String(value)} truncateUrls />
+                                  </p>
                                 </div>
                               ),
                             )}
