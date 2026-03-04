@@ -1,6 +1,6 @@
 {
-  "processedCount": 2118,
-  "successCount": 2118,
+  "processedCount": 2129,
+  "successCount": 2129,
   "failedCount": 0,
   "skippedCount": 0,
   "processedPlaceIds": [
@@ -2120,12 +2120,23 @@
     "ChIJcabBM7ZvToYRzJNsvPLOKxg",
     "ChIJleZQZALQRIYR68Q_p3_PnKY",
     "ChIJzwxhN7jRRIYR5VWc7TXvEbs",
-    "ChIJfUDc7MlHToYRMkaN03zfi_k"
+    "ChIJfUDc7MlHToYRMkaN03zfi_k",
+    "ChIJxef5H37qQIYROlKOqiapaDw",
+    "ChIJOy6Uh_tZXIYRjD5BmHS2If0",
+    "ChIJj_6Wxi72XIYRgJvrQMzV3rg",
+    "ChIJXZNNQzlFAYcRdUXG-MFRYfg",
+    "ChIJUWlwlJRB54YR9eyoTgIWlvg",
+    "ChIJGz68OQwsT4YRUSPnHKYQd1o",
+    "ChIJQ0BTliBPAYcRD31ve5wGbyM",
+    "ChIJp7NhWwuBb4YRjCCufDhutdM",
+    "ChIJqRQtKxVyToYRvgRjxb_8YNs",
+    "ChIJX-yUWwhDNIYR9x3cD3FAn60",
+    "ChIJbwZgLhkNSYYRSw4b2n51K1c"
   ],
-  "lastProcessedIndex": 2117,
-  "apiCallsUsed": 18898,
-  "imagesUploaded": 78639,
-  "imageUploadsFailed": 1439,
-  "lastUpdated": "2026-03-04T19:38:53.722Z",
+  "lastProcessedIndex": 2128,
+  "apiCallsUsed": 18990,
+  "imagesUploaded": 78970,
+  "imageUploadsFailed": 1440,
+  "lastUpdated": "2026-03-04T19:51:38.060Z",
   "errors": []
 }

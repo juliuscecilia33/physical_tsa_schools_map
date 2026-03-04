@@ -1,6 +1,7 @@
 "use client";
 
 import { Facility, Note, FacilityTag } from "@/types/facility";
+import NoteText from "./NoteText";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
@@ -1574,8 +1575,8 @@ function FacilitySidebarInner({
                     >
                       <>
                           {/* Note Text */}
-                          <p className="text-sm text-slate-700 leading-relaxed mb-3">
-                            {note.note_text}
+                          <p className="text-sm text-slate-700 leading-relaxed mb-3 break-words">
+                            <NoteText text={note.note_text} />
                           </p>
 
                           {/* Assigned Photo */}

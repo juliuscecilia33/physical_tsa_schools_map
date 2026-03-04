@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
+import NoteText from "./NoteText";
 import {
   X,
   MapPin,
@@ -1850,8 +1851,8 @@ export default function CRMFacilityDetailsSidebar({
                                 ) : (
                                   // View Mode
                                   <>
-                                    <p className="text-sm text-slate-700 leading-relaxed mb-2">
-                                      {note.note_text}
+                                    <p className="text-sm text-slate-700 leading-relaxed mb-2 break-words">
+                                      <NoteText text={note.note_text} />
                                     </p>
 
                                     {/* Creator Info and Actions */}
