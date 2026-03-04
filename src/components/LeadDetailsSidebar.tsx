@@ -23,7 +23,7 @@ import {
   useCloseLeadStatuses,
 } from "@/hooks/useCloseCRM";
 import { CloseActivityTimeline } from "./CloseActivityTimeline";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Facility } from "@/types/facility";
 import {
   useFacilityLeadLinks,
@@ -91,6 +91,11 @@ export function LeadDetailsSidebar({
 
   // Facility search state
   const [facilitySearchQuery, setFacilitySearchQuery] = useState("");
+
+  // Reset facility search when lead changes or sidebar closes
+  useEffect(() => {
+    setFacilitySearchQuery("");
+  }, [leadId]);
 
   // Link confirmation modal state
   const [isLinkConfirmModalOpen, setIsLinkConfirmModalOpen] = useState(false);
@@ -876,28 +881,30 @@ export function LeadDetailsSidebar({
                     )}
 
                     {/* Suggested Matches Section - Only show if no linked facilities */}
+                    {linkedFacilities.length === 0 && (
+                      <>
+                        {/* Search Input */}
+                        <div className="mb-4">
+                          <div className="relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                            <input
+                              type="text"
+                              value={facilitySearchQuery}
+                              onChange={(e) =>
+                                setFacilitySearchQuery(e.target.value)
+                              }
+                              placeholder="Search by name, location, or sport..."
+                              className="w-full pl-10 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            />
+                          </div>
+                        </div>
+                      </>
+                    )}
+
                     {linkedFacilities.length === 0 &&
                       unmatchedFacilities.length > 0 && (
-                        <>
-                          {/* Search Input */}
-                          <div className="mb-4">
-                            <div className="relative">
-                              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                              <input
-                                type="text"
-                                value={facilitySearchQuery}
-                                onChange={(e) =>
-                                  setFacilitySearchQuery(e.target.value)
-                                }
-                                placeholder="Search by name, location, or sport..."
-                                className="w-full pl-10 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              />
-                            </div>
-                          </div>
-
-                          {/* Facilities List */}
-                          <div className="space-y-3">
-                            {unmatchedFacilities.map((facility, idx) => {
+                        <div className="space-y-3">
+                          {unmatchedFacilities.map((facility, idx) => {
                               // Determine confidence badge style
                               const getConfidenceBadge = () => {
                                 switch (facility.confidence) {
@@ -1071,10 +1078,9 @@ export function LeadDetailsSidebar({
                               );
                             })}
                           </div>
-                        </>
                       )}
 
-                    {/* No Facilities Message - Only show if no linked facilities and no matches */}
+                    {/* No Facilities Message */}
                     {linkedFacilities.length === 0 &&
                       unmatchedFacilities.length === 0 && (
                         <motion.div

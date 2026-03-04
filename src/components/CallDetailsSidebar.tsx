@@ -111,6 +111,7 @@ export function CallDetailsSidebar({ callId, leadId, onClose }: CallDetailsSideb
   );
 
   const [isSummaryExpanded, setIsSummaryExpanded] = useState(false);
+  const [isTranscriptExpanded, setIsTranscriptExpanded] = useState(false);
 
   const isOpen = !!callId;
 
@@ -356,7 +357,7 @@ export function CallDetailsSidebar({ callId, leadId, onClose }: CallDetailsSideb
                           {hasMore && (
                             <button
                               onClick={() => setIsSummaryExpanded(!isSummaryExpanded)}
-                              className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors mt-3"
+                              className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors mt-3 cursor-pointer"
                             >
                               {isSummaryExpanded ? (
                                 <>
@@ -521,7 +522,10 @@ export function CallDetailsSidebar({ callId, leadId, onClose }: CallDetailsSideb
                         Full Transcript
                       </h3>
                       <div className="space-y-4">
-                        {call.recording_transcript.utterances.map((utterance, idx) => {
+                        {(isTranscriptExpanded
+                          ? call.recording_transcript.utterances
+                          : call.recording_transcript.utterances.slice(0, 6)
+                        ).map((utterance, idx) => {
                           const speakerName = getSpeakerName(utterance.speaker_label);
                           const speakerSide = utterance.speaker_side;
                           const isCloseUser = speakerSide === 'close-user';
@@ -556,6 +560,24 @@ export function CallDetailsSidebar({ callId, leadId, onClose }: CallDetailsSideb
                           );
                         })}
                       </div>
+                      {call.recording_transcript.utterances.length > 6 && (
+                        <button
+                          onClick={() => setIsTranscriptExpanded(!isTranscriptExpanded)}
+                          className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors mt-3 cursor-pointer"
+                        >
+                          {isTranscriptExpanded ? (
+                            <>
+                              <ChevronUp className="w-4 h-4" />
+                              Show less
+                            </>
+                          ) : (
+                            <>
+                              <ChevronDown className="w-4 h-4" />
+                              Show more ({call.recording_transcript.utterances.length - 6} more messages)
+                            </>
+                          )}
+                        </button>
+                      )}
                     </div>
                   )}
 

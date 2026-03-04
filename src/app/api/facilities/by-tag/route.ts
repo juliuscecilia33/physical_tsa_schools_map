@@ -13,6 +13,7 @@ export const maxDuration = 300;
 const sql = postgres(process.env.DATABASE_URL!, {
   ssl: { rejectUnauthorized: false },
   max: 10,
+  prepare: false,
 });
 
 // Pre-warm the database connection at module load time

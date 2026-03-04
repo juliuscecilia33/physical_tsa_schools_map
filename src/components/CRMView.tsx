@@ -669,6 +669,8 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
     backgroundLoadingProgress,
     isError,
     error,
+    isBackgroundError,
+    retryBackgroundLoading,
   } = useFacilities();
 
   // Convert Facility[] to FacilityLightweight[] (they have the same structure)
@@ -887,6 +889,20 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
                       <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg border border-blue-200">
                         <div className="animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-blue-600"></div>
                         Loading more facilities... ({backgroundLoadingProgress.toLocaleString()} loaded)
+                      </span>
+                    </div>
+                  )}
+                  {/* Background error with retry */}
+                  {!isPriorityLoading && isBackgroundError && !isBackgroundLoading && (
+                    <div className="text-sm text-slate-600 font-medium">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-700 rounded-lg border border-red-200">
+                        Failed to load remaining facilities
+                        <button
+                          onClick={() => retryBackgroundLoading()}
+                          className="ml-2 px-2 py-0.5 bg-red-600 text-white text-xs font-semibold rounded hover:bg-red-700 transition-colors"
+                        >
+                          Retry
+                        </button>
                       </span>
                     </div>
                   )}

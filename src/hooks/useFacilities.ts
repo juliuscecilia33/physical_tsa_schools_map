@@ -259,6 +259,9 @@ export interface UseFacilitiesReturn {
   backgroundLoadingProgress: number;
   isError: boolean;
   error: Error | null;
+  isBackgroundError: boolean;
+  backgroundError: Error | null;
+  retryBackgroundLoading: () => void;
 }
 
 /**
@@ -289,6 +292,9 @@ export function useFacilities(): UseFacilitiesReturn {
     data: backgroundFacilities = [],
     isLoading: isBackgroundLoading,
     isSuccess: isBackgroundLoadingSuccess,
+    isError: isBackgroundError,
+    error: backgroundError,
+    refetch: refetchBackground,
   } = useQuery({
     queryKey: ['facilities', 'background'],
     queryFn: ({ signal }) => fetchAllBackgroundFacilities([SERPAPI_TAG_ID], signal),
@@ -350,5 +356,8 @@ export function useFacilities(): UseFacilitiesReturn {
     backgroundLoadingProgress,
     isError,
     error,
+    isBackgroundError,
+    backgroundError: backgroundError as Error | null,
+    retryBackgroundLoading: refetchBackground,
   };
 }
