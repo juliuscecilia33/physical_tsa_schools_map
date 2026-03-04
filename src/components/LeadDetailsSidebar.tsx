@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
   MapPin,
@@ -12,30 +12,273 @@ import {
   Calendar,
   ExternalLink,
   AlertCircle,
-} from 'lucide-react';
-import { useCloseLead, useCloseLeadActivities, useCloseLeadStatuses } from '@/hooks/useCloseCRM';
-import { CloseActivityTimeline } from './CloseActivityTimeline';
-import { useMemo } from 'react';
+  Search,
+  Link2,
+} from "lucide-react";
+import {
+  useCloseLead,
+  useCloseLeadActivities,
+  useCloseLeadStatuses,
+} from "@/hooks/useCloseCRM";
+import { CloseActivityTimeline } from "./CloseActivityTimeline";
+import { useMemo, useState } from "react";
+import { Facility } from "@/types/facility";
+
+// Sport emoji mapping
+const SPORT_EMOJIS: { [key: string]: string } = {
+  Basketball: "🏀",
+  Soccer: "⚽",
+  Baseball: "⚾",
+  Football: "🏈",
+  Tennis: "🎾",
+  Volleyball: "🏐",
+  Swimming: "🏊",
+  "Track & Field": "🏃",
+  Golf: "⛳",
+  Hockey: "🏒",
+  Lacrosse: "🥍",
+  Softball: "🥎",
+  Wrestling: "🤼",
+  Gymnastics: "🤸",
+  Pickleball: "🏓",
+  Racquetball: "🎾",
+  Squash: "🎾",
+  Badminton: "🏸",
+  "Gym/Fitness": "💪",
+  CrossFit: "🏋️",
+  Yoga: "🧘",
+  Pilates: "🧘‍♀️",
+  "Martial Arts": "🥋",
+  Boxing: "🥊",
+  Bowling: "🎳",
+  Skating: "⛸️",
+  Climbing: "🧗",
+  "Water Sports": "🚣",
+};
 
 interface LeadDetailsSidebarProps {
   leadId: string | null;
   onClose: () => void;
+  facilities: Facility[];
 }
 
-export function LeadDetailsSidebar({ leadId, onClose }: LeadDetailsSidebarProps) {
-  const { data: lead, isLoading: leadLoading, error: leadError } = useCloseLead(leadId);
+export function LeadDetailsSidebar({
+  leadId,
+  onClose,
+  facilities,
+}: LeadDetailsSidebarProps) {
   const {
-    data: activitiesData,
-    isLoading: activitiesLoading,
-  } = useCloseLeadActivities(leadId);
+    data: lead,
+    isLoading: leadLoading,
+    error: leadError,
+  } = useCloseLead(leadId);
+  const { data: activitiesData, isLoading: activitiesLoading } =
+    useCloseLeadActivities(leadId);
   const { data: statuses } = useCloseLeadStatuses();
+
+  // Facility search state
+  const [facilitySearchQuery, setFacilitySearchQuery] = useState("");
 
   // Get status label
   const statusLabel = useMemo(() => {
     if (!lead || !statuses) return null;
     const status = statuses.find((s) => s.id === lead.status_id);
-    return status?.label || lead.status_label || 'Unknown';
+    return status?.label || lead.status_label || "Unknown";
   }, [lead, statuses]);
+
+  // Utility: Normalize phone number (remove all non-digit characters)
+  const normalizePhone = (phone: string | undefined): string => {
+    if (!phone) return "";
+    return phone.replace(/\D/g, "");
+  };
+
+  // Utility: Extract city from address string
+  const extractCity = (address: string): string => {
+    // Typical format: "123 Street, City, State ZIP"
+    const parts = address.split(",");
+    if (parts.length >= 2) {
+      return parts[parts.length - 2].trim().toLowerCase();
+    }
+    return "";
+  };
+
+  // Utility: Calculate Levenshtein distance for fuzzy matching
+  const levenshteinDistance = (str1: string, str2: string): number => {
+    const len1 = str1.length;
+    const len2 = str2.length;
+    const matrix: number[][] = [];
+
+    for (let i = 0; i <= len1; i++) {
+      matrix[i] = [i];
+    }
+    for (let j = 0; j <= len2; j++) {
+      matrix[0][j] = j;
+    }
+
+    for (let i = 1; i <= len1; i++) {
+      for (let j = 1; j <= len2; j++) {
+        const cost = str1[i - 1] === str2[j - 1] ? 0 : 1;
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j] + 1,
+          matrix[i][j - 1] + 1,
+          matrix[i - 1][j - 1] + cost,
+        );
+      }
+    }
+
+    return matrix[len1][len2];
+  };
+
+  // Utility: Check if strings are similar (fuzzy match)
+  const isFuzzyMatch = (
+    str1: string,
+    str2: string,
+    threshold: number = 0.8,
+  ): boolean => {
+    const s1 = str1.toLowerCase();
+    const s2 = str2.toLowerCase();
+    const maxLen = Math.max(s1.length, s2.length);
+    if (maxLen === 0) return false;
+    const distance = levenshteinDistance(s1, s2);
+    const similarity = 1 - distance / maxLen;
+    return similarity >= threshold;
+  };
+
+  // Match facilities based on confidence scoring
+  const matchedFacilities = useMemo(() => {
+    if (!facilities || facilities.length === 0 || !lead) return [];
+
+    const leadName = (lead.display_name || lead.name || "")
+      .toLowerCase()
+      .trim();
+    const leadPhone =
+      lead.contacts && lead.contacts.length > 0
+        ? normalizePhone(lead.contacts[0].phones?.[0]?.phone)
+        : "";
+    const leadAddress =
+      lead.addresses && lead.addresses.length > 0
+        ? lead.addresses[0].address_1?.toLowerCase() || ""
+        : "";
+    const leadCity =
+      lead.addresses && lead.addresses.length > 0
+        ? (lead.addresses[0].city || "").toLowerCase()
+        : "";
+
+    interface MatchResult extends Facility {
+      confidence: number;
+      matchReason: string;
+    }
+
+    // Score each facility
+    const results: MatchResult[] = facilities
+      .map((facility) => {
+        let confidence = 0;
+        let matchReason = "";
+
+        // 1. Phone Match (Confidence: 5)
+        if (leadPhone && facility.phone) {
+          const facilityPhone = normalizePhone(facility.phone);
+          if (facilityPhone === leadPhone) {
+            confidence = 5;
+            matchReason = "Phone match";
+            return { ...facility, confidence, matchReason };
+          }
+        }
+
+        // 2. Address Match (Confidence: 5)
+        if (leadAddress && facility.address) {
+          const facilityAddress = facility.address.toLowerCase();
+          // Check if addresses are very similar
+          if (
+            facilityAddress.includes(leadAddress) ||
+            leadAddress.includes(facilityAddress) ||
+            isFuzzyMatch(leadAddress, facilityAddress, 0.85)
+          ) {
+            confidence = 5;
+            matchReason = "Address match";
+            return { ...facility, confidence, matchReason };
+          }
+        }
+
+        // 3. Name + City Match (Confidence: 4)
+        if (leadName && leadCity && facility.name && facility.address) {
+          const facilityName = facility.name.toLowerCase();
+          const facilityCity = extractCity(facility.address);
+
+          if (facilityName === leadName && facilityCity === leadCity) {
+            confidence = 4;
+            matchReason = "Name + City match";
+            return { ...facility, confidence, matchReason };
+          }
+        }
+
+        // 4. Exact Name Match (Confidence: 3)
+        if (leadName && facility.name) {
+          const facilityName = facility.name.toLowerCase();
+          if (facilityName === leadName) {
+            confidence = 3;
+            matchReason = "Exact name match";
+            return { ...facility, confidence, matchReason };
+          }
+        }
+
+        // 5. Fuzzy Name Match (Confidence: 2)
+        if (leadName && facility.name) {
+          const facilityName = facility.name.toLowerCase();
+          if (isFuzzyMatch(leadName, facilityName, 0.75)) {
+            confidence = 2;
+            matchReason = "Fuzzy name match";
+            return { ...facility, confidence, matchReason };
+          }
+        }
+
+        return { ...facility, confidence, matchReason };
+      })
+      .filter((result) => result.confidence > 0); // Only show matches
+
+    // Apply manual search filter
+    let filteredResults = results;
+    if (facilitySearchQuery.trim()) {
+      const query = facilitySearchQuery.toLowerCase();
+      filteredResults = results.filter((facility) => {
+        const nameMatch = facility.name.toLowerCase().includes(query);
+        const addressMatch = facility.address.toLowerCase().includes(query);
+        const sportsMatch = facility.identified_sports?.some((sport) =>
+          sport.toLowerCase().includes(query),
+        );
+        return nameMatch || addressMatch || sportsMatch;
+      });
+    }
+
+    // Sort by confidence (highest first), then by name
+    return filteredResults
+      .sort((a, b) => {
+        if (b.confidence !== a.confidence) {
+          return b.confidence - a.confidence;
+        }
+        return a.name.localeCompare(b.name);
+      })
+      .slice(0, 50); // Limit to 50 results
+  }, [facilities, lead, facilitySearchQuery]);
+
+  // Calculate confidence breakdown
+  const confidenceBreakdown = useMemo(() => {
+    const breakdown = {
+      high: 0, // Confidence 5
+      medium: 0, // Confidence 4
+      low: 0, // Confidence 3
+      fuzzy: 0, // Confidence 2
+    };
+
+    matchedFacilities.forEach((facility) => {
+      if (facility.confidence === 5) breakdown.high++;
+      else if (facility.confidence === 4) breakdown.medium++;
+      else if (facility.confidence === 3) breakdown.low++;
+      else if (facility.confidence === 2) breakdown.fuzzy++;
+    });
+
+    return breakdown;
+  }, [matchedFacilities]);
 
   const isOpen = !!leadId;
 
@@ -54,17 +297,19 @@ export function LeadDetailsSidebar({ leadId, onClose }: LeadDetailsSidebarProps)
 
           {/* Sidebar */}
           <motion.div
-            initial={{ x: '100%' }}
+            initial={{ x: "100%" }}
             animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+            exit={{ x: "100%" }}
+            transition={{ type: "spring", damping: 30, stiffness: 300 }}
             className="fixed right-0 top-0 h-full w-full max-w-2xl bg-white shadow-2xl z-50 overflow-hidden flex flex-col"
           >
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-white">
               <div className="flex-1 min-w-0">
                 <h2 className="text-xl font-bold text-gray-900 truncate">
-                  {leadLoading ? 'Loading...' : lead?.display_name || lead?.name || 'Lead Details'}
+                  {leadLoading
+                    ? "Loading..."
+                    : lead?.display_name || lead?.name || "Lead Details"}
                 </h2>
                 {statusLabel && (
                   <div className="mt-2">
@@ -88,8 +333,12 @@ export function LeadDetailsSidebar({ leadId, onClose }: LeadDetailsSidebarProps)
                 <div className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
                   <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
                   <div>
-                    <p className="font-medium text-red-900">Failed to load lead</p>
-                    <p className="text-sm text-red-700 mt-1">{leadError.message}</p>
+                    <p className="font-medium text-red-900">
+                      Failed to load lead
+                    </p>
+                    <p className="text-sm text-red-700 mt-1">
+                      {leadError.message}
+                    </p>
                   </div>
                 </div>
               )}
@@ -108,7 +357,9 @@ export function LeadDetailsSidebar({ leadId, onClose }: LeadDetailsSidebarProps)
                     </h3>
 
                     {lead.description && (
-                      <p className="text-sm text-gray-700">{lead.description}</p>
+                      <p className="text-sm text-gray-700">
+                        {lead.description}
+                      </p>
                     )}
 
                     {/* Address */}
@@ -125,8 +376,10 @@ export function LeadDetailsSidebar({ leadId, onClose }: LeadDetailsSidebarProps)
                             lead.addresses[0].zipcode) && (
                             <div>
                               {lead.addresses[0].city}
-                              {lead.addresses[0].state && `, ${lead.addresses[0].state}`}
-                              {lead.addresses[0].zipcode && ` ${lead.addresses[0].zipcode}`}
+                              {lead.addresses[0].state &&
+                                `, ${lead.addresses[0].state}`}
+                              {lead.addresses[0].zipcode &&
+                                ` ${lead.addresses[0].zipcode}`}
                             </div>
                           )}
                         </div>
@@ -153,8 +406,14 @@ export function LeadDetailsSidebar({ leadId, onClose }: LeadDetailsSidebarProps)
                     <div className="flex items-center gap-3 text-xs text-gray-500">
                       <Calendar className="w-4 h-4" />
                       <div>
-                        <div>Created: {new Date(lead.date_created).toLocaleDateString()}</div>
-                        <div>Updated: {new Date(lead.date_updated).toLocaleDateString()}</div>
+                        <div>
+                          Created:{" "}
+                          {new Date(lead.date_created).toLocaleDateString()}
+                        </div>
+                        <div>
+                          Updated:{" "}
+                          {new Date(lead.date_updated).toLocaleDateString()}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -174,10 +433,14 @@ export function LeadDetailsSidebar({ leadId, onClose }: LeadDetailsSidebarProps)
                             className="p-4 bg-gray-50 rounded-lg space-y-2"
                           >
                             {contact.name && (
-                              <p className="font-medium text-gray-900">{contact.name}</p>
+                              <p className="font-medium text-gray-900">
+                                {contact.name}
+                              </p>
                             )}
                             {contact.title && (
-                              <p className="text-sm text-gray-600">{contact.title}</p>
+                              <p className="text-sm text-gray-600">
+                                {contact.title}
+                              </p>
                             )}
 
                             {/* Emails */}
@@ -243,7 +506,10 @@ export function LeadDetailsSidebar({ leadId, onClose }: LeadDetailsSidebarProps)
                       </h3>
                       <div className="space-y-2">
                         {Object.entries(lead.custom).map(([key, value]) => (
-                          <div key={key} className="flex justify-between text-sm">
+                          <div
+                            key={key}
+                            className="flex justify-between text-sm"
+                          >
                             <span className="text-gray-600">{key}:</span>
                             <span className="text-gray-900 font-medium">
                               {String(value)}
@@ -275,7 +541,10 @@ export function LeadDetailsSidebar({ leadId, onClose }: LeadDetailsSidebarProps)
                           <span>• Tasks: {activitiesData.count.tasks}</span>
                         )}
                         {activitiesData.count.opportunities > 0 && (
-                          <span>• Opportunities: {activitiesData.count.opportunities}</span>
+                          <span>
+                            • Opportunities:{" "}
+                            {activitiesData.count.opportunities}
+                          </span>
                         )}
                       </div>
                     )}
@@ -283,6 +552,275 @@ export function LeadDetailsSidebar({ leadId, onClose }: LeadDetailsSidebarProps)
                       activities={activitiesData?.activities || []}
                       isLoading={activitiesLoading}
                     />
+                  </div>
+
+                  {/* Nearby Facilities */}
+                  <div className="bg-white border border-gray-200 rounded-lg p-5">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider flex items-center gap-2">
+                        <Building2 className="w-4 h-4" />
+                        Matched Facilities
+                        {matchedFacilities.length > 0 && (
+                          <span className="inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold text-white bg-blue-600 rounded-full">
+                            {matchedFacilities.length}
+                          </span>
+                        )}
+                      </h3>
+                    </div>
+
+                    {/* Confidence Breakdown */}
+                    {matchedFacilities.length > 0 && (
+                      <>
+                        <div className="mb-3 flex flex-wrap gap-2 text-xs">
+                          {confidenceBreakdown.high > 0 && (
+                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-50 text-green-700 rounded-md font-medium border border-green-200">
+                              <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                              {confidenceBreakdown.high} High Match
+                              {confidenceBreakdown.high !== 1 ? "es" : ""}
+                            </span>
+                          )}
+                          {confidenceBreakdown.medium > 0 && (
+                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 rounded-md font-medium border border-blue-200">
+                              <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                              {confidenceBreakdown.medium} Name+City
+                            </span>
+                          )}
+                          {confidenceBreakdown.low > 0 && (
+                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-yellow-50 text-yellow-700 rounded-md font-medium border border-yellow-200">
+                              <span className="w-2 h-2 bg-yellow-500 rounded-full"></span>
+                              {confidenceBreakdown.low} Name Match
+                              {confidenceBreakdown.low !== 1 ? "es" : ""}
+                            </span>
+                          )}
+                          {confidenceBreakdown.fuzzy > 0 && (
+                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-orange-50 text-orange-700 rounded-md font-medium border border-orange-200">
+                              <span className="w-2 h-2 bg-orange-500 rounded-full"></span>
+                              {confidenceBreakdown.fuzzy} Fuzzy Match
+                              {confidenceBreakdown.fuzzy !== 1 ? "es" : ""}
+                            </span>
+                          )}
+                        </div>
+                        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                          <p className="text-xs text-blue-800 flex items-start gap-2">
+                            <Link2 className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                            <span>
+                              <strong>Link facilities to this lead</strong> to track relationships and manage your outreach.
+                              Click "Link to Lead" on any facility card below.
+                            </span>
+                          </p>
+                        </div>
+                      </>
+                    )}
+
+                    {/* Search Input */}
+                    <div className="mb-4">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <input
+                          type="text"
+                          value={facilitySearchQuery}
+                          onChange={(e) =>
+                            setFacilitySearchQuery(e.target.value)
+                          }
+                          placeholder="Search by name, location, or sport..."
+                          className="w-full pl-10 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Facilities List */}
+                    {matchedFacilities.length > 0 ? (
+                      <div className="space-y-3">
+                        {matchedFacilities.map((facility, idx) => {
+                          // Determine confidence badge style
+                          const getConfidenceBadge = () => {
+                            switch (facility.confidence) {
+                              case 5:
+                                return {
+                                  label: "High Match",
+                                  className:
+                                    "bg-gradient-to-r from-green-50 to-green-100 text-green-800 border-green-300",
+                                  dotColor: "bg-green-500",
+                                  needsReview: false,
+                                };
+                              case 4:
+                                return {
+                                  label: "Name + City",
+                                  className:
+                                    "bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 border-blue-300",
+                                  dotColor: "bg-blue-500",
+                                  needsReview: true,
+                                };
+                              case 3:
+                                return {
+                                  label: "Name Match",
+                                  className:
+                                    "bg-gradient-to-r from-yellow-50 to-yellow-100 text-yellow-800 border-yellow-300",
+                                  dotColor: "bg-yellow-500",
+                                  needsReview: true,
+                                };
+                              case 2:
+                                return {
+                                  label: "Fuzzy Match",
+                                  className:
+                                    "bg-gradient-to-r from-orange-50 to-orange-100 text-orange-800 border-orange-300",
+                                  dotColor: "bg-orange-500",
+                                  needsReview: true,
+                                };
+                              default:
+                                return {
+                                  label: "Match",
+                                  className:
+                                    "bg-gradient-to-r from-gray-50 to-gray-100 text-gray-800 border-gray-300",
+                                  dotColor: "bg-gray-500",
+                                  needsReview: false,
+                                };
+                            }
+                          };
+
+                          const confidenceBadge = getConfidenceBadge();
+
+                          return (
+                            <motion.div
+                              key={facility.place_id}
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: idx * 0.04, duration: 0.3 }}
+                              whileTap={{ scale: 0.98 }}
+                              className="p-5 rounded-xl transition-all duration-300 cursor-pointer bg-gradient-to-br from-white to-gray-50/50 hover:from-gray-50 hover:to-gray-100/50 border-2 border-gray-200 hover:border-blue-300 shadow-sm hover:shadow-md"
+                            >
+                              <div className="space-y-3">
+                                {/* Header: Name and Confidence Badge */}
+                                <div className="flex items-start justify-between gap-3">
+                                  <h4 className="font-bold text-gray-900 text-base leading-tight flex-1">
+                                    {facility.name}
+                                  </h4>
+                                  <div className="flex flex-col gap-1 items-end flex-shrink-0">
+                                    <span
+                                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold border shadow-sm ${confidenceBadge.className}`}
+                                    >
+                                      <span
+                                        className={`w-1.5 h-1.5 rounded-full ${confidenceBadge.dotColor}`}
+                                      ></span>
+                                      {confidenceBadge.label}
+                                    </span>
+                                    {confidenceBadge.needsReview && (
+                                      <span className="text-[10px] text-gray-500 italic font-medium">
+                                        Needs review
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+
+                                {/* Address */}
+                                <div className="flex items-start gap-2">
+                                  <MapPin className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                                  <p className="text-sm text-gray-600 leading-relaxed">
+                                    {facility.address}
+                                  </p>
+                                </div>
+
+                                {/* Phone */}
+                                {facility.phone && (
+                                  <div className="flex items-center gap-2">
+                                    <Phone className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                                    <p className="text-sm text-gray-700 font-medium">
+                                      {facility.phone}
+                                    </p>
+                                  </div>
+                                )}
+
+                                {/* Sports Badges */}
+                                {facility.identified_sports &&
+                                  facility.identified_sports.length > 0 && (
+                                    <div className="flex flex-wrap gap-2">
+                                      {facility.identified_sports
+                                        .slice(0, 5)
+                                        .map((sport) => (
+                                          <span
+                                            key={sport}
+                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 rounded-lg text-xs font-semibold shadow-sm border border-blue-200"
+                                          >
+                                            <span className="text-base">
+                                              {SPORT_EMOJIS[sport] || "🏅"}
+                                            </span>
+                                            <span>{sport}</span>
+                                          </span>
+                                        ))}
+                                      {facility.identified_sports.length >
+                                        5 && (
+                                        <span className="inline-flex items-center px-3 py-1.5 bg-gray-100 text-gray-600 rounded-lg text-xs font-semibold border border-gray-200">
+                                          +
+                                          {facility.identified_sports.length -
+                                            5}{" "}
+                                          more
+                                        </span>
+                                      )}
+                                    </div>
+                                  )}
+
+                                {/* Rating */}
+                                {facility.rating && (
+                                  <div className="flex items-center gap-2 text-sm">
+                                    <div className="flex items-center gap-1">
+                                      <span className="text-yellow-500 text-base">
+                                        ★
+                                      </span>
+                                      <span className="font-bold text-gray-900">
+                                        {facility.rating.toFixed(1)}
+                                      </span>
+                                    </div>
+                                    <span className="text-gray-400">•</span>
+                                    <span className="text-gray-500">
+                                      {facility.user_ratings_total} reviews
+                                    </span>
+                                  </div>
+                                )}
+
+                                {/* Link to Lead Button */}
+                                <div className="pt-3 border-t border-gray-200">
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      // TODO: Implement link functionality
+                                      console.log('Link facility to lead:', {
+                                        leadId: lead?.id,
+                                        facilityId: facility.place_id,
+                                        confidence: facility.confidence,
+                                      });
+                                    }}
+                                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 hover:border-blue-300 rounded-lg transition-all duration-200 hover:shadow-sm"
+                                  >
+                                    <Link2 className="w-4 h-4" />
+                                    Link to Lead
+                                  </button>
+                                </div>
+                              </div>
+                            </motion.div>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <motion.div
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ duration: 0.3 }}
+                        className="text-center py-12"
+                      >
+                        <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
+                          <Building2 className="w-8 h-8 text-gray-400" />
+                        </div>
+                        <p className="text-base font-semibold text-gray-700 mb-1">
+                          {facilitySearchQuery.trim()
+                            ? "No facilities match your search"
+                            : "No matching facilities found"}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          Try adjusting your search or check if the lead details
+                          are correct
+                        </p>
+                      </motion.div>
+                    )}
                   </div>
                 </>
               ) : null}

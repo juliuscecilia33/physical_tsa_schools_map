@@ -12,10 +12,15 @@ import { CallDetailsSidebar } from './CallDetailsSidebar';
 import { ContactDetailsSidebar } from './ContactDetailsSidebar';
 import { EmailDetailsSidebar } from './EmailDetailsSidebar';
 import { User, Building2, Phone, Mail, Users, CheckCircle, XCircle, X } from 'lucide-react';
+import { Facility } from '@/types/facility';
 
 type Tab = 'leads' | 'calls' | 'emails' | 'contacts' | 'users';
 
-export function CloseCRMExplorer() {
+interface CloseCRMExplorerProps {
+  facilities?: Facility[];
+}
+
+export function CloseCRMExplorer({ facilities = [] }: CloseCRMExplorerProps) {
   const [activeTab, setActiveTab] = useState<Tab>('leads');
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
   const [selectedCallId, setSelectedCallId] = useState<string | null>(null);
@@ -140,6 +145,7 @@ export function CloseCRMExplorer() {
       <LeadDetailsSidebar
         leadId={selectedLeadId}
         onClose={() => setSelectedLeadId(null)}
+        facilities={facilities}
       />
 
       {/* Call Details Sidebar */}

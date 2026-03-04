@@ -1024,7 +1024,7 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <CloseCRMExplorer />
+            <CloseCRMExplorer facilities={facilities as unknown as Facility[]} />
           </motion.div>
         ) : (
           <motion.div

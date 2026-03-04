@@ -1,7 +1,7 @@
 {
-  "processedCount": 1386,
-  "successCount": 1192,
-  "failedCount": 199,
+  "processedCount": 1403,
+  "successCount": 1207,
+  "failedCount": 202,
   "skippedCount": 17,
   "processedFacilityIds": [
     "2651e40a-b22d-4b23-9fd7-8ff121dfdd25",
@@ -1198,15 +1198,30 @@
     "5384cb15-3d48-4ab9-9b38-777d699f7d2a",
     "4c1d5582-6599-41c0-a1e0-a6272ac64256",
     "295ab633-f580-4b5a-824b-2b18f2138352",
-    "32f8a0c3-f0c8-4b7d-8458-b268996b5173"
+    "32f8a0c3-f0c8-4b7d-8458-b268996b5173",
+    "5b4a405f-7f88-44f9-b60e-3fb0fbfad495",
+    "162437f1-fadd-44b0-a4b8-27cba29545dd",
+    "7a99dd4b-0384-48c9-8960-425ee6876843",
+    "79a17ce3-b5f1-480b-b98c-2513fded49e9",
+    "549d87f0-5e76-434e-9658-273c9d46917f",
+    "d5eaffd5-e286-4004-8217-d1b2d410ec84",
+    "e889cad5-6dcd-46d4-a41f-c4ec0516611b",
+    "638ceff1-518e-40e5-a180-83b8b90b2342",
+    "e575e54b-8cf0-41b5-b0cd-6c111465127a",
+    "ce1ff3cf-1815-4398-9412-ec91fc68b7be",
+    "d9e6b556-e1fa-46d6-be48-25ba6a2b279e",
+    "7374c797-36c8-4a33-be4c-ed3434a4c8a4",
+    "49a0b096-a689-4764-872d-f251a11b1abb",
+    "a761711a-4621-446b-bde2-322c7d6c8aee",
+    "b1fba815-e7bd-4edd-9328-886aaa3289fc"
   ],
-  "lastProcessedIndex": 1399,
-  "imagesProcessed": 48695,
+  "lastProcessedIndex": 1416,
+  "imagesProcessed": 49345,
   "imagesSkipped": 39,
-  "imagesFailed": 495,
-  "totalBytesBefore": 118091291022,
-  "totalBytesAfter": 47222485198,
-  "lastUpdated": "2026-03-04T02:16:57.883Z",
+  "imagesFailed": 496,
+  "totalBytesBefore": 119580852878,
+  "totalBytesAfter": 47778149730,
+  "lastUpdated": "2026-03-04T02:45:46.050Z",
   "errors": [
     {
       "facility_id": "c8861bb6-f825-4d28-a60f-695b1edfef7b",
@@ -4672,8 +4687,15 @@
       "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/6ac25a71-7eea-4d96-a026-c3f48bca509d/1772232913737_35.jpg",
       "error": "Failed to download image",
       "timestamp": "2026-03-04T02:16:07.914Z"
+    },
+    {
+      "facility_id": "d545cb9a-617a-48b2-82b4-e05ee05a5a02",
+      "facility_name": "Harry Myers Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d545cb9a-617a-48b2-82b4-e05ee05a5a02/1772044626255_18.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-04T02:41:25.723Z"
     }
   ],
-  "deletionsSucceeded": 45061,
+  "deletionsSucceeded": 45711,
   "deletionsFailed": 8
 }
