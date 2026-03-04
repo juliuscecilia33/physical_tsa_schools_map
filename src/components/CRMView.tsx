@@ -665,6 +665,7 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
     isPriorityLoading,
     isBackgroundLoading,
     backgroundLoadingComplete,
+    backgroundLoadingProgress,
     isError,
     error,
   } = useFacilities();
@@ -787,6 +788,13 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
 
   const facilitiesWithNotes = facilities.filter((f) => f.has_notes).length;
 
+  // Calculate display count for "Total Facilities" card
+  // During background loading, show priority count + progress
+  // After loading completes, show actual total
+  const displayTotalFacilities = isBackgroundLoading
+    ? facilities.length + backgroundLoadingProgress
+    : facilities.length;
+
   // Show error state (only for critical errors, not for loading)
   if (isError && !isPriorityLoading) {
     return (
@@ -845,7 +853,7 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
             <div className="grid grid-cols-2 gap-5">
               <SummaryCard
                 label="Total Facilities"
-                value={facilities.length}
+                value={displayTotalFacilities}
                 icon={Building2}
               />
               <SummaryCard
@@ -865,7 +873,7 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
                     <div className="text-sm text-slate-600 font-medium">
                       <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg border border-blue-200">
                         <div className="animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-blue-600"></div>
-                        Loading more facilities...
+                        Loading more facilities... ({backgroundLoadingProgress.toLocaleString()} loaded)
                       </span>
                     </div>
                   )}

@@ -1,10 +1,14 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Facility } from "@/types/facility";
 
 // SerpAPI tag ID for priority loading
 const SERPAPI_TAG_ID = 'e326fe36-5536-4209-87ed-f99528e1d1ee';
+
+// Module-level progress callback for background loading
+let currentProgressCallback: ((count: number) => void) | null = null;
 
 // Fetch facilities by tag IDs
 async function fetchFacilitiesByTags(tagIds: string[]): Promise<Facility[]> {
@@ -61,6 +65,11 @@ async function fetchAllBackgroundFacilities(
 
     allFacilities = [...allFacilities, ...facilities];
 
+    // Call progress callback if available
+    if (currentProgressCallback) {
+      currentProgressCallback(allFacilities.length);
+    }
+
     console.log(
       `Background batch loaded: ${facilities.length} facilities (offset: ${offset})`
     );
@@ -87,6 +96,7 @@ export interface UseFacilitiesReturn {
   isPriorityLoading: boolean;
   isBackgroundLoading: boolean;
   backgroundLoadingComplete: boolean;
+  backgroundLoadingProgress: number;
   isError: boolean;
   error: Error | null;
 }
@@ -97,6 +107,19 @@ export interface UseFacilitiesReturn {
  * Phase 2: Background batch loading (excluding SerpAPI tag)
  */
 export function useFacilities(): UseFacilitiesReturn {
+  // Track background loading progress (incremental count)
+  const [backgroundLoadingProgress, setBackgroundLoadingProgress] = useState(0);
+
+  // Set up progress callback for background loading
+  useEffect(() => {
+    currentProgressCallback = (count: number) => {
+      setBackgroundLoadingProgress(count);
+    };
+    return () => {
+      currentProgressCallback = null;
+    };
+  }, []);
+
   // Phase 1: Fetch SerpAPI-tagged facilities immediately (priority load)
   const {
     data: priorityFacilities = [],
@@ -130,6 +153,13 @@ export function useFacilities(): UseFacilitiesReturn {
   // Derive backgroundLoadingComplete from query success state
   const backgroundLoadingComplete = isBackgroundLoadingSuccess;
 
+  // Reset progress when background loading starts
+  useEffect(() => {
+    if (isBackgroundLoading && backgroundLoadingProgress === 0 && backgroundFacilities.length === 0) {
+      // Progress will be updated by the callback
+    }
+  }, [isBackgroundLoading, backgroundLoadingProgress, backgroundFacilities.length]);
+
   return {
     facilities,
     priorityFacilities,
@@ -137,6 +167,7 @@ export function useFacilities(): UseFacilitiesReturn {
     isPriorityLoading,
     isBackgroundLoading,
     backgroundLoadingComplete,
+    backgroundLoadingProgress,
     isError,
     error,
   };
