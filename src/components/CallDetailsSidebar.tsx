@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X,
@@ -20,14 +20,31 @@ import {
   ChevronDown,
   ChevronUp,
   Link2,
+  Search,
 } from 'lucide-react';
 import { useCloseCall, useCloseLead, useCloseUser, useCloseCalls } from '@/hooks/useCloseCRM';
-import { useFacilityLeadLinks } from '@/hooks/useFacilityLeadLinks';
+import { useFacilityLeadLinks, useCreateFacilityLeadLink, useDeleteFacilityLeadLink } from '@/hooks/useFacilityLeadLinks';
+import { Facility } from '@/types/facility';
+import { useQueryClient } from '@tanstack/react-query';
+import { createClient } from '@/lib/supabase/client';
+import { updateFacilityTags } from '@/utils/facilityCache';
+
+const CLOSE_DATA_TAG_ID = 'ef3537b6-4d83-4eb8-84a5-9bc74e776c72';
+
+const SPORT_EMOJIS: { [key: string]: string } = {
+  Basketball: '🏀', Soccer: '⚽', Baseball: '⚾', Football: '🏈',
+  Tennis: '🎾', Volleyball: '🏐', Swimming: '🏊', 'Track & Field': '🏃',
+  Golf: '⛳', Hockey: '🏒', Lacrosse: '🥍', Softball: '🥎',
+  Wrestling: '🤼', Gymnastics: '🤸', Pickleball: '🏓', Badminton: '🏸',
+  'Gym/Fitness': '💪', CrossFit: '🏋️', Yoga: '🧘', 'Martial Arts': '🥋',
+  Boxing: '🥊', Bowling: '🎳', Skating: '⛸️', Climbing: '🧗',
+};
 
 interface CallDetailsSidebarProps {
   callId: string | null;
   leadId?: string | null;
   onClose: () => void;
+  facilities?: Facility[];
 }
 
 function formatDuration(seconds: number | undefined): string {
@@ -102,11 +119,15 @@ function renderFormattedSummary(summaryText: string) {
   return elements;
 }
 
-export function CallDetailsSidebar({ callId, leadId, onClose }: CallDetailsSidebarProps) {
+export function CallDetailsSidebar({ callId, leadId, onClose, facilities = [] }: CallDetailsSidebarProps) {
   const { data: call, isLoading: callLoading, error: callError } = useCloseCall(callId);
   const { data: lead, isLoading: leadLoading, error: leadError } = useCloseLead(leadId || call?.lead_id || null);
   const { data: user } = useCloseUser(); // Get current user for now
   const { data: facilityLeadLinks = [] } = useFacilityLeadLinks(leadId || call?.lead_id || null);
+  const createLinkMutation = useCreateFacilityLeadLink();
+  const deleteLinkMutation = useDeleteFacilityLeadLink();
+  const queryClient = useQueryClient();
+  const supabase = createClient();
 
   // Get related calls for the same lead
   const { data: relatedCallsData } = useCloseCalls(
@@ -115,8 +136,194 @@ export function CallDetailsSidebar({ callId, leadId, onClose }: CallDetailsSideb
 
   const [isSummaryExpanded, setIsSummaryExpanded] = useState(false);
   const [isTranscriptExpanded, setIsTranscriptExpanded] = useState(false);
+  const [showFacilityPicker, setShowFacilityPicker] = useState(false);
+  const [facilitySearchQuery, setFacilitySearchQuery] = useState('');
+  const [isLinkConfirmModalOpen, setIsLinkConfirmModalOpen] = useState(false);
+  const [pendingLinkFacility, setPendingLinkFacility] = useState<{
+    placeId: string;
+    confidence: number;
+    matchReason: string;
+    facilityName: string;
+  } | null>(null);
 
   const isOpen = !!callId;
+
+  // Utility functions for facility matching
+  const normalizePhone = (phone: string | undefined): string => {
+    if (!phone) return '';
+    return phone.replace(/\D/g, '');
+  };
+
+  const extractCity = (address: string): string => {
+    const parts = address.split(',');
+    if (parts.length >= 2) {
+      return parts[parts.length - 2].trim().toLowerCase();
+    }
+    return '';
+  };
+
+  const levenshteinDistance = (str1: string, str2: string): number => {
+    const len1 = str1.length;
+    const len2 = str2.length;
+    const matrix: number[][] = [];
+    for (let i = 0; i <= len1; i++) matrix[i] = [i];
+    for (let j = 0; j <= len2; j++) matrix[0][j] = j;
+    for (let i = 1; i <= len1; i++) {
+      for (let j = 1; j <= len2; j++) {
+        const cost = str1[i - 1] === str2[j - 1] ? 0 : 1;
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j] + 1,
+          matrix[i][j - 1] + 1,
+          matrix[i - 1][j - 1] + cost,
+        );
+      }
+    }
+    return matrix[len1][len2];
+  };
+
+  const isFuzzyMatch = (str1: string, str2: string, threshold: number = 0.8): boolean => {
+    const s1 = str1.toLowerCase();
+    const s2 = str2.toLowerCase();
+    const maxLen = Math.max(s1.length, s2.length);
+    if (maxLen === 0) return false;
+    const distance = levenshteinDistance(s1, s2);
+    return 1 - distance / maxLen >= threshold;
+  };
+
+  // Facility matching logic
+  const matchedFacilities = useMemo(() => {
+    if (!facilities || facilities.length === 0 || !lead) return [];
+
+    const leadName = (lead.display_name || lead.name || '').toLowerCase().trim();
+    const leadPhone = lead.contacts?.length ? normalizePhone(lead.contacts[0].phones?.[0]?.phone) : '';
+    const leadAddress = lead.addresses?.length ? lead.addresses[0].address_1?.toLowerCase() || '' : '';
+    const leadCity = lead.addresses?.length ? (lead.addresses[0].city || '').toLowerCase() : '';
+
+    interface MatchResult extends Facility {
+      confidence: number;
+      matchReason: string;
+    }
+
+    const results: MatchResult[] = facilities
+      .map((facility) => {
+        let confidence = 0;
+        let matchReason = '';
+
+        if (leadPhone && facility.phone) {
+          if (normalizePhone(facility.phone) === leadPhone) {
+            return { ...facility, confidence: 5, matchReason: 'Phone match' };
+          }
+        }
+        if (leadAddress && facility.address) {
+          const fa = facility.address.toLowerCase();
+          if (fa.includes(leadAddress) || leadAddress.includes(fa) || isFuzzyMatch(leadAddress, fa, 0.85)) {
+            return { ...facility, confidence: 5, matchReason: 'Address match' };
+          }
+        }
+        if (leadName && leadCity && facility.name && facility.address) {
+          if (facility.name.toLowerCase() === leadName && extractCity(facility.address) === leadCity) {
+            return { ...facility, confidence: 4, matchReason: 'Name + City match' };
+          }
+        }
+        if (leadName && facility.name) {
+          if (facility.name.toLowerCase() === leadName) {
+            return { ...facility, confidence: 3, matchReason: 'Exact name match' };
+          }
+        }
+        if (leadName && facility.name) {
+          if (isFuzzyMatch(leadName, facility.name.toLowerCase(), 0.75)) {
+            return { ...facility, confidence: 2, matchReason: 'Fuzzy name match' };
+          }
+        }
+
+        return { ...facility, confidence, matchReason };
+      })
+      .filter((r) => r.confidence > 0);
+
+    let filtered = results;
+    if (facilitySearchQuery.trim()) {
+      const q = facilitySearchQuery.toLowerCase();
+      filtered = results.filter((f) => {
+        return f.name.toLowerCase().includes(q) || f.address.toLowerCase().includes(q) ||
+          f.identified_sports?.some((s) => s.toLowerCase().includes(q));
+      });
+    }
+
+    return filtered
+      .sort((a, b) => b.confidence !== a.confidence ? b.confidence - a.confidence : a.name.localeCompare(b.name))
+      .slice(0, 50);
+  }, [facilities, lead, facilitySearchQuery]);
+
+  const linkedFacilities = useMemo(() => {
+    if (!facilityLeadLinks || !facilities) return [];
+    return facilityLeadLinks
+      .map((link) => {
+        const facility = facilities.find((f) => f.place_id === link.place_id);
+        if (!facility) return null;
+        return { ...facility, link, confidence: link.confidence, matchReason: link.match_reason };
+      })
+      .filter(Boolean) as ((typeof matchedFacilities)[0] & { link: (typeof facilityLeadLinks)[0] })[];
+  }, [facilityLeadLinks, facilities]);
+
+  const unmatchedFacilities = useMemo(() => {
+    if (!linkedFacilities.length) return matchedFacilities;
+    const linkedIds = new Set(linkedFacilities.map((f) => f.place_id));
+    return matchedFacilities.filter((f) => !linkedIds.has(f.place_id));
+  }, [matchedFacilities, linkedFacilities]);
+
+  // Facility link handlers
+  const handleLinkFacility = (placeId: string, confidence: number, matchReason: string, facilityName: string) => {
+    setPendingLinkFacility({ placeId, confidence, matchReason, facilityName });
+    setIsLinkConfirmModalOpen(true);
+  };
+
+  const assignCloseDataTag = async (placeId: string) => {
+    try {
+      const { error: insertError } = await supabase
+        .from('facility_tag_assignments')
+        .insert({ place_id: placeId, tag_id: CLOSE_DATA_TAG_ID });
+      if (insertError && insertError.code !== '23505') return;
+
+      const { data: tagData, error: tagError } = await supabase
+        .from('facility_tags')
+        .select('id, name, color, description')
+        .eq('id', CLOSE_DATA_TAG_ID)
+        .single();
+      if (tagError || !tagData) return;
+
+      const facility = facilities.find((f) => f.place_id === placeId);
+      const currentTags = facility?.tags ?? [];
+      if (!currentTags.some((t) => t.id === CLOSE_DATA_TAG_ID)) {
+        updateFacilityTags(queryClient, placeId, [...currentTags, tagData]);
+      }
+    } catch (error) {
+      console.error('Error in assignCloseDataTag:', error);
+    }
+  };
+
+  const handleConfirmLink = async () => {
+    if (!lead?.id || !pendingLinkFacility) return;
+    try {
+      await createLinkMutation.mutateAsync({
+        place_id: pendingLinkFacility.placeId,
+        close_lead_id: lead.id,
+        confidence: pendingLinkFacility.confidence,
+        match_reason: pendingLinkFacility.matchReason,
+      });
+      await assignCloseDataTag(pendingLinkFacility.placeId);
+      setIsLinkConfirmModalOpen(false);
+      setPendingLinkFacility(null);
+      setShowFacilityPicker(false);
+    } catch (error) {
+      console.error('Error linking facility:', error);
+      alert('Failed to link facility. Please try again.');
+    }
+  };
+
+  const handleCancelLink = () => {
+    setIsLinkConfirmModalOpen(false);
+    setPendingLinkFacility(null);
+  };
 
   // Filter out the current call from related calls
   const relatedCalls = relatedCallsData?.calls?.filter((c) => c.id !== callId) || [];
@@ -152,26 +359,27 @@ export function CallDetailsSidebar({ callId, leadId, onClose }: CallDetailsSideb
   });
 
   return (
+    <>
     <AnimatePresence>
       {isOpen && (
-        <>
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40"
-          />
-
-          {/* Sidebar */}
-          <motion.div
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="fixed right-0 top-0 h-full w-full max-w-2xl bg-white shadow-2xl z-50 overflow-hidden flex flex-col"
-          >
+        <motion.div
+          key="call-details-backdrop"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onClose}
+          className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40"
+        />
+      )}
+      {isOpen && (
+        <motion.div
+          key="call-details-sidebar"
+          initial={{ x: '100%' }}
+          animate={{ x: 0 }}
+          exit={{ x: '100%' }}
+          transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+          className="fixed right-0 top-0 h-full w-full max-w-2xl bg-white shadow-2xl z-50 overflow-hidden flex flex-col"
+        >
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-white">
               <div className="flex-1 min-w-0 flex items-center gap-3">
@@ -290,10 +498,13 @@ export function CallDetailsSidebar({ callId, leadId, onClose }: CallDetailsSideb
                                 Linked to Facility
                               </span>
                             ) : (
-                              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-500">
+                              <button
+                                onClick={() => setShowFacilityPicker(!showFacilityPicker)}
+                                className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors cursor-pointer"
+                              >
                                 <Link2 className="w-3 h-3" />
-                                No Facility Linked
-                              </span>
+                                Link Lead to Facility
+                              </button>
                             )}
                           </div>
                         </div>
@@ -347,6 +558,130 @@ export function CallDetailsSidebar({ callId, leadId, onClose }: CallDetailsSideb
                       <p className="text-sm text-gray-500 italic">No lead associated with this call</p>
                     )}
                   </div>
+
+                  {/* Facility Picker Section */}
+                  {showFacilityPicker && facilityLeadLinks.length === 0 && lead && (
+                    <div className="bg-white border border-gray-200 rounded-lg p-5 space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider flex items-center gap-2">
+                          <Building2 className="w-4 h-4" />
+                          Match Facility
+                          {unmatchedFacilities.length > 0 && (
+                            <span className="inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold text-white bg-blue-600 rounded-full">
+                              {unmatchedFacilities.length}
+                            </span>
+                          )}
+                        </h3>
+                        <button
+                          onClick={() => setShowFacilityPicker(false)}
+                          className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+                        >
+                          <X className="w-4 h-4 text-gray-400" />
+                        </button>
+                      </div>
+
+                      {/* Search */}
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <input
+                          type="text"
+                          value={facilitySearchQuery}
+                          onChange={(e) => setFacilitySearchQuery(e.target.value)}
+                          placeholder="Search by name, location, or sport..."
+                          className="w-full pl-10 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
+                      </div>
+
+                      {/* Matched Facilities */}
+                      {unmatchedFacilities.length > 0 ? (
+                        <div className="space-y-3 max-h-[400px] overflow-y-auto">
+                          {unmatchedFacilities.map((facility, idx) => {
+                            const getConfidenceBadge = () => {
+                              switch (facility.confidence) {
+                                case 5: return { label: 'High Match', className: 'bg-gradient-to-r from-green-50 to-green-100 text-green-800 border-green-300', dotColor: 'bg-green-500' };
+                                case 4: return { label: 'Name + City', className: 'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 border-blue-300', dotColor: 'bg-blue-500' };
+                                case 3: return { label: 'Name Match', className: 'bg-gradient-to-r from-yellow-50 to-yellow-100 text-yellow-800 border-yellow-300', dotColor: 'bg-yellow-500' };
+                                case 2: return { label: 'Fuzzy Match', className: 'bg-gradient-to-r from-orange-50 to-orange-100 text-orange-800 border-orange-300', dotColor: 'bg-orange-500' };
+                                default: return { label: 'Match', className: 'bg-gradient-to-r from-gray-50 to-gray-100 text-gray-800 border-gray-300', dotColor: 'bg-gray-500' };
+                              }
+                            };
+                            const badge = getConfidenceBadge();
+
+                            return (
+                              <motion.div
+                                key={facility.place_id}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: idx * 0.04, duration: 0.3 }}
+                                className="p-4 rounded-xl bg-gradient-to-br from-white to-gray-50/50 border-2 border-gray-200 hover:border-blue-300 shadow-sm hover:shadow-md transition-all duration-300"
+                              >
+                                <div className="space-y-2">
+                                  <div className="flex items-start justify-between gap-2">
+                                    <h4 className="font-bold text-gray-900 text-sm leading-tight flex-1">
+                                      {facility.name}
+                                    </h4>
+                                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold border shadow-sm flex-shrink-0 ${badge.className}`}>
+                                      <span className={`w-1.5 h-1.5 rounded-full ${badge.dotColor}`}></span>
+                                      {badge.label}
+                                    </span>
+                                  </div>
+
+                                  <div className="flex items-start gap-2">
+                                    <MapPin className="w-3.5 h-3.5 text-blue-600 flex-shrink-0 mt-0.5" />
+                                    <p className="text-xs text-gray-600">{facility.address}</p>
+                                  </div>
+
+                                  {facility.phone && (
+                                    <div className="flex items-center gap-2">
+                                      <Phone className="w-3.5 h-3.5 text-blue-600 flex-shrink-0" />
+                                      <p className="text-xs text-gray-700 font-medium">{facility.phone}</p>
+                                    </div>
+                                  )}
+
+                                  {facility.identified_sports && facility.identified_sports.length > 0 && (
+                                    <div className="flex flex-wrap gap-1">
+                                      {facility.identified_sports.slice(0, 4).map((sport) => (
+                                        <span key={sport} className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 rounded-md text-[10px] font-semibold border border-blue-200">
+                                          <span>{SPORT_EMOJIS[sport] || '🏅'}</span>
+                                          {sport}
+                                        </span>
+                                      ))}
+                                      {facility.identified_sports.length > 4 && (
+                                        <span className="inline-flex items-center px-2 py-1 bg-gray-100 text-gray-600 rounded-md text-[10px] font-semibold border border-gray-200">
+                                          +{facility.identified_sports.length - 4} more
+                                        </span>
+                                      )}
+                                    </div>
+                                  )}
+
+                                  <div className="pt-2 border-t border-gray-200">
+                                    <button
+                                      onClick={() => handleLinkFacility(facility.place_id, facility.confidence, facility.matchReason, facility.name)}
+                                      disabled={createLinkMutation.isPending}
+                                      className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 hover:border-blue-300 rounded-lg transition-all duration-200 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                                    >
+                                      <Link2 className="w-3.5 h-3.5" />
+                                      {createLinkMutation.isPending ? 'Linking...' : 'Link to Lead'}
+                                    </button>
+                                  </div>
+                                </div>
+                              </motion.div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div className="text-center py-8">
+                          <Building2 className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                          <p className="text-sm font-medium text-gray-600">
+                            {facilitySearchQuery.trim() ? 'No facilities match your search' : 'No matching facilities found'}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            Try adjusting your search or check if the lead details are correct
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                   {/* Call Summary Section */}
                   {call.recording_transcript?.summary_text && (() => {
@@ -644,8 +979,77 @@ export function CallDetailsSidebar({ callId, leadId, onClose }: CallDetailsSideb
               ) : null}
             </div>
           </motion.div>
-        </>
       )}
     </AnimatePresence>
+
+    <AnimatePresence>
+        {isLinkConfirmModalOpen && pendingLinkFacility && (
+          <motion.div key="link-confirmation-modal">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={handleCancelLink}
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[70]"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white rounded-2xl shadow-2xl z-[70] p-6"
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                    <Link2 className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <h3 className="text-lg font-bold text-gray-900">Link Facility to Lead?</h3>
+                </div>
+                <button onClick={handleCancelLink} className="p-1 hover:bg-gray-100 rounded-lg transition-colors">
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+
+              <div className="mb-6">
+                <p className="text-sm text-gray-600 mb-3">You are about to link this facility to the current lead:</p>
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="font-bold text-gray-900 mb-1">{pendingLinkFacility.facilityName}</p>
+                  <div className="flex items-center gap-2 text-xs text-gray-600">
+                    <span className="font-semibold">Match Quality:</span>
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold ${
+                      pendingLinkFacility.confidence === 5 ? 'bg-green-100 text-green-800'
+                        : pendingLinkFacility.confidence === 4 ? 'bg-blue-100 text-blue-800'
+                        : pendingLinkFacility.confidence === 3 ? 'bg-yellow-100 text-yellow-800'
+                        : 'bg-orange-100 text-orange-800'
+                    }`}>
+                      {pendingLinkFacility.matchReason}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={handleCancelLink}
+                  disabled={createLinkMutation.isPending}
+                  className="flex-1 px-4 py-2.5 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleConfirmLink}
+                  disabled={createLinkMutation.isPending}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  <Link2 className="w-4 h-4" />
+                  {createLinkMutation.isPending ? 'Linking...' : 'Link to Lead'}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }

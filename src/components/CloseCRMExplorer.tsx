@@ -156,6 +156,7 @@ export function CloseCRMExplorer({ facilities = [] }: CloseCRMExplorerProps) {
           setSelectedCallId(null);
           setSelectedCallLeadId(null);
         }}
+        facilities={facilities}
       />
 
       {/* Contact Details Sidebar */}
