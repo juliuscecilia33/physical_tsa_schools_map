@@ -627,7 +627,7 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(100);
   const [isFiltersSidebarOpen, setIsFiltersSidebarOpen] = useState(false);
-  const [filters, setFilters] = useState<FilterState>(loadFiltersFromStorage);
+  const [filters, setFilters] = useState<FilterState>(getDefaultFilters);
   const [selectedFacilityId, setSelectedFacilityId] = useState<string | null>(
     null,
   );
@@ -636,6 +636,14 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
     useState(false);
   const { setLoadingComplete } = useLoading();
   const router = useRouter();
+
+  // Hydrate filters from localStorage after mount to avoid hydration mismatch
+  useEffect(() => {
+    const stored = loadFiltersFromStorage();
+    if (JSON.stringify(stored) !== JSON.stringify(getDefaultFilters())) {
+      setFilters(stored);
+    }
+  }, []);
 
   // Handler to open facility details and close filters
   const handleOpenDetails = (placeId: string) => {

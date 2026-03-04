@@ -82,3 +82,25 @@ export function updateFacilityTags(
   updateFacilityInCache(queryClient, placeId, { tags });
 }
 
+/**
+ * Remove a facility from a specific cache segment
+ * Used when a facility moves between segments (e.g., after SerpAPI enrichment)
+ */
+export function removeFacilityFromSegment(
+  queryClient: QueryClient,
+  placeId: string,
+  segment: 'serpapi' | 'background'
+) {
+  const queryCache = queryClient.getQueryCache();
+  const query = queryCache.find({ queryKey: ['facilities', segment] });
+  const currentData = query?.state.data as FacilityLightweight[] | undefined;
+
+  if (currentData && query) {
+    queryClient.setQueryData(
+      ['facilities', segment],
+      currentData.filter((f) => f.place_id !== placeId),
+      { updatedAt: query.state.dataUpdatedAt }
+    );
+  }
+}
+

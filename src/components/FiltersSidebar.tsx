@@ -183,14 +183,14 @@ export default function FiltersSidebar({
                             className={cn(
                               "text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all cursor-pointer",
                               isSelected
-                                ? "border-opacity-100"
-                                : "border-opacity-30 opacity-60 hover:opacity-100"
+                                ? ""
+                                : "bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-700"
                             )}
-                            style={{
-                              backgroundColor: isSelected ? `${tag.color}20` : `${tag.color}10`,
+                            style={isSelected ? {
+                              backgroundColor: `${tag.color}20`,
                               borderColor: tag.color,
                               color: tag.color,
-                            }}
+                            } : undefined}
                           >
                             {tag.name}
                           </button>
