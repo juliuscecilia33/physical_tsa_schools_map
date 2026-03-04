@@ -249,7 +249,7 @@ export default function CRMFacilityDetailsSidebar({
     [linkedLeads],
   );
   const leadQueries = useCloseLeadsBatch(linkedLeadIds);
-  const { data: statuses } = useCloseLeadStatuses();
+  const { data: statuses } = useCloseLeadStatuses({ enabled: !!placeId });
 
   // Fetch activities for the selected lead (when viewing lead details)
   const {

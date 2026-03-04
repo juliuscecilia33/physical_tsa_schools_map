@@ -81,9 +81,10 @@ export function useCloseUsers(params?: { _limit?: number; _skip?: number }): Use
 /**
  * Get all lead statuses (pipeline stages)
  */
-export function useCloseLeadStatuses(): UseQueryResult<CloseLeadStatus[]> {
+export function useCloseLeadStatuses(options?: { enabled?: boolean }): UseQueryResult<CloseLeadStatus[]> {
   return useQuery({
     queryKey: ['close', 'leadStatuses'],
+    enabled: options?.enabled ?? true,
     queryFn: async () => {
       const response = await fetch('/api/close/lead-statuses');
       const data: CloseApiResponse<CloseLeadStatus[]> = await response.json();
