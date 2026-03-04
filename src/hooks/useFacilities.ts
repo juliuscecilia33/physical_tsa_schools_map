@@ -181,7 +181,7 @@ async function fetchAllBackgroundFacilities(
   excludeTagIds: string[],
   signal?: AbortSignal
 ): Promise<Facility[]> {
-  const batchSize = 1000;
+  const batchSize = 500;
   let offset = 0;
   let allFacilities: Facility[] = [];
 
@@ -207,8 +207,9 @@ async function fetchAllBackgroundFacilities(
       } catch (error: any) {
         retries++;
         if (retries >= maxRetries) {
-          console.error(`Failed to fetch batch at offset ${offset} after ${maxRetries} retries:`, error);
-          throw error; // Give up after max retries
+          console.warn(`Failed to fetch background batch at offset ${offset} after ${maxRetries} retries. Returning ${allFacilities.length} facilities collected so far.`, error);
+          // Return partial results instead of throwing
+          return allFacilities;
         }
         // Exponential backoff: 1s, 2s, 4s
         const backoffMs = Math.pow(2, retries) * 1000;
@@ -294,6 +295,8 @@ export function useFacilities(): UseFacilitiesReturn {
     enabled: !isPriorityLoading, // Only start after priority load completes
     staleTime: Infinity,
     gcTime: Infinity,
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
   // Poll module-level state to sync with component during loading

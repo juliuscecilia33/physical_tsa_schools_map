@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
 
       facilities = await sql`
         SELECT * FROM get_facilities_by_tags_paginated(
-          tag_ids := ${sql.array(tagIds)}::uuid[],
+          tag_ids := ${'{' + tagIds.join(',') + '}'}::uuid[],
           offset_val := ${offset},
           limit_val := ${limit},
           include_hidden := true,
@@ -81,7 +81,7 @@ export async function GET(request: NextRequest) {
       // Non-paginated query (backward compatibility)
       facilities = await sql`
         SELECT * FROM get_facilities_by_tags(
-          tag_ids := ${sql.array(tagIds)}::uuid[],
+          tag_ids := ${'{' + tagIds.join(',') + '}'}::uuid[],
           row_limit := 20000,
           include_hidden := true,
           include_cleaned_up := true

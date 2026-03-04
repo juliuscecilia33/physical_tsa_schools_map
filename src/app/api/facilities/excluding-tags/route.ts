@@ -9,10 +9,13 @@ const gzipAsync = promisify(gzip);
 // Set maximum execution time for this route (5 minutes for batch loading)
 export const maxDuration = 300;
 
-// Initialize direct Postgres connection
+// Initialize direct Postgres connection with statement timeout
 const sql = postgres(process.env.DATABASE_URL!, {
   ssl: { rejectUnauthorized: false },
   max: 10,
+  connection: {
+    statement_timeout: 30000, // 30 seconds - fail fast rather than hang
+  },
 });
 
 export async function GET(request: NextRequest) {
@@ -56,7 +59,7 @@ export async function GET(request: NextRequest) {
     // Call RPC function with tag exclusion and pagination
     const facilities = await sql`
       SELECT * FROM get_facilities_excluding_tags_paginated(
-        exclude_tag_ids := ${sql.array(excludeTagIds)}::uuid[],
+        exclude_tag_ids := ${'{' + excludeTagIds.join(',') + '}'}::uuid[],
         offset_val := ${offset},
         limit_val := ${limit},
         include_hidden := true,
