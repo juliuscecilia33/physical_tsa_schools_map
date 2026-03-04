@@ -5,9 +5,10 @@ const URL_TEST = /^https?:\/\/\S+$/;
 
 interface NoteTextProps {
   text: string;
+  truncateUrls?: boolean;
 }
 
-const NoteText: React.FC<NoteTextProps> = ({ text }) => {
+const NoteText: React.FC<NoteTextProps> = ({ text, truncateUrls = false }) => {
   const parts = text.split(URL_SPLIT);
 
   return (
@@ -19,7 +20,7 @@ const NoteText: React.FC<NoteTextProps> = ({ text }) => {
             href={part}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-600 hover:underline break-all"
+            className={`text-blue-600 hover:underline ${truncateUrls ? 'block truncate max-w-full' : 'break-all'}`}
           >
             {part}
           </a>

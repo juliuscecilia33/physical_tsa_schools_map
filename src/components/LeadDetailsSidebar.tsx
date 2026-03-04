@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
+import NoteText from "./NoteText";
 import {
   X,
   MapPin,
@@ -14,6 +15,7 @@ import {
   AlertCircle,
   Search,
   Link2,
+  Info,
 } from "lucide-react";
 import {
   useCloseLead,
@@ -612,11 +614,13 @@ export function LeadDetailsSidebar({
                         {Object.entries(lead.custom).map(([key, value]) => (
                           <div
                             key={key}
-                            className="flex justify-between text-sm"
+                            className="flex justify-between text-sm gap-20"
                           >
-                            <span className="text-gray-600">{key}:</span>
-                            <span className="text-gray-900 font-medium">
-                              {String(value)}
+                            <span className="text-gray-600 shrink-0">
+                              {key}:
+                            </span>
+                            <span className="text-gray-900 font-medium overflow-hidden">
+                              <NoteText text={String(value)} truncateUrls />
                             </span>
                           </div>
                         ))}
@@ -673,6 +677,18 @@ export function LeadDetailsSidebar({
                               unmatchedFacilities.length}
                           </span>
                         )}
+                        {linkedFacilities.length === 0 &&
+                          unmatchedFacilities.length > 0 && (
+                            <span className="relative group">
+                              <Info className="w-4 h-4 text-blue-500 cursor-help" />
+                              <span className="hidden group-hover:block absolute left-1/2 -translate-x-1/2 top-full mt-2 w-64 p-2 text-xs text-white bg-gray-900 rounded-lg shadow-lg z-50 normal-case font-light">
+                                Link facilities to this lead to track
+                                relationships and manage your outreach. Click
+                                &quot;Link to Lead&quot; on any facility card
+                                below.
+                              </span>
+                            </span>
+                          )}
                       </h3>
                     </div>
 
@@ -863,55 +879,6 @@ export function LeadDetailsSidebar({
                     {linkedFacilities.length === 0 &&
                       unmatchedFacilities.length > 0 && (
                         <>
-                          {/* Suggested Matches Heading */}
-                          <h4 className="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-3 flex items-center gap-2">
-                            <span className="w-2 h-2 bg-gray-400 rounded-full"></span>
-                            Suggested Matches ({unmatchedFacilities.length})
-                          </h4>
-
-                          {/* Confidence Breakdown */}
-                          <div className="mb-3 flex flex-wrap gap-2 text-xs">
-                            {confidenceBreakdown.high > 0 && (
-                              <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-50 text-green-700 rounded-md font-medium border border-green-200">
-                                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                                {confidenceBreakdown.high} High Match
-                                {confidenceBreakdown.high !== 1 ? "es" : ""}
-                              </span>
-                            )}
-                            {confidenceBreakdown.medium > 0 && (
-                              <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 rounded-md font-medium border border-blue-200">
-                                <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-                                {confidenceBreakdown.medium} Name+City
-                              </span>
-                            )}
-                            {confidenceBreakdown.low > 0 && (
-                              <span className="inline-flex items-center gap-1 px-2 py-1 bg-yellow-50 text-yellow-700 rounded-md font-medium border border-yellow-200">
-                                <span className="w-2 h-2 bg-yellow-500 rounded-full"></span>
-                                {confidenceBreakdown.low} Name Match
-                                {confidenceBreakdown.low !== 1 ? "es" : ""}
-                              </span>
-                            )}
-                            {confidenceBreakdown.fuzzy > 0 && (
-                              <span className="inline-flex items-center gap-1 px-2 py-1 bg-orange-50 text-orange-700 rounded-md font-medium border border-orange-200">
-                                <span className="w-2 h-2 bg-orange-500 rounded-full"></span>
-                                {confidenceBreakdown.fuzzy} Fuzzy Match
-                                {confidenceBreakdown.fuzzy !== 1 ? "es" : ""}
-                              </span>
-                            )}
-                          </div>
-
-                          {/* Info Box */}
-                          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                            <p className="text-xs text-blue-800 flex items-start gap-2">
-                              <Link2 className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                              <span>
-                                <strong>Link facilities to this lead</strong> to
-                                track relationships and manage your outreach.
-                                Click "Link to Lead" on any facility card below.
-                              </span>
-                            </p>
-                          </div>
-
                           {/* Search Input */}
                           <div className="mb-4">
                             <div className="relative">
