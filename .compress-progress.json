@@ -1,7 +1,7 @@
 {
-  "processedCount": 1434,
-  "successCount": 1224,
-  "failedCount": 216,
+  "processedCount": 1445,
+  "successCount": 1229,
+  "failedCount": 222,
   "skippedCount": 17,
   "processedFacilityIds": [
     "2651e40a-b22d-4b23-9fd7-8ff121dfdd25",
@@ -1230,15 +1230,20 @@
     "f7e6a1cf-fbf2-491b-bee4-b445c12467da",
     "318b7006-a829-4973-bd83-1ece926d7a01",
     "16a3d7a7-b929-4379-9a38-5b1d583f76f0",
-    "c82849f3-b249-491c-b8b7-20f66569e6c5"
+    "c82849f3-b249-491c-b8b7-20f66569e6c5",
+    "093f09ef-7de8-4945-9155-d40fb50e3dd2",
+    "ce0a520d-50d7-4809-aa9b-82ced5dbec38",
+    "6adcff0b-ff97-4576-b6cb-25397e61aff7",
+    "a35603e4-e418-4b85-9da4-e7cdc3f50dab",
+    "aa4c6149-2134-4de9-a3f6-6ddc9942ed93"
   ],
-  "lastProcessedIndex": 1447,
-  "imagesProcessed": 50442,
+  "lastProcessedIndex": 1458,
+  "imagesProcessed": 50857,
   "imagesSkipped": 39,
-  "imagesFailed": 523,
-  "totalBytesBefore": 122194532682,
-  "totalBytesAfter": 48829657276,
-  "lastUpdated": "2026-03-04T03:49:47.387Z",
+  "imagesFailed": 538,
+  "totalBytesBefore": 123316408686,
+  "totalBytesAfter": 49268674820,
+  "lastUpdated": "2026-03-04T04:16:23.972Z",
   "errors": [
     {
       "facility_id": "c8861bb6-f825-4d28-a60f-695b1edfef7b",
@@ -4900,8 +4905,113 @@
       "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/793fff80-bb30-4f14-b5b8-7fe2e5eed9da/1772153338332_30.jpg",
       "error": "Failed to upload compressed image",
       "timestamp": "2026-03-04T03:44:06.339Z"
+    },
+    {
+      "facility_id": "c18f8f67-dcbd-4240-aa86-94ed5ce30541",
+      "facility_name": "D. W. Rutledge Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/c18f8f67-dcbd-4240-aa86-94ed5ce30541/1772066632461_9.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T03:59:20.143Z"
+    },
+    {
+      "facility_id": "e68497f0-d310-4484-bc99-906c2ffdb5c7",
+      "facility_name": "Stamper Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/e68497f0-d310-4484-bc99-906c2ffdb5c7/1772333469858_3.jpg",
+      "error": "Failed to upload compressed image",
+      "timestamp": "2026-03-04T04:01:14.370Z"
+    },
+    {
+      "facility_id": "e68497f0-d310-4484-bc99-906c2ffdb5c7",
+      "facility_name": "Stamper Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/e68497f0-d310-4484-bc99-906c2ffdb5c7/1772333496540_29.jpg",
+      "error": "Failed to upload compressed image",
+      "timestamp": "2026-03-04T04:02:36.272Z"
+    },
+    {
+      "facility_id": "e68497f0-d310-4484-bc99-906c2ffdb5c7",
+      "facility_name": "Stamper Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/e68497f0-d310-4484-bc99-906c2ffdb5c7/1772333502155_35.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-04T04:02:56.994Z"
+    },
+    {
+      "facility_id": "b0dbfe6b-6e29-4bdb-9805-5b51c2d5ae34",
+      "facility_name": "Los Encinos Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/b0dbfe6b-6e29-4bdb-9805-5b51c2d5ae34/1772085560523_35.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-04T04:06:06.465Z"
+    },
+    {
+      "facility_id": "07655ed4-c4d8-4db0-bf48-3e7ad99735be",
+      "facility_name": "Holford Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/07655ed4-c4d8-4db0-bf48-3e7ad99735be/1772067057176_1.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-04T04:06:21.698Z"
+    },
+    {
+      "facility_id": "1798c214-369e-4795-80bc-2f08360f0eda",
+      "facility_name": "Old Celina Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/1798c214-369e-4795-80bc-2f08360f0eda/1772082472259_5.jpg",
+      "error": "Failed to upload compressed image",
+      "timestamp": "2026-03-04T04:09:11.162Z"
+    },
+    {
+      "facility_id": "1798c214-369e-4795-80bc-2f08360f0eda",
+      "facility_name": "Old Celina Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/1798c214-369e-4795-80bc-2f08360f0eda/1772082478224_10.jpg",
+      "error": "Failed to upload compressed image",
+      "timestamp": "2026-03-04T04:10:26.117Z"
+    },
+    {
+      "facility_id": "1798c214-369e-4795-80bc-2f08360f0eda",
+      "facility_name": "Old Celina Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/1798c214-369e-4795-80bc-2f08360f0eda/1772082491014_20.jpg",
+      "error": "Failed to upload compressed image",
+      "timestamp": "2026-03-04T04:11:08.913Z"
+    },
+    {
+      "facility_id": "1798c214-369e-4795-80bc-2f08360f0eda",
+      "facility_name": "Old Celina Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/1798c214-369e-4795-80bc-2f08360f0eda/1772082508412_34.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-04T04:11:49.757Z"
+    },
+    {
+      "facility_id": "1076d53c-f876-493a-b83c-1f854abdf5e4",
+      "facility_name": "Victor Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/1076d53c-f876-493a-b83c-1f854abdf5e4/1772083830932_10.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-04T04:13:01.393Z"
+    },
+    {
+      "facility_id": "1076d53c-f876-493a-b83c-1f854abdf5e4",
+      "facility_name": "Victor Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/1076d53c-f876-493a-b83c-1f854abdf5e4/1772083836313_14.jpg",
+      "error": "Failed to upload compressed image",
+      "timestamp": "2026-03-04T04:14:11.439Z"
+    },
+    {
+      "facility_id": "1076d53c-f876-493a-b83c-1f854abdf5e4",
+      "facility_name": "Victor Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/1076d53c-f876-493a-b83c-1f854abdf5e4/1772083843547_20.jpg",
+      "error": "Failed to upload compressed image",
+      "timestamp": "2026-03-04T04:14:33.561Z"
+    },
+    {
+      "facility_id": "1076d53c-f876-493a-b83c-1f854abdf5e4",
+      "facility_name": "Victor Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/1076d53c-f876-493a-b83c-1f854abdf5e4/1772083854492_28.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-04T04:14:52.918Z"
+    },
+    {
+      "facility_id": "1076d53c-f876-493a-b83c-1f854abdf5e4",
+      "facility_name": "Victor Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/1076d53c-f876-493a-b83c-1f854abdf5e4/1772083865107_36.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-04T04:16:13.921Z"
     }
   ],
-  "deletionsSucceeded": 46807,
-  "deletionsFailed": 9
+  "deletionsSucceeded": 47220,
+  "deletionsFailed": 11
 }
