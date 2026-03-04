@@ -1180,11 +1180,11 @@ function FacilitySidebarInner({
         animate={{ x: 0 }}
         exit={{ x: "-100%" }}
         transition={{ type: "spring", damping: 25, stiffness: 200 }}
-        className="fixed top-[1vh] left-20 h-[98vh] w-full md:w-[400px] bg-white shadow-xl rounded-2xl z-50 flex flex-col overflow-hidden"
+        className="fixed top-[1vh] left-20 h-[98vh] w-full md:w-[440px] bg-white shadow-2xl rounded-2xl z-50 flex flex-col overflow-hidden font-poppins"
       >
         {/* Header with gradient */}
-        <div className="sticky top-0 bg-white z-20">
-          <div className="px-5 pt-4 pb-3 flex justify-between items-start">
+        <div className="sticky top-0 bg-white border-b border-slate-200 z-20">
+          <div className="px-6 py-4 flex justify-between items-start">
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -1192,7 +1192,7 @@ function FacilitySidebarInner({
               className="flex-1 pr-4"
             >
               <div className="flex items-center gap-2 mb-2">
-                <h2 className="text-2xl font-semibold text-slate-900 leading-tight">
+                <h2 className="text-xl font-bold text-slate-900 leading-tight">
                   {displayFacility.name}
                 </h2>
                 {displayFacility.business_status && (
@@ -1241,7 +1241,7 @@ function FacilitySidebarInner({
             </motion.div>
             <button
               onClick={onClose}
-              className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
+              className="flex-shrink-0 p-2 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
               aria-label="Close"
             >
               <X className="w-5 h-5" />
@@ -1250,7 +1250,7 @@ function FacilitySidebarInner({
         </div>
 
         {/* Content */}
-        <div ref={contentRef} className="flex-1 overflow-y-auto p-5 space-y-4">
+        <div ref={contentRef} className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
           <AnimatePresence mode="wait">
           {viewMode === "facility" ? (
           <motion.div
@@ -1259,7 +1259,7 @@ function FacilitySidebarInner({
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: -100, opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="space-y-4"
+            className="space-y-6"
           >
           {/* Photos */}
           {displayFacility.photo_references &&
