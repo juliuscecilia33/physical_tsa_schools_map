@@ -1,7 +1,7 @@
 {
-  "processedCount": 1355,
-  "successCount": 1167,
-  "failedCount": 193,
+  "processedCount": 1383,
+  "successCount": 1191,
+  "failedCount": 197,
   "skippedCount": 17,
   "processedFacilityIds": [
     "2651e40a-b22d-4b23-9fd7-8ff121dfdd25",
@@ -1173,15 +1173,39 @@
     "5c6bb272-44da-4e1f-96e5-bd6c6aea08bf",
     "e9089375-f1e9-41ac-a966-9e448a49805f",
     "5bec1890-fda7-4f26-bda3-bea5ccdd7cb0",
-    "90322259-4681-47f2-8f7d-22a97bab297e"
+    "90322259-4681-47f2-8f7d-22a97bab297e",
+    "d33d749e-57d0-489d-8dfd-d45de902e8d4",
+    "f3af241b-f791-4880-9b01-462f9193b761",
+    "3e84c380-f83f-4ff4-85dd-605f5fcba353",
+    "9d0e519b-70cd-476e-b847-59753f61561a",
+    "19547b95-34bb-41b5-8919-05c0059f5192",
+    "42cc3fbf-0403-4879-96fe-2713f21333d5",
+    "8a6fa6b8-45ba-4fab-80e2-a58e04dbf244",
+    "3c166c36-b60a-4798-85f1-c426f3d74095",
+    "227b3cd2-04a5-4194-9247-5ea91ab8e06a",
+    "e3b14889-a43a-4cfe-be44-2848fc61e583",
+    "233a16db-aae2-4f2a-b9d7-1dea3249357d",
+    "76308c46-2e06-4912-add6-77a37b79b3c8",
+    "61ec5f09-5196-4fd3-8911-537072f0a23c",
+    "570aaa1b-a27b-48f7-9995-0fd1c1a5af69",
+    "8efbd1aa-1c89-4343-987c-c3d245bea5c3",
+    "2a78fe90-0623-49d1-96cf-f517ed24d691",
+    "a5acfe06-ddeb-4f1f-b0ec-59bf27f55317",
+    "07ab8941-4ea4-41b8-8682-26c78fcc1926",
+    "b7b2d1b2-3457-40c8-99e2-555f97373b26",
+    "5d10e78e-65c2-450b-97d6-47204001cd4a",
+    "2d6000fc-14ab-427a-87b6-cb71bdfb0689",
+    "5384cb15-3d48-4ab9-9b38-777d699f7d2a",
+    "4c1d5582-6599-41c0-a1e0-a6272ac64256",
+    "295ab633-f580-4b5a-824b-2b18f2138352"
   ],
-  "lastProcessedIndex": 1368,
-  "imagesProcessed": 47574,
+  "lastProcessedIndex": 1396,
+  "imagesProcessed": 48577,
   "imagesSkipped": 39,
-  "imagesFailed": 488,
-  "totalBytesBefore": 115567599268,
-  "totalBytesAfter": 46207762600,
-  "lastUpdated": "2026-03-04T01:15:04.313Z",
+  "imagesFailed": 493,
+  "totalBytesBefore": 117700426915,
+  "totalBytesAfter": 47054422578,
+  "lastUpdated": "2026-03-04T02:03:16.899Z",
   "errors": [
     {
       "facility_id": "c8861bb6-f825-4d28-a60f-695b1edfef7b",
@@ -4598,8 +4622,43 @@
       "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/f8dabfb8-45d1-45b3-9229-bbbaa370b2d2/1772151472438_19.jpg",
       "error": "Failed to compress image",
       "timestamp": "2026-03-04T00:39:45.782Z"
+    },
+    {
+      "facility_id": "c7af5e03-9651-487c-a35e-6f5c1bfc03b0",
+      "facility_name": "Chester L Davis Sportsplex",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/c7af5e03-9651-487c-a35e-6f5c1bfc03b0/1772150110182_29.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T01:16:22.992Z"
+    },
+    {
+      "facility_id": "bf313f16-db0e-4f85-89b4-c6e734cb80d9",
+      "facility_name": "Texan Dome",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/bf313f16-db0e-4f85-89b4-c6e734cb80d9/1772150475277_28.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T01:19:45.501Z"
+    },
+    {
+      "facility_id": "f9a3a9cc-71dd-4406-9107-9c07c7b6a9d6",
+      "facility_name": "Leo Buckley Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/f9a3a9cc-71dd-4406-9107-9c07c7b6a9d6/1772138104331_12.jpg",
+      "error": "Failed to upload compressed image",
+      "timestamp": "2026-03-04T01:53:39.406Z"
+    },
+    {
+      "facility_id": "7226e075-821d-480e-9368-aeb473aa2abf",
+      "facility_name": "Holman D. Rhoton Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/7226e075-821d-480e-9368-aeb473aa2abf/1772232355703_13.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-04T02:02:03.568Z"
+    },
+    {
+      "facility_id": "7226e075-821d-480e-9368-aeb473aa2abf",
+      "facility_name": "Holman D. Rhoton Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/7226e075-821d-480e-9368-aeb473aa2abf/1772232377939_31.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T02:02:51.456Z"
     }
   ],
-  "deletionsSucceeded": 43940,
+  "deletionsSucceeded": 44943,
   "deletionsFailed": 8
 }

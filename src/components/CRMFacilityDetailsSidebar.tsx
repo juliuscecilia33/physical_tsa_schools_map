@@ -26,6 +26,9 @@ import {
   Maximize2,
   Tag,
   Map,
+  Loader2,
+  Sparkles,
+  AlertCircle,
 } from "lucide-react";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
@@ -45,6 +48,9 @@ interface CRMFacilityDetailsSidebarProps {
   placeId: string | null;
   onClose: () => void;
 }
+
+// SerpAPI Tag ID - "Scraped by SerpAPI" tag
+const SERPAPI_TAG_ID = "e326fe36-5536-4209-87ed-f99528e1d1ee";
 
 // Sport emoji mapping
 const SPORT_EMOJIS: { [key: string]: string } = {
@@ -195,6 +201,11 @@ export default function CRMFacilityDetailsSidebar({
   const [showCreateTagSection, setShowCreateTagSection] = useState(false);
   const [showManageTagsSection, setShowManageTagsSection] = useState(false);
 
+  // SerpAPI Enrichment state
+  const [isEnriching, setIsEnriching] = useState(false);
+  const [enrichmentProgress, setEnrichmentProgress] = useState<string | null>(null);
+  const [enrichmentError, setEnrichmentError] = useState<string | null>(null);
+
   // Current user state
   const [currentUser, setCurrentUser] = useState<{
     id: string;
@@ -216,6 +227,9 @@ export default function CRMFacilityDetailsSidebar({
     { name: "Indigo", value: "#6366f1" },
     { name: "Gray", value: "#6b7280" },
   ];
+
+  // Check if facility already has SerpAPI tag
+  const hasSerpApiTag = facilityTags.some(tag => tag.id === SERPAPI_TAG_ID);
 
   // Fetch current user on mount and listen to auth changes
   useEffect(() => {
@@ -712,6 +726,137 @@ export default function CRMFacilityDetailsSidebar({
     }
   };
 
+  // Enrich facility with SerpAPI data
+  const handleEnrichWithSerpApi = async () => {
+    if (!facility) return;
+
+    // Validate facility has location data
+    if (!facility.location) {
+      setEnrichmentError("Facility missing location coordinates. Cannot enrich.");
+      return;
+    }
+
+    // Parse location coordinates from PostGIS format
+    // Format: "POINT(lng lat)" or object with coordinates
+    let lat: number | null = null;
+    let lng: number | null = null;
+
+    if (typeof facility.location === 'string') {
+      // Parse PostGIS POINT format: "POINT(lng lat)"
+      const match = facility.location.match(/POINT\((-?\d+\.?\d*)\s+(-?\d+\.?\d*)\)/);
+      if (match) {
+        lng = parseFloat(match[1]);
+        lat = parseFloat(match[2]);
+      }
+    } else if (facility.location && typeof facility.location === 'object') {
+      // Handle object format
+      const loc = facility.location as any;
+      lat = loc.lat || loc.latitude || null;
+      lng = loc.lng || loc.longitude || null;
+    }
+
+    if (!lat || !lng) {
+      setEnrichmentError("Could not parse location coordinates. Cannot enrich.");
+      return;
+    }
+
+    try {
+      setIsEnriching(true);
+      setEnrichmentError(null);
+      setEnrichmentProgress("Starting enrichment...");
+
+      // Call enrichment API with SSE
+      const response = await fetch("/api/enrich-facility", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          facilityId: facility.id,
+          placeId: facility.place_id,
+          facilityName: facility.name,
+          facilityAddress: facility.address,
+          lat,
+          lng,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      // Read SSE stream
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+
+      if (reader) {
+        let buffer = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n\n");
+          buffer = lines.pop() || "";
+
+          for (const line of lines) {
+            if (line.trim()) {
+              const eventLines = line.split("\n");
+              let eventType = "";
+              let dataStr = "";
+
+              for (const eventLine of eventLines) {
+                if (eventLine.startsWith("event: ")) {
+                  eventType = eventLine.substring(7).trim();
+                } else if (eventLine.startsWith("data: ")) {
+                  dataStr = eventLine.substring(6).trim();
+                }
+              }
+
+              if (eventType && dataStr) {
+                const data = JSON.parse(dataStr);
+
+                if (eventType === "progress") {
+                  setEnrichmentProgress(data.message);
+                } else if (eventType === "complete") {
+                  setEnrichmentProgress(
+                    `✅ Enrichment complete! ${data.photosUploaded} photos, ${data.reviewsCollected} reviews collected`
+                  );
+                } else if (eventType === "error") {
+                  console.error("Enrichment error:", data.error);
+                  setEnrichmentError(data.error || "Enrichment failed");
+                  setEnrichmentProgress(null);
+                }
+              }
+            }
+          }
+        }
+
+        // Wait a moment to show the final message
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+
+        // Refetch facility data to show updates
+        await queryClient.refetchQueries({
+          queryKey: ["facility", "full", facility.place_id],
+          exact: true,
+        });
+
+        // Also invalidate facilities list
+        queryClient.invalidateQueries({
+          queryKey: ["facilities"],
+        });
+
+        // Clear progress after successful completion
+        setEnrichmentProgress(null);
+      }
+    } catch (error: any) {
+      console.error("Enrichment error:", error);
+      setEnrichmentError(error.message || "Failed to enrich facility");
+      setEnrichmentProgress(null);
+    } finally {
+      setIsEnriching(false);
+    }
+  };
+
   const getPhotoUrl = (photoReference: string, highRes: boolean = false) => {
     const maxWidth = highRes ? 1600 : 400;
     return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=${maxWidth}&photo_reference=${photoReference}&key=${process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY}`;
@@ -1115,16 +1260,41 @@ export default function CRMFacilityDetailsSidebar({
                     </div>
                   )}
 
-                  {/* View on Map Button */}
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={handleViewOnMap}
-                    className="mt-3 flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium shadow-sm transition-all cursor-pointer"
-                  >
-                    <Map className="w-4 h-4" />
-                    <span>View on Map</span>
-                  </motion.button>
+                  {/* Action Buttons */}
+                  <div className="mt-3 flex gap-2">
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={handleViewOnMap}
+                      className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium shadow-sm transition-all cursor-pointer"
+                    >
+                      <Map className="w-4 h-4" />
+                      <span>View on Map</span>
+                    </motion.button>
+
+                    {/* Enrich with SerpAPI Button - only show if not already scraped */}
+                    {!hasSerpApiTag && (
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={handleEnrichWithSerpApi}
+                        disabled={isEnriching}
+                        className="flex items-center gap-2 px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-sm font-medium shadow-sm transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isEnriching ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <span>Enriching...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="w-4 h-4" />
+                            <span>Enrich with SerpAPI</span>
+                          </>
+                        )}
+                      </motion.button>
+                    )}
+                  </div>
                 </>
               ) : null}
             </div>
@@ -1149,6 +1319,54 @@ export default function CRMFacilityDetailsSidebar({
               </div>
             ) : facility ? (
               <>
+                {/* Enrichment Progress Indicator */}
+                {isEnriching && enrichmentProgress && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-purple-50 border border-purple-200 rounded-xl p-4 mb-6"
+                  >
+                    <div className="flex items-start gap-3">
+                      <Loader2 className="w-5 h-5 text-purple-600 animate-spin flex-shrink-0 mt-0.5" />
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-purple-900 mb-1">
+                          Enriching Facility
+                        </p>
+                        <p className="text-sm text-purple-700">
+                          {enrichmentProgress}
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* Enrichment Error Display */}
+                {enrichmentError && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6"
+                  >
+                    <div className="flex items-start gap-3">
+                      <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-red-900 mb-1">
+                          Enrichment Failed
+                        </p>
+                        <p className="text-sm text-red-700 mb-3">
+                          {enrichmentError}
+                        </p>
+                        <button
+                          onClick={() => setEnrichmentError(null)}
+                          className="text-xs text-red-600 hover:text-red-700 font-medium"
+                        >
+                          Dismiss
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
                 {/* Photos - only show if no scraped photos available */}
                 {facility.photo_references &&
                 facility.photo_references.length > 0 &&

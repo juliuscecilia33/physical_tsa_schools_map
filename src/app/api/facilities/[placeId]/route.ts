@@ -40,6 +40,7 @@ export async function GET(
 
     // Transform the data to match Facility type
     const facility: Facility = {
+      id: data.id,
       place_id: data.place_id,
       name: data.name,
       sport_types: data.sport_types || [],

@@ -14,6 +14,7 @@ export interface PhotoData {
 }
 
 export interface Facility {
+  id: string; // Database UUID primary key
   place_id: string;
   name: string;
   sport_types: string[];
