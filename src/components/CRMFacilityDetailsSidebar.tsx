@@ -929,6 +929,14 @@ export default function CRMFacilityDetailsSidebar({
         // Wait a moment to show the final message
         await new Promise((resolve) => setTimeout(resolve, 1500));
 
+        // Optimistically update the CRM table with the SerpAPI tag
+        const serpApiTag = { id: SERPAPI_TAG_ID, name: "Scraped by SerpAPI", color: "#8b5cf6", description: null };
+        if (!facilityTags.some((t) => t.id === SERPAPI_TAG_ID)) {
+          const updatedTags = [...facilityTags, serpApiTag];
+          setFacilityTags(updatedTags);
+          updateFacilityTags(queryClient, facility.place_id, updatedTags);
+        }
+
         // Refetch facility data to show updates
         await queryClient.refetchQueries({
           queryKey: ["facility", "full", facility.place_id],
