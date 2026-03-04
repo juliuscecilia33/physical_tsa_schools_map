@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { CloseActivity } from '@/types/close';
+import { useState } from "react";
+import { CloseActivity } from "@/types/close";
 import {
   Phone,
   PhoneIncoming,
@@ -15,7 +15,7 @@ import {
   ArrowDownToLine,
   ArrowUpFromLine,
   Circle,
-} from 'lucide-react';
+} from "lucide-react";
 
 interface CloseActivityTimelineProps {
   activities: CloseActivity[];
@@ -24,27 +24,27 @@ interface CloseActivityTimelineProps {
 
 function getActivityIcon(activity: CloseActivity) {
   switch (activity.type) {
-    case 'call':
-      return activity.call?.direction === 'inbound' ? (
+    case "call":
+      return activity.call?.direction === "inbound" ? (
         <PhoneIncoming className="w-4 h-4" />
       ) : (
         <PhoneOutgoing className="w-4 h-4" />
       );
-    case 'email':
-      return activity.email?.direction === 'incoming' ? (
+    case "email":
+      return activity.email?.direction === "incoming" ? (
         <ArrowDownToLine className="w-4 h-4" />
       ) : (
         <ArrowUpFromLine className="w-4 h-4" />
       );
-    case 'note':
+    case "note":
       return <FileText className="w-4 h-4" />;
-    case 'task':
+    case "task":
       return activity.task?.is_complete ? (
         <CheckCircle2 className="w-4 h-4" />
       ) : (
         <Circle className="w-4 h-4" />
       );
-    case 'opportunity':
+    case "opportunity":
       return <DollarSign className="w-4 h-4" />;
     default:
       return <Circle className="w-4 h-4" />;
@@ -53,41 +53,41 @@ function getActivityIcon(activity: CloseActivity) {
 
 function getActivityColor(activity: CloseActivity): string {
   switch (activity.type) {
-    case 'call':
-      return activity.call?.direction === 'inbound'
-        ? 'bg-blue-100 text-blue-600 border-blue-200'
-        : 'bg-green-100 text-green-600 border-green-200';
-    case 'email':
-      return 'bg-purple-100 text-purple-600 border-purple-200';
-    case 'note':
-      return 'bg-yellow-100 text-yellow-700 border-yellow-200';
-    case 'task':
+    case "call":
+      return activity.call?.direction === "inbound"
+        ? "bg-blue-100 text-blue-600 border-blue-200"
+        : "bg-green-100 text-green-600 border-green-200";
+    case "email":
+      return "bg-purple-100 text-purple-600 border-purple-200";
+    case "note":
+      return "bg-yellow-100 text-yellow-700 border-yellow-200";
+    case "task":
       return activity.task?.is_complete
-        ? 'bg-emerald-100 text-emerald-600 border-emerald-200'
-        : 'bg-gray-100 text-gray-600 border-gray-200';
-    case 'opportunity':
-      return 'bg-orange-100 text-orange-600 border-orange-200';
+        ? "bg-emerald-100 text-emerald-600 border-emerald-200"
+        : "bg-gray-100 text-gray-600 border-gray-200";
+    case "opportunity":
+      return "bg-orange-100 text-orange-600 border-orange-200";
     default:
-      return 'bg-gray-100 text-gray-600 border-gray-200';
+      return "bg-gray-100 text-gray-600 border-gray-200";
   }
 }
 
 function formatDuration(seconds: number | undefined): string {
-  if (!seconds) return 'N/A';
+  if (!seconds) return "N/A";
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;
-  return `${mins}:${secs.toString().padStart(2, '0')}`;
+  return `${mins}:${secs.toString().padStart(2, "0")}`;
 }
 
 function ActivityItem({ activity }: { activity: CloseActivity }) {
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <div className="relative pl-8 pb-6 border-l-2 border-gray-200 last:border-l-0 last:pb-0">
+    <div className="relative pl-8 pb-6 border-l-1 border-gray-200 last:border-l-0 last:pb-0">
       {/* Icon */}
       <div
-        className={`absolute left-0 -ml-[17px] w-8 h-8 rounded-full border-2 flex items-center justify-center ${getActivityColor(
-          activity
+        className={`absolute left-1 top-1/2 -translate-y-1/2 -ml-[17px] w-8 h-8 rounded-full border-2 flex items-center justify-center ${getActivityColor(
+          activity,
         )}`}
       >
         {getActivityIcon(activity)}
@@ -101,7 +101,9 @@ function ActivityItem({ activity }: { activity: CloseActivity }) {
         {/* Header */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
-            <h4 className="font-semibold text-gray-900 text-sm">{activity.title}</h4>
+            <h4 className="font-semibold text-gray-900 text-sm">
+              {activity.title}
+            </h4>
             <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-gray-500">
               <span>{new Date(activity.date_created).toLocaleString()}</span>
               {activity.user_name && (
@@ -114,7 +116,7 @@ function ActivityItem({ activity }: { activity: CloseActivity }) {
           </div>
           <span
             className={`text-xs px-2 py-1 rounded-full font-medium capitalize ${getActivityColor(
-              activity
+              activity,
             )}`}
           >
             {activity.type}
@@ -129,7 +131,7 @@ function ActivityItem({ activity }: { activity: CloseActivity }) {
         )}
 
         {/* Type-specific details */}
-        {activity.type === 'call' && activity.call && (
+        {activity.type === "call" && activity.call && (
           <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-gray-600">
             {activity.call.duration !== undefined && (
               <span className="flex items-center gap-1">
@@ -139,7 +141,7 @@ function ActivityItem({ activity }: { activity: CloseActivity }) {
             )}
             {activity.call.disposition && (
               <span className="px-2 py-0.5 bg-gray-100 rounded capitalize">
-                {activity.call.disposition.replace('-', ' ')}
+                {activity.call.disposition.replace("-", " ")}
               </span>
             )}
             {activity.call.phone && (
@@ -152,12 +154,16 @@ function ActivityItem({ activity }: { activity: CloseActivity }) {
         {expanded && (
           <div className="mt-4 pt-4 border-t border-gray-100 space-y-3">
             {/* Call details */}
-            {activity.type === 'call' && activity.call && (
+            {activity.type === "call" && activity.call && (
               <>
                 {activity.call.note && (
                   <div>
-                    <p className="text-xs font-medium text-gray-700 mb-1">Notes:</p>
-                    <p className="text-sm text-gray-600">{activity.call.note}</p>
+                    <p className="text-xs font-medium text-gray-700 mb-1">
+                      Notes:
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      {activity.call.note}
+                    </p>
                   </div>
                 )}
                 {activity.call.recording_url && (
@@ -176,11 +182,14 @@ function ActivityItem({ activity }: { activity: CloseActivity }) {
             )}
 
             {/* Email details */}
-            {activity.type === 'email' && activity.email && (
+            {activity.type === "email" && activity.email && (
               <div>
-                {(activity.email.latest_normalized_subject || activity.email.subject) && (
+                {(activity.email.latest_normalized_subject ||
+                  activity.email.subject) && (
                   <p className="text-xs font-medium text-gray-700 mb-1">
-                    Subject: {activity.email.latest_normalized_subject || activity.email.subject}
+                    Subject:{" "}
+                    {activity.email.latest_normalized_subject ||
+                      activity.email.subject}
                   </p>
                 )}
                 {(activity.email.preview || activity.email.snippet) && (
@@ -192,7 +201,7 @@ function ActivityItem({ activity }: { activity: CloseActivity }) {
             )}
 
             {/* Note details */}
-            {activity.type === 'note' && activity.note && (
+            {activity.type === "note" && activity.note && (
               <div>
                 <p className="text-sm text-gray-700 whitespace-pre-wrap">
                   {activity.note.note}
@@ -201,7 +210,7 @@ function ActivityItem({ activity }: { activity: CloseActivity }) {
             )}
 
             {/* Task details */}
-            {activity.type === 'task' && activity.task && (
+            {activity.type === "task" && activity.task && (
               <div>
                 <p className="text-sm text-gray-700">{activity.task.text}</p>
                 {activity.task.due_date && (
@@ -213,7 +222,7 @@ function ActivityItem({ activity }: { activity: CloseActivity }) {
             )}
 
             {/* Opportunity details */}
-            {activity.type === 'opportunity' && activity.opportunity && (
+            {activity.type === "opportunity" && activity.opportunity && (
               <div className="space-y-1 text-sm">
                 {activity.opportunity.value_formatted && (
                   <p className="font-semibold text-gray-900">
@@ -231,7 +240,9 @@ function ActivityItem({ activity }: { activity: CloseActivity }) {
                   </p>
                 )}
                 {activity.opportunity.note && (
-                  <p className="text-gray-700 mt-2">{activity.opportunity.note}</p>
+                  <p className="text-gray-700 mt-2">
+                    {activity.opportunity.note}
+                  </p>
                 )}
               </div>
             )}
@@ -246,20 +257,25 @@ export function CloseActivityTimeline({
   activities,
   isLoading,
 }: CloseActivityTimelineProps) {
-  const [filter, setFilter] = useState<string>('all');
+  const [filter, setFilter] = useState<string>("all");
+  const [showAll, setShowAll] = useState(false);
 
   const filteredActivities =
-    filter === 'all'
-      ? activities
-      : activities.filter((a) => a.type === filter);
+    filter === "all" ? activities : activities.filter((a) => a.type === filter);
+
+  const INITIAL_DISPLAY_COUNT = 5;
+  const activitiesToDisplay = showAll
+    ? filteredActivities
+    : filteredActivities.slice(0, INITIAL_DISPLAY_COUNT);
+  const hasMore = filteredActivities.length > INITIAL_DISPLAY_COUNT;
 
   const activityCounts = {
     all: activities.length,
-    call: activities.filter((a) => a.type === 'call').length,
-    email: activities.filter((a) => a.type === 'email').length,
-    note: activities.filter((a) => a.type === 'note').length,
-    task: activities.filter((a) => a.type === 'task').length,
-    opportunity: activities.filter((a) => a.type === 'opportunity').length,
+    call: activities.filter((a) => a.type === "call").length,
+    email: activities.filter((a) => a.type === "email").length,
+    note: activities.filter((a) => a.type === "note").length,
+    task: activities.filter((a) => a.type === "task").length,
+    opportunity: activities.filter((a) => a.type === "opportunity").length,
   };
 
   if (isLoading) {
@@ -284,16 +300,16 @@ export function CloseActivityTimeline({
       {/* Filter buttons */}
       <div className="flex flex-wrap gap-2">
         {[
-          { id: 'all', label: 'All', icon: Circle },
-          { id: 'call', label: 'Calls', icon: Phone },
-          { id: 'email', label: 'Emails', icon: Mail },
-          { id: 'note', label: 'Notes', icon: FileText },
-          { id: 'task', label: 'Tasks', icon: CheckCircle2 },
-          { id: 'opportunity', label: 'Opportunities', icon: DollarSign },
+          { id: "all", label: "All", icon: Circle },
+          { id: "call", label: "Calls", icon: Phone },
+          { id: "email", label: "Emails", icon: Mail },
+          { id: "note", label: "Notes", icon: FileText },
+          { id: "task", label: "Tasks", icon: CheckCircle2 },
+          { id: "opportunity", label: "Opportunities", icon: DollarSign },
         ].map((btn) => {
           const Icon = btn.icon;
           const count = activityCounts[btn.id as keyof typeof activityCounts];
-          if (count === 0 && btn.id !== 'all') return null;
+          if (count === 0 && btn.id !== "all") return null;
 
           return (
             <button
@@ -301,8 +317,8 @@ export function CloseActivityTimeline({
               onClick={() => setFilter(btn.id)}
               className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors ${
                 filter === btn.id
-                  ? 'bg-blue-50 border-blue-200 text-blue-700'
-                  : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                  ? "bg-blue-50 border-blue-200 text-blue-700"
+                  : "bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
               }`}
             >
               <Icon className="w-4 h-4" />
@@ -322,9 +338,23 @@ export function CloseActivityTimeline({
             <p className="text-sm">No {filter} activities found</p>
           </div>
         ) : (
-          filteredActivities.map((activity) => (
-            <ActivityItem key={activity.id} activity={activity} />
-          ))
+          <>
+            {activitiesToDisplay.map((activity) => (
+              <ActivityItem key={activity.id} activity={activity} />
+            ))}
+            {hasMore && (
+              <div className="flex justify-center pt-4">
+                <button
+                  onClick={() => setShowAll(!showAll)}
+                  className="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors"
+                >
+                  {showAll
+                    ? "Show Less"
+                    : `Show More (${filteredActivities.length - INITIAL_DISPLAY_COUNT} more)`}
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
