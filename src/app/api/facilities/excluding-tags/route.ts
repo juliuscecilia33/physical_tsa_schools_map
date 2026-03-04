@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import postgres from "postgres";
+import { gzip } from "zlib";
+import { promisify } from "util";
 import { FacilityLightweight } from "@/types/facility";
+
+const gzipAsync = promisify(gzip);
+
+// Set maximum execution time for this route (5 minutes for batch loading)
+export const maxDuration = 300;
 
 // Initialize direct Postgres connection
 const sql = postgres(process.env.DATABASE_URL!, {
@@ -94,21 +101,31 @@ export async function GET(request: NextRequest) {
       total_photo_count: facility.total_photo_count,
     }));
 
-    // Return with cache headers and pagination metadata
-    return NextResponse.json(
-      {
-        facilities: transformedFacilities,
-        count: transformedFacilities.length,
-        offset,
-        limit,
-        hasMore: transformedFacilities.length === limit, // If we got full limit, there might be more
-      },
-      {
-        headers: {
-          "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
-        },
-      }
+    // Prepare response data
+    const responseData = {
+      facilities: transformedFacilities,
+      count: transformedFacilities.length,
+      offset,
+      limit,
+      hasMore: transformedFacilities.length === limit, // If we got full limit, there might be more
+    };
+
+    // Compress response with gzip
+    const jsonString = JSON.stringify(responseData);
+    const compressed = await gzipAsync(jsonString);
+
+    console.log(
+      `Compression: ${jsonString.length} bytes → ${compressed.length} bytes (${((compressed.length / jsonString.length) * 100).toFixed(1)}%)`
     );
+
+    // Return compressed response with appropriate headers
+    return new Response(compressed, {
+      headers: {
+        "Content-Type": "application/json",
+        "Content-Encoding": "gzip",
+        "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
+      },
+    });
   } catch (error: any) {
     console.error("Excluding-tags facilities API error:", error);
     return NextResponse.json(

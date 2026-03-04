@@ -42,25 +42,19 @@ export default function MapView({ isVisible }: { isVisible: boolean }) {
     priorityFacilities,
     isPriorityLoading,
     backgroundLoadingComplete,
+    priorityLoadingProgress,
     isError,
     error,
   } = useFacilities();
 
-  // Update progress based on two-phase loading
+  // Update progress based on two-phase loading with batched priority
   useEffect(() => {
     if (isPriorityLoading) {
-      // Phase 1: Priority loading (0-90%)
-      setProgress(0);
-      const interval = setInterval(() => {
-        setProgress((prev) => {
-          if (prev >= 85) {
-            clearInterval(interval);
-            return 85;
-          }
-          return prev + 3;
-        });
-      }, 50);
-      return () => clearInterval(interval);
+      // Phase 1: Priority loading with batching (0-90%)
+      // Show incremental progress based on actual loaded facilities
+      const estimatedTotal = 2200; // Approximate total priority facilities
+      const progressPercent = Math.min(85, (priorityLoadingProgress / estimatedTotal) * 85);
+      setProgress(progressPercent);
     } else if (!backgroundLoadingComplete) {
       // Phase 1 complete, jump to 90% and show UI
       setProgress(90);
@@ -70,7 +64,7 @@ export default function MapView({ isVisible }: { isVisible: boolean }) {
       setProgress(100);
       setLoadingComplete();
     }
-  }, [isPriorityLoading, backgroundLoadingComplete, setLoadingComplete, setPriorityLoadComplete]);
+  }, [isPriorityLoading, priorityLoadingProgress, backgroundLoadingComplete, setLoadingComplete, setPriorityLoadComplete]);
 
   // Optimistic update for facility hidden status
   // This will be handled by cache invalidation later
@@ -79,17 +73,21 @@ export default function MapView({ isVisible }: { isVisible: boolean }) {
     console.log(`Facility ${place_id} hidden status changed to ${hidden}`);
   };
 
-  // Show loading state with progress bar (only for priority loading phase)
-  if (isPriorityLoading || progress < 90) {
-    const totalCount = priorityFacilities.length > 0 ? priorityFacilities.length : null;
-    const loadedCount = totalCount ? Math.floor(totalCount * (progress / 100)) : 0;
+  // Show loading state with progress bar until first batch loads
+  // Show UI after first batch (500 facilities) for faster perceived load time
+  const minFacilitiesForUI = 500;
+  const shouldShowLoading = isPriorityLoading && priorityFacilities.length < minFacilitiesForUI;
+
+  if (shouldShowLoading) {
+    const loadedCount = priorityLoadingProgress;
+    const estimatedTotal = 2200; // Approximate total priority facilities
 
     return (
       <div className={`fixed inset-0 flex items-center justify-center bg-gray-100 z-[100] ${!isVisible ? 'hidden' : ''}`}>
         <ProgressBar
           progress={progress}
           loadedCount={loadedCount}
-          totalCount={totalCount}
+          totalCount={estimatedTotal}
         />
       </div>
     );

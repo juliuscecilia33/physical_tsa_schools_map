@@ -1,7 +1,7 @@
 {
-  "processedCount": 1319,
-  "successCount": 1133,
-  "failedCount": 191,
+  "processedCount": 1352,
+  "successCount": 1164,
+  "failedCount": 193,
   "skippedCount": 17,
   "processedFacilityIds": [
     "2651e40a-b22d-4b23-9fd7-8ff121dfdd25",
@@ -1139,15 +1139,46 @@
     "f7ef8d3d-d02a-4813-9db9-86142bd97b2a",
     "b9f8b516-ab93-408e-bb65-a39601c821bc",
     "22ee68b4-02a9-49d3-8f0b-5726fea54c29",
-    "a9ce1230-fcd8-40a8-9635-b0e8d272b7c5"
+    "a9ce1230-fcd8-40a8-9635-b0e8d272b7c5",
+    "6235f086-e586-4ea7-baca-dcf530f59b1b",
+    "809c1166-9b43-42d3-a6e4-649aabaf830c",
+    "89792e7e-444a-404e-8541-9459a301b0e6",
+    "df808e3a-4b81-4190-8f82-2a75e2ad8f75",
+    "e1381f19-b3eb-434a-a7cb-c4d909f3d150",
+    "a577879d-4d1a-4519-939f-d23ca98266f5",
+    "df07e4b5-40ca-435e-a5bd-e485496b9dc8",
+    "b0f36f74-07d7-43eb-9e1f-2c7b31c839ea",
+    "e1b4c369-d269-417b-a926-6d4abee9e290",
+    "8170fd2a-0ee8-4bd5-9646-4a7a9dfba8ec",
+    "b32f7c62-bed2-4e7e-ac78-74d31bf2b125",
+    "54f16b82-3038-4323-a80c-e0bc13355fd3",
+    "ca3e7f52-2099-428c-9a4b-1f8ee2948a64",
+    "17768879-10e1-47bf-b1a1-2571389c685c",
+    "c834a6bf-ff73-4e74-acdb-8e64460361bd",
+    "1e5cd5de-6634-47db-bcd1-33bb26025efc",
+    "083a7a43-01f2-47d6-8990-5f3ce78cb4d1",
+    "fbc05424-b047-4461-b754-ef46d236747a",
+    "3c8bbe8f-8b06-41af-b420-2476a8264369",
+    "634c31dd-159f-4192-9ca2-0a1fb2a8c110",
+    "56468509-044a-4954-8b44-817a41f06b33",
+    "814dd8f7-0c71-4730-bd74-e62afcca0e17",
+    "3ada22e2-9d50-4485-8d7f-ba9d72cdc9e9",
+    "589aa6a6-ea6b-430d-97d4-af51efe78b70",
+    "91867b7d-58fa-41dd-8278-112e91848ee7",
+    "f30608c9-7900-4d95-9c7b-f7f7484b5d26",
+    "e6fa149f-3276-4472-8ffa-091915363676",
+    "4462fcf5-0a49-490d-b9c8-d1f3d3f6f00c",
+    "0ba78bc4-7d4d-4055-be56-6e5d2d19fde0",
+    "16cb7ef4-d09a-442f-bd3d-0418ea46a807",
+    "5c6bb272-44da-4e1f-96e5-bd6c6aea08bf"
   ],
-  "lastProcessedIndex": 1332,
-  "imagesProcessed": 46272,
+  "lastProcessedIndex": 1365,
+  "imagesProcessed": 47457,
   "imagesSkipped": 39,
-  "imagesFailed": 484,
-  "totalBytesBefore": 112252166589,
-  "totalBytesAfter": 44818009348,
-  "lastUpdated": "2026-03-04T00:12:26.009Z",
+  "imagesFailed": 488,
+  "totalBytesBefore": 115217326566,
+  "totalBytesAfter": 46030784596,
+  "lastUpdated": "2026-03-04T01:09:34.831Z",
   "errors": [
     {
       "facility_id": "c8861bb6-f825-4d28-a60f-695b1edfef7b",
@@ -4536,8 +4567,36 @@
       "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4ae443c9-198a-4434-b838-c779af977390/1772147812638_29.jpg",
       "error": "Failed to download image",
       "timestamp": "2026-03-03T23:52:59.317Z"
+    },
+    {
+      "facility_id": "06471286-d634-4805-a316-001b01444e93",
+      "facility_name": "David G Burnet Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/06471286-d634-4805-a316-001b01444e93/1772234901633_25.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T00:17:24.019Z"
+    },
+    {
+      "facility_id": "f8dabfb8-45d1-45b3-9229-bbbaa370b2d2",
+      "facility_name": "Club At New Territory",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/f8dabfb8-45d1-45b3-9229-bbbaa370b2d2/1772151453049_3.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T00:39:10.339Z"
+    },
+    {
+      "facility_id": "f8dabfb8-45d1-45b3-9229-bbbaa370b2d2",
+      "facility_name": "Club At New Territory",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/f8dabfb8-45d1-45b3-9229-bbbaa370b2d2/1772151465588_13.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T00:39:33.365Z"
+    },
+    {
+      "facility_id": "f8dabfb8-45d1-45b3-9229-bbbaa370b2d2",
+      "facility_name": "Club At New Territory",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/f8dabfb8-45d1-45b3-9229-bbbaa370b2d2/1772151472438_19.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T00:39:45.782Z"
     }
   ],
-  "deletionsSucceeded": 42638,
+  "deletionsSucceeded": 43823,
   "deletionsFailed": 8
 }

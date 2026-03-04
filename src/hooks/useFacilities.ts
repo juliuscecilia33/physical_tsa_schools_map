@@ -7,10 +7,11 @@ import { Facility } from "@/types/facility";
 // SerpAPI tag ID for priority loading
 const SERPAPI_TAG_ID = 'e326fe36-5536-4209-87ed-f99528e1d1ee';
 
-// Module-level progress callback for background loading
-let currentProgressCallback: ((count: number) => void) | null = null;
+// Module-level progress callbacks for loading
+let currentPriorityProgressCallback: ((count: number) => void) | null = null;
+let currentBackgroundProgressCallback: ((count: number) => void) | null = null;
 
-// Fetch facilities by tag IDs
+// Fetch facilities by tag IDs (non-paginated - for backward compatibility)
 async function fetchFacilitiesByTags(tagIds: string[]): Promise<Facility[]> {
   const response = await fetch(`/api/facilities/by-tag?tagIds=${tagIds.join(',')}`);
 
@@ -22,25 +23,157 @@ async function fetchFacilitiesByTags(tagIds: string[]): Promise<Facility[]> {
   return data.facilities as Facility[];
 }
 
+// Fetch facilities by tag IDs (paginated)
+async function fetchFacilitiesByTagsPaginated(
+  tagIds: string[],
+  offset: number,
+  limit: number,
+  signal?: AbortSignal
+): Promise<{ facilities: Facility[]; hasMore: boolean }> {
+  // Create timeout controller (60 seconds per batch)
+  const timeoutController = new AbortController();
+  const timeoutId = setTimeout(() => timeoutController.abort(), 60000);
+
+  // Combine external signal with timeout signal
+  const combinedSignal = signal || timeoutController.signal;
+
+  try {
+    const response = await fetch(
+      `/api/facilities/by-tag?tagIds=${tagIds.join(',')}&offset=${offset}&limit=${limit}`,
+      { signal: combinedSignal }
+    );
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch facilities by tags: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return {
+      facilities: data.facilities as Facility[],
+      hasMore: data.hasMore || false,
+    };
+  } catch (error: any) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      throw new Error('Request timeout after 60 seconds');
+    }
+    throw error;
+  }
+}
+
 // Fetch facilities excluding specific tag IDs (paginated)
 async function fetchFacilitiesExcludingTags(
   excludeTagIds: string[],
   offset: number,
-  limit: number
+  limit: number,
+  signal?: AbortSignal
 ): Promise<{ facilities: Facility[]; hasMore: boolean }> {
-  const response = await fetch(
-    `/api/facilities/excluding-tags?excludeTagIds=${excludeTagIds.join(',')}&offset=${offset}&limit=${limit}`
-  );
+  // Create timeout controller (60 seconds per batch)
+  const timeoutController = new AbortController();
+  const timeoutId = setTimeout(() => timeoutController.abort(), 60000);
 
-  if (!response.ok) {
-    throw new Error(`Failed to fetch facilities excluding tags: ${response.statusText}`);
+  // Combine external signal with timeout signal
+  const combinedSignal = signal || timeoutController.signal;
+
+  try {
+    const response = await fetch(
+      `/api/facilities/excluding-tags?excludeTagIds=${excludeTagIds.join(',')}&offset=${offset}&limit=${limit}`,
+      { signal: combinedSignal }
+    );
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch facilities excluding tags: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return {
+      facilities: data.facilities as Facility[],
+      hasMore: data.hasMore || false,
+    };
+  } catch (error: any) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      throw new Error('Request timeout after 60 seconds');
+    }
+    throw error;
+  }
+}
+
+// Fetch all priority facilities in batches (used by React Query)
+async function fetchAllPriorityFacilities(
+  tagIds: string[],
+  signal?: AbortSignal
+): Promise<Facility[]> {
+  const batchSize = 500;
+  let offset = 0;
+  let allFacilities: Facility[] = [];
+
+  while (true) {
+    if (signal?.aborted) {
+      throw new Error('Priority loading aborted');
+    }
+
+    // Retry logic with exponential backoff
+    let retries = 0;
+    const maxRetries = 3;
+    let batchResult: { facilities: Facility[]; hasMore: boolean } | null = null;
+
+    while (retries < maxRetries) {
+      try {
+        batchResult = await fetchFacilitiesByTagsPaginated(
+          tagIds,
+          offset,
+          batchSize,
+          signal
+        );
+        break; // Success, exit retry loop
+      } catch (error: any) {
+        retries++;
+        if (retries >= maxRetries) {
+          console.error(`Failed to fetch priority batch at offset ${offset} after ${maxRetries} retries:`, error);
+          throw error; // Give up after max retries
+        }
+        // Exponential backoff: 1s, 2s, 4s
+        const backoffMs = Math.pow(2, retries) * 1000;
+        console.warn(`Priority batch fetch failed at offset ${offset}, retry ${retries}/${maxRetries} in ${backoffMs}ms:`, error.message);
+        await new Promise(resolve => setTimeout(resolve, backoffMs));
+      }
+    }
+
+    if (!batchResult) {
+      throw new Error('Failed to fetch priority batch after retries');
+    }
+
+    const { facilities, hasMore } = batchResult;
+
+    allFacilities = [...allFacilities, ...facilities];
+
+    // Call progress callback if available
+    if (currentPriorityProgressCallback) {
+      currentPriorityProgressCallback(allFacilities.length);
+    }
+
+    console.log(
+      `Priority batch loaded: ${facilities.length} facilities (offset: ${offset})`
+    );
+
+    if (!hasMore) {
+      console.log(
+        `Priority loading complete. Total: ${allFacilities.length} facilities`
+      );
+      break;
+    }
+
+    offset += batchSize;
+    // Add small delay between batches to not overwhelm the server
+    await new Promise(resolve => setTimeout(resolve, 100));
   }
 
-  const data = await response.json();
-  return {
-    facilities: data.facilities as Facility[],
-    hasMore: data.hasMore || false,
-  };
+  return allFacilities;
 }
 
 // Fetch all background facilities in batches (used by React Query)
@@ -57,17 +190,44 @@ async function fetchAllBackgroundFacilities(
       throw new Error('Background loading aborted');
     }
 
-    const { facilities, hasMore } = await fetchFacilitiesExcludingTags(
-      excludeTagIds,
-      offset,
-      batchSize
-    );
+    // Retry logic with exponential backoff
+    let retries = 0;
+    const maxRetries = 3;
+    let batchResult: { facilities: Facility[]; hasMore: boolean } | null = null;
+
+    while (retries < maxRetries) {
+      try {
+        batchResult = await fetchFacilitiesExcludingTags(
+          excludeTagIds,
+          offset,
+          batchSize,
+          signal
+        );
+        break; // Success, exit retry loop
+      } catch (error: any) {
+        retries++;
+        if (retries >= maxRetries) {
+          console.error(`Failed to fetch batch at offset ${offset} after ${maxRetries} retries:`, error);
+          throw error; // Give up after max retries
+        }
+        // Exponential backoff: 1s, 2s, 4s
+        const backoffMs = Math.pow(2, retries) * 1000;
+        console.warn(`Batch fetch failed at offset ${offset}, retry ${retries}/${maxRetries} in ${backoffMs}ms:`, error.message);
+        await new Promise(resolve => setTimeout(resolve, backoffMs));
+      }
+    }
+
+    if (!batchResult) {
+      throw new Error('Failed to fetch batch after retries');
+    }
+
+    const { facilities, hasMore } = batchResult;
 
     allFacilities = [...allFacilities, ...facilities];
 
     // Call progress callback if available
-    if (currentProgressCallback) {
-      currentProgressCallback(allFacilities.length);
+    if (currentBackgroundProgressCallback) {
+      currentBackgroundProgressCallback(allFacilities.length);
     }
 
     console.log(
@@ -96,6 +256,7 @@ export interface UseFacilitiesReturn {
   isPriorityLoading: boolean;
   isBackgroundLoading: boolean;
   backgroundLoadingComplete: boolean;
+  priorityLoadingProgress: number;
   backgroundLoadingProgress: number;
   isError: boolean;
   error: Error | null;
@@ -107,20 +268,25 @@ export interface UseFacilitiesReturn {
  * Phase 2: Background batch loading (excluding SerpAPI tag)
  */
 export function useFacilities(): UseFacilitiesReturn {
-  // Track background loading progress (incremental count)
+  // Track loading progress (incremental counts)
+  const [priorityLoadingProgress, setPriorityLoadingProgress] = useState(0);
   const [backgroundLoadingProgress, setBackgroundLoadingProgress] = useState(0);
 
-  // Set up progress callback for background loading
+  // Set up progress callbacks for both loading phases
   useEffect(() => {
-    currentProgressCallback = (count: number) => {
+    currentPriorityProgressCallback = (count: number) => {
+      setPriorityLoadingProgress(count);
+    };
+    currentBackgroundProgressCallback = (count: number) => {
       setBackgroundLoadingProgress(count);
     };
     return () => {
-      currentProgressCallback = null;
+      currentPriorityProgressCallback = null;
+      currentBackgroundProgressCallback = null;
     };
   }, []);
 
-  // Phase 1: Fetch SerpAPI-tagged facilities immediately (priority load)
+  // Phase 1: Fetch SerpAPI-tagged facilities in batches (priority load)
   const {
     data: priorityFacilities = [],
     isLoading: isPriorityLoading,
@@ -128,7 +294,7 @@ export function useFacilities(): UseFacilitiesReturn {
     error,
   } = useQuery({
     queryKey: ['facilities', 'serpapi'],
-    queryFn: () => fetchFacilitiesByTags([SERPAPI_TAG_ID]),
+    queryFn: ({ signal }) => fetchAllPriorityFacilities([SERPAPI_TAG_ID], signal),
     staleTime: Infinity,
     gcTime: Infinity,
   });
@@ -167,6 +333,7 @@ export function useFacilities(): UseFacilitiesReturn {
     isPriorityLoading,
     isBackgroundLoading,
     backgroundLoadingComplete,
+    priorityLoadingProgress,
     backgroundLoadingProgress,
     isError,
     error,

@@ -665,6 +665,7 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
     isPriorityLoading,
     isBackgroundLoading,
     backgroundLoadingComplete,
+    priorityLoadingProgress,
     backgroundLoadingProgress,
     isError,
     error,
@@ -789,9 +790,12 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
   const facilitiesWithNotes = facilities.filter((f) => f.has_notes).length;
 
   // Calculate display count for "Total Facilities" card
-  // During background loading, show priority count + progress
-  // After loading completes, show actual total
-  const displayTotalFacilities = isBackgroundLoading
+  // During priority loading: show incremental priority progress
+  // During background loading: show current facilities + background progress
+  // After loading completes: show actual total
+  const displayTotalFacilities = isPriorityLoading
+    ? priorityLoadingProgress
+    : isBackgroundLoading
     ? facilities.length + backgroundLoadingProgress
     : facilities.length;
 
@@ -868,8 +872,17 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
               {/* Toolbar */}
               <div className="flex flex-col sm:flex-row justify-between gap-4 items-center">
                 <div className="flex items-center gap-3">
+                  {/* Priority loading indicator */}
+                  {isPriorityLoading && (
+                    <div className="text-sm text-slate-600 font-medium">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg border border-blue-200">
+                        <div className="animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-blue-600"></div>
+                        Loading priority facilities... ({priorityLoadingProgress.toLocaleString()} loaded)
+                      </span>
+                    </div>
+                  )}
                   {/* Background loading indicator */}
-                  {isBackgroundLoading && (
+                  {!isPriorityLoading && isBackgroundLoading && (
                     <div className="text-sm text-slate-600 font-medium">
                       <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg border border-blue-200">
                         <div className="animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-blue-600"></div>
@@ -878,7 +891,7 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
                     </div>
                   )}
                   {/* Active filters indicator */}
-                  {!isBackgroundLoading && activeFilterCount > 0 && (
+                  {!isPriorityLoading && !isBackgroundLoading && activeFilterCount > 0 && (
                     <div className="text-sm text-slate-600 font-medium">
                       <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg border border-blue-200">
                         <Filter className="h-3.5 w-3.5" />
@@ -887,7 +900,7 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
                       </span>
                     </div>
                   )}
-                  {!isBackgroundLoading && activeFilterCount === 0 && (
+                  {!isPriorityLoading && !isBackgroundLoading && activeFilterCount === 0 && (
                     <div className="text-sm text-slate-500 font-medium">
                       No filters applied
                     </div>
