@@ -108,6 +108,7 @@ async function fetchAllPriorityFacilities(
   tagIds: string[],
   signal?: AbortSignal
 ): Promise<Facility[]> {
+  const firstBatchSize = 200;
   const batchSize = 500;
   let offset = 0;
   let allFacilities: Facility[] = [];
@@ -124,10 +125,11 @@ async function fetchAllPriorityFacilities(
 
     while (retries < maxRetries) {
       try {
+        const currentBatchSize = offset === 0 ? firstBatchSize : batchSize;
         batchResult = await fetchFacilitiesByTagsPaginated(
           tagIds,
           offset,
-          batchSize,
+          currentBatchSize,
           signal
         );
         break; // Success, exit retry loop
@@ -166,7 +168,7 @@ async function fetchAllPriorityFacilities(
       break;
     }
 
-    offset += batchSize;
+    offset += offset === 0 ? firstBatchSize : batchSize;
     // Add small delay between batches to not overwhelm the server
     await new Promise(resolve => setTimeout(resolve, 100));
   }
@@ -295,11 +297,14 @@ export function useFacilities(): UseFacilitiesReturn {
   });
 
   // Poll module-level state to sync with component during loading
+  // Use faster polling (500ms) during priority loading for responsive first-load UX,
+  // then slower polling (2s) during background loading
   useEffect(() => {
     if (isPriorityLoading || isBackgroundLoading) {
+      const pollInterval = isPriorityLoading ? 500 : 2000;
       const interval = setInterval(() => {
         forceUpdate(); // Trigger re-render to pick up latest module state
-      }, 2000); // Check every 2s — progress bar doesn't need sub-second updates
+      }, pollInterval);
       return () => clearInterval(interval);
     }
   }, [isPriorityLoading, isBackgroundLoading]);

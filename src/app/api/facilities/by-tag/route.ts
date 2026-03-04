@@ -15,6 +15,12 @@ const sql = postgres(process.env.DATABASE_URL!, {
   max: 10,
 });
 
+// Pre-warm the database connection at module load time
+// This starts the TCP+SSL handshake before the first real request arrives
+sql`SELECT 1`.catch(() => {
+  console.warn('Database connection pre-warm failed (will retry on first request)');
+});
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);

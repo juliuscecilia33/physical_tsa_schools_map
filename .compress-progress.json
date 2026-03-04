@@ -1,8 +1,8 @@
 {
-  "processedCount": 1812,
-  "successCount": 1446,
-  "failedCount": 463,
-  "skippedCount": 98,
+  "processedCount": 1853,
+  "successCount": 1458,
+  "failedCount": 492,
+  "skippedCount": 328,
   "processedFacilityIds": [
     "2651e40a-b22d-4b23-9fd7-8ff121dfdd25",
     "c675e478-4ccb-45bb-ba28-300715a96376",
@@ -1452,15 +1452,27 @@
     "03d8545e-bf7d-4e99-b079-2df5feb85174",
     "587bb523-bae9-407c-b99d-d111cd16ae84",
     "208e97cd-7a92-46a3-9458-22f10cc079bb",
-    "d88ee355-ad1b-4144-8835-deba610d55dd"
+    "d88ee355-ad1b-4144-8835-deba610d55dd",
+    "18958f6b-e2e0-45fd-9b59-fb3b6958650b",
+    "ff05d030-1e68-4b5e-b027-79036a0ac346",
+    "d49dd218-f201-4826-9a51-0c694697fb09",
+    "0cf791d7-61ab-4da2-a585-4c452ef8b0a7",
+    "7684b52c-4613-49d5-ac98-c2e6ecfa9621",
+    "5b8100e5-1f3d-4f5d-a3eb-0ae5790ed855",
+    "7f8122e1-e9d8-4721-8ebe-9ce2d03b844f",
+    "120c4637-cf3b-4398-9c98-bdd28b31620b",
+    "cfcac8d3-49a6-4972-bee8-e1b53c6a8d6b",
+    "da4bc628-15c7-40e3-89ef-50003cc348d4",
+    "222f335d-0609-4125-b11a-4e460d62dd52",
+    "555ece29-483c-4d6d-ac88-e267abdc82b1"
   ],
-  "lastProcessedIndex": 1903,
-  "imagesProcessed": 60586,
-  "imagesSkipped": 418,
-  "imagesFailed": 4064,
-  "totalBytesBefore": 146774601943,
-  "totalBytesAfter": 59033468322,
-  "lastUpdated": "2026-03-04T18:28:15.319Z",
+  "lastProcessedIndex": 2173,
+  "imagesProcessed": 60601,
+  "imagesSkipped": 1895,
+  "imagesFailed": 4099,
+  "totalBytesBefore": 146821301518,
+  "totalBytesAfter": 59053468642,
+  "lastUpdated": "2026-03-04T18:36:47.212Z",
   "errors": [
     {
       "facility_id": "c8861bb6-f825-4d28-a60f-695b1edfef7b",
@@ -29909,8 +29921,253 @@
       "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d08f747f-f192-4dd0-b022-3844e321c6b1/1772322305887_4.jpg",
       "error": "Failed to compress image",
       "timestamp": "2026-03-04T18:27:49.198Z"
+    },
+    {
+      "facility_id": "3d7cf152-6237-416b-a953-01ddd2f9811f",
+      "facility_name": "Labonte Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/3d7cf152-6237-416b-a953-01ddd2f9811f/1772156771166_12.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:28:22.664Z"
+    },
+    {
+      "facility_id": "6b022209-f203-48f9-9559-cc8540ec2354",
+      "facility_name": "Fitness Connection",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/6b022209-f203-48f9-9559-cc8540ec2354/1772243218773_15.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:28:49.932Z"
+    },
+    {
+      "facility_id": "6b022209-f203-48f9-9559-cc8540ec2354",
+      "facility_name": "Fitness Connection",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/6b022209-f203-48f9-9559-cc8540ec2354/1772243251528_38.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:28:55.034Z"
+    },
+    {
+      "facility_id": "304a1536-3985-4ebb-aeff-69a13a204036",
+      "facility_name": "Farias Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/304a1536-3985-4ebb-aeff-69a13a204036/1772240677809_13.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:29:01.329Z"
+    },
+    {
+      "facility_id": "fb78b29f-a326-4443-b9ad-19d7cc714ace",
+      "facility_name": "Highlander Stadium at Bel Air High School",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/fb78b29f-a326-4443-b9ad-19d7cc714ace/1772340331238_16.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:29:12.526Z"
+    },
+    {
+      "facility_id": "92e4fd05-c443-41cd-870f-19fc7099bc38",
+      "facility_name": "Incredible Crush Volleyball Rockwall",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/92e4fd05-c443-41cd-870f-19fc7099bc38/1772241515244_17.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:29:58.806Z"
+    },
+    {
+      "facility_id": "5025c0d4-80be-4b3b-980d-e00971f7c10b",
+      "facility_name": "Eagle Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/5025c0d4-80be-4b3b-980d-e00971f7c10b/1772218646627_5.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:30:08.279Z"
+    },
+    {
+      "facility_id": "5025c0d4-80be-4b3b-980d-e00971f7c10b",
+      "facility_name": "Eagle Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/5025c0d4-80be-4b3b-980d-e00971f7c10b/1772218667329_24.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:30:12.832Z"
+    },
+    {
+      "facility_id": "5025c0d4-80be-4b3b-980d-e00971f7c10b",
+      "facility_name": "Eagle Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/5025c0d4-80be-4b3b-980d-e00971f7c10b/1772218681000_37.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:30:16.281Z"
+    },
+    {
+      "facility_id": "f4e9162d-2c81-48e5-bd8c-51b528c5c090",
+      "facility_name": "Westside Community Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/f4e9162d-2c81-48e5-bd8c-51b528c5c090/1772045574370_12.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:30:22.169Z"
+    },
+    {
+      "facility_id": "944d8703-7762-4cc5-a81c-ed0a37184071",
+      "facility_name": "Katy Railroad Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/944d8703-7762-4cc5-a81c-ed0a37184071/1772242908533_23.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:30:54.958Z"
+    },
+    {
+      "facility_id": "c1b1d6e0-8ad9-4f00-b1a2-a7aefa958e6c",
+      "facility_name": "Daniel Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/c1b1d6e0-8ad9-4f00-b1a2-a7aefa958e6c/1772322252894_9.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:31:04.003Z"
+    },
+    {
+      "facility_id": "18542b89-07f5-4a45-a2e7-8548b732a32e",
+      "facility_name": "Legend Sports Court",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/18542b89-07f5-4a45-a2e7-8548b732a32e/1772222693428_0.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:31:12.670Z"
+    },
+    {
+      "facility_id": "71866480-956e-424c-b928-46caee9ebaf1",
+      "facility_name": "North Lakes Sports Complex",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/71866480-956e-424c-b928-46caee9ebaf1/1772322009628_8.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:31:18.364Z"
+    },
+    {
+      "facility_id": "9b57e256-d3b1-4f9a-98e1-9c3e03219f77",
+      "facility_name": "D-BAT Humble",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/9b57e256-d3b1-4f9a-98e1-9c3e03219f77/1772242954132_9.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:31:24.007Z"
+    },
+    {
+      "facility_id": "ed19f8ff-9563-4a4d-8bda-a0c496326e02",
+      "facility_name": "Premier Baseball of Texas",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/ed19f8ff-9563-4a4d-8bda-a0c496326e02/1772083147164_35.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:31:38.989Z"
+    },
+    {
+      "facility_id": "2eb513e5-e38d-4052-b130-22e44c9ea21f",
+      "facility_name": "Municipal Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/2eb513e5-e38d-4052-b130-22e44c9ea21f/1772067816359_15.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:31:49.335Z"
+    },
+    {
+      "facility_id": "e23a41b5-a051-4e69-b910-9895736c0f77",
+      "facility_name": "Avery Ranch Morningside Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/e23a41b5-a051-4e69-b910-9895736c0f77/1772237052598_11.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:32:00.347Z"
+    },
+    {
+      "facility_id": "e23a41b5-a051-4e69-b910-9895736c0f77",
+      "facility_name": "Avery Ranch Morningside Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/e23a41b5-a051-4e69-b910-9895736c0f77/1772237085779_36.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:32:05.931Z"
+    },
+    {
+      "facility_id": "9266e03f-66c7-4ddf-9da2-1a324d60c88b",
+      "facility_name": "Grady Littlejohn Softball & Baseball Complex",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/9266e03f-66c7-4ddf-9da2-1a324d60c88b/1772326301036_20.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:32:16.482Z"
+    },
+    {
+      "facility_id": "9c97b701-c3b7-4819-851a-7d332e5ee3f0",
+      "facility_name": "The Farm League Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/9c97b701-c3b7-4819-851a-7d332e5ee3f0/1772234242288_2.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:32:21.732Z"
+    },
+    {
+      "facility_id": "9c97b701-c3b7-4819-851a-7d332e5ee3f0",
+      "facility_name": "The Farm League Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/9c97b701-c3b7-4819-851a-7d332e5ee3f0/1772234267946_22.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:32:25.877Z"
+    },
+    {
+      "facility_id": "2c2d5d84-ee29-4823-82d1-98c3a0252e31",
+      "facility_name": "Palm View Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/2c2d5d84-ee29-4823-82d1-98c3a0252e31/1772326105820_2.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:32:40.804Z"
+    },
+    {
+      "facility_id": "37fad3a9-7324-44ac-9b92-bd24570aef48",
+      "facility_name": "San Angelo Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/37fad3a9-7324-44ac-9b92-bd24570aef48/1772217618435_16.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:32:59.930Z"
+    },
+    {
+      "facility_id": "37fad3a9-7324-44ac-9b92-bd24570aef48",
+      "facility_name": "San Angelo Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/37fad3a9-7324-44ac-9b92-bd24570aef48/1772217641273_35.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:33:04.650Z"
+    },
+    {
+      "facility_id": "34854722-f4be-40be-a2b9-4c982b873602",
+      "facility_name": "Jourdanton HS Baseball Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/34854722-f4be-40be-a2b9-4c982b873602/1772334584079_27.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:33:18.348Z"
+    },
+    {
+      "facility_id": "e9c8679e-1c86-437b-9227-40fbe055cdd2",
+      "facility_name": "Spread It LLC",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/e9c8679e-1c86-437b-9227-40fbe055cdd2/1772217260871_25.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:33:27.483Z"
+    },
+    {
+      "facility_id": "33273904-a426-4910-8fe2-cd1351e38909",
+      "facility_name": "Windlands Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/33273904-a426-4910-8fe2-cd1351e38909/1772221910007_8.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:34:12.911Z"
+    },
+    {
+      "facility_id": "8108e125-e4bb-464b-b8d5-e13a67d74b7a",
+      "facility_name": "First Baptist Church, McDonald Activity Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/8108e125-e4bb-464b-b8d5-e13a67d74b7a/1772238804791_9.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:34:38.169Z"
+    },
+    {
+      "facility_id": "153cd333-1e3a-4f0b-834c-42fea38242f7",
+      "facility_name": "Mark McGrath Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/153cd333-1e3a-4f0b-834c-42fea38242f7/1772059562500_14.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:34:42.988Z"
+    },
+    {
+      "facility_id": "6b6f30a1-f35b-4074-b471-5de19d25e89e",
+      "facility_name": "Pearland Recreation Center & Natatorium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/6b6f30a1-f35b-4074-b471-5de19d25e89e/1772082616041_5.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:35:25.852Z"
+    },
+    {
+      "facility_id": "8adb0f7f-cf14-45da-b3a6-19bd3cf75130",
+      "facility_name": "Black Iron Athletics",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/8adb0f7f-cf14-45da-b3a6-19bd3cf75130/1772227297065_7.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:35:37.500Z"
+    },
+    {
+      "facility_id": "ff904dd8-7f85-4006-b189-bea02c684198",
+      "facility_name": "Breckinridge Park Playground",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/ff904dd8-7f85-4006-b189-bea02c684198/1772227582937_28.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:35:51.071Z"
+    },
+    {
+      "facility_id": "0d762d5e-13f7-4cb8-8644-647933bbffc5",
+      "facility_name": "Moody Community Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/0d762d5e-13f7-4cb8-8644-647933bbffc5/1772089060297_16.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:36:16.423Z"
+    },
+    {
+      "facility_id": "24bb9e94-baa4-4c02-89a4-2842492f88fe",
+      "facility_name": "Charles H. Haws Athletic Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/24bb9e94-baa4-4c02-89a4-2842492f88fe/1772339365693_29.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:36:30.452Z"
     }
   ],
-  "deletionsSucceeded": 56945,
+  "deletionsSucceeded": 56960,
   "deletionsFailed": 15
 }
