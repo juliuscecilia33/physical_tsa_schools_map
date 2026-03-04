@@ -1,15 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useReducer } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Facility } from "@/types/facility";
 
 // SerpAPI tag ID for priority loading
 const SERPAPI_TAG_ID = 'e326fe36-5536-4209-87ed-f99528e1d1ee';
 
-// Module-level progress callbacks for loading
-let currentPriorityProgressCallback: ((count: number) => void) | null = null;
-let currentBackgroundProgressCallback: ((count: number) => void) | null = null;
+// Module-level progress state (shared across all component instances)
+let priorityProgressState = 0;
+let backgroundProgressState = 0;
 
 // Fetch facilities by tag IDs (non-paginated - for backward compatibility)
 async function fetchFacilitiesByTags(tagIds: string[]): Promise<Facility[]> {
@@ -152,10 +152,8 @@ async function fetchAllPriorityFacilities(
 
     allFacilities = [...allFacilities, ...facilities];
 
-    // Call progress callback if available
-    if (currentPriorityProgressCallback) {
-      currentPriorityProgressCallback(allFacilities.length);
-    }
+    // Update module-level progress state
+    priorityProgressState = allFacilities.length;
 
     console.log(
       `Priority batch loaded: ${facilities.length} facilities (offset: ${offset})`
@@ -225,10 +223,8 @@ async function fetchAllBackgroundFacilities(
 
     allFacilities = [...allFacilities, ...facilities];
 
-    // Call progress callback if available
-    if (currentBackgroundProgressCallback) {
-      currentBackgroundProgressCallback(allFacilities.length);
-    }
+    // Update module-level progress state
+    backgroundProgressState = allFacilities.length;
 
     console.log(
       `Background batch loaded: ${facilities.length} facilities (offset: ${offset})`
@@ -268,23 +264,8 @@ export interface UseFacilitiesReturn {
  * Phase 2: Background batch loading (excluding SerpAPI tag)
  */
 export function useFacilities(): UseFacilitiesReturn {
-  // Track loading progress (incremental counts)
-  const [priorityLoadingProgress, setPriorityLoadingProgress] = useState(0);
-  const [backgroundLoadingProgress, setBackgroundLoadingProgress] = useState(0);
-
-  // Set up progress callbacks for both loading phases
-  useEffect(() => {
-    currentPriorityProgressCallback = (count: number) => {
-      setPriorityLoadingProgress(count);
-    };
-    currentBackgroundProgressCallback = (count: number) => {
-      setBackgroundLoadingProgress(count);
-    };
-    return () => {
-      currentPriorityProgressCallback = null;
-      currentBackgroundProgressCallback = null;
-    };
-  }, []);
+  // Force re-render when module-level state changes
+  const [, forceUpdate] = useReducer((x) => x + 1, 0);
 
   // Phase 1: Fetch SerpAPI-tagged facilities in batches (priority load)
   const {
@@ -313,18 +294,39 @@ export function useFacilities(): UseFacilitiesReturn {
     gcTime: Infinity,
   });
 
+  // Poll module-level state to sync with component during loading
+  useEffect(() => {
+    if (isPriorityLoading || isBackgroundLoading) {
+      const interval = setInterval(() => {
+        forceUpdate(); // Trigger re-render to pick up latest module state
+      }, 100); // Check every 100ms
+      return () => clearInterval(interval);
+    }
+  }, [isPriorityLoading, isBackgroundLoading]);
+
+  // Reset module state when priority loading starts
+  useEffect(() => {
+    if (isPriorityLoading) {
+      priorityProgressState = 0;
+    }
+  }, [isPriorityLoading]);
+
+  // Reset module state when background loading starts
+  useEffect(() => {
+    if (isBackgroundLoading) {
+      backgroundProgressState = 0;
+    }
+  }, [isBackgroundLoading]);
+
+  // Read progress from module-level state
+  const priorityLoadingProgress = priorityProgressState;
+  const backgroundLoadingProgress = backgroundProgressState;
+
   // Merge priority and background facilities
   const facilities = [...priorityFacilities, ...backgroundFacilities];
 
   // Derive backgroundLoadingComplete from query success state
   const backgroundLoadingComplete = isBackgroundLoadingSuccess;
-
-  // Reset progress when background loading starts
-  useEffect(() => {
-    if (isBackgroundLoading && backgroundLoadingProgress === 0 && backgroundFacilities.length === 0) {
-      // Progress will be updated by the callback
-    }
-  }, [isBackgroundLoading, backgroundLoadingProgress, backgroundFacilities.length]);
 
   return {
     facilities,
