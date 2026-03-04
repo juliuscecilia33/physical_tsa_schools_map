@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useReducer } from "react";
+import { useEffect, useMemo, useReducer } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Facility } from "@/types/facility";
 
@@ -299,7 +299,7 @@ export function useFacilities(): UseFacilitiesReturn {
     if (isPriorityLoading || isBackgroundLoading) {
       const interval = setInterval(() => {
         forceUpdate(); // Trigger re-render to pick up latest module state
-      }, 100); // Check every 100ms
+      }, 500); // Check every 500ms
       return () => clearInterval(interval);
     }
   }, [isPriorityLoading, isBackgroundLoading]);
@@ -322,8 +322,11 @@ export function useFacilities(): UseFacilitiesReturn {
   const priorityLoadingProgress = priorityProgressState;
   const backgroundLoadingProgress = backgroundProgressState;
 
-  // Merge priority and background facilities
-  const facilities = [...priorityFacilities, ...backgroundFacilities];
+  // Merge priority and background facilities (memoized to avoid new array on every render)
+  const facilities = useMemo(
+    () => [...priorityFacilities, ...backgroundFacilities],
+    [priorityFacilities, backgroundFacilities]
+  );
 
   // Derive backgroundLoadingComplete from query success state
   const backgroundLoadingComplete = isBackgroundLoadingSuccess;

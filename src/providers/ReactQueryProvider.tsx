@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 
 // Create a function to persist cache to sessionStorage
 function createQueryClient() {
-  return new QueryClient({
+  const client = new QueryClient({
     defaultOptions: {
       queries: {
         // Session-based caching: data stays fresh until user refreshes
@@ -22,6 +22,30 @@ function createQueryClient() {
       },
     },
   });
+
+  // Synchronous restore before any queries mount (avoids race condition with useEffect)
+  if (typeof window !== "undefined") {
+    try {
+      const cachedData = sessionStorage.getItem("react-query-cache");
+      if (cachedData) {
+        const parsed = JSON.parse(cachedData);
+        const queries = Array.isArray(parsed) ? parsed : [parsed];
+        for (const entry of queries) {
+          if (entry.queryKey && entry.data) {
+            client.setQueryData(entry.queryKey, entry.data, {
+              updatedAt: entry.dataUpdatedAt || Date.now(),
+            });
+            console.log(`Restored facilities cache [${entry.queryKey.join(',')}] from sessionStorage with timestamp:`, new Date(entry.dataUpdatedAt || Date.now()).toLocaleTimeString());
+          }
+        }
+      }
+    } catch (error) {
+      console.warn("Failed to restore React Query cache:", error);
+      sessionStorage.removeItem("react-query-cache");
+    }
+  }
+
+  return client;
 }
 
 export function ReactQueryProvider({ children }: { children: React.ReactNode }) {
@@ -34,23 +58,31 @@ export function ReactQueryProvider({ children }: { children: React.ReactNode }) 
       const cache = queryClient.getQueryCache();
       const queries = cache.getAll();
 
-      // Only persist the main facilities query (not notes, tags, or other queries)
-      const facilitiesQuery = queries.find(
+      // Persist both facility queries (serpapi + background)
+      const serpApiQuery = queries.find(
         (query) =>
           Array.isArray(query.queryKey) &&
           query.queryKey[0] === "facilities" &&
-          query.queryKey[1] === "all"
+          query.queryKey[1] === "serpapi"
+      );
+      const backgroundQuery = queries.find(
+        (query) =>
+          Array.isArray(query.queryKey) &&
+          query.queryKey[0] === "facilities" &&
+          query.queryKey[1] === "background"
       );
 
-      if (facilitiesQuery && facilitiesQuery.state.data) {
-        try {
-          const serializedCache = {
-            queryKey: facilitiesQuery.queryKey,
-            data: facilitiesQuery.state.data,
-            dataUpdatedAt: facilitiesQuery.state.dataUpdatedAt,
-          };
+      const queriesToSave = [serpApiQuery, backgroundQuery]
+        .filter((q) => q && q.state.data)
+        .map((q) => ({
+          queryKey: q!.queryKey,
+          data: q!.state.data,
+          dataUpdatedAt: q!.state.dataUpdatedAt,
+        }));
 
-          const cacheString = JSON.stringify(serializedCache);
+      if (queriesToSave.length > 0) {
+        try {
+          const cacheString = JSON.stringify(queriesToSave);
 
           // Check size (sessionStorage limit is typically 5-10MB)
           const sizeInMB = new Blob([cacheString]).size / (1024 * 1024);
@@ -61,7 +93,7 @@ export function ReactQueryProvider({ children }: { children: React.ReactNode }) 
           }
 
           sessionStorage.setItem("react-query-cache", cacheString);
-          console.log(`Persisted facilities cache (${sizeInMB.toFixed(2)}MB)`);
+          console.log(`Persisted facilities cache (${sizeInMB.toFixed(2)}MB, ${queriesToSave.length} queries)`);
         } catch (error) {
           console.warn("Failed to persist React Query cache:", error);
         }
@@ -95,22 +127,30 @@ export function ReactQueryProvider({ children }: { children: React.ReactNode }) 
           const cache = queryClient.getQueryCache();
           const queries = cache.getAll();
 
-          const facilitiesQuery = queries.find(
+          const serpApiQuery = queries.find(
             (query) =>
               Array.isArray(query.queryKey) &&
               query.queryKey[0] === "facilities" &&
-              query.queryKey[1] === "all"
+              query.queryKey[1] === "serpapi"
+          );
+          const backgroundQuery = queries.find(
+            (query) =>
+              Array.isArray(query.queryKey) &&
+              query.queryKey[0] === "facilities" &&
+              query.queryKey[1] === "background"
           );
 
-          if (facilitiesQuery && facilitiesQuery.state.data) {
-            try {
-              const serializedCache = {
-                queryKey: facilitiesQuery.queryKey,
-                data: facilitiesQuery.state.data,
-                dataUpdatedAt: facilitiesQuery.state.dataUpdatedAt,
-              };
+          const queriesToSave = [serpApiQuery, backgroundQuery]
+            .filter((q) => q && q.state.data)
+            .map((q) => ({
+              queryKey: q!.queryKey,
+              data: q!.state.data,
+              dataUpdatedAt: q!.state.dataUpdatedAt,
+            }));
 
-              const cacheString = JSON.stringify(serializedCache);
+          if (queriesToSave.length > 0) {
+            try {
+              const cacheString = JSON.stringify(queriesToSave);
               const sizeInMB = new Blob([cacheString]).size / (1024 * 1024);
 
               if (sizeInMB > 8) {
@@ -122,7 +162,7 @@ export function ReactQueryProvider({ children }: { children: React.ReactNode }) 
 
               sessionStorage.setItem("react-query-cache", cacheString);
               console.log(
-                `Persisted facilities cache on visibility change (${sizeInMB.toFixed(2)}MB)`
+                `Persisted facilities cache on visibility change (${sizeInMB.toFixed(2)}MB, ${queriesToSave.length} queries)`
               );
             } catch (error) {
               console.warn("Failed to persist React Query cache:", error);
@@ -139,27 +179,6 @@ export function ReactQueryProvider({ children }: { children: React.ReactNode }) 
     };
   }, [queryClient]);
 
-  // Restore cache from sessionStorage on mount
-  useEffect(() => {
-    try {
-      const cachedData = sessionStorage.getItem("react-query-cache");
-      if (cachedData) {
-        const parsed = JSON.parse(cachedData);
-
-        // Restore the main facilities query with preserved timestamp
-        if (parsed.queryKey && parsed.data) {
-          queryClient.setQueryData(parsed.queryKey, parsed.data, {
-            updatedAt: parsed.dataUpdatedAt || Date.now(),
-          });
-          console.log("Restored facilities cache from sessionStorage with timestamp:", new Date(parsed.dataUpdatedAt || Date.now()).toLocaleTimeString());
-        }
-      }
-    } catch (error) {
-      console.warn("Failed to restore React Query cache:", error);
-      // Clear corrupted cache
-      sessionStorage.removeItem("react-query-cache");
-    }
-  }, [queryClient]);
 
   return (
     <QueryClientProvider client={queryClient}>

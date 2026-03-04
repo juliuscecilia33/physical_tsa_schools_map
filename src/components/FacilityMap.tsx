@@ -293,6 +293,7 @@ export default function FacilityMap({
   >(["parks", "fitness", "sports", "education", "other"]);
   const [isAnimating, setIsAnimating] = useState(false);
   const mapRef = useRef<MapRef>(null);
+  const animationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const router = useRouter();
 
   // Expose animation state globally for cache persistence logic
@@ -309,18 +310,7 @@ export default function FacilityMap({
       const facility = facilities.find((f) => f.place_id === focusPlaceId);
 
       if (facility) {
-        // Focus map on facility location with smooth animation
-        const map = mapRef.current?.getMap();
-        setIsAnimating(true);
-        map?.flyTo({
-          center: [facility.location.lng, facility.location.lat],
-          zoom: 16,
-          duration: 1500,
-        });
-        // Clear animation flag after animation completes
-        setTimeout(() => setIsAnimating(false), 1600);
-
-        // Open facility sidebar
+        flyToFacility(facility.location.lng, facility.location.lat);
         setSelectedFacility(facility);
       }
     }
@@ -333,6 +323,26 @@ export default function FacilityMap({
       router.replace('/');
     }
   }, [selectedFacility, focusPlaceId, router]);
+
+  // Cleanup animation timer on unmount
+  useEffect(() => {
+    return () => {
+      if (animationTimerRef.current) clearTimeout(animationTimerRef.current);
+    };
+  }, []);
+
+  // Shared helper: fly to a location and manage animation timer
+  const flyToFacility = useCallback((lng: number, lat: number) => {
+    const map = mapRef.current?.getMap();
+    setIsAnimating(true);
+    map?.flyTo({
+      center: [lng, lat],
+      zoom: 16,
+      duration: 1500,
+    });
+    if (animationTimerRef.current) clearTimeout(animationTimerRef.current);
+    animationTimerRef.current = setTimeout(() => setIsAnimating(false), 1600);
+  }, []);
 
   const toggleSection = (section: keyof typeof expandedSections) => {
     setExpandedSections((prev) => ({
@@ -524,6 +534,13 @@ export default function FacilityMap({
     onSelectedTagsChange([]);
   };
 
+  // Lookup map for O(1) facility access by place_id (avoids JSON.stringify/parse)
+  const facilityLookup = useMemo(() => {
+    const lookup: Record<string, Facility> = {};
+    filteredFacilities.forEach((f) => { lookup[f.place_id] = f; });
+    return lookup;
+  }, [filteredFacilities]);
+
   // Convert filtered facilities to GeoJSON format with color coding
   const geojsonData = useMemo(() => {
     return {
@@ -539,8 +556,6 @@ export default function FacilityMap({
             name: facility.name,
             category,
             color,
-            // Store the full facility data
-            facilityData: JSON.stringify(facility),
           },
           geometry: {
             type: "Point" as const,
@@ -552,68 +567,35 @@ export default function FacilityMap({
   }, [filteredFacilities]);
 
   // Handle click on individual markers
-  const onMarkerClick = (event: MapLayerMouseEvent) => {
+  const onMarkerClick = useCallback((event: MapLayerMouseEvent) => {
     const feature = event.features?.[0];
     if (!feature) return;
 
-    const facilityData = feature.properties?.facilityData;
-    if (facilityData) {
-      const facility: Facility = JSON.parse(facilityData);
-
-      // Zoom to facility location
-      const map = mapRef.current?.getMap();
-      setIsAnimating(true);
-      map?.flyTo({
-        center: [facility.location.lng, facility.location.lat],
-        zoom: 16,
-        duration: 1500,
-      });
-      // Clear animation flag after animation completes
-      setTimeout(() => setIsAnimating(false), 1600);
-
+    const placeId = feature.properties?.place_id;
+    const facility = placeId ? facilityLookup[placeId] : undefined;
+    if (facility) {
+      flyToFacility(facility.location.lng, facility.location.lat);
       setSelectedFacility(facility);
       setClickedFacility(facility);
     }
-  };
+  }, [facilityLookup, flyToFacility]);
 
   // Handle facility selection from search
-  const handleSearchSelect = (facility: Facility) => {
-    // Focus map on facility location with smooth animation
-    const map = mapRef.current?.getMap();
-    setIsAnimating(true);
-    map?.flyTo({
-      center: [facility.location.lng, facility.location.lat],
-      zoom: 16,
-      duration: 1500,
-    });
-    // Clear animation flag after animation completes
-    setTimeout(() => setIsAnimating(false), 1600);
-
-    // Open facility sidebar
+  const handleSearchSelect = useCallback((facility: Facility) => {
+    flyToFacility(facility.location.lng, facility.location.lat);
     setSelectedFacility(facility);
-  };
+  }, [flyToFacility]);
 
   // Handle AI filters applied - store for AISearchPanel to use
-  const handleAIFiltersApplied = (filters: AISearchFilters) => {
+  const handleAIFiltersApplied = useCallback((filters: AISearchFilters) => {
     setCurrentAIFilters(filters);
-  };
+  }, []);
 
   // Handle facility selection from AI search results
-  const handleAIFacilitySelect = (facility: Facility) => {
-    // Zoom to facility on map
-    const map = mapRef.current?.getMap();
-    setIsAnimating(true);
-    map?.flyTo({
-      center: [facility.location.lng, facility.location.lat],
-      zoom: 16,
-      duration: 1500,
-    });
-    // Clear animation flag after animation completes
-    setTimeout(() => setIsAnimating(false), 1600);
-
-    // Open facility sidebar
+  const handleAIFacilitySelect = useCallback((facility: Facility) => {
+    flyToFacility(facility.location.lng, facility.location.lat);
     setSelectedFacility(facility);
-  };
+  }, [flyToFacility]);
 
   // Memoize the callback to prevent unnecessary re-renders of FacilitySidebar
   const handleFacilityDataLoaded = useCallback(
@@ -654,9 +636,9 @@ export default function FacilityMap({
           // Show hover popup if no facility is currently selected
           if (!selectedFacility && e.features && e.features.length > 0) {
             const feature = e.features[0];
-            const facilityData = feature.properties?.facilityData;
-            if (facilityData) {
-              const facility: Facility = JSON.parse(facilityData);
+            const placeId = feature.properties?.place_id;
+            const facility = placeId ? facilityLookup[placeId] : undefined;
+            if (facility) {
               setHoveredFacility(facility);
             }
           }

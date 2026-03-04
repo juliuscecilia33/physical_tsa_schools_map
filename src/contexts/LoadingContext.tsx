@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useCallback, useContext, useMemo, useState, ReactNode } from "react";
 
 interface LoadingContextType {
   isInitialLoading: boolean;
@@ -17,21 +17,23 @@ export function LoadingProvider({ children }: { children: ReactNode }) {
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [isPriorityLoadComplete, setIsPriorityLoadComplete] = useState(false);
 
-  const setLoadingComplete = () => {
+  const setLoadingComplete = useCallback(() => {
     setIsInitialLoading(false);
-  };
+  }, []);
 
-  const setPriorityLoadComplete = () => {
+  const setPriorityLoadComplete = useCallback(() => {
     setIsPriorityLoadComplete(true);
-  };
+  }, []);
+
+  const value = useMemo(() => ({
+    isInitialLoading,
+    isPriorityLoadComplete,
+    setLoadingComplete,
+    setPriorityLoadComplete,
+  }), [isInitialLoading, isPriorityLoadComplete, setLoadingComplete, setPriorityLoadComplete]);
 
   return (
-    <LoadingContext.Provider value={{
-      isInitialLoading,
-      isPriorityLoadComplete,
-      setLoadingComplete,
-      setPriorityLoadComplete
-    }}>
+    <LoadingContext.Provider value={value}>
       {children}
     </LoadingContext.Provider>
   );
