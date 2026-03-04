@@ -72,6 +72,7 @@ export async function GET(request: NextRequest) {
     const transformedFacilities: FacilityLightweight[] = (
       facilities || []
     ).map((facility: any) => ({
+      id: facility.id,
       place_id: facility.place_id,
       name: facility.name,
       sport_types: facility.sport_types || [],

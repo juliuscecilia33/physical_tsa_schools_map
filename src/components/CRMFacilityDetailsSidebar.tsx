@@ -741,18 +741,18 @@ export default function CRMFacilityDetailsSidebar({
     let lat: number | null = null;
     let lng: number | null = null;
 
-    if (typeof facility.location === 'string') {
+    const location = facility.location as any; // Type assertion for runtime flexibility
+    if (typeof location === 'string') {
       // Parse PostGIS POINT format: "POINT(lng lat)"
-      const match = facility.location.match(/POINT\((-?\d+\.?\d*)\s+(-?\d+\.?\d*)\)/);
+      const match = location.match(/POINT\((-?\d+\.?\d*)\s+(-?\d+\.?\d*)\)/);
       if (match) {
         lng = parseFloat(match[1]);
         lat = parseFloat(match[2]);
       }
-    } else if (facility.location && typeof facility.location === 'object') {
+    } else if (location && typeof location === 'object') {
       // Handle object format
-      const loc = facility.location as any;
-      lat = loc.lat || loc.latitude || null;
-      lng = loc.lng || loc.longitude || null;
+      lat = location.lat || location.latitude || null;
+      lng = location.lng || location.longitude || null;
     }
 
     if (!lat || !lng) {

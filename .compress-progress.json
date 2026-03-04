@@ -1,7 +1,7 @@
 {
-  "processedCount": 1403,
-  "successCount": 1207,
-  "failedCount": 202,
+  "processedCount": 1408,
+  "successCount": 1211,
+  "failedCount": 203,
   "skippedCount": 17,
   "processedFacilityIds": [
     "2651e40a-b22d-4b23-9fd7-8ff121dfdd25",
@@ -1213,15 +1213,19 @@
     "7374c797-36c8-4a33-be4c-ed3434a4c8a4",
     "49a0b096-a689-4764-872d-f251a11b1abb",
     "a761711a-4621-446b-bde2-322c7d6c8aee",
-    "b1fba815-e7bd-4edd-9328-886aaa3289fc"
+    "b1fba815-e7bd-4edd-9328-886aaa3289fc",
+    "f2a89315-474d-4f13-be4d-f5ecb5db5680",
+    "0a8a3f84-d919-4449-a158-7cec3c6bf0c1",
+    "204f1a72-9c7e-4404-934f-f9b532243a48",
+    "a501f20c-2d1b-4801-87d9-b3f676b5824e"
   ],
-  "lastProcessedIndex": 1416,
-  "imagesProcessed": 49345,
+  "lastProcessedIndex": 1421,
+  "imagesProcessed": 49541,
   "imagesSkipped": 39,
-  "imagesFailed": 496,
-  "totalBytesBefore": 119580852878,
-  "totalBytesAfter": 47778149730,
-  "lastUpdated": "2026-03-04T02:45:46.050Z",
+  "imagesFailed": 497,
+  "totalBytesBefore": 119930356529,
+  "totalBytesAfter": 47900332916,
+  "lastUpdated": "2026-03-04T02:54:23.184Z",
   "errors": [
     {
       "facility_id": "c8861bb6-f825-4d28-a60f-695b1edfef7b",
@@ -4694,8 +4698,15 @@
       "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d545cb9a-617a-48b2-82b4-e05ee05a5a02/1772044626255_18.jpg",
       "error": "Failed to download image",
       "timestamp": "2026-03-04T02:41:25.723Z"
+    },
+    {
+      "facility_id": "ef5067ae-cff8-4c09-b18d-523073c1ccb8",
+      "facility_name": "Mercy Street Sports Complex",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/ef5067ae-cff8-4c09-b18d-523073c1ccb8/1772087896454_4.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T02:52:56.325Z"
     }
   ],
-  "deletionsSucceeded": 45711,
+  "deletionsSucceeded": 45907,
   "deletionsFailed": 8
 }

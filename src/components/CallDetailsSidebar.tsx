@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X,
@@ -55,7 +55,7 @@ function getDispositionColor(disposition: string | undefined): string {
 
 function renderFormattedSummary(summaryText: string) {
   const lines = summaryText.split('\n').filter(line => line.trim());
-  const elements: JSX.Element[] = [];
+  const elements: React.JSX.Element[] = [];
   let currentList: string[] = [];
   let key = 0;
 
