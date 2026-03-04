@@ -297,7 +297,7 @@ export default function CRMFacilityDetailsSidebar({
     if (facility) {
       setFacilityTags(facility.tags || []);
     }
-  }, [facility?.place_id, !!facility]);
+  }, [facility]);
 
   // Fetch all tags on component mount
   useEffect(() => {

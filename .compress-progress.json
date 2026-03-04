@@ -1,7 +1,7 @@
 {
-  "processedCount": 1383,
-  "successCount": 1191,
-  "failedCount": 197,
+  "processedCount": 1386,
+  "successCount": 1192,
+  "failedCount": 199,
   "skippedCount": 17,
   "processedFacilityIds": [
     "2651e40a-b22d-4b23-9fd7-8ff121dfdd25",
@@ -1197,15 +1197,16 @@
     "2d6000fc-14ab-427a-87b6-cb71bdfb0689",
     "5384cb15-3d48-4ab9-9b38-777d699f7d2a",
     "4c1d5582-6599-41c0-a1e0-a6272ac64256",
-    "295ab633-f580-4b5a-824b-2b18f2138352"
+    "295ab633-f580-4b5a-824b-2b18f2138352",
+    "32f8a0c3-f0c8-4b7d-8458-b268996b5173"
   ],
-  "lastProcessedIndex": 1396,
-  "imagesProcessed": 48577,
+  "lastProcessedIndex": 1399,
+  "imagesProcessed": 48695,
   "imagesSkipped": 39,
-  "imagesFailed": 493,
-  "totalBytesBefore": 117700426915,
-  "totalBytesAfter": 47054422578,
-  "lastUpdated": "2026-03-04T02:03:16.899Z",
+  "imagesFailed": 495,
+  "totalBytesBefore": 118091291022,
+  "totalBytesAfter": 47222485198,
+  "lastUpdated": "2026-03-04T02:16:57.883Z",
   "errors": [
     {
       "facility_id": "c8861bb6-f825-4d28-a60f-695b1edfef7b",
@@ -4657,8 +4658,22 @@
       "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/7226e075-821d-480e-9368-aeb473aa2abf/1772232377939_31.jpg",
       "error": "Failed to compress image",
       "timestamp": "2026-03-04T02:02:51.456Z"
+    },
+    {
+      "facility_id": "c1322f2b-f0dd-4137-a332-a5e77e158572",
+      "facility_name": "Edna Mae Washington Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/c1322f2b-f0dd-4137-a332-a5e77e158572/1772153963554_31.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-04T02:05:04.189Z"
+    },
+    {
+      "facility_id": "6ac25a71-7eea-4d96-a026-c3f48bca509d",
+      "facility_name": "Norich Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/6ac25a71-7eea-4d96-a026-c3f48bca509d/1772232913737_35.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-04T02:16:07.914Z"
     }
   ],
-  "deletionsSucceeded": 44943,
+  "deletionsSucceeded": 45061,
   "deletionsFailed": 8
 }
