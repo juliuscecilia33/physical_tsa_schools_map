@@ -1,7 +1,7 @@
 {
-  "processedCount": 1427,
-  "successCount": 1222,
-  "failedCount": 211,
+  "processedCount": 1434,
+  "successCount": 1224,
+  "failedCount": 216,
   "skippedCount": 17,
   "processedFacilityIds": [
     "2651e40a-b22d-4b23-9fd7-8ff121dfdd25",
@@ -1228,15 +1228,17 @@
     "4b9c7709-627e-446e-a3d1-1a41295d863f",
     "59eec559-ae76-42b3-ab21-bf8bfd1c3116",
     "f7e6a1cf-fbf2-491b-bee4-b445c12467da",
-    "318b7006-a829-4973-bd83-1ece926d7a01"
+    "318b7006-a829-4973-bd83-1ece926d7a01",
+    "16a3d7a7-b929-4379-9a38-5b1d583f76f0",
+    "c82849f3-b249-491c-b8b7-20f66569e6c5"
   ],
-  "lastProcessedIndex": 1440,
-  "imagesProcessed": 50197,
+  "lastProcessedIndex": 1447,
+  "imagesProcessed": 50442,
   "imagesSkipped": 39,
-  "imagesFailed": 510,
-  "totalBytesBefore": 121644105039,
-  "totalBytesAfter": 48595086698,
-  "lastUpdated": "2026-03-04T03:32:03.240Z",
+  "imagesFailed": 523,
+  "totalBytesBefore": 122194532682,
+  "totalBytesAfter": 48829657276,
+  "lastUpdated": "2026-03-04T03:49:47.387Z",
   "errors": [
     {
       "facility_id": "c8861bb6-f825-4d28-a60f-695b1edfef7b",
@@ -4807,8 +4809,99 @@
       "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/7726e6ba-69bc-42c7-bbd0-4aa641d1d260/1772152810925_15.jpg",
       "error": "Failed to download image",
       "timestamp": "2026-03-04T03:28:58.962Z"
+    },
+    {
+      "facility_id": "e3398f86-408d-4b05-85ab-a7e36b736d65",
+      "facility_name": "Ramon Lucio Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/e3398f86-408d-4b05-85ab-a7e36b736d65/1772153570329_3.jpg",
+      "error": "Failed to upload compressed image",
+      "timestamp": "2026-03-04T03:32:19.183Z"
+    },
+    {
+      "facility_id": "e3398f86-408d-4b05-85ab-a7e36b736d65",
+      "facility_name": "Ramon Lucio Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/e3398f86-408d-4b05-85ab-a7e36b736d65/1772153608603_32.jpg",
+      "error": "Failed to upload compressed image",
+      "timestamp": "2026-03-04T03:34:55.945Z"
+    },
+    {
+      "facility_id": "e9e76e0f-b24f-45e3-a074-115c35a76aa2",
+      "facility_name": "Lake Halbert Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/e9e76e0f-b24f-45e3-a074-115c35a76aa2/1772339630882_2.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T03:35:31.531Z"
+    },
+    {
+      "facility_id": "e9e76e0f-b24f-45e3-a074-115c35a76aa2",
+      "facility_name": "Lake Halbert Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/e9e76e0f-b24f-45e3-a074-115c35a76aa2/1772339632928_4.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T03:35:36.315Z"
+    },
+    {
+      "facility_id": "e9e76e0f-b24f-45e3-a074-115c35a76aa2",
+      "facility_name": "Lake Halbert Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/e9e76e0f-b24f-45e3-a074-115c35a76aa2/1772339644086_14.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T03:36:10.807Z"
+    },
+    {
+      "facility_id": "e9e76e0f-b24f-45e3-a074-115c35a76aa2",
+      "facility_name": "Lake Halbert Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/e9e76e0f-b24f-45e3-a074-115c35a76aa2/1772339653402_22.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T03:36:36.877Z"
+    },
+    {
+      "facility_id": "f56389b0-c5d4-4f8f-a960-5e5e290289b3",
+      "facility_name": "Gibbs Recreation and Wellness Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/f56389b0-c5d4-4f8f-a960-5e5e290289b3/1772152947503_9.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-04T03:38:01.987Z"
+    },
+    {
+      "facility_id": "f56389b0-c5d4-4f8f-a960-5e5e290289b3",
+      "facility_name": "Gibbs Recreation and Wellness Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/f56389b0-c5d4-4f8f-a960-5e5e290289b3/1772152957849_17.jpg",
+      "error": "Failed to upload compressed image",
+      "timestamp": "2026-03-04T03:38:22.311Z"
+    },
+    {
+      "facility_id": "99eafd45-4139-45c6-af57-1cf3f70b7a65",
+      "facility_name": "Atlet Sports Performance & Physical Therapy",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/99eafd45-4139-45c6-af57-1cf3f70b7a65/1772153141075_0.jpg",
+      "error": "Failed to upload compressed image",
+      "timestamp": "2026-03-04T03:39:44.383Z"
+    },
+    {
+      "facility_id": "99eafd45-4139-45c6-af57-1cf3f70b7a65",
+      "facility_name": "Atlet Sports Performance & Physical Therapy",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/99eafd45-4139-45c6-af57-1cf3f70b7a65/1772153151062_8.jpg",
+      "error": "Failed to upload compressed image",
+      "timestamp": "2026-03-04T03:40:05.393Z"
+    },
+    {
+      "facility_id": "793fff80-bb30-4f14-b5b8-7fe2e5eed9da",
+      "facility_name": "Grand Prairie Family YMCA",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/793fff80-bb30-4f14-b5b8-7fe2e5eed9da/1772153305852_1.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-04T03:40:45.973Z"
+    },
+    {
+      "facility_id": "793fff80-bb30-4f14-b5b8-7fe2e5eed9da",
+      "facility_name": "Grand Prairie Family YMCA",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/793fff80-bb30-4f14-b5b8-7fe2e5eed9da/1772153337291_29.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-04T03:42:54.395Z"
+    },
+    {
+      "facility_id": "793fff80-bb30-4f14-b5b8-7fe2e5eed9da",
+      "facility_name": "Grand Prairie Family YMCA",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/793fff80-bb30-4f14-b5b8-7fe2e5eed9da/1772153338332_30.jpg",
+      "error": "Failed to upload compressed image",
+      "timestamp": "2026-03-04T03:44:06.339Z"
     }
   ],
-  "deletionsSucceeded": 46562,
+  "deletionsSucceeded": 46807,
   "deletionsFailed": 9
 }

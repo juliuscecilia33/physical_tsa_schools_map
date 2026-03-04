@@ -90,6 +90,15 @@ export function LeadDetailsSidebar({
   // Facility search state
   const [facilitySearchQuery, setFacilitySearchQuery] = useState("");
 
+  // Link confirmation modal state
+  const [isLinkConfirmModalOpen, setIsLinkConfirmModalOpen] = useState(false);
+  const [pendingLinkFacility, setPendingLinkFacility] = useState<{
+    placeId: string;
+    confidence: number;
+    matchReason: string;
+    facilityName: string;
+  } | null>(null);
+
   // Get status label
   const statusLabel = useMemo(() => {
     if (!lead || !statuses) return null;
@@ -287,8 +296,8 @@ export function LeadDetailsSidebar({
           matchReason: link.match_reason,
         };
       })
-      .filter(Boolean) as (typeof matchedFacilities[0] & {
-      link: typeof facilityLeadLinks[0];
+      .filter(Boolean) as ((typeof matchedFacilities)[0] & {
+      link: (typeof facilityLeadLinks)[0];
     })[];
   }, [facilityLeadLinks, facilities]);
 
@@ -296,13 +305,9 @@ export function LeadDetailsSidebar({
   const unmatchedFacilities = useMemo(() => {
     if (!linkedFacilities.length) return matchedFacilities;
 
-    const linkedPlaceIds = new Set(
-      linkedFacilities.map((f) => f.place_id)
-    );
+    const linkedPlaceIds = new Set(linkedFacilities.map((f) => f.place_id));
 
-    return matchedFacilities.filter(
-      (f) => !linkedPlaceIds.has(f.place_id)
-    );
+    return matchedFacilities.filter((f) => !linkedPlaceIds.has(f.place_id));
   }, [matchedFacilities, linkedFacilities]);
 
   // Calculate confidence breakdown (for unmatched facilities only)
@@ -324,28 +329,41 @@ export function LeadDetailsSidebar({
     return breakdown;
   }, [unmatchedFacilities]);
 
-  // Handle linking a facility to the lead
-  const handleLinkFacility = async (
+  // Handle linking a facility to the lead - open confirmation modal
+  const handleLinkFacility = (
     placeId: string,
     confidence: number,
-    matchReason: string
+    matchReason: string,
+    facilityName: string,
   ) => {
-    if (!lead?.id) return;
+    setPendingLinkFacility({ placeId, confidence, matchReason, facilityName });
+    setIsLinkConfirmModalOpen(true);
+  };
 
-    if (!confirm("Are you sure you want to link this facility to the lead?"))
-      return;
+  // Confirm linking facility
+  const handleConfirmLink = async () => {
+    if (!lead?.id || !pendingLinkFacility) return;
 
     try {
       await createLinkMutation.mutateAsync({
-        place_id: placeId,
+        place_id: pendingLinkFacility.placeId,
         close_lead_id: lead.id,
-        confidence,
-        match_reason: matchReason,
+        confidence: pendingLinkFacility.confidence,
+        match_reason: pendingLinkFacility.matchReason,
       });
+      // Close modal and clear pending state
+      setIsLinkConfirmModalOpen(false);
+      setPendingLinkFacility(null);
     } catch (error) {
       console.error("Error linking facility:", error);
       alert("Failed to link facility. Please try again.");
     }
+  };
+
+  // Cancel linking facility
+  const handleCancelLink = () => {
+    setIsLinkConfirmModalOpen(false);
+    setPendingLinkFacility(null);
   };
 
   // Handle unlinking a facility from the lead
@@ -366,21 +384,12 @@ export function LeadDetailsSidebar({
     }
   };
 
-  // Debug logging (temporary)
-  console.log("[LeadDetailsSidebar] Debug:", {
-    leadId,
-    facilityLeadLinksCount: facilityLeadLinks?.length || 0,
-    linkedFacilitiesCount: linkedFacilities.length,
-    unmatchedFacilitiesCount: unmatchedFacilities.length,
-    facilitiesCount: facilities?.length || 0,
-  });
-
   const isOpen = !!leadId;
 
   return (
     <AnimatePresence>
       {isOpen && (
-        <>
+        <motion.div key="lead-details-sidebar">
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -660,7 +669,8 @@ export function LeadDetailsSidebar({
                         {(linkedFacilities.length > 0 ||
                           unmatchedFacilities.length > 0) && (
                           <span className="inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold text-white bg-blue-600 rounded-full">
-                            {linkedFacilities.length + unmatchedFacilities.length}
+                            {linkedFacilities.length +
+                              unmatchedFacilities.length}
                           </span>
                         )}
                       </h3>
@@ -722,7 +732,10 @@ export function LeadDetailsSidebar({
                                 key={facility.place_id}
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: idx * 0.04, duration: 0.3 }}
+                                transition={{
+                                  delay: idx * 0.04,
+                                  duration: 0.3,
+                                }}
                                 className="p-5 rounded-xl transition-all duration-300 bg-gradient-to-br from-green-50 to-white border-2 border-green-300 shadow-sm"
                               >
                                 <div className="space-y-3">
@@ -749,7 +762,9 @@ export function LeadDetailsSidebar({
 
                                   {/* Match Reason */}
                                   <div className="flex items-center gap-2 text-xs text-gray-600">
-                                    <span className="font-semibold">Reason:</span>
+                                    <span className="font-semibold">
+                                      Reason:
+                                    </span>
                                     <span>{facility.matchReason}</span>
                                   </div>
 
@@ -788,9 +803,13 @@ export function LeadDetailsSidebar({
                                               <span>{sport}</span>
                                             </span>
                                           ))}
-                                        {facility.identified_sports.length > 5 && (
+                                        {facility.identified_sports.length >
+                                          5 && (
                                           <span className="inline-flex items-center px-3 py-1.5 bg-gray-100 text-gray-600 rounded-lg text-xs font-semibold border border-gray-200">
-                                            +{facility.identified_sports.length - 5} more
+                                            +
+                                            {facility.identified_sports.length -
+                                              5}{" "}
+                                            more
                                           </span>
                                         )}
                                       </div>
@@ -800,7 +819,9 @@ export function LeadDetailsSidebar({
                                   {facility.rating && (
                                     <div className="flex items-center gap-2 text-sm">
                                       <div className="flex items-center gap-1">
-                                        <span className="text-yellow-500 text-base">★</span>
+                                        <span className="text-yellow-500 text-base">
+                                          ★
+                                        </span>
                                         <span className="font-bold text-gray-900">
                                           {facility.rating.toFixed(1)}
                                         </span>
@@ -818,7 +839,7 @@ export function LeadDetailsSidebar({
                                       onClick={() =>
                                         handleUnlinkFacility(
                                           facility.link.id,
-                                          facility.place_id
+                                          facility.place_id,
                                         )
                                       }
                                       disabled={deleteLinkMutation.isPending}
@@ -839,247 +860,252 @@ export function LeadDetailsSidebar({
                     )}
 
                     {/* Suggested Matches Section - Only show if no linked facilities */}
-                    {linkedFacilities.length === 0 && unmatchedFacilities.length > 0 && (
-                      <>
-                        {/* Suggested Matches Heading */}
-                        <h4 className="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-3 flex items-center gap-2">
-                          <span className="w-2 h-2 bg-gray-400 rounded-full"></span>
-                          Suggested Matches ({unmatchedFacilities.length})
-                        </h4>
+                    {linkedFacilities.length === 0 &&
+                      unmatchedFacilities.length > 0 && (
+                        <>
+                          {/* Suggested Matches Heading */}
+                          <h4 className="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-3 flex items-center gap-2">
+                            <span className="w-2 h-2 bg-gray-400 rounded-full"></span>
+                            Suggested Matches ({unmatchedFacilities.length})
+                          </h4>
 
-                        {/* Confidence Breakdown */}
-                        <div className="mb-3 flex flex-wrap gap-2 text-xs">
-                          {confidenceBreakdown.high > 0 && (
-                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-50 text-green-700 rounded-md font-medium border border-green-200">
-                              <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                              {confidenceBreakdown.high} High Match
-                              {confidenceBreakdown.high !== 1 ? "es" : ""}
-                            </span>
-                          )}
-                          {confidenceBreakdown.medium > 0 && (
-                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 rounded-md font-medium border border-blue-200">
-                              <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-                              {confidenceBreakdown.medium} Name+City
-                            </span>
-                          )}
-                          {confidenceBreakdown.low > 0 && (
-                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-yellow-50 text-yellow-700 rounded-md font-medium border border-yellow-200">
-                              <span className="w-2 h-2 bg-yellow-500 rounded-full"></span>
-                              {confidenceBreakdown.low} Name Match
-                              {confidenceBreakdown.low !== 1 ? "es" : ""}
-                            </span>
-                          )}
-                          {confidenceBreakdown.fuzzy > 0 && (
-                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-orange-50 text-orange-700 rounded-md font-medium border border-orange-200">
-                              <span className="w-2 h-2 bg-orange-500 rounded-full"></span>
-                              {confidenceBreakdown.fuzzy} Fuzzy Match
-                              {confidenceBreakdown.fuzzy !== 1 ? "es" : ""}
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Info Box */}
-                        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                          <p className="text-xs text-blue-800 flex items-start gap-2">
-                            <Link2 className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                            <span>
-                              <strong>Link facilities to this lead</strong> to track
-                              relationships and manage your outreach. Click "Link to
-                              Lead" on any facility card below.
-                            </span>
-                          </p>
-                        </div>
-
-                        {/* Search Input */}
-                        <div className="mb-4">
-                          <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                            <input
-                              type="text"
-                              value={facilitySearchQuery}
-                              onChange={(e) =>
-                                setFacilitySearchQuery(e.target.value)
-                              }
-                              placeholder="Search by name, location, or sport..."
-                              className="w-full pl-10 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            />
+                          {/* Confidence Breakdown */}
+                          <div className="mb-3 flex flex-wrap gap-2 text-xs">
+                            {confidenceBreakdown.high > 0 && (
+                              <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-50 text-green-700 rounded-md font-medium border border-green-200">
+                                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                                {confidenceBreakdown.high} High Match
+                                {confidenceBreakdown.high !== 1 ? "es" : ""}
+                              </span>
+                            )}
+                            {confidenceBreakdown.medium > 0 && (
+                              <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 rounded-md font-medium border border-blue-200">
+                                <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                                {confidenceBreakdown.medium} Name+City
+                              </span>
+                            )}
+                            {confidenceBreakdown.low > 0 && (
+                              <span className="inline-flex items-center gap-1 px-2 py-1 bg-yellow-50 text-yellow-700 rounded-md font-medium border border-yellow-200">
+                                <span className="w-2 h-2 bg-yellow-500 rounded-full"></span>
+                                {confidenceBreakdown.low} Name Match
+                                {confidenceBreakdown.low !== 1 ? "es" : ""}
+                              </span>
+                            )}
+                            {confidenceBreakdown.fuzzy > 0 && (
+                              <span className="inline-flex items-center gap-1 px-2 py-1 bg-orange-50 text-orange-700 rounded-md font-medium border border-orange-200">
+                                <span className="w-2 h-2 bg-orange-500 rounded-full"></span>
+                                {confidenceBreakdown.fuzzy} Fuzzy Match
+                                {confidenceBreakdown.fuzzy !== 1 ? "es" : ""}
+                              </span>
+                            )}
                           </div>
-                        </div>
 
-                        {/* Facilities List */}
-                        <div className="space-y-3">
-                          {unmatchedFacilities.map((facility, idx) => {
-                          // Determine confidence badge style
-                          const getConfidenceBadge = () => {
-                            switch (facility.confidence) {
-                              case 5:
-                                return {
-                                  label: "High Match",
-                                  className:
-                                    "bg-gradient-to-r from-green-50 to-green-100 text-green-800 border-green-300",
-                                  dotColor: "bg-green-500",
-                                  needsReview: false,
-                                };
-                              case 4:
-                                return {
-                                  label: "Name + City",
-                                  className:
-                                    "bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 border-blue-300",
-                                  dotColor: "bg-blue-500",
-                                  needsReview: true,
-                                };
-                              case 3:
-                                return {
-                                  label: "Name Match",
-                                  className:
-                                    "bg-gradient-to-r from-yellow-50 to-yellow-100 text-yellow-800 border-yellow-300",
-                                  dotColor: "bg-yellow-500",
-                                  needsReview: true,
-                                };
-                              case 2:
-                                return {
-                                  label: "Fuzzy Match",
-                                  className:
-                                    "bg-gradient-to-r from-orange-50 to-orange-100 text-orange-800 border-orange-300",
-                                  dotColor: "bg-orange-500",
-                                  needsReview: true,
-                                };
-                              default:
-                                return {
-                                  label: "Match",
-                                  className:
-                                    "bg-gradient-to-r from-gray-50 to-gray-100 text-gray-800 border-gray-300",
-                                  dotColor: "bg-gray-500",
-                                  needsReview: false,
-                                };
-                            }
-                          };
+                          {/* Info Box */}
+                          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                            <p className="text-xs text-blue-800 flex items-start gap-2">
+                              <Link2 className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                              <span>
+                                <strong>Link facilities to this lead</strong> to
+                                track relationships and manage your outreach.
+                                Click "Link to Lead" on any facility card below.
+                              </span>
+                            </p>
+                          </div>
 
-                          const confidenceBadge = getConfidenceBadge();
+                          {/* Search Input */}
+                          <div className="mb-4">
+                            <div className="relative">
+                              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                              <input
+                                type="text"
+                                value={facilitySearchQuery}
+                                onChange={(e) =>
+                                  setFacilitySearchQuery(e.target.value)
+                                }
+                                placeholder="Search by name, location, or sport..."
+                                className="w-full pl-10 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              />
+                            </div>
+                          </div>
 
-                          return (
-                            <motion.div
-                              key={facility.place_id}
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: idx * 0.04, duration: 0.3 }}
-                              whileTap={{ scale: 0.98 }}
-                              className="p-5 rounded-xl transition-all duration-300 cursor-pointer bg-gradient-to-br from-white to-gray-50/50 hover:from-gray-50 hover:to-gray-100/50 border-2 border-gray-200 hover:border-blue-300 shadow-sm hover:shadow-md"
-                            >
-                              <div className="space-y-3">
-                                {/* Header: Name and Confidence Badge */}
-                                <div className="flex items-start justify-between gap-3">
-                                  <h4 className="font-bold text-gray-900 text-base leading-tight flex-1">
-                                    {facility.name}
-                                  </h4>
-                                  <div className="flex flex-col gap-1 items-end flex-shrink-0">
-                                    <span
-                                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold border shadow-sm ${confidenceBadge.className}`}
-                                    >
-                                      <span
-                                        className={`w-1.5 h-1.5 rounded-full ${confidenceBadge.dotColor}`}
-                                      ></span>
-                                      {confidenceBadge.label}
-                                    </span>
-                                    {confidenceBadge.needsReview && (
-                                      <span className="text-[10px] text-gray-500 italic font-medium">
-                                        Needs review
-                                      </span>
-                                    )}
-                                  </div>
-                                </div>
+                          {/* Facilities List */}
+                          <div className="space-y-3">
+                            {unmatchedFacilities.map((facility, idx) => {
+                              // Determine confidence badge style
+                              const getConfidenceBadge = () => {
+                                switch (facility.confidence) {
+                                  case 5:
+                                    return {
+                                      label: "High Match",
+                                      className:
+                                        "bg-gradient-to-r from-green-50 to-green-100 text-green-800 border-green-300",
+                                      dotColor: "bg-green-500",
+                                      needsReview: false,
+                                    };
+                                  case 4:
+                                    return {
+                                      label: "Name + City",
+                                      className:
+                                        "bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 border-blue-300",
+                                      dotColor: "bg-blue-500",
+                                      needsReview: true,
+                                    };
+                                  case 3:
+                                    return {
+                                      label: "Name Match",
+                                      className:
+                                        "bg-gradient-to-r from-yellow-50 to-yellow-100 text-yellow-800 border-yellow-300",
+                                      dotColor: "bg-yellow-500",
+                                      needsReview: true,
+                                    };
+                                  case 2:
+                                    return {
+                                      label: "Fuzzy Match",
+                                      className:
+                                        "bg-gradient-to-r from-orange-50 to-orange-100 text-orange-800 border-orange-300",
+                                      dotColor: "bg-orange-500",
+                                      needsReview: true,
+                                    };
+                                  default:
+                                    return {
+                                      label: "Match",
+                                      className:
+                                        "bg-gradient-to-r from-gray-50 to-gray-100 text-gray-800 border-gray-300",
+                                      dotColor: "bg-gray-500",
+                                      needsReview: false,
+                                    };
+                                }
+                              };
 
-                                {/* Address */}
-                                <div className="flex items-start gap-2">
-                                  <MapPin className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
-                                  <p className="text-sm text-gray-600 leading-relaxed">
-                                    {facility.address}
-                                  </p>
-                                </div>
+                              const confidenceBadge = getConfidenceBadge();
 
-                                {/* Phone */}
-                                {facility.phone && (
-                                  <div className="flex items-center gap-2">
-                                    <Phone className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                                    <p className="text-sm text-gray-700 font-medium">
-                                      {facility.phone}
-                                    </p>
-                                  </div>
-                                )}
-
-                                {/* Sports Badges */}
-                                {facility.identified_sports &&
-                                  facility.identified_sports.length > 0 && (
-                                    <div className="flex flex-wrap gap-2">
-                                      {facility.identified_sports
-                                        .slice(0, 5)
-                                        .map((sport) => (
+                              return (
+                                <motion.div
+                                  key={facility.place_id}
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{
+                                    delay: idx * 0.04,
+                                    duration: 0.3,
+                                  }}
+                                  whileTap={{ scale: 0.98 }}
+                                  className="p-5 rounded-xl transition-all duration-300 cursor-pointer bg-gradient-to-br from-white to-gray-50/50 hover:from-gray-50 hover:to-gray-100/50 border-2 border-gray-200 hover:border-blue-300 shadow-sm hover:shadow-md"
+                                >
+                                  <div className="space-y-3">
+                                    {/* Header: Name and Confidence Badge */}
+                                    <div className="flex items-start justify-between gap-3">
+                                      <h4 className="font-bold text-gray-900 text-base leading-tight flex-1">
+                                        {facility.name}
+                                      </h4>
+                                      <div className="flex flex-col gap-1 items-end flex-shrink-0">
+                                        <span
+                                          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold border shadow-sm ${confidenceBadge.className}`}
+                                        >
                                           <span
-                                            key={sport}
-                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 rounded-lg text-xs font-semibold shadow-sm border border-blue-200"
-                                          >
-                                            <span className="text-base">
-                                              {SPORT_EMOJIS[sport] || "🏅"}
-                                            </span>
-                                            <span>{sport}</span>
-                                          </span>
-                                        ))}
-                                      {facility.identified_sports.length >
-                                        5 && (
-                                        <span className="inline-flex items-center px-3 py-1.5 bg-gray-100 text-gray-600 rounded-lg text-xs font-semibold border border-gray-200">
-                                          +
-                                          {facility.identified_sports.length -
-                                            5}{" "}
-                                          more
+                                            className={`w-1.5 h-1.5 rounded-full ${confidenceBadge.dotColor}`}
+                                          ></span>
+                                          {confidenceBadge.label}
                                         </span>
+                                        {confidenceBadge.needsReview && (
+                                          <span className="text-[10px] text-gray-500 italic font-medium">
+                                            Needs review
+                                          </span>
+                                        )}
+                                      </div>
+                                    </div>
+
+                                    {/* Address */}
+                                    <div className="flex items-start gap-2">
+                                      <MapPin className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                                      <p className="text-sm text-gray-600 leading-relaxed">
+                                        {facility.address}
+                                      </p>
+                                    </div>
+
+                                    {/* Phone */}
+                                    {facility.phone && (
+                                      <div className="flex items-center gap-2">
+                                        <Phone className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                                        <p className="text-sm text-gray-700 font-medium">
+                                          {facility.phone}
+                                        </p>
+                                      </div>
+                                    )}
+
+                                    {/* Sports Badges */}
+                                    {facility.identified_sports &&
+                                      facility.identified_sports.length > 0 && (
+                                        <div className="flex flex-wrap gap-2">
+                                          {facility.identified_sports
+                                            .slice(0, 5)
+                                            .map((sport) => (
+                                              <span
+                                                key={sport}
+                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 rounded-lg text-xs font-semibold shadow-sm border border-blue-200"
+                                              >
+                                                <span className="text-base">
+                                                  {SPORT_EMOJIS[sport] || "🏅"}
+                                                </span>
+                                                <span>{sport}</span>
+                                              </span>
+                                            ))}
+                                          {facility.identified_sports.length >
+                                            5 && (
+                                            <span className="inline-flex items-center px-3 py-1.5 bg-gray-100 text-gray-600 rounded-lg text-xs font-semibold border border-gray-200">
+                                              +
+                                              {facility.identified_sports
+                                                .length - 5}{" "}
+                                              more
+                                            </span>
+                                          )}
+                                        </div>
                                       )}
-                                    </div>
-                                  )}
 
-                                {/* Rating */}
-                                {facility.rating && (
-                                  <div className="flex items-center gap-2 text-sm">
-                                    <div className="flex items-center gap-1">
-                                      <span className="text-yellow-500 text-base">
-                                        ★
-                                      </span>
-                                      <span className="font-bold text-gray-900">
-                                        {facility.rating.toFixed(1)}
-                                      </span>
+                                    {/* Rating */}
+                                    {facility.rating && (
+                                      <div className="flex items-center gap-2 text-sm">
+                                        <div className="flex items-center gap-1">
+                                          <span className="text-yellow-500 text-base">
+                                            ★
+                                          </span>
+                                          <span className="font-bold text-gray-900">
+                                            {facility.rating.toFixed(1)}
+                                          </span>
+                                        </div>
+                                        <span className="text-gray-400">•</span>
+                                        <span className="text-gray-500">
+                                          {facility.user_ratings_total} reviews
+                                        </span>
+                                      </div>
+                                    )}
+
+                                    {/* Link to Lead Button */}
+                                    <div className="pt-3 border-t border-gray-200">
+                                      <button
+                                        onClick={() =>
+                                          handleLinkFacility(
+                                            facility.place_id,
+                                            facility.confidence,
+                                            facility.matchReason,
+                                            facility.name,
+                                          )
+                                        }
+                                        disabled={createLinkMutation.isPending}
+                                        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 hover:border-blue-300 rounded-lg transition-all duration-200 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                                      >
+                                        <Link2 className="w-4 h-4" />
+                                        {createLinkMutation.isPending
+                                          ? "Linking..."
+                                          : "Link to Lead"}
+                                      </button>
                                     </div>
-                                    <span className="text-gray-400">•</span>
-                                    <span className="text-gray-500">
-                                      {facility.user_ratings_total} reviews
-                                    </span>
                                   </div>
-                                )}
-
-                                {/* Link to Lead Button */}
-                                <div className="pt-3 border-t border-gray-200">
-                                  <button
-                                    onClick={() =>
-                                      handleLinkFacility(
-                                        facility.place_id,
-                                        facility.confidence,
-                                        facility.matchReason
-                                      )
-                                    }
-                                    disabled={createLinkMutation.isPending}
-                                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 hover:border-blue-300 rounded-lg transition-all duration-200 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                                  >
-                                    <Link2 className="w-4 h-4" />
-                                    {createLinkMutation.isPending
-                                      ? "Linking..."
-                                      : "Link to Lead"}
-                                  </button>
-                                </div>
-                              </div>
-                            </motion.div>
-                          );
-                        })}
-                        </div>
-                      </>
-                    )}
+                                </motion.div>
+                              );
+                            })}
+                          </div>
+                        </>
+                      )}
 
                     {/* No Facilities Message - Only show if no linked facilities and no matches */}
                     {linkedFacilities.length === 0 &&
@@ -1099,8 +1125,8 @@ export function LeadDetailsSidebar({
                               : "No matching facilities found"}
                           </p>
                           <p className="text-sm text-gray-500">
-                            Try adjusting your search or check if the lead details
-                            are correct
+                            Try adjusting your search or check if the lead
+                            details are correct
                           </p>
                         </motion.div>
                       )}
@@ -1109,8 +1135,100 @@ export function LeadDetailsSidebar({
               ) : null}
             </div>
           </motion.div>
-        </>
+        </motion.div>
       )}
+
+      {/* Link Confirmation Modal */}
+      <AnimatePresence>
+        {isLinkConfirmModalOpen && pendingLinkFacility && (
+          <motion.div key="link-confirmation-modal">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={handleCancelLink}
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[70]"
+            />
+
+            {/* Modal */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white rounded-2xl shadow-2xl z-[70] p-6"
+            >
+              {/* Header */}
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                    <Link2 className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900">
+                      Link Facility to Lead?
+                    </h3>
+                  </div>
+                </div>
+                <button
+                  onClick={handleCancelLink}
+                  className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+
+              {/* Body */}
+              <div className="mb-6">
+                <p className="text-sm text-gray-600 mb-3">
+                  You are about to link this facility to the current lead:
+                </p>
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="font-bold text-gray-900 mb-1">
+                    {pendingLinkFacility.facilityName}
+                  </p>
+                  <div className="flex items-center gap-2 text-xs text-gray-600">
+                    <span className="font-semibold">Match Quality:</span>
+                    <span
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold ${
+                        pendingLinkFacility.confidence === 5
+                          ? "bg-green-100 text-green-800"
+                          : pendingLinkFacility.confidence === 4
+                            ? "bg-blue-100 text-blue-800"
+                            : pendingLinkFacility.confidence === 3
+                              ? "bg-yellow-100 text-yellow-800"
+                              : "bg-orange-100 text-orange-800"
+                      }`}
+                    >
+                      {pendingLinkFacility.matchReason}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3">
+                <button
+                  onClick={handleCancelLink}
+                  disabled={createLinkMutation.isPending}
+                  className="flex-1 px-4 py-2.5 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleConfirmLink}
+                  disabled={createLinkMutation.isPending}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  <Link2 className="w-4 h-4" />
+                  {createLinkMutation.isPending ? "Linking..." : "Link to Lead"}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </AnimatePresence>
   );
 }
