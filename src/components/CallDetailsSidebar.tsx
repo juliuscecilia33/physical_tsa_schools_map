@@ -19,8 +19,10 @@ import {
   ExternalLink,
   ChevronDown,
   ChevronUp,
+  Link2,
 } from 'lucide-react';
 import { useCloseCall, useCloseLead, useCloseUser, useCloseCalls } from '@/hooks/useCloseCRM';
+import { useFacilityLeadLinks } from '@/hooks/useFacilityLeadLinks';
 
 interface CallDetailsSidebarProps {
   callId: string | null;
@@ -104,6 +106,7 @@ export function CallDetailsSidebar({ callId, leadId, onClose }: CallDetailsSideb
   const { data: call, isLoading: callLoading, error: callError } = useCloseCall(callId);
   const { data: lead, isLoading: leadLoading, error: leadError } = useCloseLead(leadId || call?.lead_id || null);
   const { data: user } = useCloseUser(); // Get current user for now
+  const { data: facilityLeadLinks = [] } = useFacilityLeadLinks(leadId || call?.lead_id || null);
 
   // Get related calls for the same lead
   const { data: relatedCallsData } = useCloseCalls(
@@ -278,6 +281,17 @@ export function CallDetailsSidebar({ callId, leadId, onClose }: CallDetailsSideb
                           {lead.status_label && (
                             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mt-2">
                               {lead.status_label}
+                            </span>
+                          )}
+                          {facilityLeadLinks.length > 0 ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 mt-2 ml-1">
+                              <Link2 className="w-3 h-3" />
+                              Linked to Facility
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-500 mt-2 ml-1">
+                              <Link2 className="w-3 h-3" />
+                              No Facility Linked
                             </span>
                           )}
                         </div>

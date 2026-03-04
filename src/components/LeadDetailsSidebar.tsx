@@ -30,6 +30,11 @@ import {
   useCreateFacilityLeadLink,
   useDeleteFacilityLeadLink,
 } from "@/hooks/useFacilityLeadLinks";
+import { useQueryClient } from "@tanstack/react-query";
+import { createClient } from "@/lib/supabase/client";
+import { updateFacilityTags } from "@/utils/facilityCache";
+
+const CLOSE_DATA_TAG_ID = "ef3537b6-4d83-4eb8-84a5-9bc74e776c72";
 
 // Sport emoji mapping
 const SPORT_EMOJIS: { [key: string]: string } = {
@@ -88,6 +93,8 @@ export function LeadDetailsSidebar({
     useFacilityLeadLinks(leadId);
   const createLinkMutation = useCreateFacilityLeadLink();
   const deleteLinkMutation = useDeleteFacilityLeadLink();
+  const queryClient = useQueryClient();
+  const supabase = createClient();
 
   // Facility search state
   const [facilitySearchQuery, setFacilitySearchQuery] = useState("");
@@ -347,6 +354,42 @@ export function LeadDetailsSidebar({
     setIsLinkConfirmModalOpen(true);
   };
 
+  // Auto-assign "Close Data Included" tag to a facility
+  const assignCloseDataTag = async (placeId: string) => {
+    try {
+      // Insert tag assignment (ignore if already exists)
+      const { error: insertError } = await supabase
+        .from("facility_tag_assignments")
+        .insert({ place_id: placeId, tag_id: CLOSE_DATA_TAG_ID });
+
+      if (insertError && insertError.code !== "23505") {
+        console.error("Error assigning Close Data tag:", insertError);
+        return;
+      }
+
+      // Fetch the tag details for cache update
+      const { data: tagData, error: tagError } = await supabase
+        .from("facility_tags")
+        .select("id, name, color, description")
+        .eq("id", CLOSE_DATA_TAG_ID)
+        .single();
+
+      if (tagError || !tagData) {
+        console.error("Error fetching Close Data tag details:", tagError);
+        return;
+      }
+
+      // Update the facility cache with the new tag
+      const facility = facilities.find((f) => f.place_id === placeId);
+      const currentTags = facility?.tags ?? [];
+      if (!currentTags.some((t) => t.id === CLOSE_DATA_TAG_ID)) {
+        updateFacilityTags(queryClient, placeId, [...currentTags, tagData]);
+      }
+    } catch (error) {
+      console.error("Error in assignCloseDataTag:", error);
+    }
+  };
+
   // Confirm linking facility
   const handleConfirmLink = async () => {
     if (!lead?.id || !pendingLinkFacility) return;
@@ -358,6 +401,8 @@ export function LeadDetailsSidebar({
         confidence: pendingLinkFacility.confidence,
         match_reason: pendingLinkFacility.matchReason,
       });
+      // Auto-assign "Close Data Included" tag
+      await assignCloseDataTag(pendingLinkFacility.placeId);
       // Close modal and clear pending state
       setIsLinkConfirmModalOpen(false);
       setPendingLinkFacility(null);
