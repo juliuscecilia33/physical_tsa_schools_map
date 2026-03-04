@@ -332,6 +332,9 @@ export function LeadDetailsSidebar({
   ) => {
     if (!lead?.id) return;
 
+    if (!confirm("Are you sure you want to link this facility to the lead?"))
+      return;
+
     try {
       await createLinkMutation.mutateAsync({
         place_id: placeId,
@@ -362,6 +365,15 @@ export function LeadDetailsSidebar({
       alert("Failed to unlink facility. Please try again.");
     }
   };
+
+  // Debug logging (temporary)
+  console.log("[LeadDetailsSidebar] Debug:", {
+    leadId,
+    facilityLeadLinksCount: facilityLeadLinks?.length || 0,
+    linkedFacilitiesCount: linkedFacilities.length,
+    unmatchedFacilitiesCount: unmatchedFacilities.length,
+    facilitiesCount: facilities?.length || 0,
+  });
 
   const isOpen = !!leadId;
 
@@ -810,7 +822,7 @@ export function LeadDetailsSidebar({
                                         )
                                       }
                                       disabled={deleteLinkMutation.isPending}
-                                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 hover:border-red-300 rounded-lg transition-all duration-200 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 hover:border-red-300 rounded-lg transition-all duration-200 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                                     >
                                       <X className="w-4 h-4" />
                                       {deleteLinkMutation.isPending
@@ -826,15 +838,16 @@ export function LeadDetailsSidebar({
                       </div>
                     )}
 
-                    {/* Confidence Breakdown for Unmatched */}
-                    {unmatchedFacilities.length > 0 && (
+                    {/* Suggested Matches Section - Only show if no linked facilities */}
+                    {linkedFacilities.length === 0 && unmatchedFacilities.length > 0 && (
                       <>
-                        {linkedFacilities.length > 0 && (
-                          <h4 className="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-3 flex items-center gap-2 mt-6">
-                            <span className="w-2 h-2 bg-gray-400 rounded-full"></span>
-                            Suggested Matches ({unmatchedFacilities.length})
-                          </h4>
-                        )}
+                        {/* Suggested Matches Heading */}
+                        <h4 className="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-3 flex items-center gap-2">
+                          <span className="w-2 h-2 bg-gray-400 rounded-full"></span>
+                          Suggested Matches ({unmatchedFacilities.length})
+                        </h4>
+
+                        {/* Confidence Breakdown */}
                         <div className="mb-3 flex flex-wrap gap-2 text-xs">
                           {confidenceBreakdown.high > 0 && (
                             <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-50 text-green-700 rounded-md font-medium border border-green-200">
@@ -864,38 +877,38 @@ export function LeadDetailsSidebar({
                             </span>
                           )}
                         </div>
+
+                        {/* Info Box */}
                         <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                           <p className="text-xs text-blue-800 flex items-start gap-2">
                             <Link2 className="w-4 h-4 mt-0.5 flex-shrink-0" />
                             <span>
-                              <strong>Link facilities to this lead</strong> to track relationships and manage your outreach.
-                              Click "Link to Lead" on any facility card below.
+                              <strong>Link facilities to this lead</strong> to track
+                              relationships and manage your outreach. Click "Link to
+                              Lead" on any facility card below.
                             </span>
                           </p>
                         </div>
-                      </>
-                    )}
 
-                    {/* Search Input */}
-                    <div className="mb-4">
-                      <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                        <input
-                          type="text"
-                          value={facilitySearchQuery}
-                          onChange={(e) =>
-                            setFacilitySearchQuery(e.target.value)
-                          }
-                          placeholder="Search by name, location, or sport..."
-                          className="w-full pl-10 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        />
-                      </div>
-                    </div>
+                        {/* Search Input */}
+                        <div className="mb-4">
+                          <div className="relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                            <input
+                              type="text"
+                              value={facilitySearchQuery}
+                              onChange={(e) =>
+                                setFacilitySearchQuery(e.target.value)
+                              }
+                              placeholder="Search by name, location, or sport..."
+                              className="w-full pl-10 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            />
+                          </div>
+                        </div>
 
-                    {/* Facilities List */}
-                    {unmatchedFacilities.length > 0 ? (
-                      <div className="space-y-3">
-                        {unmatchedFacilities.map((facility, idx) => {
+                        {/* Facilities List */}
+                        <div className="space-y-3">
+                          {unmatchedFacilities.map((facility, idx) => {
                           // Determine confidence badge style
                           const getConfidenceBadge = () => {
                             switch (facility.confidence) {
@@ -1052,7 +1065,7 @@ export function LeadDetailsSidebar({
                                       )
                                     }
                                     disabled={createLinkMutation.isPending}
-                                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 hover:border-blue-300 rounded-lg transition-all duration-200 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 hover:border-blue-300 rounded-lg transition-all duration-200 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                                   >
                                     <Link2 className="w-4 h-4" />
                                     {createLinkMutation.isPending
@@ -1064,28 +1077,33 @@ export function LeadDetailsSidebar({
                             </motion.div>
                           );
                         })}
-                      </div>
-                    ) : linkedFacilities.length === 0 ? (
-                      <motion.div
-                        initial={{ scale: 0.8, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ duration: 0.3 }}
-                        className="text-center py-12"
-                      >
-                        <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
-                          <Building2 className="w-8 h-8 text-gray-400" />
                         </div>
-                        <p className="text-base font-semibold text-gray-700 mb-1">
-                          {facilitySearchQuery.trim()
-                            ? "No facilities match your search"
-                            : "No matching facilities found"}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          Try adjusting your search or check if the lead details
-                          are correct
-                        </p>
-                      </motion.div>
-                    ) : null}
+                      </>
+                    )}
+
+                    {/* No Facilities Message - Only show if no linked facilities and no matches */}
+                    {linkedFacilities.length === 0 &&
+                      unmatchedFacilities.length === 0 && (
+                        <motion.div
+                          initial={{ scale: 0.8, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ duration: 0.3 }}
+                          className="text-center py-12"
+                        >
+                          <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
+                            <Building2 className="w-8 h-8 text-gray-400" />
+                          </div>
+                          <p className="text-base font-semibold text-gray-700 mb-1">
+                            {facilitySearchQuery.trim()
+                              ? "No facilities match your search"
+                              : "No matching facilities found"}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            Try adjusting your search or check if the lead details
+                            are correct
+                          </p>
+                        </motion.div>
+                      )}
                   </div>
                 </>
               ) : null}

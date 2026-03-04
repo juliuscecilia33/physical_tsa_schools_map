@@ -1,7 +1,7 @@
 {
-  "processedCount": 1423,
-  "successCount": 1221,
-  "failedCount": 208,
+  "processedCount": 1427,
+  "successCount": 1222,
+  "failedCount": 211,
   "skippedCount": 17,
   "processedFacilityIds": [
     "2651e40a-b22d-4b23-9fd7-8ff121dfdd25",
@@ -1227,15 +1227,16 @@
     "660a4f9b-8ad4-4347-b778-f5624c8eff84",
     "4b9c7709-627e-446e-a3d1-1a41295d863f",
     "59eec559-ae76-42b3-ab21-bf8bfd1c3116",
-    "f7e6a1cf-fbf2-491b-bee4-b445c12467da"
+    "f7e6a1cf-fbf2-491b-bee4-b445c12467da",
+    "318b7006-a829-4973-bd83-1ece926d7a01"
   ],
-  "lastProcessedIndex": 1436,
-  "imagesProcessed": 50065,
+  "lastProcessedIndex": 1440,
+  "imagesProcessed": 50197,
   "imagesSkipped": 39,
-  "imagesFailed": 507,
-  "totalBytesBefore": 121354341656,
-  "totalBytesAfter": 48485210154,
-  "lastUpdated": "2026-03-04T03:19:59.605Z",
+  "imagesFailed": 510,
+  "totalBytesBefore": 121644105039,
+  "totalBytesAfter": 48595086698,
+  "lastUpdated": "2026-03-04T03:32:03.240Z",
   "errors": [
     {
       "facility_id": "c8861bb6-f825-4d28-a60f-695b1edfef7b",
@@ -4785,8 +4786,29 @@
       "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/90059eda-715f-43a8-8bec-46a8a74390c1/1772065810385_8.jpg",
       "error": "Failed to download image",
       "timestamp": "2026-03-04T03:19:51.338Z"
+    },
+    {
+      "facility_id": "acff598b-2172-4616-a2bb-0cd117d1b231",
+      "facility_name": "John Gupton Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/acff598b-2172-4616-a2bb-0cd117d1b231/1772065951934_36.jpg",
+      "error": "Failed to upload compressed image",
+      "timestamp": "2026-03-04T03:23:55.636Z"
+    },
+    {
+      "facility_id": "edb62469-099e-4b78-8bfd-120b8020020f",
+      "facility_name": "WELLBEING T50 FITNESS",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/edb62469-099e-4b78-8bfd-120b8020020f/1772153530472_5.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-04T03:25:16.816Z"
+    },
+    {
+      "facility_id": "7726e6ba-69bc-42c7-bbd0-4aa641d1d260",
+      "facility_name": "Martin Weiss Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/7726e6ba-69bc-42c7-bbd0-4aa641d1d260/1772152810925_15.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-04T03:28:58.962Z"
     }
   ],
-  "deletionsSucceeded": 46431,
-  "deletionsFailed": 8
+  "deletionsSucceeded": 46562,
+  "deletionsFailed": 9
 }
