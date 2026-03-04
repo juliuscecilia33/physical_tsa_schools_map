@@ -1,7 +1,7 @@
 {
-  "processedCount": 1414,
-  "successCount": 1217,
-  "failedCount": 203,
+  "processedCount": 1423,
+  "successCount": 1221,
+  "failedCount": 208,
   "skippedCount": 17,
   "processedFacilityIds": [
     "2651e40a-b22d-4b23-9fd7-8ff121dfdd25",
@@ -1223,15 +1223,19 @@
     "199103e9-d175-4c59-a4dc-b6ae55a8b38e",
     "e2d89e08-3388-40fa-8409-b9b282d03605",
     "83c43a26-02cc-4b5d-a248-c9604abfbd76",
-    "cfef698e-1621-4f9e-8c94-29f2639fed77"
+    "cfef698e-1621-4f9e-8c94-29f2639fed77",
+    "660a4f9b-8ad4-4347-b778-f5624c8eff84",
+    "4b9c7709-627e-446e-a3d1-1a41295d863f",
+    "59eec559-ae76-42b3-ab21-bf8bfd1c3116",
+    "f7e6a1cf-fbf2-491b-bee4-b445c12467da"
   ],
-  "lastProcessedIndex": 1427,
-  "imagesProcessed": 49758,
+  "lastProcessedIndex": 1436,
+  "imagesProcessed": 50065,
   "imagesSkipped": 39,
-  "imagesFailed": 497,
-  "totalBytesBefore": 120538037429,
-  "totalBytesAfter": 48133577640,
-  "lastUpdated": "2026-03-04T03:03:51.959Z",
+  "imagesFailed": 507,
+  "totalBytesBefore": 121354341656,
+  "totalBytesAfter": 48485210154,
+  "lastUpdated": "2026-03-04T03:19:59.605Z",
   "errors": [
     {
       "facility_id": "c8861bb6-f825-4d28-a60f-695b1edfef7b",
@@ -4711,8 +4715,78 @@
       "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/ef5067ae-cff8-4c09-b18d-523073c1ccb8/1772087896454_4.jpg",
       "error": "Failed to compress image",
       "timestamp": "2026-03-04T02:52:56.325Z"
+    },
+    {
+      "facility_id": "da6ffe62-ac23-44e4-a6db-6c95b4bcf254",
+      "facility_name": "Eastside Sports Complex",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/da6ffe62-ac23-44e4-a6db-6c95b4bcf254/1772059999095_21.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T03:08:43.584Z"
+    },
+    {
+      "facility_id": "da6ffe62-ac23-44e4-a6db-6c95b4bcf254",
+      "facility_name": "Eastside Sports Complex",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/da6ffe62-ac23-44e4-a6db-6c95b4bcf254/1772060009598_31.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T03:09:08.196Z"
+    },
+    {
+      "facility_id": "4ea35bfd-1d41-4e2a-8f64-cdfcd7b42c98",
+      "facility_name": "The Gym @ Contagion Athletics",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4ea35bfd-1d41-4e2a-8f64-cdfcd7b42c98/1772061096520_3.jpg",
+      "error": "Failed to upload compressed image",
+      "timestamp": "2026-03-04T03:09:38.167Z"
+    },
+    {
+      "facility_id": "4ea35bfd-1d41-4e2a-8f64-cdfcd7b42c98",
+      "facility_name": "The Gym @ Contagion Athletics",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4ea35bfd-1d41-4e2a-8f64-cdfcd7b42c98/1772061116534_21.jpg",
+      "error": "Failed to upload compressed image",
+      "timestamp": "2026-03-04T03:10:17.486Z"
+    },
+    {
+      "facility_id": "597e013e-6f10-4ec2-bc0d-c83aec8afb6c",
+      "facility_name": "Lynn Gripon Park at Countryside",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/597e013e-6f10-4ec2-bc0d-c83aec8afb6c/1772065130157_4.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-04T03:11:18.827Z"
+    },
+    {
+      "facility_id": "597e013e-6f10-4ec2-bc0d-c83aec8afb6c",
+      "facility_name": "Lynn Gripon Park at Countryside",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/597e013e-6f10-4ec2-bc0d-c83aec8afb6c/1772065139447_11.jpg",
+      "error": "Failed to upload compressed image",
+      "timestamp": "2026-03-04T03:11:39.407Z"
+    },
+    {
+      "facility_id": "be4fcc5a-053f-43a4-b39f-33ebfed97d5a",
+      "facility_name": "J.A. Carr Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/be4fcc5a-053f-43a4-b39f-33ebfed97d5a/1772063916067_3.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-04T03:15:48.838Z"
+    },
+    {
+      "facility_id": "be4fcc5a-053f-43a4-b39f-33ebfed97d5a",
+      "facility_name": "J.A. Carr Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/be4fcc5a-053f-43a4-b39f-33ebfed97d5a/1772063941496_23.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-04T03:16:46.761Z"
+    },
+    {
+      "facility_id": "be4fcc5a-053f-43a4-b39f-33ebfed97d5a",
+      "facility_name": "J.A. Carr Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/be4fcc5a-053f-43a4-b39f-33ebfed97d5a/1772063959274_37.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-04T03:17:48.403Z"
+    },
+    {
+      "facility_id": "90059eda-715f-43a8-8bec-46a8a74390c1",
+      "facility_name": "Bandera Performance Diesel",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/90059eda-715f-43a8-8bec-46a8a74390c1/1772065810385_8.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-04T03:19:51.338Z"
     }
   ],
-  "deletionsSucceeded": 46124,
+  "deletionsSucceeded": 46431,
   "deletionsFailed": 8
 }

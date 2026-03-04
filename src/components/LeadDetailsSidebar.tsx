@@ -23,6 +23,11 @@ import {
 import { CloseActivityTimeline } from "./CloseActivityTimeline";
 import { useMemo, useState } from "react";
 import { Facility } from "@/types/facility";
+import {
+  useFacilityLeadLinks,
+  useCreateFacilityLeadLink,
+  useDeleteFacilityLeadLink,
+} from "@/hooks/useFacilityLeadLinks";
 
 // Sport emoji mapping
 const SPORT_EMOJIS: { [key: string]: string } = {
@@ -75,6 +80,12 @@ export function LeadDetailsSidebar({
   const { data: activitiesData, isLoading: activitiesLoading } =
     useCloseLeadActivities(leadId);
   const { data: statuses } = useCloseLeadStatuses();
+
+  // Facility-lead links
+  const { data: facilityLeadLinks = [], isLoading: linksLoading } =
+    useFacilityLeadLinks(leadId);
+  const createLinkMutation = useCreateFacilityLeadLink();
+  const deleteLinkMutation = useDeleteFacilityLeadLink();
 
   // Facility search state
   const [facilitySearchQuery, setFacilitySearchQuery] = useState("");
@@ -261,7 +272,40 @@ export function LeadDetailsSidebar({
       .slice(0, 50); // Limit to 50 results
   }, [facilities, lead, facilitySearchQuery]);
 
-  // Calculate confidence breakdown
+  // Separate linked facilities from matched facilities
+  const linkedFacilities = useMemo(() => {
+    if (!facilityLeadLinks || !facilities) return [];
+
+    return facilityLeadLinks
+      .map((link) => {
+        const facility = facilities.find((f) => f.place_id === link.place_id);
+        if (!facility) return null;
+        return {
+          ...facility,
+          link,
+          confidence: link.confidence,
+          matchReason: link.match_reason,
+        };
+      })
+      .filter(Boolean) as (typeof matchedFacilities[0] & {
+      link: typeof facilityLeadLinks[0];
+    })[];
+  }, [facilityLeadLinks, facilities]);
+
+  // Filter out linked facilities from matched facilities
+  const unmatchedFacilities = useMemo(() => {
+    if (!linkedFacilities.length) return matchedFacilities;
+
+    const linkedPlaceIds = new Set(
+      linkedFacilities.map((f) => f.place_id)
+    );
+
+    return matchedFacilities.filter(
+      (f) => !linkedPlaceIds.has(f.place_id)
+    );
+  }, [matchedFacilities, linkedFacilities]);
+
+  // Calculate confidence breakdown (for unmatched facilities only)
   const confidenceBreakdown = useMemo(() => {
     const breakdown = {
       high: 0, // Confidence 5
@@ -270,7 +314,7 @@ export function LeadDetailsSidebar({
       fuzzy: 0, // Confidence 2
     };
 
-    matchedFacilities.forEach((facility) => {
+    unmatchedFacilities.forEach((facility) => {
       if (facility.confidence === 5) breakdown.high++;
       else if (facility.confidence === 4) breakdown.medium++;
       else if (facility.confidence === 3) breakdown.low++;
@@ -278,7 +322,46 @@ export function LeadDetailsSidebar({
     });
 
     return breakdown;
-  }, [matchedFacilities]);
+  }, [unmatchedFacilities]);
+
+  // Handle linking a facility to the lead
+  const handleLinkFacility = async (
+    placeId: string,
+    confidence: number,
+    matchReason: string
+  ) => {
+    if (!lead?.id) return;
+
+    try {
+      await createLinkMutation.mutateAsync({
+        place_id: placeId,
+        close_lead_id: lead.id,
+        confidence,
+        match_reason: matchReason,
+      });
+    } catch (error) {
+      console.error("Error linking facility:", error);
+      alert("Failed to link facility. Please try again.");
+    }
+  };
+
+  // Handle unlinking a facility from the lead
+  const handleUnlinkFacility = async (linkId: string, placeId: string) => {
+    if (!lead?.id) return;
+
+    if (!confirm("Are you sure you want to unlink this facility?")) return;
+
+    try {
+      await deleteLinkMutation.mutateAsync({
+        id: linkId,
+        closeLeadId: lead.id,
+        placeId,
+      });
+    } catch (error) {
+      console.error("Error unlinking facility:", error);
+      alert("Failed to unlink facility. Please try again.");
+    }
+  };
 
   const isOpen = !!leadId;
 
@@ -554,23 +637,204 @@ export function LeadDetailsSidebar({
                     />
                   </div>
 
-                  {/* Nearby Facilities */}
+                  {/* Linked & Matched Facilities */}
                   <div className="bg-white border border-gray-200 rounded-lg p-5">
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider flex items-center gap-2">
                         <Building2 className="w-4 h-4" />
-                        Matched Facilities
-                        {matchedFacilities.length > 0 && (
+                        {linkedFacilities.length > 0
+                          ? "Linked Facilities"
+                          : "Matched Facilities"}
+                        {(linkedFacilities.length > 0 ||
+                          unmatchedFacilities.length > 0) && (
                           <span className="inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold text-white bg-blue-600 rounded-full">
-                            {matchedFacilities.length}
+                            {linkedFacilities.length + unmatchedFacilities.length}
                           </span>
                         )}
                       </h3>
                     </div>
 
-                    {/* Confidence Breakdown */}
-                    {matchedFacilities.length > 0 && (
+                    {/* Linked Facilities Section */}
+                    {linkedFacilities.length > 0 && (
+                      <div className="mb-6">
+                        <h4 className="text-xs font-semibold text-green-700 uppercase tracking-wider mb-3 flex items-center gap-2">
+                          <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                          Linked ({linkedFacilities.length})
+                        </h4>
+                        <div className="space-y-3">
+                          {linkedFacilities.map((facility, idx) => {
+                            const getConfidenceBadge = () => {
+                              switch (facility.confidence) {
+                                case 5:
+                                  return {
+                                    label: "High Match",
+                                    className:
+                                      "bg-gradient-to-r from-green-50 to-green-100 text-green-800 border-green-300",
+                                    dotColor: "bg-green-500",
+                                  };
+                                case 4:
+                                  return {
+                                    label: "Name + City",
+                                    className:
+                                      "bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 border-blue-300",
+                                    dotColor: "bg-blue-500",
+                                  };
+                                case 3:
+                                  return {
+                                    label: "Name Match",
+                                    className:
+                                      "bg-gradient-to-r from-yellow-50 to-yellow-100 text-yellow-800 border-yellow-300",
+                                    dotColor: "bg-yellow-500",
+                                  };
+                                case 2:
+                                  return {
+                                    label: "Fuzzy Match",
+                                    className:
+                                      "bg-gradient-to-r from-orange-50 to-orange-100 text-orange-800 border-orange-300",
+                                    dotColor: "bg-orange-500",
+                                  };
+                                default:
+                                  return {
+                                    label: "Match",
+                                    className:
+                                      "bg-gradient-to-r from-gray-50 to-gray-100 text-gray-800 border-gray-300",
+                                    dotColor: "bg-gray-500",
+                                  };
+                              }
+                            };
+
+                            const confidenceBadge = getConfidenceBadge();
+
+                            return (
+                              <motion.div
+                                key={facility.place_id}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: idx * 0.04, duration: 0.3 }}
+                                className="p-5 rounded-xl transition-all duration-300 bg-gradient-to-br from-green-50 to-white border-2 border-green-300 shadow-sm"
+                              >
+                                <div className="space-y-3">
+                                  {/* Header with Linked Badge */}
+                                  <div className="flex items-start justify-between gap-3">
+                                    <h4 className="font-bold text-gray-900 text-base leading-tight flex-1">
+                                      {facility.name}
+                                    </h4>
+                                    <div className="flex flex-col gap-1 items-end flex-shrink-0">
+                                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold bg-green-100 text-green-800 border border-green-300 shadow-sm">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                                        Linked
+                                      </span>
+                                      <span
+                                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold border shadow-sm ${confidenceBadge.className}`}
+                                      >
+                                        <span
+                                          className={`w-1.5 h-1.5 rounded-full ${confidenceBadge.dotColor}`}
+                                        ></span>
+                                        {confidenceBadge.label}
+                                      </span>
+                                    </div>
+                                  </div>
+
+                                  {/* Match Reason */}
+                                  <div className="flex items-center gap-2 text-xs text-gray-600">
+                                    <span className="font-semibold">Reason:</span>
+                                    <span>{facility.matchReason}</span>
+                                  </div>
+
+                                  {/* Address */}
+                                  <div className="flex items-start gap-2">
+                                    <MapPin className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                                    <p className="text-sm text-gray-600 leading-relaxed">
+                                      {facility.address}
+                                    </p>
+                                  </div>
+
+                                  {/* Phone */}
+                                  {facility.phone && (
+                                    <div className="flex items-center gap-2">
+                                      <Phone className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                                      <p className="text-sm text-gray-700 font-medium">
+                                        {facility.phone}
+                                      </p>
+                                    </div>
+                                  )}
+
+                                  {/* Sports Badges */}
+                                  {facility.identified_sports &&
+                                    facility.identified_sports.length > 0 && (
+                                      <div className="flex flex-wrap gap-2">
+                                        {facility.identified_sports
+                                          .slice(0, 5)
+                                          .map((sport) => (
+                                            <span
+                                              key={sport}
+                                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 rounded-lg text-xs font-semibold shadow-sm border border-blue-200"
+                                            >
+                                              <span className="text-base">
+                                                {SPORT_EMOJIS[sport] || "🏅"}
+                                              </span>
+                                              <span>{sport}</span>
+                                            </span>
+                                          ))}
+                                        {facility.identified_sports.length > 5 && (
+                                          <span className="inline-flex items-center px-3 py-1.5 bg-gray-100 text-gray-600 rounded-lg text-xs font-semibold border border-gray-200">
+                                            +{facility.identified_sports.length - 5} more
+                                          </span>
+                                        )}
+                                      </div>
+                                    )}
+
+                                  {/* Rating */}
+                                  {facility.rating && (
+                                    <div className="flex items-center gap-2 text-sm">
+                                      <div className="flex items-center gap-1">
+                                        <span className="text-yellow-500 text-base">★</span>
+                                        <span className="font-bold text-gray-900">
+                                          {facility.rating.toFixed(1)}
+                                        </span>
+                                      </div>
+                                      <span className="text-gray-400">•</span>
+                                      <span className="text-gray-500">
+                                        {facility.user_ratings_total} reviews
+                                      </span>
+                                    </div>
+                                  )}
+
+                                  {/* Unlink Button */}
+                                  <div className="pt-3 border-t border-green-200">
+                                    <button
+                                      onClick={() =>
+                                        handleUnlinkFacility(
+                                          facility.link.id,
+                                          facility.place_id
+                                        )
+                                      }
+                                      disabled={deleteLinkMutation.isPending}
+                                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 hover:border-red-300 rounded-lg transition-all duration-200 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                      <X className="w-4 h-4" />
+                                      {deleteLinkMutation.isPending
+                                        ? "Unlinking..."
+                                        : "Unlink from Lead"}
+                                    </button>
+                                  </div>
+                                </div>
+                              </motion.div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Confidence Breakdown for Unmatched */}
+                    {unmatchedFacilities.length > 0 && (
                       <>
+                        {linkedFacilities.length > 0 && (
+                          <h4 className="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-3 flex items-center gap-2 mt-6">
+                            <span className="w-2 h-2 bg-gray-400 rounded-full"></span>
+                            Suggested Matches ({unmatchedFacilities.length})
+                          </h4>
+                        )}
                         <div className="mb-3 flex flex-wrap gap-2 text-xs">
                           {confidenceBreakdown.high > 0 && (
                             <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-50 text-green-700 rounded-md font-medium border border-green-200">
@@ -629,9 +893,9 @@ export function LeadDetailsSidebar({
                     </div>
 
                     {/* Facilities List */}
-                    {matchedFacilities.length > 0 ? (
+                    {unmatchedFacilities.length > 0 ? (
                       <div className="space-y-3">
-                        {matchedFacilities.map((facility, idx) => {
+                        {unmatchedFacilities.map((facility, idx) => {
                           // Determine confidence badge style
                           const getConfidenceBadge = () => {
                             switch (facility.confidence) {
@@ -780,19 +1044,20 @@ export function LeadDetailsSidebar({
                                 {/* Link to Lead Button */}
                                 <div className="pt-3 border-t border-gray-200">
                                   <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      // TODO: Implement link functionality
-                                      console.log('Link facility to lead:', {
-                                        leadId: lead?.id,
-                                        facilityId: facility.place_id,
-                                        confidence: facility.confidence,
-                                      });
-                                    }}
-                                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 hover:border-blue-300 rounded-lg transition-all duration-200 hover:shadow-sm"
+                                    onClick={() =>
+                                      handleLinkFacility(
+                                        facility.place_id,
+                                        facility.confidence,
+                                        facility.matchReason
+                                      )
+                                    }
+                                    disabled={createLinkMutation.isPending}
+                                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 hover:border-blue-300 rounded-lg transition-all duration-200 hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                                   >
                                     <Link2 className="w-4 h-4" />
-                                    Link to Lead
+                                    {createLinkMutation.isPending
+                                      ? "Linking..."
+                                      : "Link to Lead"}
                                   </button>
                                 </div>
                               </div>
@@ -800,7 +1065,7 @@ export function LeadDetailsSidebar({
                           );
                         })}
                       </div>
-                    ) : (
+                    ) : linkedFacilities.length === 0 ? (
                       <motion.div
                         initial={{ scale: 0.8, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
@@ -820,7 +1085,7 @@ export function LeadDetailsSidebar({
                           are correct
                         </p>
                       </motion.div>
-                    )}
+                    ) : null}
                   </div>
                 </>
               ) : null}

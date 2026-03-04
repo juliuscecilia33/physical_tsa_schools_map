@@ -29,6 +29,8 @@ import {
   Loader2,
   Sparkles,
   AlertCircle,
+  User,
+  Link2,
 } from "lucide-react";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
@@ -43,6 +45,11 @@ import { useFacilityDetails } from "@/hooks/useFacilityDetails";
 import { Note, FacilityTag } from "@/types/facility";
 import SportDetailModal from "@/components/SportDetailModal";
 import TagManagerModal from "@/components/TagManagerModal";
+import {
+  useLeadFacilityLinks,
+  useDeleteFacilityLeadLink,
+} from "@/hooks/useFacilityLeadLinks";
+import { useCloseLead } from "@/hooks/useCloseCRM";
 
 interface CRMFacilityDetailsSidebarProps {
   placeId: string | null;
@@ -213,6 +220,11 @@ export default function CRMFacilityDetailsSidebar({
     display_name?: string;
     avatar_url?: string;
   } | null>(null);
+
+  // Linked leads
+  const { data: linkedLeads = [], isLoading: linkedLeadsLoading } =
+    useLeadFacilityLinks(placeId);
+  const deleteLinkMutation = useDeleteFacilityLeadLink();
 
   // Predefined color palette for tags
   const TAG_COLORS = [
@@ -723,6 +735,24 @@ export default function CRMFacilityDetailsSidebar({
   const handleViewOnMap = () => {
     if (facility) {
       router.push(`/?focus=${facility.place_id}`);
+    }
+  };
+
+  // Handle unlinking a lead from the facility
+  const handleUnlinkLead = async (linkId: string, closeLeadId: string) => {
+    if (!facility) return;
+
+    if (!confirm("Are you sure you want to unlink this lead?")) return;
+
+    try {
+      await deleteLinkMutation.mutateAsync({
+        id: linkId,
+        closeLeadId,
+        placeId: facility.place_id,
+      });
+    } catch (error) {
+      console.error("Error unlinking lead:", error);
+      alert("Failed to unlink lead. Please try again.");
     }
   };
 
@@ -1845,6 +1875,144 @@ export default function CRMFacilityDetailsSidebar({
                       <span>Add</span>
                     </motion.button>
                   </div>
+                </motion.div>
+
+                {/* Divider */}
+                <div className="border-t border-slate-200"></div>
+
+                {/* Linked Leads Section */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.11 }}
+                >
+                  <div className="flex items-center mb-3">
+                    <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
+                      <User className="w-4 h-4" />
+                      Linked Leads ({linkedLeads.length})
+                    </h3>
+                  </div>
+
+                  {linkedLeadsLoading ? (
+                    <div className="text-center py-4">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                    </div>
+                  ) : linkedLeads.length === 0 ? (
+                    <div className="text-center py-6 bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-2xl border border-slate-100">
+                      <User className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                      <p className="text-sm text-slate-500">
+                        No leads linked to this facility yet
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {linkedLeads.map((link, idx) => {
+                        // Get confidence badge styling
+                        const getConfidenceBadge = () => {
+                          switch (link.confidence) {
+                            case 5:
+                              return {
+                                label: "High Match",
+                                className:
+                                  "bg-gradient-to-r from-green-50 to-green-100 text-green-800 border-green-300",
+                                dotColor: "bg-green-500",
+                              };
+                            case 4:
+                              return {
+                                label: "Name + City",
+                                className:
+                                  "bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 border-blue-300",
+                                dotColor: "bg-blue-500",
+                              };
+                            case 3:
+                              return {
+                                label: "Name Match",
+                                className:
+                                  "bg-gradient-to-r from-yellow-50 to-yellow-100 text-yellow-800 border-yellow-300",
+                                dotColor: "bg-yellow-500",
+                              };
+                            case 2:
+                              return {
+                                label: "Fuzzy Match",
+                                className:
+                                  "bg-gradient-to-r from-orange-50 to-orange-100 text-orange-800 border-orange-300",
+                                dotColor: "bg-orange-500",
+                              };
+                            default:
+                              return {
+                                label: "Match",
+                                className:
+                                  "bg-gradient-to-r from-gray-50 to-gray-100 text-gray-800 border-gray-300",
+                                dotColor: "bg-gray-500",
+                              };
+                          }
+                        };
+
+                        const confidenceBadge = getConfidenceBadge();
+
+                        return (
+                          <motion.div
+                            key={link.id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: idx * 0.05 }}
+                            className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-white border-2 border-blue-200 shadow-sm"
+                          >
+                            <div className="space-y-2">
+                              {/* Lead ID and Linked Badge */}
+                              <div className="flex items-start justify-between gap-2">
+                                <div className="flex-1">
+                                  <h4 className="font-bold text-gray-900 text-sm">
+                                    Lead ID: {link.close_lead_id}
+                                  </h4>
+                                  <p className="text-xs text-gray-500 mt-1">
+                                    Linked on{" "}
+                                    {new Date(link.created_at).toLocaleDateString()}
+                                  </p>
+                                </div>
+                                <div className="flex flex-col gap-1 items-end">
+                                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-xs font-bold bg-blue-100 text-blue-800 border border-blue-300">
+                                    <Link2 className="w-3 h-3" />
+                                    Linked
+                                  </span>
+                                  <span
+                                    className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-xs font-bold border ${confidenceBadge.className}`}
+                                  >
+                                    <span
+                                      className={`w-1.5 h-1.5 rounded-full ${confidenceBadge.dotColor}`}
+                                    ></span>
+                                    {confidenceBadge.label}
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* Match Reason */}
+                              <div className="flex items-center gap-2 text-xs text-gray-600">
+                                <span className="font-semibold">Reason:</span>
+                                <span>{link.match_reason}</span>
+                              </div>
+
+                              {/* Actions */}
+                              <div className="pt-2 border-t border-blue-200 flex gap-2">
+                                <button
+                                  onClick={() =>
+                                    handleUnlinkLead(link.id, link.close_lead_id)
+                                  }
+                                  disabled={deleteLinkMutation.isPending}
+                                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 hover:border-red-300 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                  <X className="w-3 h-3" />
+                                  {deleteLinkMutation.isPending
+                                    ? "Unlinking..."
+                                    : "Unlink"}
+                                </button>
+                              </div>
+                            </div>
+                          </motion.div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </motion.div>
 
                 {/* Divider */}
