@@ -566,6 +566,41 @@ export default function FacilityMap({
     };
   }, [filteredFacilities]);
 
+  // Throttled mouse move for hover popups
+  const lastHoveredIdRef = useRef<string | null>(null);
+  const throttleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleMouseMove = useCallback((e: MapLayerMouseEvent) => {
+    // Skip entirely when sidebar is open
+    if (selectedFacility) return;
+    if (throttleTimerRef.current) return; // Throttle: skip if timer active
+
+    throttleTimerRef.current = setTimeout(() => {
+      throttleTimerRef.current = null;
+    }, 50);
+
+    if (e.features && e.features.length > 0) {
+      const feature = e.features[0];
+      const placeId = feature.properties?.place_id;
+      // Skip if same feature already hovered
+      if (placeId === lastHoveredIdRef.current) return;
+      lastHoveredIdRef.current = placeId || null;
+      const facility = placeId ? facilityLookup[placeId] : undefined;
+      if (facility) {
+        setHoveredFacility(facility);
+      }
+    }
+  }, [selectedFacility, facilityLookup]);
+
+  // Clean up throttle timer on unmount
+  useEffect(() => {
+    return () => {
+      if (throttleTimerRef.current) {
+        clearTimeout(throttleTimerRef.current);
+      }
+    };
+  }, []);
+
   // Handle click on individual markers
   const onMarkerClick = useCallback((event: MapLayerMouseEvent) => {
     const feature = event.features?.[0];
@@ -601,14 +636,11 @@ export default function FacilityMap({
   const handleFacilityDataLoaded = useCallback(
     (fullFacility: Facility) => {
       // Update clickedFacility with full data so popup shows correct counts
-      if (
-        clickedFacility &&
-        fullFacility.place_id === clickedFacility.place_id
-      ) {
-        setClickedFacility(fullFacility);
-      }
+      setClickedFacility((prev) =>
+        prev && fullFacility.place_id === prev.place_id ? fullFacility : prev
+      );
     },
-    [clickedFacility]
+    []
   );
 
   return (
@@ -632,17 +664,7 @@ export default function FacilityMap({
             setClickedFacility(null);
           }
         }}
-        onMouseMove={(e) => {
-          // Show hover popup if no facility is currently selected
-          if (!selectedFacility && e.features && e.features.length > 0) {
-            const feature = e.features[0];
-            const placeId = feature.properties?.place_id;
-            const facility = placeId ? facilityLookup[placeId] : undefined;
-            if (facility) {
-              setHoveredFacility(facility);
-            }
-          }
-        }}
+        onMouseMove={handleMouseMove}
         onMouseLeave={() => {
           setHoveredFacility(null);
         }}
@@ -800,7 +822,12 @@ export default function FacilityMap({
           </Popup>
         )}
 
-        <Source id="facilities" type="geojson" data={geojsonData}>
+        <Source
+          id="facilities"
+          type="geojson"
+          data={geojsonData}
+          generateId={false}
+        >
           {/* Modern flat colored dots at low zoom (zoom < 10) */}
           <Layer
             id="facility-dots-low-zoom"
@@ -810,9 +837,6 @@ export default function FacilityMap({
               "circle-color": ["get", "color"],
               "circle-radius": 5,
               "circle-opacity": 0.7,
-              "circle-stroke-width": 1,
-              "circle-stroke-color": ["get", "color"],
-              "circle-stroke-opacity": 0.9,
             }}
           />
 
@@ -825,7 +849,7 @@ export default function FacilityMap({
               "circle-color": ["get", "color"],
               "circle-radius": 10,
               "circle-opacity": 0.7,
-              "circle-stroke-width": 1,
+              "circle-stroke-width": 0.5,
               "circle-stroke-color": ["get", "color"],
               "circle-stroke-opacity": 0.9,
             }}

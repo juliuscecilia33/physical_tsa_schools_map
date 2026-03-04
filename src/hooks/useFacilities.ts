@@ -299,7 +299,7 @@ export function useFacilities(): UseFacilitiesReturn {
     if (isPriorityLoading || isBackgroundLoading) {
       const interval = setInterval(() => {
         forceUpdate(); // Trigger re-render to pick up latest module state
-      }, 500); // Check every 500ms
+      }, 2000); // Check every 2s — progress bar doesn't need sub-second updates
       return () => clearInterval(interval);
     }
   }, [isPriorityLoading, isBackgroundLoading]);

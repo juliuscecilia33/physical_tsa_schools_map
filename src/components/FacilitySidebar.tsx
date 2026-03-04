@@ -33,7 +33,7 @@ import {
   ChevronUp,
   Image as ImageIcon,
 } from "lucide-react";
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, memo } from "react";
 import { createPortal } from "react-dom";
 import { createClient } from "@/lib/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -144,7 +144,7 @@ const TAG_COLORS = [
   { name: "Gray", value: "#6b7280" },
 ];
 
-export default function FacilitySidebar({
+function FacilitySidebarInner({
   facility,
   onClose,
   onUpdateFacility,
@@ -268,6 +268,11 @@ export default function FacilitySidebar({
       subscription.unsubscribe();
     };
   }, []);
+
+  // Reset loadingImages state when facility changes to prevent unbounded growth
+  useEffect(() => {
+    setLoadingImages({});
+  }, [facility?.place_id]);
 
   // Fetch notes when facility changes
   useEffect(() => {
@@ -476,11 +481,6 @@ export default function FacilitySidebar({
       // Update cache to reflect that this facility now has notes
       updateFacilityNotesFlag(queryClient, facility.place_id, true);
 
-      // Invalidate full facility details query to refetch updated data
-      queryClient.invalidateQueries({
-        queryKey: ["facility", "full", facility.place_id],
-      });
-
       // Close the modal after successful add
       setIsAddNoteModalOpen(false);
     } catch (error) {
@@ -556,11 +556,6 @@ export default function FacilitySidebar({
 
       if (error) throw error;
 
-      // Invalidate full facility details query to refetch updated data
-      queryClient.invalidateQueries({
-        queryKey: ["facility", "full", facility.place_id],
-      });
-
       // Close modal
       setIsEditNoteModalOpen(false);
       setEditingNote(null);
@@ -599,11 +594,6 @@ export default function FacilitySidebar({
         .eq("id", noteId);
 
       if (error) throw error;
-
-      // Invalidate full facility details query to refetch updated data
-      queryClient.invalidateQueries({
-        queryKey: ["facility", "full", facility.place_id],
-      });
     } catch (error) {
       console.error("Error deleting note:", error);
       // Revert optimistic update
@@ -805,11 +795,6 @@ export default function FacilitySidebar({
       // Update cache with new tags
       updateFacilityTags(queryClient, facility.place_id, updatedTags);
 
-      // Refetch full facility details query to get fresh data immediately
-      await queryClient.refetchQueries({
-        queryKey: ["facility", "full", facility.place_id],
-        exact: true,
-      });
     } catch (error) {
       console.error("Error assigning tag:", error);
       // Revert optimistic update on error
@@ -838,12 +823,6 @@ export default function FacilitySidebar({
       facility.tags = facility.tags.filter((t) => t.id !== tagId);
     }
     updateFacilityTags(queryClient, facility.place_id, updatedTags);
-
-    // Refetch full facility details query to get fresh data immediately
-    await queryClient.refetchQueries({
-      queryKey: ["facility", "full", facility.place_id],
-      exact: true,
-    });
 
     try {
       const { error } = await supabase
@@ -1050,21 +1029,20 @@ export default function FacilitySidebar({
     updateAllReviewImageArrows();
 
     // Attach scroll and resize listeners to all review image containers
-    const listeners: Array<{ ref: HTMLDivElement; reviewIndex: number }> = [];
+    const listeners: Array<{ ref: HTMLDivElement; scrollHandler: () => void }> = [];
     Object.entries(reviewImageScrollRefs.current).forEach(([key, ref]) => {
       if (ref) {
         const reviewIndex = parseInt(key);
         const scrollHandler = () => updateReviewImageArrows(reviewIndex);
         ref.addEventListener("scroll", scrollHandler);
         window.addEventListener("resize", scrollHandler);
-        listeners.push({ ref, reviewIndex });
+        listeners.push({ ref, scrollHandler });
       }
     });
 
-    // Cleanup
+    // Cleanup - use the same handler references for proper removal
     return () => {
-      listeners.forEach(({ ref, reviewIndex }) => {
-        const scrollHandler = () => updateReviewImageArrows(reviewIndex);
+      listeners.forEach(({ ref, scrollHandler }) => {
         ref.removeEventListener("scroll", scrollHandler);
         window.removeEventListener("resize", scrollHandler);
       });
@@ -2880,3 +2858,5 @@ export default function FacilitySidebar({
     </AnimatePresence>
   );
 }
+
+export default memo(FacilitySidebarInner);

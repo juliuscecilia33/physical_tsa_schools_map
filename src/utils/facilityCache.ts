@@ -15,22 +15,25 @@ export function updateFacilityInCache(
   placeId: string,
   updates: Partial<FacilityLightweight>
 ) {
-  // Get the query from cache to access its state
   const queryCache = queryClient.getQueryCache();
-  const query = queryCache.find({ queryKey: ['facilities', 'all'] });
-  const currentData = query?.state.data as FacilityLightweight[] | undefined;
+  const segments = ['serpapi', 'background'] as const;
 
-  if (currentData && query) {
-    const updatedData = currentData.map((facility) =>
-      facility.place_id === placeId
-        ? { ...facility, ...updates }
-        : facility
-    );
+  for (const segment of segments) {
+    const query = queryCache.find({ queryKey: ['facilities', segment] });
+    const currentData = query?.state.data as FacilityLightweight[] | undefined;
 
-    // Preserve the original dataUpdatedAt timestamp to prevent cache invalidation
-    queryClient.setQueryData(['facilities', 'all'], updatedData, {
-      updatedAt: query.state.dataUpdatedAt
-    });
+    if (currentData && query) {
+      const updatedData = currentData.map((facility) =>
+        facility.place_id === placeId
+          ? { ...facility, ...updates }
+          : facility
+      );
+
+      // Preserve the original dataUpdatedAt timestamp to prevent cache invalidation
+      queryClient.setQueryData(['facilities', segment], updatedData, {
+        updatedAt: query.state.dataUpdatedAt
+      });
+    }
   }
 }
 

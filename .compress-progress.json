@@ -1,8 +1,8 @@
 {
-  "processedCount": 1792,
-  "successCount": 1434,
-  "failedCount": 455,
-  "skippedCount": 22,
+  "processedCount": 1812,
+  "successCount": 1446,
+  "failedCount": 463,
+  "skippedCount": 98,
   "processedFacilityIds": [
     "2651e40a-b22d-4b23-9fd7-8ff121dfdd25",
     "c675e478-4ccb-45bb-ba28-300715a96376",
@@ -1440,15 +1440,27 @@
     "802935cb-1108-43d5-9dc0-cc441bc5e037",
     "e1c3a1a8-c606-430a-839d-34faf5ece9c3",
     "c8a9cf63-e678-44ff-bfcc-e20263f383bd",
-    "b9b1a0e8-ee2b-4536-af8d-3acd8dce2b8c"
+    "b9b1a0e8-ee2b-4536-af8d-3acd8dce2b8c",
+    "836b0895-9f28-4653-b284-dbc81fee30e5",
+    "ecc8c3c0-7d3f-460d-bc34-738f62b9ee7d",
+    "6c78a4f3-c10f-4797-a7e2-c91872291f24",
+    "7a7a1441-9757-45c4-a2ca-169fa6f79288",
+    "e386f7d4-c903-4a48-8a66-f5906adddc48",
+    "436100d6-206c-40d3-b1a6-897a6a4e5586",
+    "d4873b93-cbbe-4bed-a5f4-63f041cb9354",
+    "1ac4fddb-1a2f-4958-8efd-d85e7cfd32c4",
+    "03d8545e-bf7d-4e99-b079-2df5feb85174",
+    "587bb523-bae9-407c-b99d-d111cd16ae84",
+    "208e97cd-7a92-46a3-9458-22f10cc079bb",
+    "d88ee355-ad1b-4144-8835-deba610d55dd"
   ],
-  "lastProcessedIndex": 1810,
-  "imagesProcessed": 60174,
-  "imagesSkipped": 113,
-  "imagesFailed": 4054,
-  "totalBytesBefore": 145801427506,
-  "totalBytesAfter": 58644030192,
-  "lastUpdated": "2026-03-04T18:07:42.666Z",
+  "lastProcessedIndex": 1903,
+  "imagesProcessed": 60586,
+  "imagesSkipped": 418,
+  "imagesFailed": 4064,
+  "totalBytesBefore": 146774601943,
+  "totalBytesAfter": 59033468322,
+  "lastUpdated": "2026-03-04T18:28:15.319Z",
   "errors": [
     {
       "facility_id": "c8861bb6-f825-4d28-a60f-695b1edfef7b",
@@ -29827,8 +29839,78 @@
       "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/bfb2f0ee-f38d-4f4c-923f-17891c546a19/1772412963827_10.jpg",
       "error": "Failed to compress image",
       "timestamp": "2026-03-04T17:50:30.052Z"
+    },
+    {
+      "facility_id": "ab93362a-f518-495e-a374-5f035f26e74c",
+      "facility_name": "TruFit Athletic Clubs - Boca Chica",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/ab93362a-f518-495e-a374-5f035f26e74c/1772345971295_16.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-04T18:08:33.260Z"
+    },
+    {
+      "facility_id": "ec58a7a2-3ab0-4aca-9c66-20c5911eb904",
+      "facility_name": "Bedford Boys Ranch Lake",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/ec58a7a2-3ab0-4aca-9c66-20c5911eb904/1772409446228_38.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:22:05.892Z"
+    },
+    {
+      "facility_id": "8b08a83f-f9eb-4952-968a-58f55a1cbd06",
+      "facility_name": "Keller Sports Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/8b08a83f-f9eb-4952-968a-58f55a1cbd06/1772299346184_17.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:26:02.620Z"
+    },
+    {
+      "facility_id": "de87118a-2a97-493a-8227-c036576d65f4",
+      "facility_name": "Panola College",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/de87118a-2a97-493a-8227-c036576d65f4/1772342088356_37.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-04T18:26:19.136Z"
+    },
+    {
+      "facility_id": "915bb243-c933-4ff7-8f91-f031875c0b61",
+      "facility_name": "Lucy Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/915bb243-c933-4ff7-8f91-f031875c0b61/1772343416050_31.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:26:30.258Z"
+    },
+    {
+      "facility_id": "525b4fd7-c8d4-46f3-93e1-6b2305038277",
+      "facility_name": "Meadow Bend Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/525b4fd7-c8d4-46f3-93e1-6b2305038277/1772244416995_30.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-04T18:26:38.865Z"
+    },
+    {
+      "facility_id": "8e7c9712-2cd5-4de0-af89-eb7bb81043be",
+      "facility_name": "Dan Law Field at Rip Griffin Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/8e7c9712-2cd5-4de0-af89-eb7bb81043be/1772319064009_19.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:27:12.550Z"
+    },
+    {
+      "facility_id": "8e7c9712-2cd5-4de0-af89-eb7bb81043be",
+      "facility_name": "Dan Law Field at Rip Griffin Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/8e7c9712-2cd5-4de0-af89-eb7bb81043be/1772319102229_34.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:27:15.978Z"
+    },
+    {
+      "facility_id": "8e7c9712-2cd5-4de0-af89-eb7bb81043be",
+      "facility_name": "Dan Law Field at Rip Griffin Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/8e7c9712-2cd5-4de0-af89-eb7bb81043be/1772319104348_36.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:27:17.499Z"
+    },
+    {
+      "facility_id": "d08f747f-f192-4dd0-b022-3844e321c6b1",
+      "facility_name": "Brian Schwengler Memorial Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d08f747f-f192-4dd0-b022-3844e321c6b1/1772322305887_4.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-04T18:27:49.198Z"
     }
   ],
-  "deletionsSucceeded": 56533,
+  "deletionsSucceeded": 56945,
   "deletionsFailed": 15
 }
