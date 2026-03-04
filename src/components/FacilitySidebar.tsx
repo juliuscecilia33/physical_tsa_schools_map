@@ -32,6 +32,10 @@ import {
   ChevronDown,
   ChevronUp,
   Image as ImageIcon,
+  User,
+  Link2,
+  Building2,
+  Calendar,
 } from "lucide-react";
 import { useState, useEffect, useRef, useMemo, memo } from "react";
 import { createPortal } from "react-dom";
@@ -42,6 +46,17 @@ import {
   updateFacilityTags,
 } from "@/utils/facilityCache";
 import { useFacilityDetails } from "@/hooks/useFacilityDetails";
+import { CloseLead } from "@/types/close";
+import {
+  useLeadFacilityLinks,
+  useDeleteFacilityLeadLink,
+} from "@/hooks/useFacilityLeadLinks";
+import {
+  useCloseLeadsBatch,
+  useCloseLeadStatuses,
+  useCloseLeadActivities,
+} from "@/hooks/useCloseCRM";
+import { CloseActivityTimeline } from "./CloseActivityTimeline";
 import SportDetailModal from "@/components/SportDetailModal";
 import TagManagerModal from "@/components/TagManagerModal";
 import AddNoteModal from "@/components/AddNoteModal";
@@ -224,6 +239,59 @@ function FacilitySidebarInner({
   const [editTagDescription, setEditTagDescription] = useState("");
   const [assigningTag, setAssigningTag] = useState(false);
   const [facilityTags, setFacilityTags] = useState<FacilityTag[]>([]);
+
+  // Linked leads state & hooks
+  const [viewMode, setViewMode] = useState<"facility" | "lead">("facility");
+  const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
+
+  const { data: linkedLeads = [], isLoading: linkedLeadsLoading } =
+    useLeadFacilityLinks(facility?.place_id || null);
+  const deleteLinkMutation = useDeleteFacilityLeadLink();
+
+  const linkedLeadIds = useMemo(
+    () => linkedLeads.map((link) => link.close_lead_id),
+    [linkedLeads],
+  );
+  const leadQueries = useCloseLeadsBatch(linkedLeadIds);
+  const { data: statuses } = useCloseLeadStatuses({ enabled: !!facility });
+
+  const {
+    data: selectedLeadActivities,
+    isLoading: selectedLeadActivitiesLoading,
+  } = useCloseLeadActivities(selectedLeadId);
+
+  const leadsMap = useMemo(() => {
+    const map: Record<string, CloseLead> = {};
+    leadQueries.forEach((query, idx) => {
+      if (query.data) {
+        map[linkedLeadIds[idx]] = query.data;
+      }
+    });
+    return map;
+  }, [leadQueries, linkedLeadIds]);
+
+  const selectedLead = selectedLeadId ? leadsMap[selectedLeadId] : null;
+
+  const getStatusLabel = (statusId: string) => {
+    if (!statuses) return "Unknown";
+    const status = statuses.find((s) => s.id === statusId);
+    return status?.label || "Unknown";
+  };
+
+  const handleUnlinkLead = async (linkId: string, closeLeadId: string) => {
+    if (!displayFacility) return;
+    if (!confirm("Are you sure you want to unlink this lead?")) return;
+    try {
+      await deleteLinkMutation.mutateAsync({
+        id: linkId,
+        closeLeadId,
+        placeId: displayFacility.place_id,
+      });
+    } catch (error) {
+      console.error("Error unlinking lead:", error);
+      alert("Failed to unlink lead. Please try again.");
+    }
+  };
 
   // Current user state
   const [currentUser, setCurrentUser] = useState<{
@@ -1183,6 +1251,16 @@ function FacilitySidebarInner({
 
         {/* Content */}
         <div ref={contentRef} className="flex-1 overflow-y-auto p-5 space-y-4">
+          <AnimatePresence mode="wait">
+          {viewMode === "facility" ? (
+          <motion.div
+            key="facility-view"
+            initial={{ x: 0, opacity: 1 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -100, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="space-y-4"
+          >
           {/* Photos */}
           {displayFacility.photo_references &&
           displayFacility.photo_references.length > 0 &&
@@ -1672,6 +1750,185 @@ function FacilitySidebarInner({
                 <span>Add</span>
               </motion.button>
             </div>
+          </motion.div>
+
+          {/* Divider */}
+          <div className="border-t border-slate-200"></div>
+
+          {/* Linked Leads Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.11 }}
+          >
+            <div className="flex items-center mb-3">
+              <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
+                <User className="w-4 h-4" />
+                Linked Leads from Close ({linkedLeads.length})
+              </h3>
+            </div>
+
+            {linkedLeadsLoading ? (
+              <div className="text-center py-4">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+              </div>
+            ) : linkedLeads.length === 0 ? (
+              <div className="text-center py-6 bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-2xl border border-slate-100">
+                <User className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                <p className="text-sm text-slate-500">
+                  No leads linked to this facility yet
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {linkedLeads.map((link, idx) => {
+                  const getConfidenceBadge = () => {
+                    switch (link.confidence) {
+                      case 5:
+                        return {
+                          label: "High Match",
+                          className:
+                            "bg-gradient-to-r from-green-50 to-green-100 text-green-800 border-green-300",
+                          dotColor: "bg-green-500",
+                        };
+                      case 4:
+                        return {
+                          label: "Name + City",
+                          className:
+                            "bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 border-blue-300",
+                          dotColor: "bg-blue-500",
+                        };
+                      case 3:
+                        return {
+                          label: "Name Match",
+                          className:
+                            "bg-gradient-to-r from-yellow-50 to-yellow-100 text-yellow-800 border-yellow-300",
+                          dotColor: "bg-yellow-500",
+                        };
+                      case 2:
+                        return {
+                          label: "Fuzzy Match",
+                          className:
+                            "bg-gradient-to-r from-orange-50 to-orange-100 text-orange-800 border-orange-300",
+                          dotColor: "bg-orange-500",
+                        };
+                      default:
+                        return {
+                          label: "Match",
+                          className:
+                            "bg-gradient-to-r from-gray-50 to-gray-100 text-gray-800 border-gray-300",
+                          dotColor: "bg-gray-500",
+                        };
+                    }
+                  };
+
+                  const confidenceBadge = getConfidenceBadge();
+
+                  return (
+                    <motion.div
+                      key={link.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.05 }}
+                      className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-white border-2 border-blue-200 shadow-sm"
+                    >
+                      {(() => {
+                        const lead = leadsMap[link.close_lead_id];
+                        const isLoadingLead = leadQueries[idx]?.isLoading;
+
+                        return (
+                          <div className="space-y-2">
+                            {/* Lead Name/Status and Badges */}
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex-1">
+                                {isLoadingLead ? (
+                                  <>
+                                    <div className="h-5 w-48 bg-slate-200 rounded animate-pulse mb-2"></div>
+                                    <div className="h-4 w-32 bg-slate-200 rounded animate-pulse"></div>
+                                  </>
+                                ) : lead ? (
+                                  <>
+                                    <h4 className="font-bold text-gray-900 text-sm">
+                                      {lead.display_name || lead.name}
+                                    </h4>
+                                    <div className="flex items-center gap-2 mt-1">
+                                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        {getStatusLabel(lead.status_id)}
+                                      </span>
+                                      <span className="text-xs text-gray-500">
+                                        Linked{" "}
+                                        {new Date(
+                                          link.created_at,
+                                        ).toLocaleDateString()}
+                                      </span>
+                                    </div>
+                                  </>
+                                ) : (
+                                  <>
+                                    <h4 className="font-bold text-gray-900 text-sm">
+                                      Lead ID: {link.close_lead_id}
+                                    </h4>
+                                    <p className="text-xs text-gray-500 mt-1">
+                                      Linked on{" "}
+                                      {new Date(
+                                        link.created_at,
+                                      ).toLocaleDateString()}
+                                    </p>
+                                  </>
+                                )}
+                              </div>
+                              <div className="flex flex-col gap-1 items-end">
+                                <span
+                                  className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-xs font-bold border ${confidenceBadge.className}`}
+                                >
+                                  <span
+                                    className={`w-1.5 h-1.5 rounded-full ${confidenceBadge.dotColor}`}
+                                  ></span>
+                                  {confidenceBadge.label}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Match Reason */}
+                            <div className="flex items-center gap-2 text-xs text-gray-600">
+                              <span className="font-semibold">Reason:</span>
+                              <span>{link.match_reason}</span>
+                            </div>
+
+                            {/* Actions */}
+                            <div className="pt-2 border-t border-blue-200 flex gap-2">
+                              <button
+                                onClick={() => {
+                                  setSelectedLeadId(link.close_lead_id);
+                                  setViewMode("lead");
+                                }}
+                                disabled={isLoadingLead}
+                                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 hover:border-blue-300 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                              >
+                                <ExternalLink className="w-3 h-3" />
+                                View Details
+                              </button>
+                              <button
+                                onClick={() =>
+                                  handleUnlinkLead(link.id, link.close_lead_id)
+                                }
+                                disabled={deleteLinkMutation.isPending}
+                                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 hover:border-red-300 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                              >
+                                <X className="w-3 h-3" />
+                                {deleteLinkMutation.isPending
+                                  ? "Unlinking..."
+                                  : "Unlink"}
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })()}
+                    </motion.div>
+                  );
+                })}
+              </div>
+            )}
           </motion.div>
 
           {/* Divider */}
@@ -2280,6 +2537,278 @@ function FacilitySidebarInner({
               )}
             </motion.div>
           )}
+          </motion.div>
+          ) : viewMode === "lead" && selectedLead ? (
+          <motion.div
+            key="lead-view"
+            initial={{ x: 100, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: 100, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="space-y-6"
+          >
+            {/* Back Button */}
+            <motion.button
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              onClick={() => {
+                setViewMode("facility");
+                setSelectedLeadId(null);
+              }}
+              className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              Back to Facility
+            </motion.button>
+
+            {/* About Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05 }}
+              className="bg-slate-50 rounded-lg p-5 space-y-4"
+            >
+              <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                <Building2 className="w-4 h-4" />
+                About
+              </h3>
+
+              {selectedLead.description && (
+                <p className="text-sm text-slate-700">
+                  {selectedLead.description}
+                </p>
+              )}
+
+              {/* Address */}
+              {selectedLead.addresses &&
+                selectedLead.addresses.length > 0 && (
+                  <div className="flex items-start gap-3">
+                    <MapPin className="w-4 h-4 text-slate-400 mt-0.5" />
+                    <div className="text-sm text-slate-700">
+                      {selectedLead.addresses[0].address_1}
+                      {selectedLead.addresses[0].address_2 && (
+                        <>, {selectedLead.addresses[0].address_2}</>
+                      )}
+                      {(selectedLead.addresses[0].city ||
+                        selectedLead.addresses[0].state ||
+                        selectedLead.addresses[0].zipcode) && (
+                        <div>
+                          {selectedLead.addresses[0].city}
+                          {selectedLead.addresses[0].state &&
+                            `, ${selectedLead.addresses[0].state}`}
+                          {selectedLead.addresses[0].zipcode &&
+                            ` ${selectedLead.addresses[0].zipcode}`}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+              {/* Website */}
+              {selectedLead.url && (
+                <div className="flex items-center gap-3">
+                  <Globe className="w-4 h-4 text-slate-400" />
+                  <a
+                    href={selectedLead.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                  >
+                    {selectedLead.url}
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+              )}
+
+              {/* Dates */}
+              <div className="flex items-center gap-3 text-xs text-slate-500">
+                <Calendar className="w-4 h-4" />
+                <div>
+                  <div>
+                    Created:{" "}
+                    {new Date(
+                      selectedLead.date_created,
+                    ).toLocaleDateString()}
+                  </div>
+                  <div>
+                    Updated:{" "}
+                    {new Date(
+                      selectedLead.date_updated,
+                    ).toLocaleDateString()}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Contacts Section */}
+            {selectedLead.contacts &&
+              selectedLead.contacts.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="bg-white border border-slate-200 rounded-lg p-5 space-y-4"
+                >
+                  <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                    <User className="w-4 h-4" />
+                    Contacts ({selectedLead.contacts.length})
+                  </h3>
+
+                  <div className="space-y-4">
+                    {selectedLead.contacts.map((contact) => (
+                      <div
+                        key={contact.id}
+                        className="p-4 bg-slate-50 rounded-lg space-y-2"
+                      >
+                        {contact.name && (
+                          <p className="font-medium text-slate-900">
+                            {contact.name}
+                          </p>
+                        )}
+                        {contact.title && (
+                          <p className="text-sm text-slate-600">
+                            {contact.title}
+                          </p>
+                        )}
+
+                        {/* Emails */}
+                        {contact.emails &&
+                          contact.emails.length > 0 && (
+                            <div className="space-y-1">
+                              {contact.emails.map((email, idx) => (
+                                <div
+                                  key={idx}
+                                  className="flex items-center gap-2 text-sm"
+                                >
+                                  <Mail className="w-4 h-4 text-slate-400" />
+                                  <a
+                                    href={`mailto:${email.email}`}
+                                    className="text-blue-600 hover:text-blue-800"
+                                  >
+                                    {email.email}
+                                  </a>
+                                  {email.type && (
+                                    <span className="text-xs text-slate-500">
+                                      ({email.type})
+                                    </span>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+
+                        {/* Phones */}
+                        {contact.phones &&
+                          contact.phones.length > 0 && (
+                            <div className="space-y-1">
+                              {contact.phones.map((phone, idx) => (
+                                <div
+                                  key={idx}
+                                  className="flex items-center gap-2 text-sm"
+                                >
+                                  <Phone className="w-4 h-4 text-slate-400" />
+                                  <a
+                                    href={`tel:${phone.phone}`}
+                                    className="text-blue-600 hover:text-blue-800"
+                                  >
+                                    {phone.phone}
+                                  </a>
+                                  {phone.type && (
+                                    <span className="text-xs text-slate-500">
+                                      ({phone.type})
+                                    </span>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+
+            {/* Custom Fields */}
+            {selectedLead.custom &&
+              Object.keys(selectedLead.custom).length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.15 }}
+                  className="bg-white border border-slate-200 rounded-lg p-5 space-y-3"
+                >
+                  <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider">
+                    Custom Fields
+                  </h3>
+                  <div className="space-y-2">
+                    {Object.entries(selectedLead.custom).map(
+                      ([key, value]) => (
+                        <div
+                          key={key}
+                          className="flex justify-between text-sm"
+                        >
+                          <span className="text-slate-600">{key}:</span>
+                          <span className="text-slate-900 font-medium">
+                            {String(value)}
+                          </span>
+                        </div>
+                      ),
+                    )}
+                  </div>
+                </motion.div>
+              )}
+
+            {/* Activity Timeline */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="bg-white border border-slate-200 rounded-lg p-5"
+            >
+              <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-4">
+                Activity Timeline
+              </h3>
+              {selectedLeadActivities && (
+                <div className="mb-3 flex flex-wrap gap-2 text-xs text-slate-600">
+                  <span>
+                    Total: {selectedLeadActivities.count.total}
+                  </span>
+                  {selectedLeadActivities.count.calls > 0 && (
+                    <span>
+                      • Calls: {selectedLeadActivities.count.calls}
+                    </span>
+                  )}
+                  {selectedLeadActivities.count.emails > 0 && (
+                    <span>
+                      • Emails: {selectedLeadActivities.count.emails}
+                    </span>
+                  )}
+                  {selectedLeadActivities.count.notes > 0 && (
+                    <span>
+                      • Notes: {selectedLeadActivities.count.notes}
+                    </span>
+                  )}
+                  {selectedLeadActivities.count.tasks > 0 && (
+                    <span>
+                      • Tasks: {selectedLeadActivities.count.tasks}
+                    </span>
+                  )}
+                  {selectedLeadActivities.count.opportunities > 0 && (
+                    <span>
+                      • Opportunities:{" "}
+                      {selectedLeadActivities.count.opportunities}
+                    </span>
+                  )}
+                </div>
+              )}
+              <CloseActivityTimeline
+                activities={selectedLeadActivities?.activities || []}
+                isLoading={selectedLeadActivitiesLoading}
+              />
+            </motion.div>
+          </motion.div>
+          ) : null}
+          </AnimatePresence>
         </div>
 
         {/* Photos Grid Modal */}
