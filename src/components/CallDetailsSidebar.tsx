@@ -492,19 +492,11 @@ export function CallDetailsSidebar({ callId, leadId, onClose, facilities = [] }:
                                 {lead.status_label}
                               </span>
                             )}
-                            {facilityLeadLinks.length > 0 ? (
+                            {facilityLeadLinks.length > 0 && (
                               <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                 <Link2 className="w-3 h-3" />
                                 Linked to Facility
                               </span>
-                            ) : (
-                              <button
-                                onClick={() => setShowFacilityPicker(!showFacilityPicker)}
-                                className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors cursor-pointer"
-                              >
-                                <Link2 className="w-3 h-3" />
-                                Link Lead to Facility
-                              </button>
                             )}
                           </div>
                         </div>
@@ -540,16 +532,25 @@ export function CallDetailsSidebar({ callId, leadId, onClose, facilities = [] }:
                           </div>
                         )}
 
-                        <div className="pt-2">
+                        <div className="flex items-center gap-2 pt-2">
                           <a
                             href={`https://app.close.com/lead/${leadId || call.lead_id}/`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 shadow-sm hover:shadow transition-all duration-200"
                           >
-                            View in Close CRM
                             <ExternalLink className="w-3 h-3" />
+                            View in Close CRM
                           </a>
+                          {facilityLeadLinks.length === 0 && (
+                            <button
+                              onClick={() => setShowFacilityPicker(!showFacilityPicker)}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 shadow-sm hover:shadow transition-all duration-200 cursor-pointer"
+                            >
+                              <Link2 className="w-3 h-3" />
+                              Link Lead to Facility
+                            </button>
+                          )}
                         </div>
                       </div>
                     ) : (leadId || call.lead_id) ? (
