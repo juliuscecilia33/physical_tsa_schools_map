@@ -47,9 +47,11 @@ import {
 } from "@/utils/facilityCache";
 import { useFacilityDetails } from "@/hooks/useFacilityDetails";
 import { Note, FacilityTag } from "@/types/facility";
-import { CloseLead } from "@/types/close";
+import { CloseLead, CloseActivity } from "@/types/close";
 import SportDetailModal from "@/components/SportDetailModal";
 import TagManagerModal from "@/components/TagManagerModal";
+import { CallDetailContent } from "./CallDetailContent";
+import { EmailDetailContent } from "./EmailDetailContent";
 import {
   useLeadFacilityLinks,
   useDeleteFacilityLeadLink,
@@ -238,8 +240,9 @@ export default function CRMFacilityDetailsSidebar({
   } | null>(null);
 
   // Step-based view navigation
-  const [viewMode, setViewMode] = useState<"facility" | "lead">("facility");
+  const [viewMode, setViewMode] = useState<"facility" | "lead" | "call" | "email">("facility");
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
+  const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
 
   // Linked leads
   const { data: linkedLeads = [], isLoading: linkedLeadsLoading } =
@@ -373,6 +376,13 @@ export default function CRMFacilityDetailsSidebar({
       setFacilityTags(facility.tags || []);
     }
   }, [facility]);
+
+  // Reset view state when switching facilities
+  useEffect(() => {
+    setViewMode("facility");
+    setSelectedLeadId(null);
+    setSelectedActivityId(null);
+  }, [placeId]);
 
   // Fetch all tags on component mount
   useEffect(() => {
@@ -1092,6 +1102,16 @@ export default function CRMFacilityDetailsSidebar({
       );
     }
     return stars;
+  };
+
+  const handleActivityClick = (activity: CloseActivity) => {
+    if (activity.type === "call") {
+      setViewMode("call");
+      setSelectedActivityId(activity.call?.id || activity.id);
+    } else if (activity.type === "email") {
+      setViewMode("email");
+      setSelectedActivityId(activity.email?.id || activity.id);
+    }
   };
 
   const handleImageLoad = (idx: number | string) => {
@@ -2896,6 +2916,7 @@ export default function CRMFacilityDetailsSidebar({
                       onClick={() => {
                         setViewMode("facility");
                         setSelectedLeadId(null);
+                        setSelectedActivityId(null);
                       }}
                       className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
                     >
@@ -3146,8 +3167,55 @@ export default function CRMFacilityDetailsSidebar({
                       <CloseActivityTimeline
                         activities={selectedLeadActivities?.activities || []}
                         isLoading={selectedLeadActivitiesLoading}
+                        onActivityClick={handleActivityClick}
                       />
                     </motion.div>
+                  </motion.div>
+                ) : viewMode === "call" && selectedActivityId ? (
+                  <motion.div
+                    key="call-view"
+                    initial={{ x: 100, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: 100, opacity: 0 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    className="space-y-4"
+                  >
+                    <motion.button
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      onClick={() => {
+                        setViewMode("lead");
+                        setSelectedActivityId(null);
+                      }}
+                      className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                      Back to Lead
+                    </motion.button>
+                    <CallDetailContent callId={selectedActivityId} leadId={selectedLeadId || undefined} />
+                  </motion.div>
+                ) : viewMode === "email" && selectedActivityId ? (
+                  <motion.div
+                    key="email-view"
+                    initial={{ x: 100, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: 100, opacity: 0 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    className="space-y-4"
+                  >
+                    <motion.button
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      onClick={() => {
+                        setViewMode("lead");
+                        setSelectedActivityId(null);
+                      }}
+                      className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                      Back to Lead
+                    </motion.button>
+                    <EmailDetailContent emailThreadId={selectedActivityId} leadId={selectedLeadId || undefined} />
                   </motion.div>
                 ) : null}
               </AnimatePresence>
