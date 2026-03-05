@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCloseUser } from '@/hooks/useCloseCRM';
 import { CloseUsersList } from './CloseUsersList';
 import { CloseLeadsList } from './CloseLeadsList';
@@ -18,9 +18,11 @@ type Tab = 'leads' | 'calls' | 'emails' | 'contacts' | 'users';
 
 interface CloseCRMExplorerProps {
   facilities?: Facility[];
+  onAddFacilityFromLead?: (leadName: string, leadId: string) => void;
+  externalLeadId?: string | null;
 }
 
-export function CloseCRMExplorer({ facilities = [] }: CloseCRMExplorerProps) {
+export function CloseCRMExplorer({ facilities = [], onAddFacilityFromLead, externalLeadId }: CloseCRMExplorerProps) {
   const [activeTab, setActiveTab] = useState<Tab>('leads');
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
   const [selectedCallId, setSelectedCallId] = useState<string | null>(null);
@@ -35,6 +37,13 @@ export function CloseCRMExplorer({ facilities = [] }: CloseCRMExplorerProps) {
     return false;
   });
   const { data: currentUser, isLoading: authLoading, error: authError } = useCloseUser();
+
+  // Sync externalLeadId into selectedLeadId (used to reopen lead after adding facility)
+  useEffect(() => {
+    if (externalLeadId) {
+      setSelectedLeadId(externalLeadId);
+    }
+  }, [externalLeadId]);
 
   const handleDismiss = () => {
     setIsDismissed(true);
@@ -146,6 +155,7 @@ export function CloseCRMExplorer({ facilities = [] }: CloseCRMExplorerProps) {
         leadId={selectedLeadId}
         onClose={() => setSelectedLeadId(null)}
         facilities={facilities}
+        onAddFacility={onAddFacilityFromLead}
       />
 
       {/* Call Details Sidebar */}

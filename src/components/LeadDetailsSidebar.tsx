@@ -16,6 +16,7 @@ import {
   Search,
   Link2,
   Info,
+  Plus,
 } from "lucide-react";
 import {
   useCloseLead,
@@ -72,12 +73,14 @@ interface LeadDetailsSidebarProps {
   leadId: string | null;
   onClose: () => void;
   facilities: Facility[];
+  onAddFacility?: (leadName: string, leadId: string) => void;
 }
 
 export function LeadDetailsSidebar({
   leadId,
   onClose,
   facilities,
+  onAddFacility,
 }: LeadDetailsSidebarProps) {
   const {
     data: lead,
@@ -928,9 +931,9 @@ export function LeadDetailsSidebar({
                     {/* Suggested Matches Section - Only show if no linked facilities */}
                     {linkedFacilities.length === 0 && (
                       <>
-                        {/* Search Input */}
-                        <div className="mb-4">
-                          <div className="relative">
+                        {/* Search Input + Add Facility */}
+                        <div className="mb-4 flex items-center gap-2">
+                          <div className="relative flex-1">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                             <input
                               type="text"
@@ -942,6 +945,22 @@ export function LeadDetailsSidebar({
                               className="w-full pl-10 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             />
                           </div>
+                          {onAddFacility && lead && (
+                            <button
+                              onClick={() => {
+                                onAddFacility(
+                                  lead.display_name || lead.name,
+                                  lead.id,
+                                );
+                                onClose();
+                              }}
+                              title="Add new facility"
+                              className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 text-sm font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition-colors cursor-pointer"
+                            >
+                              <Plus className="w-4 h-4" />
+                              Add
+                            </button>
+                          )}
                         </div>
                       </>
                     )}
@@ -1146,6 +1165,21 @@ export function LeadDetailsSidebar({
                             Try adjusting your search or check if the lead
                             details are correct
                           </p>
+                          {onAddFacility && lead && (
+                            <button
+                              onClick={() => {
+                                onAddFacility(
+                                  lead.display_name || lead.name,
+                                  lead.id,
+                                );
+                                onClose();
+                              }}
+                              className="mt-4 inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors cursor-pointer"
+                            >
+                              <Plus className="w-4 h-4" />
+                              Add Facility
+                            </button>
+                          )}
                         </motion.div>
                       )}
                   </div>

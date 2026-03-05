@@ -49,7 +49,7 @@ const TABS = [
   { id: "facilities", label: "Facilities", icon: Building2 },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
   { id: "close", label: "Close", icon: Users },
-  { id: "settings", label: "Settings", icon: Settings },
+  // { id: "settings", label: "Settings", icon: Settings },
 ];
 
 function CRMTabs({
@@ -209,15 +209,14 @@ function FacilityTable({
 
                   <td className="px-4 py-3 align-top min-w-[180px]">
                     <div className="flex flex-wrap gap-1.5">
-                      {facility.identified_sports
-                        ?.map((sport) => (
-                          <span
-                            key={sport}
-                            className="text-[10px] bg-blue-50 text-blue-700 font-semibold px-2 py-0.5 rounded uppercase tracking-wide border border-blue-100"
-                          >
-                            {sport}
-                          </span>
-                        ))}
+                      {facility.identified_sports?.map((sport) => (
+                        <span
+                          key={sport}
+                          className="text-[10px] bg-blue-50 text-blue-700 font-semibold px-2 py-0.5 rounded uppercase tracking-wide border border-blue-100"
+                        >
+                          {sport}
+                        </span>
+                      ))}
                       {(!facility.identified_sports ||
                         facility.identified_sports.length === 0) && (
                         <span className="text-xs text-gray-400 italic">
@@ -624,6 +623,9 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
   const [selectedSport, setSelectedSport] = useState<string | null>(null);
   const [isAddFacilitySidebarOpen, setIsAddFacilitySidebarOpen] =
     useState(false);
+  const [addFacilitySearchQuery, setAddFacilitySearchQuery] = useState("");
+  const [pendingLeadId, setPendingLeadId] = useState<string | null>(null);
+  const [externalLeadId, setExternalLeadId] = useState<string | null>(null);
   const { setLoadingComplete } = useLoading();
   const router = useRouter();
 
@@ -796,8 +798,8 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
   const displayTotalFacilities = isPriorityLoading
     ? priorityLoadingProgress
     : isBackgroundLoading
-    ? facilities.length + backgroundLoadingProgress
-    : facilities.length;
+      ? facilities.length + backgroundLoadingProgress
+      : facilities.length;
 
   // Show error state (only for critical errors, not for loading)
   if (isError && !isPriorityLoading) {
@@ -877,7 +879,8 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
                     <div className="text-sm text-slate-600 font-medium">
                       <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg border border-blue-200">
                         <div className="animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-blue-600"></div>
-                        Loading priority facilities... ({priorityLoadingProgress.toLocaleString()} loaded)
+                        Loading priority facilities... (
+                        {priorityLoadingProgress.toLocaleString()} loaded)
                       </span>
                     </div>
                   )}
@@ -886,39 +889,46 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
                     <div className="text-sm text-slate-600 font-medium">
                       <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg border border-blue-200">
                         <div className="animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-blue-600"></div>
-                        Loading more facilities... ({backgroundLoadingProgress.toLocaleString()} loaded)
+                        Loading more facilities... (
+                        {backgroundLoadingProgress.toLocaleString()} loaded)
                       </span>
                     </div>
                   )}
                   {/* Background error with retry */}
-                  {!isPriorityLoading && isBackgroundError && !isBackgroundLoading && (
-                    <div className="text-sm text-slate-600 font-medium">
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-700 rounded-lg border border-red-200">
-                        Failed to load remaining facilities
-                        <button
-                          onClick={() => retryBackgroundLoading()}
-                          className="ml-2 px-2 py-0.5 bg-red-600 text-white text-xs font-semibold rounded hover:bg-red-700 transition-colors"
-                        >
-                          Retry
-                        </button>
-                      </span>
-                    </div>
-                  )}
+                  {!isPriorityLoading &&
+                    isBackgroundError &&
+                    !isBackgroundLoading && (
+                      <div className="text-sm text-slate-600 font-medium">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-700 rounded-lg border border-red-200">
+                          Failed to load remaining facilities
+                          <button
+                            onClick={() => retryBackgroundLoading()}
+                            className="ml-2 px-2 py-0.5 bg-red-600 text-white text-xs font-semibold rounded hover:bg-red-700 transition-colors"
+                          >
+                            Retry
+                          </button>
+                        </span>
+                      </div>
+                    )}
                   {/* Active filters indicator */}
-                  {!isPriorityLoading && !isBackgroundLoading && activeFilterCount > 0 && (
-                    <div className="text-sm text-slate-600 font-medium">
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg border border-blue-200">
-                        <Filter className="h-3.5 w-3.5" />
-                        {activeFilterCount} active filter
-                        {activeFilterCount !== 1 ? "s" : ""}
-                      </span>
-                    </div>
-                  )}
-                  {!isPriorityLoading && !isBackgroundLoading && activeFilterCount === 0 && (
-                    <div className="text-sm text-slate-500 font-medium">
-                      No filters applied
-                    </div>
-                  )}
+                  {!isPriorityLoading &&
+                    !isBackgroundLoading &&
+                    activeFilterCount > 0 && (
+                      <div className="text-sm text-slate-600 font-medium">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg border border-blue-200">
+                          <Filter className="h-3.5 w-3.5" />
+                          {activeFilterCount} active filter
+                          {activeFilterCount !== 1 ? "s" : ""}
+                        </span>
+                      </div>
+                    )}
+                  {!isPriorityLoading &&
+                    !isBackgroundLoading &&
+                    activeFilterCount === 0 && (
+                      <div className="text-sm text-slate-500 font-medium">
+                        No filters applied
+                      </div>
+                    )}
                 </div>
 
                 <div className="flex items-center gap-3 w-full sm:w-auto">
@@ -1038,7 +1048,15 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <CloseCRMExplorer facilities={facilities as unknown as Facility[]} />
+            <CloseCRMExplorer
+              facilities={facilities as unknown as Facility[]}
+              onAddFacilityFromLead={(leadName, leadId) => {
+                setAddFacilitySearchQuery(leadName);
+                setPendingLeadId(leadId);
+                setIsAddFacilitySidebarOpen(true);
+              }}
+              externalLeadId={externalLeadId}
+            />
           </motion.div>
         ) : (
           <motion.div
@@ -1086,12 +1104,26 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
       {/* Add Facility Sidebar */}
       <AddFacilitySidebar
         isOpen={isAddFacilitySidebarOpen}
-        onClose={() => setIsAddFacilitySidebarOpen(false)}
+        onClose={() => {
+          setIsAddFacilitySidebarOpen(false);
+          setAddFacilitySearchQuery("");
+        }}
         onSuccess={(placeId) => {
           setIsAddFacilitySidebarOpen(false);
-          // Optionally open the new facility in details sidebar
-          setSelectedFacilityId(placeId);
+          if (pendingLeadId) {
+            // Reopen the lead sidebar after creating facility
+            setExternalLeadId(pendingLeadId);
+            // Clear after a short delay so the effect fires on next set
+            setTimeout(() => {
+              setExternalLeadId(null);
+              setPendingLeadId(null);
+            }, 100);
+          } else {
+            setSelectedFacilityId(placeId);
+          }
+          setAddFacilitySearchQuery("");
         }}
+        initialSearchQuery={addFacilitySearchQuery}
       />
     </div>
   );

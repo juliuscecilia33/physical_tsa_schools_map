@@ -26,6 +26,7 @@ interface AddFacilitySidebarProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: (placeId: string) => void;
+  initialSearchQuery?: string;
 }
 
 interface FormData {
@@ -70,6 +71,7 @@ export default function AddFacilitySidebar({
   isOpen,
   onClose,
   onSuccess,
+  initialSearchQuery,
 }: AddFacilitySidebarProps) {
   const queryClient = useQueryClient();
   const supabase = createClient();
@@ -98,6 +100,7 @@ export default function AddFacilitySidebar({
   const [error, setError] = useState<string | null>(null);
   const [showTagSection, setShowTagSection] = useState(false);
   const [showSportTypeDropdown, setShowSportTypeDropdown] = useState(false);
+  const [existingFacility, setExistingFacility] = useState<{ place_id: string; name: string; address: string } | null>(null);
 
   // Tags
   const [allTags, setAllTags] = useState<FacilityTag[]>([]);
@@ -111,6 +114,15 @@ export default function AddFacilitySidebar({
   const [facilityDetails, setFacilityDetails] =
     useState<import("@/hooks/useFacilitySearch").FacilityDetails | null>(null);
   const facilitySearch = useFacilitySearch();
+
+  // Pre-fill search when initialSearchQuery is provided
+  useEffect(() => {
+    if (isOpen && initialSearchQuery) {
+      setSearchInput(initialSearchQuery);
+      facilitySearch.handleInputChange(initialSearchQuery);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, initialSearchQuery]);
 
   // Fetch all tags on mount
   useEffect(() => {
@@ -154,6 +166,7 @@ export default function AddFacilitySidebar({
       setEnableSerpApiEnrichment(false);
       setError(null);
       setEnrichmentProgress(null);
+      setExistingFacility(null);
       setShowTagSection(false);
       setShowSportTypeDropdown(false);
       setSearchInput("");
@@ -195,6 +208,20 @@ export default function AddFacilitySidebar({
     const details = await facilitySearch.selectPrediction(prediction);
 
     if (details) {
+      // Check if this facility already exists in the database
+      const { data: existing } = await supabase
+        .from("sports_facilities")
+        .select("place_id, name, address")
+        .eq("place_id", details.placeId)
+        .maybeSingle();
+
+      if (existing) {
+        setExistingFacility(existing);
+        setSearchInput("");
+        return; // Don't populate form
+      }
+      setExistingFacility(null);
+
       // Store full facility details for later use in facility insert
       setFacilityDetails(details);
 
@@ -253,14 +280,14 @@ export default function AddFacilitySidebar({
       // Check if place already exists
       const { data: existing, error: existingError } = await supabase
         .from("sports_facilities")
-        .select("place_id")
+        .select("place_id, name, address")
         .eq("place_id", formData.place_id)
         .maybeSingle();
 
       if (existingError) throw existingError;
 
       if (existing) {
-        setError("This facility already exists in the database");
+        setError(`This facility already exists in the database: ${existing.name} - ${existing.address}`);
         setIsSaving(false);
         setEnrichmentProgress(null);
         return;
@@ -581,6 +608,34 @@ export default function AddFacilitySidebar({
                 </p>
               )}
             </div>
+          )}
+
+          {/* Duplicate Facility Banner */}
+          {existingFacility && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-amber-50 border border-amber-300 rounded-xl p-4 flex items-start gap-3"
+            >
+              <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-amber-900">Facility Already Exists</p>
+                <p className="text-sm text-amber-800 mt-1">
+                  <span className="font-medium">{existingFacility.name}</span>
+                  <br />
+                  {existingFacility.address}
+                </p>
+                <button
+                  onClick={() => {
+                    onSuccess(existingFacility.place_id);
+                    onClose();
+                  }}
+                  className="mt-3 px-4 py-2 bg-amber-600 text-white text-sm font-semibold rounded-lg hover:bg-amber-700 transition-colors"
+                >
+                  View Facility
+                </button>
+              </div>
+            </motion.div>
           )}
 
           {/* Divider */}
