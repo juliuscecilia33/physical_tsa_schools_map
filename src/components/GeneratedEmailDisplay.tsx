@@ -19,18 +19,18 @@ interface Props {
 
 function BreakdownRenderer({ breakdown }: { breakdown: EmailBreakdown }) {
   return (
-    <div className="space-y-4 mt-2">
+    <div className="space-y-5 mt-2">
       {breakdown.referencedActivities?.length > 0 && (
-        <div>
-          <p className="text-xs font-semibold text-gray-600 mb-1.5">Referenced Activities</p>
-          <div className="space-y-1.5">
+        <div className="bg-blue-50/60 border-l-3 border-blue-400 rounded-r-lg p-3">
+          <p className="text-sm font-semibold text-blue-700 mb-2">Referenced Activities</p>
+          <div className="space-y-2">
             {breakdown.referencedActivities.map((a, i) => (
-              <div key={i} className="text-xs text-gray-500 flex gap-2">
-                <span className="shrink-0 font-medium text-gray-600">
+              <div key={i} className="text-sm flex gap-2">
+                <span className="shrink-0 font-medium text-blue-900">
                   [{a.date}] {a.type}{a.direction ? ` (${a.direction})` : ""}
                 </span>
                 <span className="text-gray-400">—</span>
-                <span>{a.influence}</span>
+                <span className="text-gray-700">{a.influence}</span>
               </div>
             ))}
           </div>
@@ -38,17 +38,17 @@ function BreakdownRenderer({ breakdown }: { breakdown: EmailBreakdown }) {
       )}
 
       {breakdown.keyQuotes?.length > 0 && (
-        <div>
-          <p className="text-xs font-semibold text-gray-600 mb-1.5">Key Quotes</p>
-          <div className="space-y-2">
+        <div className="bg-purple-50/60 border-l-3 border-purple-400 rounded-r-lg p-3">
+          <p className="text-sm font-semibold text-purple-700 mb-2">Key Quotes</p>
+          <div className="space-y-3">
             {breakdown.keyQuotes.map((q, i) => (
-              <div key={i} className="text-xs">
-                <blockquote className="border-l-2 border-indigo-200 pl-2 text-gray-600 italic">
+              <div key={i}>
+                <blockquote className="border-l-3 border-purple-300 pl-3 text-sm text-gray-700 italic">
                   &ldquo;{q.quote}&rdquo;
                 </blockquote>
-                <p className="text-gray-400 mt-0.5">
-                  <span className="font-medium text-gray-500">Source:</span> {q.source}
-                  {q.usage && <> &middot; <span className="font-medium text-gray-500">Used for:</span> {q.usage}</>}
+                <p className="text-xs text-gray-500 mt-1 pl-3">
+                  <span className="font-medium">Source:</span> {q.source}
+                  {q.usage && <> &middot; <span className="font-medium">Used for:</span> {q.usage}</>}
                 </p>
               </div>
             ))}
@@ -57,13 +57,13 @@ function BreakdownRenderer({ breakdown }: { breakdown: EmailBreakdown }) {
       )}
 
       {breakdown.talkingPointRationale?.length > 0 && (
-        <div>
-          <p className="text-xs font-semibold text-gray-600 mb-1.5">Talking Points</p>
-          <div className="space-y-1.5">
+        <div className="bg-amber-50/60 border-l-3 border-amber-400 rounded-r-lg p-3">
+          <p className="text-sm font-semibold text-amber-700 mb-2">Talking Points</p>
+          <div className="space-y-2">
             {breakdown.talkingPointRationale.map((tp, i) => (
-              <div key={i} className="text-xs">
-                <span className="font-medium text-gray-600">{tp.point}</span>
-                <span className="text-gray-400"> — {tp.why}</span>
+              <div key={i} className="text-sm">
+                <span className="font-semibold text-gray-800">{tp.point}</span>
+                <span className="text-gray-600"> — {tp.why}</span>
               </div>
             ))}
           </div>
@@ -71,9 +71,9 @@ function BreakdownRenderer({ breakdown }: { breakdown: EmailBreakdown }) {
       )}
 
       {breakdown.toneJustification && (
-        <div>
-          <p className="text-xs font-semibold text-gray-600 mb-1">Tone</p>
-          <p className="text-xs text-gray-500">{breakdown.toneJustification}</p>
+        <div className="bg-green-50/60 border-l-3 border-green-400 rounded-r-lg p-3">
+          <p className="text-sm font-semibold text-green-700 mb-1.5">Tone</p>
+          <p className="text-sm text-gray-700">{breakdown.toneJustification}</p>
         </div>
       )}
     </div>
@@ -170,7 +170,7 @@ export function GeneratedEmailDisplay({ email, contactEmail, contactName, isOutd
           {showReasoning && (
             <div className="mt-2">
               {email.reasoning && (
-                <p className="text-xs text-gray-500 leading-relaxed mb-2">
+                <p className="text-sm text-gray-600 leading-relaxed mb-2">
                   {email.reasoning}
                 </p>
               )}
