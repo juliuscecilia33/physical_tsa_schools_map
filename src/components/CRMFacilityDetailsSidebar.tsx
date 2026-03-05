@@ -156,7 +156,7 @@ export default function CRMFacilityDetailsSidebar({
   const contentRef = useRef<HTMLDivElement>(null);
 
   // Fetch full facility details including reviews and additional data
-  const { data: facility, isLoading: isLoadingDetails, truncated, totalPhotos, totalReviews, fetchFullDetails } = useFacilityDetails(
+  const { data: facility, isLoading: isLoadingDetails, truncated, totalReviews, fetchFullDetails } = useFacilityDetails(
     placeId || null,
     !!placeId,
   );
@@ -174,6 +174,7 @@ export default function CRMFacilityDetailsSidebar({
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
   const additionalPhotoScrollRef = useRef<HTMLDivElement>(null);
+  const hasTriggeredFullLoad = useRef(false);
   const [showAdditionalLeftArrow, setShowAdditionalLeftArrow] = useState(false);
   const [showAdditionalRightArrow, setShowAdditionalRightArrow] =
     useState(false);
@@ -1141,6 +1142,14 @@ export default function CRMFacilityDetailsSidebar({
       additionalPhotoScrollRef.current;
     setShowAdditionalLeftArrow(scrollLeft > 0);
     setShowAdditionalRightArrow(scrollLeft < scrollWidth - clientWidth - 1);
+
+    // Auto-load full details when scrolled near the end
+    if (truncated && !hasTriggeredFullLoad.current) {
+      if (scrollLeft + clientWidth >= scrollWidth - 300) {
+        hasTriggeredFullLoad.current = true;
+        fetchFullDetails();
+      }
+    }
   };
 
   // Handle review images scroll
@@ -1197,6 +1206,7 @@ export default function CRMFacilityDetailsSidebar({
 
   // Update arrows for additional photos when loaded or facility changes
   useEffect(() => {
+    hasTriggeredFullLoad.current = false;
     updateAdditionalPhotoArrows();
     const scrollContainer = additionalPhotoScrollRef.current;
     if (scrollContainer) {
@@ -1604,9 +1614,10 @@ export default function CRMFacilityDetailsSidebar({
                               Scraped Photos ({combinedPhotos.length})
                             </h3>
                             <button
-                              onClick={() =>
-                                setIsAdditionalPhotosModalOpen(true)
-                              }
+                              onClick={() => {
+                                if (truncated) fetchFullDetails();
+                                setIsAdditionalPhotosModalOpen(true);
+                              }}
                               className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
                             >
                               <Maximize2 className="w-3.5 h-3.5" />
@@ -1729,15 +1740,6 @@ export default function CRMFacilityDetailsSidebar({
                       </>
                     )}
 
-                    {/* Load all photos button when truncated */}
-                    {truncated && totalPhotos > 10 && (
-                      <button
-                        onClick={fetchFullDetails}
-                        className="w-full mt-2 py-2.5 text-sm font-medium text-blue-600 hover:bg-slate-50 rounded-xl transition-colors border border-slate-200 hover:border-blue-600 cursor-pointer"
-                      >
-                        Load all {totalPhotos} photos
-                      </button>
-                    )}
 
                     {/* Divider */}
                     <div className="border-t border-slate-200"></div>
@@ -2597,9 +2599,10 @@ export default function CRMFacilityDetailsSidebar({
                                 </span>
                               </h3>
                               <button
-                                onClick={() =>
-                                  setIsAdditionalReviewsModalOpen(true)
-                                }
+                                onClick={() => {
+                                  if (truncated) fetchFullDetails();
+                                  setIsAdditionalReviewsModalOpen(true);
+                                }}
                                 className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
                               >
                                 <Maximize2 className="w-3.5 h-3.5" />

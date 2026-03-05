@@ -171,7 +171,7 @@ function FacilitySidebarInner({
   const contentRef = useRef<HTMLDivElement>(null);
 
   // Fetch full facility details including reviews and additional data
-  const { data: fullFacility, isLoading: isLoadingDetails, truncated, totalPhotos, totalReviews, fetchFullDetails } =
+  const { data: fullFacility, isLoading: isLoadingDetails, truncated, totalReviews, fetchFullDetails } =
     useFacilityDetails(facility?.place_id || null, !!facility);
 
   // Use full facility data if available, otherwise fall back to lightweight data
@@ -196,6 +196,7 @@ function FacilitySidebarInner({
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
   const additionalPhotoScrollRef = useRef<HTMLDivElement>(null);
+  const hasTriggeredFullLoad = useRef(false);
   const [showAdditionalLeftArrow, setShowAdditionalLeftArrow] = useState(false);
   const [showAdditionalRightArrow, setShowAdditionalRightArrow] =
     useState(false);
@@ -1033,6 +1034,14 @@ function FacilitySidebarInner({
       additionalPhotoScrollRef.current;
     setShowAdditionalLeftArrow(scrollLeft > 0);
     setShowAdditionalRightArrow(scrollLeft < scrollWidth - clientWidth - 1);
+
+    // Auto-load full details when scrolled near the end
+    if (truncated && !hasTriggeredFullLoad.current) {
+      if (scrollLeft + clientWidth >= scrollWidth - 300) {
+        hasTriggeredFullLoad.current = true;
+        fetchFullDetails();
+      }
+    }
   };
 
   // Handle review images scroll
@@ -1089,6 +1098,7 @@ function FacilitySidebarInner({
 
   // Update arrows for additional photos when loaded or facility changes
   useEffect(() => {
+    hasTriggeredFullLoad.current = false;
     updateAdditionalPhotoArrows();
     const scrollContainer = additionalPhotoScrollRef.current;
     if (scrollContainer) {
@@ -1424,7 +1434,10 @@ function FacilitySidebarInner({
                           Scraped Photos ({combinedPhotos.length})
                         </h3>
                         <button
-                          onClick={() => setIsAdditionalPhotosModalOpen(true)}
+                          onClick={() => {
+                            if (truncated) fetchFullDetails();
+                            setIsAdditionalPhotosModalOpen(true);
+                          }}
                           className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
                         >
                           <Maximize2 className="w-3.5 h-3.5" />
@@ -1547,15 +1560,6 @@ function FacilitySidebarInner({
                   </>
                 )}
 
-                {/* Load all photos button when truncated */}
-                {truncated && totalPhotos > 10 && (
-                  <button
-                    onClick={fetchFullDetails}
-                    className="w-full mt-2 py-2.5 text-sm font-medium text-blue-600 hover:bg-slate-50 rounded-xl transition-colors border border-slate-200 hover:border-blue-600 cursor-pointer"
-                  >
-                    Load all {totalPhotos} photos
-                  </button>
-                )}
 
                 {/* Divider - only show if photos sections were displayed above */}
                 {((displayFacility.photo_references &&
@@ -2287,9 +2291,10 @@ function FacilitySidebarInner({
                             {displayFacility.additional_reviews.length})
                           </h3>
                           <button
-                            onClick={() =>
-                              setIsAdditionalReviewsModalOpen(true)
-                            }
+                            onClick={() => {
+                              if (truncated) fetchFullDetails();
+                              setIsAdditionalReviewsModalOpen(true);
+                            }}
                             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
                           >
                             <Maximize2 className="w-3.5 h-3.5" />
