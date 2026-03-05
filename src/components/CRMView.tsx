@@ -783,13 +783,35 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
     filters.selectedTags.length +
     (filters.hasNotes !== null ? 1 : 0);
 
+  // Sort facilities by tag priority: both Close Data + SerpAPI first, then SerpAPI only, then rest
+  const sortedFacilities = [...filteredFacilities].sort((a, b) => {
+    const getScore = (f: typeof a) => {
+      const tagIds = f.tags?.map(t => t.id) || [];
+      const hasSerpAPI = tagIds.includes('e326fe36-5536-4209-87ed-f99528e1d1ee');
+      const hasCloseData = tagIds.includes('ef3537b6-4d83-4eb8-84a5-9bc74e776c72');
+      if (hasSerpAPI && hasCloseData) return 0;
+      if (hasSerpAPI) return 1;
+      return 2;
+    };
+    return getScore(a) - getScore(b);
+  });
+
   // Calculate pagination
-  const totalPages = Math.ceil(filteredFacilities.length / itemsPerPage);
+  const totalPages = Math.ceil(sortedFacilities.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const paginatedFacilities = filteredFacilities.slice(startIndex, endIndex);
+  const paginatedFacilities = sortedFacilities.slice(startIndex, endIndex);
 
   const facilitiesWithNotes = facilities.filter((f) => f.has_notes).length;
+  const facilitiesWithCloseData = facilities.filter((f) =>
+    f.tags?.some((t) => t.id === "ef3537b6-4d83-4eb8-84a5-9bc74e776c72"),
+  ).length;
+  const facilitiesWithSerpAPI = facilities.filter((f) =>
+    f.tags?.some((t) => t.id === "e326fe36-5536-4209-87ed-f99528e1d1ee"),
+  ).length;
+  const facilitiesWithPartnership = facilities.filter((f) =>
+    f.tags?.some((t) => t.id === "9482dd4a-e7c1-4b90-8bb6-31df7bdb10e4"),
+  ).length;
 
   // Calculate display count for "Total Facilities" card
   // During priority loading: show incremental priority progress
@@ -856,7 +878,7 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
             className="space-y-8"
           >
             {/* Metrics Row */}
-            <div className="grid grid-cols-2 gap-5">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-5">
               <SummaryCard
                 label="Total Facilities"
                 value={displayTotalFacilities}
@@ -866,6 +888,21 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
                 label="With Notes"
                 value={facilitiesWithNotes}
                 icon={FileText}
+              />
+              <SummaryCard
+                label="With Close Data"
+                value={facilitiesWithCloseData}
+                icon={Users}
+              />
+              <SummaryCard
+                label="Scraped with SerpAPI"
+                value={facilitiesWithSerpAPI}
+                icon={Globe}
+              />
+              <SummaryCard
+                label="Active Partnerships"
+                value={facilitiesWithPartnership}
+                icon={Star}
               />
             </div>
 
