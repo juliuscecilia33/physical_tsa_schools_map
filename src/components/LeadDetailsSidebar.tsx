@@ -330,7 +330,17 @@ export function LeadDetailsSidebar({
         const matched = matchedMap.get(facility.place_id);
         if (matched) return matched;
         return { ...facility, confidence: 1, matchReason: "Search result" };
-      })
+      });
+
+    // Deduplicate by place_id
+    const seen = new Set<string>();
+    const deduped = results.filter((f) => {
+      if (seen.has(f.place_id)) return false;
+      seen.add(f.place_id);
+      return true;
+    });
+
+    return deduped
       .sort((a, b) => {
         // Confidence-matched results first (search-only results have confidence 1)
         if (a.confidence > 1 && b.confidence <= 1) return -1;
@@ -339,8 +349,6 @@ export function LeadDetailsSidebar({
         return a.name.localeCompare(b.name);
       })
       .slice(0, 50);
-
-    return results;
   }, [matchedFacilities, linkedFacilities, facilities, facilitySearchQuery]);
 
   // Calculate confidence breakdown (for unmatched facilities only)
