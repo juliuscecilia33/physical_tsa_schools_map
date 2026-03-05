@@ -273,22 +273,8 @@ export function LeadDetailsSidebar({
       })
       .filter((result) => result.confidence > 0); // Only show matches
 
-    // Apply manual search filter
-    let filteredResults = results;
-    if (facilitySearchQuery.trim()) {
-      const query = facilitySearchQuery.toLowerCase();
-      filteredResults = results.filter((facility) => {
-        const nameMatch = facility.name.toLowerCase().includes(query);
-        const addressMatch = facility.address.toLowerCase().includes(query);
-        const sportsMatch = facility.identified_sports?.some((sport) =>
-          sport.toLowerCase().includes(query),
-        );
-        return nameMatch || addressMatch || sportsMatch;
-      });
-    }
-
     // Sort by confidence (highest first), then by name
-    return filteredResults
+    return results
       .sort((a, b) => {
         if (b.confidence !== a.confidence) {
           return b.confidence - a.confidence;
@@ -296,7 +282,7 @@ export function LeadDetailsSidebar({
         return a.name.localeCompare(b.name);
       })
       .slice(0, 50); // Limit to 50 results
-  }, [facilities, lead, facilitySearchQuery]);
+  }, [facilities, lead]);
 
   // Separate linked facilities from matched facilities
   const linkedFacilities = useMemo(() => {
@@ -318,14 +304,44 @@ export function LeadDetailsSidebar({
     })[];
   }, [facilityLeadLinks, facilities]);
 
-  // Filter out linked facilities from matched facilities
+  // Filter out linked facilities from matched facilities, and search all facilities when query is active
   const unmatchedFacilities = useMemo(() => {
-    if (!linkedFacilities.length) return matchedFacilities;
-
     const linkedPlaceIds = new Set(linkedFacilities.map((f) => f.place_id));
+    const matchedMap = new Map(matchedFacilities.map((f) => [f.place_id, f]));
 
-    return matchedFacilities.filter((f) => !linkedPlaceIds.has(f.place_id));
-  }, [matchedFacilities, linkedFacilities]);
+    if (!facilitySearchQuery.trim()) {
+      // No search query: show only confidence-matched facilities
+      return matchedFacilities.filter((f) => !linkedPlaceIds.has(f.place_id));
+    }
+
+    // With search query: search ALL facilities
+    const query = facilitySearchQuery.toLowerCase();
+    const results = facilities
+      .filter((facility) => {
+        if (linkedPlaceIds.has(facility.place_id)) return false;
+        const nameMatch = facility.name?.toLowerCase().includes(query);
+        const addressMatch = facility.address?.toLowerCase().includes(query);
+        const sportsMatch = facility.identified_sports?.some((sport) =>
+          sport.toLowerCase().includes(query),
+        );
+        return nameMatch || addressMatch || sportsMatch;
+      })
+      .map((facility) => {
+        const matched = matchedMap.get(facility.place_id);
+        if (matched) return matched;
+        return { ...facility, confidence: 1, matchReason: "Search result" };
+      })
+      .sort((a, b) => {
+        // Confidence-matched results first (search-only results have confidence 1)
+        if (a.confidence > 1 && b.confidence <= 1) return -1;
+        if (a.confidence <= 1 && b.confidence > 1) return 1;
+        if (b.confidence !== a.confidence) return b.confidence - a.confidence;
+        return a.name.localeCompare(b.name);
+      })
+      .slice(0, 50);
+
+    return results;
+  }, [matchedFacilities, linkedFacilities, facilities, facilitySearchQuery]);
 
   // Calculate confidence breakdown (for unmatched facilities only)
   const confidenceBreakdown = useMemo(() => {
@@ -1003,6 +1019,14 @@ export function LeadDetailsSidebar({
                                         "bg-gradient-to-r from-orange-50 to-orange-100 text-orange-800 border-orange-300",
                                       dotColor: "bg-orange-500",
                                       needsReview: true,
+                                    };
+                                  case 1:
+                                    return {
+                                      label: "Search Result",
+                                      className:
+                                        "bg-gradient-to-r from-purple-50 to-purple-100 text-purple-800 border-purple-300",
+                                      dotColor: "bg-purple-500",
+                                      needsReview: false,
                                     };
                                   default:
                                     return {
