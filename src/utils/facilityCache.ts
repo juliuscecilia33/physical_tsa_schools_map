@@ -83,6 +83,49 @@ export function updateFacilityTags(
 }
 
 /**
+ * Atomically move a facility from one cache segment to another.
+ * Adds to destination before removing from source to avoid a gap where the
+ * facility exists in neither segment.
+ */
+export function moveFacilityToSegment(
+  queryClient: QueryClient,
+  placeId: string,
+  from: 'serpapi' | 'background',
+  to: 'serpapi' | 'background',
+  updates?: Partial<FacilityLightweight>
+) {
+  const queryCache = queryClient.getQueryCache();
+
+  // 1. Get facility from source segment
+  const fromQuery = queryCache.find({ queryKey: ['facilities', from] });
+  const fromData = fromQuery?.state.data as FacilityLightweight[] | undefined;
+  const facility = fromData?.find((f) => f.place_id === placeId);
+
+  // 2. Add to destination segment
+  const toQuery = queryCache.find({ queryKey: ['facilities', to] });
+  const toData = toQuery?.state.data as FacilityLightweight[] | undefined;
+
+  if (toQuery && toData && facility) {
+    const updatedFacility = updates ? { ...facility, ...updates } : facility;
+    const filtered = toData.filter((f) => f.place_id !== placeId);
+    queryClient.setQueryData(
+      ['facilities', to],
+      [...filtered, updatedFacility],
+      { updatedAt: toQuery.state.dataUpdatedAt }
+    );
+  }
+
+  // 3. Remove from source segment
+  if (fromQuery && fromData) {
+    queryClient.setQueryData(
+      ['facilities', from],
+      fromData.filter((f) => f.place_id !== placeId),
+      { updatedAt: fromQuery.state.dataUpdatedAt }
+    );
+  }
+}
+
+/**
  * Remove a facility from a specific cache segment
  * Used when a facility moves between segments (e.g., after SerpAPI enrichment)
  */

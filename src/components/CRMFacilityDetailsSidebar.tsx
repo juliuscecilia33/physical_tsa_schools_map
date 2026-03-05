@@ -43,7 +43,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   updateFacilityNotesFlag,
   updateFacilityTags,
-  removeFacilityFromSegment,
+  moveFacilityToSegment,
 } from "@/utils/facilityCache";
 import { useFacilityDetails } from "@/hooks/useFacilityDetails";
 import { Note, FacilityTag } from "@/types/facility";
@@ -934,15 +934,16 @@ export default function CRMFacilityDetailsSidebar({
         // Optimistically update the CRM table with the SerpAPI tag
         const serpApiTag = allTags.find((t) => t.id === SERPAPI_TAG_ID)
           ?? { id: SERPAPI_TAG_ID, name: "Scraped by SerpAPI", color: "#8b5cf6", description: null };
+        let updatedTags = facilityTags;
         if (!facilityTags.some((t) => t.id === SERPAPI_TAG_ID)) {
-          const updatedTags = [...facilityTags, serpApiTag];
+          updatedTags = [...facilityTags, serpApiTag];
           setFacilityTags(updatedTags);
           updateFacilityTags(queryClient, facility.place_id, updatedTags);
         }
 
-        // Remove from background segment to prevent duplicate keys
-        // (facility now belongs in serpapi segment after enrichment)
-        removeFacilityFromSegment(queryClient, facility.place_id, 'background');
+        // Move facility from background to serpapi segment atomically
+        // so it never disappears from allFacilities during the refetch window
+        moveFacilityToSegment(queryClient, facility.place_id, 'background', 'serpapi', { tags: updatedTags });
 
         // Refetch facility data to show updates
         await queryClient.refetchQueries({
