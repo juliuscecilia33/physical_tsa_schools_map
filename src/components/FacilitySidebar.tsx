@@ -47,7 +47,7 @@ import {
   updateFacilityTags,
 } from "@/utils/facilityCache";
 import { useFacilityDetails } from "@/hooks/useFacilityDetails";
-import { CloseLead } from "@/types/close";
+import { CloseLead, CloseActivity } from "@/types/close";
 import {
   useLeadFacilityLinks,
   useDeleteFacilityLeadLink,
@@ -58,6 +58,8 @@ import {
   useCloseLeadActivities,
 } from "@/hooks/useCloseCRM";
 import { CloseActivityTimeline } from "./CloseActivityTimeline";
+import { CallDetailContent } from "./CallDetailContent";
+import { EmailDetailContent } from "./EmailDetailContent";
 import SportDetailModal from "@/components/SportDetailModal";
 import TagManagerModal from "@/components/TagManagerModal";
 import AddNoteModal from "@/components/AddNoteModal";
@@ -245,8 +247,9 @@ function FacilitySidebarInner({
   const [facilityTags, setFacilityTags] = useState<FacilityTag[]>([]);
 
   // Linked leads state & hooks
-  const [viewMode, setViewMode] = useState<"facility" | "lead">("facility");
+  const [viewMode, setViewMode] = useState<"facility" | "lead" | "call" | "email">("facility");
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
+  const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
 
   const { data: linkedLeads = [], isLoading: linkedLeadsLoading } =
     useLeadFacilityLinks(facility?.place_id || null);
@@ -378,6 +381,13 @@ function FacilitySidebarInner({
 
     fetchNotes();
   }, [displayFacility?.place_id]);
+
+  // Reset viewMode when facility changes
+  useEffect(() => {
+    setViewMode("facility");
+    setSelectedLeadId(null);
+    setSelectedActivityId(null);
+  }, [facility?.place_id]);
 
   // Sync facility tags from displayFacility when it changes
   useEffect(() => {
@@ -983,6 +993,16 @@ function FacilitySidebarInner({
       );
     }
     return stars;
+  };
+
+  const handleActivityClick = (activity: CloseActivity) => {
+    if (activity.type === "call") {
+      setViewMode("call");
+      setSelectedActivityId(activity.call?.id || activity.id);
+    } else if (activity.type === "email") {
+      setViewMode("email");
+      setSelectedActivityId(activity.email?.id || activity.id);
+    }
   };
 
   const handleImageLoad = (idx: number | string) => {
@@ -2685,6 +2705,7 @@ function FacilitySidebarInner({
                   onClick={() => {
                     setViewMode("facility");
                     setSelectedLeadId(null);
+                    setSelectedActivityId(null);
                   }}
                   className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
                 >
@@ -2930,9 +2951,56 @@ function FacilitySidebarInner({
                   <CloseActivityTimeline
                     activities={selectedLeadActivities?.activities || []}
                     isLoading={selectedLeadActivitiesLoading}
+                    onActivityClick={handleActivityClick}
                   />
                 </motion.div>
               </motion.div>
+            ) : viewMode === "call" && selectedActivityId ? (
+                  <motion.div
+                    key="call-view"
+                    initial={{ x: 100, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: 100, opacity: 0 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    className="space-y-4"
+                  >
+                    <motion.button
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      onClick={() => {
+                        setViewMode("lead");
+                        setSelectedActivityId(null);
+                      }}
+                      className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                      Back to Lead
+                    </motion.button>
+                    <CallDetailContent callId={selectedActivityId} leadId={selectedLeadId || undefined} />
+                  </motion.div>
+                ) : viewMode === "email" && selectedActivityId ? (
+                  <motion.div
+                    key="email-view"
+                    initial={{ x: 100, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: 100, opacity: 0 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    className="space-y-4"
+                  >
+                    <motion.button
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      onClick={() => {
+                        setViewMode("lead");
+                        setSelectedActivityId(null);
+                      }}
+                      className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                      Back to Lead
+                    </motion.button>
+                    <EmailDetailContent emailThreadId={selectedActivityId} leadId={selectedLeadId || undefined} />
+                  </motion.div>
             ) : null}
           </AnimatePresence>
         </div>
