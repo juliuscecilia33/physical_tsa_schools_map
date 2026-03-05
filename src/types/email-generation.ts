@@ -29,6 +29,9 @@ export interface GeneratedEmail {
   generation_context?: EmailBreakdown | null;
   status: 'draft' | 'sent' | 'discarded';
   created_at: string;
+  feedback_rating?: 'used' | 'helpful' | 'bad' | null;
+  feedback_note?: string | null;
+  feedback_at?: string | null;
 }
 
 export interface ActivitySummary {

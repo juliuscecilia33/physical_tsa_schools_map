@@ -41,6 +41,11 @@ INSTRUCTIONS:
 7. Keep body under 250 words
 
 8. If "PREVIOUS ANALYSIS CONTEXT" is provided, use it as a baseline. Focus new analysis on activities after the previous generation. Build on previous talking points rather than repeating.
+9. If previous email feedback is provided, use it to improve:
+   - "used": The user sent this email — this style/approach worked well, lean into it
+   - "helpful": The draft was useful for inspiration — similar approach is good
+   - "bad": The user found this unhelpful — avoid this approach/tone/angle
+   - Pay special attention to any feedback notes explaining what was good or bad
 
 Respond in this exact JSON format:
 {
@@ -84,6 +89,8 @@ function buildUserMessage(
     email_type: string;
     created_at: string;
     generation_context?: any;
+    feedback_rating?: string | null;
+    feedback_note?: string | null;
   }>
 ): string {
   let message = `LEAD INFORMATION:\n`;
@@ -133,7 +140,10 @@ function buildUserMessage(
         day: "numeric",
         year: "numeric",
       });
-      message += `[${date}] Type: ${e.email_type}\nSubject: ${e.subject}\nBody: ${truncateWords(e.body_text, 300)}\n\n`;
+      const feedback = e.feedback_rating
+        ? ` | Feedback: "${e.feedback_rating}"${e.feedback_note ? ` — "${e.feedback_note}"` : ""}`
+        : "";
+      message += `[${date}] Type: ${e.email_type}${feedback}\nSubject: ${e.subject}\nBody: ${truncateWords(e.body_text, 300)}\n\n`;
     }
   }
 
@@ -227,7 +237,7 @@ export async function POST(request: NextRequest) {
     // Fetch previously generated emails for this lead (last 5)
     const { data: previousEmails } = await supabase
       .from("generated_emails")
-      .select("subject, body_text, email_type, created_at, generation_context")
+      .select("subject, body_text, email_type, created_at, generation_context, feedback_rating, feedback_note")
       .eq("close_lead_id", leadId)
       .order("created_at", { ascending: false })
       .limit(5);

@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Copy, Check, ChevronDown, ChevronUp, AlertCircle } from "lucide-react";
+import { Copy, Check, ChevronDown, ChevronUp, AlertCircle, ThumbsUp, Lightbulb, ThumbsDown } from "lucide-react";
 import { GeneratedEmail, EmailBreakdown } from "@/types/email-generation";
+import { useEmailFeedback } from "@/hooks/useEmailFeedback";
 
 const TYPE_BADGES: Record<string, { label: string; className: string }> = {
   intro: { label: "Intro", className: "bg-emerald-100 text-emerald-700" },
@@ -15,6 +16,7 @@ interface Props {
   contactEmail?: string;
   contactName?: string;
   isOutdated?: boolean;
+  closeLeadId: string;
 }
 
 function BreakdownRenderer({ breakdown }: { breakdown: EmailBreakdown }) {
@@ -80,9 +82,21 @@ function BreakdownRenderer({ breakdown }: { breakdown: EmailBreakdown }) {
   );
 }
 
-export function GeneratedEmailDisplay({ email, contactEmail, contactName, isOutdated }: Props) {
+const RATING_OPTIONS = [
+  { value: "used" as const, label: "Used it", icon: ThumbsUp, activeClass: "bg-emerald-100 text-emerald-700 border-emerald-300", hoverClass: "hover:bg-emerald-50" },
+  { value: "helpful" as const, label: "Helpful", icon: Lightbulb, activeClass: "bg-blue-100 text-blue-700 border-blue-300", hoverClass: "hover:bg-blue-50" },
+  { value: "bad" as const, label: "Not useful", icon: ThumbsDown, activeClass: "bg-red-100 text-red-700 border-red-300", hoverClass: "hover:bg-red-50" },
+];
+
+export function GeneratedEmailDisplay({ email, contactEmail, contactName, isOutdated, closeLeadId }: Props) {
   const [copied, setCopied] = useState(false);
   const [showReasoning, setShowReasoning] = useState(false);
+  const [feedbackRating, setFeedbackRating] = useState<"used" | "helpful" | "bad" | null>(email.feedback_rating ?? null);
+  const [feedbackNote, setFeedbackNote] = useState(email.feedback_note ?? "");
+  const [showNoteInput, setShowNoteInput] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const feedbackMutation = useEmailFeedback();
+  const hasSavedFeedback = !!email.feedback_rating;
   const badge = TYPE_BADGES[email.email_type] || TYPE_BADGES.intro;
   const hasBreakdown = !!email.generation_context;
 
@@ -152,6 +166,79 @@ export function GeneratedEmailDisplay({ email, contactEmail, contactName, isOutd
             </>
           )}
         </button>
+      </div>
+
+      {/* Feedback Section */}
+      <div className="border-t border-gray-100 pt-3">
+        {hasSavedFeedback && !isEditing ? (
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-500">Feedback:</span>
+            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+              RATING_OPTIONS.find((r) => r.value === email.feedback_rating)?.activeClass
+            }`}>
+              {RATING_OPTIONS.find((r) => r.value === email.feedback_rating)?.label}
+            </span>
+            {email.feedback_note && (
+              <span className="text-xs text-gray-500 italic truncate max-w-[200px]">&ldquo;{email.feedback_note}&rdquo;</span>
+            )}
+            <button
+              onClick={() => setIsEditing(true)}
+              className="text-xs text-gray-400 hover:text-gray-600 ml-auto cursor-pointer"
+            >
+              Edit
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <p className="text-xs font-medium text-gray-500">How was this email?</p>
+            <div className="flex gap-2">
+              {RATING_OPTIONS.map((option) => {
+                const Icon = option.icon;
+                const isSelected = feedbackRating === option.value;
+                return (
+                  <button
+                    key={option.value}
+                    onClick={() => {
+                      setFeedbackRating(isSelected ? null : option.value);
+                      if (!isSelected) setShowNoteInput(true);
+                    }}
+                    className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-lg border transition-colors cursor-pointer ${
+                      isSelected
+                        ? option.activeClass
+                        : `text-gray-600 border-gray-200 ${option.hoverClass}`
+                    }`}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    {option.label}
+                  </button>
+                );
+              })}
+            </div>
+            {showNoteInput && feedbackRating && (
+              <div className="space-y-2">
+                <textarea
+                  value={feedbackNote}
+                  onChange={(e) => setFeedbackNote(e.target.value)}
+                  placeholder="Add a note (optional)"
+                  rows={2}
+                  className="w-full text-xs border border-gray-200 rounded-lg p-2 resize-none focus:outline-none focus:ring-1 focus:ring-blue-300"
+                />
+                <button
+                  onClick={() => {
+                    feedbackMutation.mutate(
+                      { emailId: email.id, closeLeadId, rating: feedbackRating, note: feedbackNote || undefined },
+                      { onSuccess: () => setIsEditing(false) }
+                    );
+                  }}
+                  disabled={feedbackMutation.isPending}
+                  className="px-3 py-1.5 text-xs font-medium text-white bg-gray-900 hover:bg-gray-800 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  {feedbackMutation.isPending ? "Saving..." : "Save Feedback"}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {(email.reasoning || hasBreakdown) && (

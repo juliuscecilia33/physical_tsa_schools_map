@@ -37,6 +37,9 @@ import {
   Link2,
   Building2,
   Calendar,
+  FileText,
+  Sparkles,
+  Loader2,
 } from "lucide-react";
 import { useState, useEffect, useRef, useMemo, memo } from "react";
 import { createPortal } from "react-dom";
@@ -60,6 +63,10 @@ import {
 import { CloseActivityTimeline } from "./CloseActivityTimeline";
 import { CallDetailContent } from "./CallDetailContent";
 import { EmailDetailContent } from "./EmailDetailContent";
+import { GeneratedEmail } from "@/types/email-generation";
+import { useGenerateEmail } from "@/hooks/useGenerateEmail";
+import { useGeneratedEmails } from "@/hooks/useGeneratedEmails";
+import { GeneratedEmailDisplay } from "./GeneratedEmailDisplay";
 import SportDetailModal from "@/components/SportDetailModal";
 import TagManagerModal from "@/components/TagManagerModal";
 import AddNoteModal from "@/components/AddNoteModal";
@@ -247,9 +254,12 @@ function FacilitySidebarInner({
   const [facilityTags, setFacilityTags] = useState<FacilityTag[]>([]);
 
   // Linked leads state & hooks
-  const [viewMode, setViewMode] = useState<"facility" | "lead" | "call" | "email">("facility");
+  const [viewMode, setViewMode] = useState<"facility" | "lead" | "call" | "email" | "generated-email">("facility");
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
   const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
+  const [generatedEmail, setGeneratedEmail] = useState<GeneratedEmail | null>(null);
+  const generateEmailMutation = useGenerateEmail();
+  const { data: generatedEmails = [] } = useGeneratedEmails(selectedLeadId);
 
   const { data: linkedLeads = [], isLoading: linkedLeadsLoading } =
     useLeadFacilityLinks(facility?.place_id || null);
@@ -266,6 +276,12 @@ function FacilitySidebarInner({
     data: selectedLeadActivities,
     isLoading: selectedLeadActivitiesLoading,
   } = useCloseLeadActivities(selectedLeadId);
+
+  const latestActivityDate = useMemo(() => {
+    const activities = selectedLeadActivities?.activities;
+    if (!activities?.length) return 0;
+    return Math.max(...activities.map((a: any) => new Date(a.date_created).getTime()));
+  }, [selectedLeadActivities?.activities]);
 
   const leadsMap = useMemo(() => {
     const map: Record<string, CloseLead> = {};
@@ -387,6 +403,7 @@ function FacilitySidebarInner({
     setViewMode("facility");
     setSelectedLeadId(null);
     setSelectedActivityId(null);
+    setGeneratedEmail(null);
   }, [facility?.place_id]);
 
   // Sync facility tags from displayFacility when it changes
@@ -2914,9 +2931,39 @@ function FacilitySidebarInner({
                   transition={{ delay: 0.2 }}
                   className="bg-white border border-slate-200 rounded-lg p-5"
                 >
-                  <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-4">
-                    Activity Timeline
-                  </h3>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider">
+                      Activity Timeline
+                    </h3>
+                    <button
+                      onClick={() => {
+                        generateEmailMutation.mutate(
+                          {
+                            leadId: selectedLeadId!,
+                            leadName: selectedLead!.display_name || selectedLead!.name,
+                            leadDescription: selectedLead!.description,
+                            contacts: selectedLead!.contacts,
+                            activities: selectedLeadActivities?.activities || [],
+                          },
+                          {
+                            onSuccess: (data) => {
+                              setGeneratedEmail(data);
+                              setViewMode("generated-email");
+                            },
+                          }
+                        );
+                      }}
+                      disabled={generateEmailMutation.isPending || !selectedLeadActivities}
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors disabled:opacity-50 cursor-pointer"
+                    >
+                      {generateEmailMutation.isPending ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <Sparkles className="w-3.5 h-3.5" />
+                      )}
+                      {generateEmailMutation.isPending ? generateEmailMutation.generationStatus : "Generate Email"}
+                    </button>
+                  </div>
                   {selectedLeadActivities && (
                     <div className="mb-3 flex flex-wrap gap-2 text-xs text-slate-600">
                       <span>Total: {selectedLeadActivities.count.total}</span>
@@ -2953,6 +3000,71 @@ function FacilitySidebarInner({
                     isLoading={selectedLeadActivitiesLoading}
                     onActivityClick={handleActivityClick}
                   />
+                </motion.div>
+
+                {/* Generated Emails History */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.25 }}
+                  className="bg-white border border-slate-200 rounded-lg p-5"
+                >
+                  <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider flex items-center gap-2 mb-4">
+                    <FileText className="w-4 h-4" />
+                    Generated Emails
+                    {generatedEmails.length > 0 && (
+                      <span className="inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold text-white bg-indigo-600 rounded-full">
+                        {generatedEmails.length}
+                      </span>
+                    )}
+                  </h3>
+                  {generatedEmails.length === 0 ? (
+                    <p className="text-xs text-slate-400">No generated emails yet</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {generatedEmails.map((email) => {
+                        const typeBadge = {
+                          intro: { label: "Intro", className: "bg-emerald-100 text-emerald-700" },
+                          follow_up: { label: "Follow-up", className: "bg-amber-100 text-amber-700" },
+                          reply: { label: "Reply", className: "bg-blue-100 text-blue-700" },
+                        }[email.email_type] || { label: email.email_type, className: "bg-slate-100 text-slate-700" };
+                        const isOutdated = latestActivityDate > new Date(email.created_at).getTime();
+
+                        return (
+                          <button
+                            key={email.id}
+                            onClick={() => {
+                              setGeneratedEmail(email);
+                              setViewMode("generated-email");
+                            }}
+                            className="w-full text-left p-3 rounded-lg border border-slate-100 hover:border-indigo-200 hover:bg-indigo-50/50 transition-colors cursor-pointer"
+                          >
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${typeBadge.className}`}>
+                                {typeBadge.label}
+                              </span>
+                              <span className="text-[10px] text-slate-400">
+                                {new Date(email.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                              </span>
+                              {isOutdated && (
+                                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-orange-100 text-orange-600">
+                                  Outdated
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs font-medium text-slate-800 truncate">
+                              {email.subject}
+                            </p>
+                            {email.recipient_name && (
+                              <p className="text-[10px] text-slate-400 mt-0.5">
+                                To: {email.recipient_name}
+                              </p>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                 </motion.div>
               </motion.div>
             ) : viewMode === "call" && selectedActivityId ? (
@@ -3000,6 +3112,35 @@ function FacilitySidebarInner({
                       Back to Lead
                     </motion.button>
                     <EmailDetailContent emailThreadId={selectedActivityId} leadId={selectedLeadId || undefined} />
+                  </motion.div>
+                ) : viewMode === "generated-email" && generatedEmail ? (
+                  <motion.div
+                    key="generated-email-view"
+                    initial={{ x: 100, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: 100, opacity: 0 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    className="space-y-4"
+                  >
+                    <motion.button
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      onClick={() => {
+                        setViewMode("lead");
+                        setGeneratedEmail(null);
+                      }}
+                      className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                      Back to Lead
+                    </motion.button>
+                    <GeneratedEmailDisplay
+                      email={generatedEmail}
+                      contactEmail={selectedLead?.contacts?.[0]?.emails?.[0]?.email}
+                      contactName={selectedLead?.contacts?.[0]?.name}
+                      isOutdated={latestActivityDate > new Date(generatedEmail.created_at).getTime()}
+                      closeLeadId={selectedLeadId!}
+                    />
                   </motion.div>
             ) : null}
           </AnimatePresence>

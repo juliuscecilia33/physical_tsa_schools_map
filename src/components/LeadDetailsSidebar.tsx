@@ -1468,6 +1468,7 @@ export function LeadDetailsSidebar({
                       contactEmail={lead?.contacts?.[0]?.emails?.[0]?.email}
                       contactName={lead?.contacts?.[0]?.name}
                       isOutdated={latestActivityDate > new Date(generatedEmail.created_at).getTime()}
+                      closeLeadId={leadId!}
                     />
                   </motion.div>
                 ) : null}
