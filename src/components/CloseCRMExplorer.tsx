@@ -168,6 +168,11 @@ export function CloseCRMExplorer({ facilities = [], onAddFacilityFromLead, exter
           setSelectedCallId(null);
           setSelectedCallLeadId(null);
         }}
+        onLeadClick={(leadId) => {
+          setSelectedCallId(null);
+          setSelectedCallLeadId(null);
+          setSelectedLeadId(leadId);
+        }}
         facilities={facilities}
       />
 

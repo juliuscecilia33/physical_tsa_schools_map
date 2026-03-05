@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
 
     // Fetch all activity types in parallel
     const [callsRes, emailsRes, notesRes, tasksRes, opportunitiesRes] = await Promise.allSettled([
-      closeClient.getCalls({ lead_id: leadId, _limit: limit }),
+      closeClient.getCalls({ lead_id: leadId, _limit: limit, _fields: 'id,lead_id,user_id,user_name,date_created,date_updated,direction,status,disposition,duration,phone,remote_phone,note,recording_url,voicemail_url,recording_duration,voicemail_duration,has_recording,recording_transcript,voicemail_transcript,contact_id' }),
       closeClient.getEmailThreads({ lead_id: leadId, _limit: limit }),
       closeClient.getNotes({ lead_id: leadId, _limit: limit }),
       closeClient.getTasks({ lead_id: leadId, _limit: limit }),

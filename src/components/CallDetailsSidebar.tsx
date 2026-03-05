@@ -19,6 +19,7 @@ import {
   ExternalLink,
   ChevronDown,
   ChevronUp,
+  ChevronRight,
   Link2,
   Search,
 } from 'lucide-react';
@@ -44,6 +45,7 @@ interface CallDetailsSidebarProps {
   callId: string | null;
   leadId?: string | null;
   onClose: () => void;
+  onLeadClick?: (leadId: string) => void;
   facilities?: Facility[];
 }
 
@@ -119,7 +121,7 @@ function renderFormattedSummary(summaryText: string) {
   return elements;
 }
 
-export function CallDetailsSidebar({ callId, leadId, onClose, facilities = [] }: CallDetailsSidebarProps) {
+export function CallDetailsSidebar({ callId, leadId, onClose, onLeadClick, facilities = [] }: CallDetailsSidebarProps) {
   const { data: call, isLoading: callLoading, error: callError } = useCloseCall(callId);
   const { data: lead, isLoading: leadLoading, error: leadError } = useCloseLead(leadId || call?.lead_id || null);
   const { data: user } = useCloseUser(); // Get current user for now
@@ -462,10 +464,21 @@ export function CallDetailsSidebar({ callId, leadId, onClose, facilities = [] }:
                   )}
 
                   {/* Lead Information Section */}
-                  <div className="bg-white border border-gray-200 rounded-lg p-5 space-y-3">
+                  <div
+                    className={`bg-white border border-gray-200 rounded-lg p-5 space-y-3${
+                      onLeadClick && (leadId || call.lead_id) ? ' cursor-pointer hover:border-blue-300 hover:shadow-md transition-all' : ''
+                    }`}
+                    onClick={() => {
+                      const id = leadId || call.lead_id;
+                      if (onLeadClick && id) onLeadClick(id);
+                    }}
+                  >
                     <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider flex items-center gap-2">
                       <Building2 className="w-4 h-4" />
                       Lead Information
+                      {onLeadClick && (leadId || call.lead_id) && (
+                        <ChevronRight className="w-4 h-4 text-gray-400 ml-auto" />
+                      )}
                     </h3>
 
                     {leadLoading ? (

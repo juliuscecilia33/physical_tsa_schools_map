@@ -342,6 +342,7 @@ export interface CloseQueryParams {
   date_created__gt?: string;
   date_created__lt?: string;
   status_id?: string;
+  _fields?: string;
 }
 
 // API Response types for convenience
