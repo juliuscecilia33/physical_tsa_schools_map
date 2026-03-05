@@ -74,6 +74,7 @@ interface LeadDetailsSidebarProps {
   onClose: () => void;
   facilities: Facility[];
   onAddFacility?: (leadName: string, leadId: string) => void;
+  onFacilityClick?: (placeId: string) => void;
 }
 
 export function LeadDetailsSidebar({
@@ -81,6 +82,7 @@ export function LeadDetailsSidebar({
   onClose,
   facilities,
   onAddFacility,
+  onFacilityClick,
 }: LeadDetailsSidebarProps) {
   const {
     data: lead,
@@ -829,7 +831,8 @@ export function LeadDetailsSidebar({
                                   delay: idx * 0.04,
                                   duration: 0.3,
                                 }}
-                                className="p-5 rounded-xl transition-all duration-300 bg-gradient-to-br from-green-50 to-white border-2 border-green-300 shadow-sm"
+                                className={`p-5 rounded-xl transition-all duration-300 bg-gradient-to-br from-green-50 to-white border-2 border-green-300 shadow-sm ${onFacilityClick ? 'cursor-pointer hover:shadow-md hover:border-green-400' : ''}`}
+                                onClick={() => onFacilityClick?.(facility.place_id)}
                               >
                                 <div className="space-y-3">
                                   {/* Header with Linked Badge */}
@@ -908,6 +911,22 @@ export function LeadDetailsSidebar({
                                       </div>
                                     )}
 
+                                  {/* Tags */}
+                                  {facility.tags && facility.tags.length > 0 && (
+                                    <div className="flex flex-wrap gap-1.5">
+                                      {facility.tags.map((tag) => (
+                                        <span
+                                          key={tag.id}
+                                          className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium border"
+                                          style={{ color: tag.color, borderColor: tag.color }}
+                                          title={tag.description || tag.name}
+                                        >
+                                          {tag.name}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  )}
+
                                   {/* Rating */}
                                   {facility.rating && (
                                     <div className="flex items-center gap-2 text-sm">
@@ -927,7 +946,7 @@ export function LeadDetailsSidebar({
                                   )}
 
                                   {/* Unlink Button */}
-                                  <div className="pt-3 border-t border-green-200">
+                                  <div className="pt-3 border-t border-green-200" onClick={(e) => e.stopPropagation()}>
                                     <button
                                       onClick={() =>
                                         handleUnlinkFacility(
@@ -1060,6 +1079,7 @@ export function LeadDetailsSidebar({
                                   }}
                                   whileTap={{ scale: 0.98 }}
                                   className="p-5 rounded-xl transition-all duration-300 cursor-pointer bg-gradient-to-br from-white to-gray-50/50 hover:from-gray-50 hover:to-gray-100/50 border-2 border-gray-200 hover:border-blue-300 shadow-sm hover:shadow-md"
+                                  onClick={() => onFacilityClick?.(facility.place_id)}
                                 >
                                   <div className="space-y-3">
                                     {/* Header: Name and Confidence Badge */}
@@ -1131,6 +1151,22 @@ export function LeadDetailsSidebar({
                                         </div>
                                       )}
 
+                                    {/* Tags */}
+                                    {facility.tags && facility.tags.length > 0 && (
+                                      <div className="flex flex-wrap gap-1.5">
+                                        {facility.tags.map((tag) => (
+                                          <span
+                                            key={tag.id}
+                                            className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium border"
+                                            style={{ color: tag.color, borderColor: tag.color }}
+                                            title={tag.description || tag.name}
+                                          >
+                                            {tag.name}
+                                          </span>
+                                        ))}
+                                      </div>
+                                    )}
+
                                     {/* Rating */}
                                     {facility.rating && (
                                       <div className="flex items-center gap-2 text-sm">
@@ -1150,7 +1186,7 @@ export function LeadDetailsSidebar({
                                     )}
 
                                     {/* Link to Lead Button */}
-                                    <div className="pt-3 border-t border-gray-200">
+                                    <div className="pt-3 border-t border-gray-200" onClick={(e) => e.stopPropagation()}>
                                       <button
                                         onClick={() =>
                                           handleLinkFacility(

@@ -20,9 +20,10 @@ interface CloseCRMExplorerProps {
   facilities?: Facility[];
   onAddFacilityFromLead?: (leadName: string, leadId: string) => void;
   externalLeadId?: string | null;
+  onFacilityClick?: (placeId: string) => void;
 }
 
-export function CloseCRMExplorer({ facilities = [], onAddFacilityFromLead, externalLeadId }: CloseCRMExplorerProps) {
+export function CloseCRMExplorer({ facilities = [], onAddFacilityFromLead, externalLeadId, onFacilityClick }: CloseCRMExplorerProps) {
   const [activeTab, setActiveTab] = useState<Tab>('leads');
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
   const [selectedCallId, setSelectedCallId] = useState<string | null>(null);
@@ -156,6 +157,7 @@ export function CloseCRMExplorer({ facilities = [], onAddFacilityFromLead, exter
         onClose={() => setSelectedLeadId(null)}
         facilities={facilities}
         onAddFacility={onAddFacilityFromLead}
+        onFacilityClick={onFacilityClick}
       />
 
       {/* Call Details Sidebar */}

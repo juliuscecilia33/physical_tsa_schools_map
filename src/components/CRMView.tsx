@@ -1056,6 +1056,7 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
                 setIsAddFacilitySidebarOpen(true);
               }}
               externalLeadId={externalLeadId}
+              onFacilityClick={(placeId) => setSelectedFacilityId(placeId)}
             />
           </motion.div>
         ) : (
