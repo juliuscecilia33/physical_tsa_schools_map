@@ -1359,7 +1359,7 @@ export default function CRMFacilityDetailsSidebar({
           animate={{ x: 0 }}
           exit={{ x: "100%" }}
           transition={{ type: "spring", damping: 30, stiffness: 300 }}
-          className="fixed right-0 top-0 bottom-0 w-full sm:w-[480px] bg-white shadow-2xl z-[60] flex flex-col overflow-hidden"
+          className="fixed right-0 top-0 bottom-0 w-full sm:w-[560px] bg-white shadow-2xl z-[60] flex flex-col overflow-hidden"
         >
           {/* Header */}
           <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-start justify-between z-10">
@@ -2147,7 +2147,15 @@ export default function CRMFacilityDetailsSidebar({
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: idx * 0.05 }}
-                                className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-white border-2 border-blue-200 shadow-sm"
+                                className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-white border-2 border-blue-200 shadow-sm cursor-pointer hover:border-blue-400 transition-colors"
+                                onClick={() => {
+                                  const lead = leadsMap[link.close_lead_id];
+                                  const isLoading = leadQueries[idx]?.isLoading;
+                                  if (!isLoading && lead) {
+                                    setSelectedLeadId(link.close_lead_id);
+                                    setViewMode("lead");
+                                  }
+                                }}
                               >
                                 {(() => {
                                   // Get the lead data for this link
@@ -2226,12 +2234,13 @@ export default function CRMFacilityDetailsSidebar({
                                           View Details
                                         </button>
                                         <button
-                                          onClick={() =>
+                                          onClick={(e) => {
+                                            e.stopPropagation();
                                             handleUnlinkLead(
                                               link.id,
                                               link.close_lead_id,
-                                            )
-                                          }
+                                            );
+                                          }}
                                           disabled={
                                             deleteLinkMutation.isPending
                                           }
