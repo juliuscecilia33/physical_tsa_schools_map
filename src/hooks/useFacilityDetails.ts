@@ -1,20 +1,26 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Facility } from "@/types/facility";
 
+interface FacilityDetailsResponse {
+  facility: Facility;
+  truncated: boolean;
+  totalPhotos: number;
+  totalReviews: number;
+}
+
 /**
- * Fetches full facility details including reviews, additional_photos, and additional_reviews
- * @param placeId - The place_id of the facility to fetch
- * @param enabled - Whether the query should run (default: true)
+ * Fetches full facility details including reviews, additional_photos, and additional_reviews.
+ * By default returns truncated data (first 10 photos/reviews). Use fetchFullDetails to load all.
  */
 export function useFacilityDetails(placeId: string | null, enabled: boolean = true) {
-  return useQuery<Facility | null>({
+  const queryClient = useQueryClient();
+
+  const query = useQuery<FacilityDetailsResponse | null>({
     queryKey: ["facility", "full", placeId],
     queryFn: async () => {
       if (!placeId) return null;
 
-      const response = await fetch(`/api/facilities/${encodeURIComponent(placeId)}`, {
-        cache: 'no-store' // Bypass browser cache to always get fresh data
-      });
+      const response = await fetch(`/api/facilities/${encodeURIComponent(placeId)}`);
 
       if (!response.ok) {
         if (response.status === 404) {
@@ -24,11 +30,31 @@ export function useFacilityDetails(placeId: string | null, enabled: boolean = tr
         throw new Error(error.error || "Failed to fetch facility details");
       }
 
-      const data = await response.json();
-      return data.facility;
+      return await response.json();
     },
     enabled: enabled && !!placeId,
     staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
+
+  const fetchFullDetails = async () => {
+    if (!placeId) return;
+
+    const response = await fetch(`/api/facilities/${encodeURIComponent(placeId)}?full=true`);
+    if (!response.ok) return;
+
+    const data: FacilityDetailsResponse = await response.json();
+    queryClient.setQueryData(["facility", "full", placeId], data);
+  };
+
+  return {
+    data: query.data?.facility ?? null,
+    truncated: query.data?.truncated ?? false,
+    totalPhotos: query.data?.totalPhotos ?? 0,
+    totalReviews: query.data?.totalReviews ?? 0,
+    isLoading: query.isLoading,
+    isError: query.isError,
+    error: query.error,
+    fetchFullDetails,
+  };
 }

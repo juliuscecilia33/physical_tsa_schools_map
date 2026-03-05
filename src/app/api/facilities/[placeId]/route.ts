@@ -22,6 +22,9 @@ export async function GET(
       );
     }
 
+    const { searchParams } = new URL(request.url);
+    const full = searchParams.get("full") === "true";
+
     // Call RPC function directly via SQL
     const result = await sql`
       SELECT * FROM get_facility_full_by_place_id(
@@ -37,6 +40,9 @@ export async function GET(
     }
 
     const data = result[0];
+
+    const allPhotos = data.additional_photos || [];
+    const allReviews = data.additional_reviews || [];
 
     // Transform the data to match Facility type
     const facility: Facility = {
@@ -65,15 +71,21 @@ export async function GET(
       cleaned_up: data.cleaned_up,
       has_notes: data.has_notes,
       tags: data.tags || [],
-      additional_photos: data.additional_photos || [],
-      additional_reviews: data.additional_reviews || [],
+      additional_photos: full ? allPhotos : allPhotos.slice(0, 10),
+      additional_reviews: full ? allReviews : allReviews.slice(0, 10),
       serp_scraped: data.serp_scraped,
       serp_scraped_at: data.serp_scraped_at,
+      total_photo_count: data.total_photo_count,
     };
 
-    // Return the facility with cache headers
+    // Return the facility with cache headers and truncation metadata
     return NextResponse.json(
-      { facility },
+      {
+        facility,
+        truncated: !full && (allPhotos.length > 10 || allReviews.length > 10),
+        totalPhotos: allPhotos.length,
+        totalReviews: allReviews.length,
+      },
       {
         headers: {
           "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",

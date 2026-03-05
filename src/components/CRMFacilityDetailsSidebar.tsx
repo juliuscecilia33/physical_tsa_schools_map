@@ -156,7 +156,7 @@ export default function CRMFacilityDetailsSidebar({
   const contentRef = useRef<HTMLDivElement>(null);
 
   // Fetch full facility details including reviews and additional data
-  const { data: facility, isLoading: isLoadingDetails } = useFacilityDetails(
+  const { data: facility, isLoading: isLoadingDetails, truncated, totalPhotos, totalReviews, fetchFullDetails } = useFacilityDetails(
     placeId || null,
     !!placeId,
   );
@@ -1729,6 +1729,16 @@ export default function CRMFacilityDetailsSidebar({
                       </>
                     )}
 
+                    {/* Load all photos button when truncated */}
+                    {truncated && totalPhotos > 10 && (
+                      <button
+                        onClick={fetchFullDetails}
+                        className="w-full mt-2 py-2.5 text-sm font-medium text-blue-600 hover:bg-slate-50 rounded-xl transition-colors border border-slate-200 hover:border-blue-600 cursor-pointer"
+                      >
+                        Load all {totalPhotos} photos
+                      </button>
+                    )}
+
                     {/* Divider */}
                     <div className="border-t border-slate-200"></div>
 
@@ -2802,6 +2812,14 @@ export default function CRMFacilityDetailsSidebar({
                                   ? "Show Less"
                                   : `Show More (${facility.additional_reviews.length - 10} more reviews)`}
                               </motion.button>
+                            )}
+                            {truncated && totalReviews > 10 && (
+                              <button
+                                onClick={fetchFullDetails}
+                                className="w-full mt-2 py-2.5 text-sm font-medium text-amber-600 hover:bg-amber-50 rounded-xl transition-colors border border-amber-200 hover:border-amber-400 cursor-pointer"
+                              >
+                                Load all {totalReviews} reviews
+                              </button>
                             )}
                           </motion.div>
                         </>

@@ -1,0 +1,27 @@
+-- Migration: Remove sport_metadata from lightweight RPC functions to reduce egress
+-- sport_metadata (2-5 KB per facility) is not needed for map rendering.
+-- It is still returned by get_facility_full_by_place_id (detail endpoint).
+--
+-- IMPORTANT: Run this migration in the Supabase SQL editor.
+-- The lightweight RPC functions need to be updated to exclude sport_metadata
+-- from their return types. Since we don't have the full function definitions
+-- in version control, apply the following changes manually:
+--
+-- For each of these functions:
+--   - get_facilities_by_tags_paginated
+--   - get_facilities_by_tags
+--   - get_facilities_excluding_tags_paginated
+--   - get_all_facilities_lightweight
+--   - get_facilities_in_viewport (if it exists)
+--
+-- Remove `sport_metadata` from the RETURNS TABLE(...) definition and
+-- from the SELECT list in the function body.
+--
+-- Example change (in each function):
+--   BEFORE: sport_metadata jsonb,
+--   AFTER:  (remove this line)
+--
+--   BEFORE: f.sport_metadata,
+--   AFTER:  (remove this line)
+--
+-- DO NOT modify get_facility_full_by_place_id — it should still return sport_metadata.

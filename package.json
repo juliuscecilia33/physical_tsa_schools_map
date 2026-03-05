@@ -14,7 +14,8 @@
     "filter:texas:v2:compare": "tsx scripts/filter-texas-facilities-v2.ts --compare",
     "filter:texas:v2:execute": "tsx scripts/filter-texas-facilities-v2.ts --execute",
     "assign:serpapi-tag": "tsx scripts/assign-serpapi-tag.ts",
-    "compress:photos": "tsx scripts/compress-facility-photos.ts"
+    "compress:photos": "tsx scripts/compress-facility-photos.ts",
+    "enrich:close-data": "tsx scripts/enrich-close-data-facilities.ts"
   },
   "repository": {
     "type": "git",

@@ -120,7 +120,7 @@ export type VisibilityFilter = 'UNHIDDEN_ONLY' | 'ALL' | 'HIDDEN_ONLY' | 'WITH_N
 // Keeps counts and metadata for popups and filtering
 export type FacilityLightweight = Omit<
   Facility,
-  'reviews' | 'additional_reviews' | 'additional_photos' | 'notes'
+  'reviews' | 'additional_reviews' | 'additional_photos' | 'notes' | 'sport_metadata'
 > & {
   additional_photos_count: number; // Count of additional photos without full array
 };

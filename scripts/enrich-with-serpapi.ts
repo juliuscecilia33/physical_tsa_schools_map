@@ -55,10 +55,10 @@ interface ProgressState {
   }>;
 }
 
-const PROGRESS_FILE = path.join(__dirname, "../.serpapi-progress.json");
+const PROGRESS_FILE = path.join(__dirname, "../.serpapi-progress-next-batch.json");
 const FACILITIES_FILE = path.join(
   __dirname,
-  "../data/top-2500-high-quality-texas-facilities.json",
+  "../data/next-2500-high-quality-texas-facilities.json",
 );
 const STORAGE_BUCKET = "facility-photos";
 

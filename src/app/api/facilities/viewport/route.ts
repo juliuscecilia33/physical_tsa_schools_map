@@ -65,7 +65,6 @@ export async function GET(request: NextRequest) {
         name: facility.name,
         sport_types: facility.sport_types || [],
         identified_sports: facility.identified_sports || [],
-        sport_metadata: facility.sport_metadata || {},
         address: facility.address,
         location: {
           lat: facility.lat,

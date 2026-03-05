@@ -210,12 +210,7 @@ function FacilityTable({
                   <td className="px-4 py-3 align-top min-w-[180px]">
                     <div className="flex flex-wrap gap-1.5">
                       {facility.identified_sports
-                        ?.filter((sport) => {
-                          const score =
-                            facility.sport_metadata?.[sport]?.score ?? 0;
-                          return score >= 40;
-                        })
-                        .map((sport) => (
+                        ?.map((sport) => (
                           <span
                             key={sport}
                             className="text-[10px] bg-blue-50 text-blue-700 font-semibold px-2 py-0.5 rounded uppercase tracking-wide border border-blue-100"
@@ -224,12 +219,7 @@ function FacilityTable({
                           </span>
                         ))}
                       {(!facility.identified_sports ||
-                        facility.identified_sports.length === 0 ||
-                        facility.identified_sports.filter(
-                          (sport) =>
-                            (facility.sport_metadata?.[sport]?.score ?? 0) >=
-                            40,
-                        ).length === 0) && (
+                        facility.identified_sports.length === 0) && (
                         <span className="text-xs text-gray-400 italic">
                           No sports
                         </span>
