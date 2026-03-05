@@ -20,6 +20,7 @@ import {
 interface CloseActivityTimelineProps {
   activities: CloseActivity[];
   isLoading?: boolean;
+  onActivityClick?: (activity: CloseActivity) => void;
 }
 
 function getActivityIcon(activity: CloseActivity) {
@@ -79,8 +80,16 @@ function formatDuration(seconds: number | undefined): string {
   return `${mins}:${secs.toString().padStart(2, "0")}`;
 }
 
-function ActivityItem({ activity }: { activity: CloseActivity }) {
+function ActivityItem({ activity, onActivityClick }: { activity: CloseActivity; onActivityClick?: (activity: CloseActivity) => void }) {
   const [expanded, setExpanded] = useState(false);
+
+  const handleClick = () => {
+    if (onActivityClick && (activity.type === 'call' || activity.type === 'email')) {
+      onActivityClick(activity);
+    } else {
+      setExpanded(!expanded);
+    }
+  };
 
   return (
     <div className="relative pl-8 pb-6 border-l-1 border-gray-200 last:border-l-0 last:pb-0">
@@ -96,7 +105,7 @@ function ActivityItem({ activity }: { activity: CloseActivity }) {
       {/* Content */}
       <div
         className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
-        onClick={() => setExpanded(!expanded)}
+        onClick={handleClick}
       >
         {/* Header */}
         <div className="flex items-start justify-between gap-3">
@@ -256,6 +265,7 @@ function ActivityItem({ activity }: { activity: CloseActivity }) {
 export function CloseActivityTimeline({
   activities,
   isLoading,
+  onActivityClick,
 }: CloseActivityTimelineProps) {
   const [filter, setFilter] = useState<string>("all");
   const [showAll, setShowAll] = useState(false);
@@ -340,7 +350,7 @@ export function CloseActivityTimeline({
         ) : (
           <>
             {activitiesToDisplay.map((activity) => (
-              <ActivityItem key={activity.id} activity={activity} />
+              <ActivityItem key={activity.id} activity={activity} onActivityClick={onActivityClick} />
             ))}
             {hasMore && (
               <div className="flex justify-center pt-4">

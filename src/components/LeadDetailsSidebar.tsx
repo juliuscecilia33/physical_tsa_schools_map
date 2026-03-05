@@ -17,6 +17,7 @@ import {
   Link2,
   Info,
   Plus,
+  ChevronLeft,
 } from "lucide-react";
 import {
   useCloseLead,
@@ -24,6 +25,9 @@ import {
   useCloseLeadStatuses,
 } from "@/hooks/useCloseCRM";
 import { CloseActivityTimeline } from "./CloseActivityTimeline";
+import { CallDetailContent } from "./CallDetailContent";
+import { EmailDetailContent } from "./EmailDetailContent";
+import { CloseActivity } from "@/types/close";
 import { useEffect, useMemo, useState } from "react";
 import { Facility } from "@/types/facility";
 import {
@@ -104,9 +108,15 @@ export function LeadDetailsSidebar({
   // Facility search state
   const [facilitySearchQuery, setFacilitySearchQuery] = useState("");
 
-  // Reset facility search when lead changes or sidebar closes
+  // Step-based navigation state
+  const [viewMode, setViewMode] = useState<"lead" | "call" | "email">("lead");
+  const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
+
+  // Reset facility search and view mode when lead changes or sidebar closes
   useEffect(() => {
     setFacilitySearchQuery("");
+    setViewMode("lead");
+    setSelectedActivityId(null);
   }, [leadId]);
 
   // Link confirmation modal state
@@ -465,6 +475,20 @@ export function LeadDetailsSidebar({
     }
   };
 
+  const handleActivityClick = (activity: CloseActivity) => {
+    if (activity.type === "call" && activity.id) {
+      // For calls, the activity id is the call activity id; we need the call id
+      // The call id is available in activity.call?.id or we use the activity id
+      const callId = activity.call?.id || activity.id;
+      setViewMode("call");
+      setSelectedActivityId(callId);
+    } else if (activity.type === "email" && activity.id) {
+      const emailThreadId = activity.email?.id || activity.id;
+      setViewMode("email");
+      setSelectedActivityId(emailThreadId);
+    }
+  };
+
   const isOpen = !!leadId;
 
   return (
@@ -514,6 +538,16 @@ export function LeadDetailsSidebar({
 
             {/* Content */}
             <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              <AnimatePresence mode="wait">
+                {viewMode === "lead" ? (
+                  <motion.div
+                    key="lead-view"
+                    initial={{ x: -100, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: -100, opacity: 0 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    className="space-y-6"
+                  >
               {leadError && (
                 <div className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
                   <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
@@ -738,6 +772,7 @@ export function LeadDetailsSidebar({
                     <CloseActivityTimeline
                       activities={activitiesData?.activities || []}
                       isLoading={activitiesLoading}
+                      onActivityClick={handleActivityClick}
                     />
                   </div>
 
@@ -1253,6 +1288,55 @@ export function LeadDetailsSidebar({
                   </div>
                 </>
               ) : null}
+                  </motion.div>
+                ) : viewMode === "call" && selectedActivityId ? (
+                  <motion.div
+                    key="call-view"
+                    initial={{ x: 100, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: 100, opacity: 0 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    className="space-y-6"
+                  >
+                    <motion.button
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      onClick={() => {
+                        setViewMode("lead");
+                        setSelectedActivityId(null);
+                      }}
+                      className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                      Back to Lead
+                    </motion.button>
+                    <CallDetailContent callId={selectedActivityId} leadId={leadId || undefined} />
+                  </motion.div>
+                ) : viewMode === "email" && selectedActivityId ? (
+                  <motion.div
+                    key="email-view"
+                    initial={{ x: 100, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: 100, opacity: 0 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    className="space-y-6"
+                  >
+                    <motion.button
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      onClick={() => {
+                        setViewMode("lead");
+                        setSelectedActivityId(null);
+                      }}
+                      className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                      Back to Lead
+                    </motion.button>
+                    <EmailDetailContent emailThreadId={selectedActivityId} leadId={leadId || undefined} />
+                  </motion.div>
+                ) : null}
+              </AnimatePresence>
             </div>
           </motion.div>
         </motion.div>
