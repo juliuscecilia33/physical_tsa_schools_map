@@ -361,6 +361,16 @@ export default function CRMFacilityDetailsSidebar({
   // Check if facility already has SerpAPI tag
   const hasSerpApiTag = facilityTags.some((tag) => tag.id === SERPAPI_TAG_ID);
 
+  // Lock body scroll when sidebar is open
+  useEffect(() => {
+    if (placeId) {
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = '';
+      };
+    }
+  }, [placeId]);
+
   // Fetch current user on mount and listen to auth changes
   useEffect(() => {
     // Initial session fetch
@@ -1533,7 +1543,7 @@ export default function CRMFacilityDetailsSidebar({
           {/* Content */}
           <div
             ref={contentRef}
-            className="flex-1 overflow-y-auto px-6 py-6 space-y-6"
+            className="flex-1 overflow-y-auto overscroll-contain px-6 py-6 space-y-6"
           >
             {isLoadingDetails ? (
               <div className="text-center py-12">
