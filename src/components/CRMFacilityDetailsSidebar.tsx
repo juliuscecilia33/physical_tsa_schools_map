@@ -293,6 +293,28 @@ export default function CRMFacilityDetailsSidebar({
     isLoading: selectedLeadActivitiesLoading,
   } = useCloseLeadActivities(selectedLeadId);
 
+  const handleEditEmail = (instructions: string) => {
+    if (!generatedEmail || !selectedLead) return;
+    generateEmailMutation.mutate(
+      {
+        leadId: selectedLeadId!,
+        leadName: selectedLead.display_name || selectedLead.name,
+        leadDescription: selectedLead.description,
+        contacts: selectedLead.contacts,
+        activities: selectedLeadActivities?.activities || [],
+        editInstructions: instructions,
+        parentEmailId: generatedEmail.id,
+        parentEmailSubject: generatedEmail.subject,
+        parentEmailBody: generatedEmail.body_text,
+      },
+      {
+        onSuccess: (data) => {
+          setGeneratedEmail(data);
+        },
+      }
+    );
+  };
+
   const latestActivityDate = useMemo(() => {
     const activities = selectedLeadActivities?.activities;
     if (!activities?.length) return 0;
@@ -423,6 +445,13 @@ export default function CRMFacilityDetailsSidebar({
     setGeneratedEmail(null);
     setFitAssessment(null);
   }, [placeId]);
+
+  // Reset scroll position when view mode changes
+  useEffect(() => {
+    if (contentRef.current) {
+      contentRef.current.scrollTop = 0;
+    }
+  }, [viewMode]);
 
   // Fetch all tags on component mount
   useEffect(() => {
@@ -3602,6 +3631,10 @@ export default function CRMFacilityDetailsSidebar({
                         new Date(generatedEmail.created_at).getTime()
                       }
                       closeLeadId={selectedLeadId!}
+                      onEditSubmit={handleEditEmail}
+                      isRegenerating={generateEmailMutation.isPending}
+                      mostRecentActivity={selectedLeadActivities?.activities?.[0]}
+                      onActivityClick={handleActivityClick}
                     />
                   </motion.div>
                 ) : viewMode === "fit-assessment" && fitAssessment ? (

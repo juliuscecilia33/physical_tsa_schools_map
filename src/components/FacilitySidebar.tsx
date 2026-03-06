@@ -301,6 +301,28 @@ function FacilitySidebarInner({
     isLoading: selectedLeadActivitiesLoading,
   } = useCloseLeadActivities(selectedLeadId);
 
+  const handleEditEmail = (instructions: string) => {
+    if (!generatedEmail || !selectedLead) return;
+    generateEmailMutation.mutate(
+      {
+        leadId: selectedLeadId!,
+        leadName: selectedLead.display_name || selectedLead.name,
+        leadDescription: selectedLead.description,
+        contacts: selectedLead.contacts,
+        activities: selectedLeadActivities?.activities || [],
+        editInstructions: instructions,
+        parentEmailId: generatedEmail.id,
+        parentEmailSubject: generatedEmail.subject,
+        parentEmailBody: generatedEmail.body_text,
+      },
+      {
+        onSuccess: (data) => {
+          setGeneratedEmail(data);
+        },
+      }
+    );
+  };
+
   const latestActivityDate = useMemo(() => {
     const activities = selectedLeadActivities?.activities;
     if (!activities?.length) return 0;
@@ -432,6 +454,13 @@ function FacilitySidebarInner({
     setGeneratedEmail(null);
     setFitAssessment(null);
   }, [facility?.place_id]);
+
+  // Reset scroll position when view mode changes
+  useEffect(() => {
+    if (contentRef.current) {
+      contentRef.current.scrollTop = 0;
+    }
+  }, [viewMode]);
 
   // Sync facility tags from displayFacility when it changes
   useEffect(() => {
@@ -3363,6 +3392,10 @@ function FacilitySidebarInner({
                     new Date(generatedEmail.created_at).getTime()
                   }
                   closeLeadId={selectedLeadId!}
+                  onEditSubmit={handleEditEmail}
+                  isRegenerating={generateEmailMutation.isPending}
+                  mostRecentActivity={selectedLeadActivities?.activities?.[0]}
+                  onActivityClick={handleActivityClick}
                 />
               </motion.div>
             ) : viewMode === "fit-assessment" && fitAssessment ? (
