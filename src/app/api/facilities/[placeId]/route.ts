@@ -6,6 +6,11 @@ import { Facility } from "@/types/facility";
 const sql = postgres(process.env.DATABASE_URL!, {
   ssl: { rejectUnauthorized: false },
   max: 10, // Connection pool size for serverless
+  prepare: false,
+  connect_timeout: 10, // 10 seconds to establish connection
+  connection: {
+    statement_timeout: 30000, // 30 seconds query timeout
+  },
 });
 
 export async function GET(

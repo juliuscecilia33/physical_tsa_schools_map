@@ -20,31 +20,55 @@ export function useFacilityDetails(placeId: string | null, enabled: boolean = tr
     queryFn: async () => {
       if (!placeId) return null;
 
-      const response = await fetch(`/api/facilities/${encodeURIComponent(placeId)}`);
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 15000);
 
-      if (!response.ok) {
-        if (response.status === 404) {
-          return null;
+      try {
+        const response = await fetch(
+          `/api/facilities/${encodeURIComponent(placeId)}`,
+          { signal: controller.signal }
+        );
+        clearTimeout(timeout);
+
+        if (!response.ok) {
+          if (response.status === 404) {
+            return null;
+          }
+          const error = await response.json();
+          throw new Error(error.error || "Failed to fetch facility details");
         }
-        const error = await response.json();
-        throw new Error(error.error || "Failed to fetch facility details");
-      }
 
-      return await response.json();
+        return await response.json();
+      } catch (err) {
+        clearTimeout(timeout);
+        throw err;
+      }
     },
     enabled: enabled && !!placeId,
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
+    retry: 1,
   });
 
   const fetchFullDetails = async () => {
     if (!placeId) return;
 
-    const response = await fetch(`/api/facilities/${encodeURIComponent(placeId)}?full=true`);
-    if (!response.ok) return;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
 
-    const data: FacilityDetailsResponse = await response.json();
-    queryClient.setQueryData(["facility", "full", placeId], data);
+    try {
+      const response = await fetch(
+        `/api/facilities/${encodeURIComponent(placeId)}?full=true`,
+        { signal: controller.signal }
+      );
+      clearTimeout(timeout);
+      if (!response.ok) return;
+
+      const data: FacilityDetailsResponse = await response.json();
+      queryClient.setQueryData(["facility", "full", placeId], data);
+    } catch {
+      clearTimeout(timeout);
+    }
   };
 
   return {
