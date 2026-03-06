@@ -120,6 +120,7 @@ export default function MapView({ isVisible }: { isVisible: boolean }) {
         onSelectedTagsChange={setSelectedTags}
         onUpdateFacility={updateFacilityHidden}
         focusPlaceId={focusPlaceId}
+        isVisible={isVisible}
       />
     </main>
   );

@@ -37,6 +37,7 @@ interface FacilityMapProps {
   onSelectedTagsChange: (tags: string[]) => void;
   onUpdateFacility: (place_id: string, hidden: boolean) => void;
   focusPlaceId?: string | null;
+  isVisible?: boolean;
 }
 
 // Sport emoji mapping
@@ -271,6 +272,7 @@ export default function FacilityMap({
   onSelectedTagsChange,
   onUpdateFacility,
   focusPlaceId,
+  isVisible,
 }: FacilityMapProps) {
   const [selectedFacility, setSelectedFacility] = useState<Facility | null>(
     null,
@@ -295,6 +297,16 @@ export default function FacilityMap({
   const mapRef = useRef<MapRef>(null);
   const animationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const router = useRouter();
+
+  // Resize map when tab becomes visible (fixes black map after switching tabs)
+  useEffect(() => {
+    if (isVisible) {
+      const timer = setTimeout(() => {
+        mapRef.current?.getMap().resize();
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [isVisible]);
 
   // Expose animation state globally for cache persistence logic
   useEffect(() => {
