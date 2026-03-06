@@ -796,14 +796,15 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
     filters.selectedTags.length +
     (filters.hasNotes !== null ? 1 : 0);
 
-  // Sort facilities by tag priority: both Close Data + SerpAPI first, then SerpAPI only, then rest
+  // Sort facilities by tag priority: all 3 tags first, then Close Data + SerpAPI, then rest
   const sortedFacilities = [...filteredFacilities].sort((a, b) => {
     const getScore = (f: typeof a) => {
       const tagIds = f.tags?.map(t => t.id) || [];
       const hasSerpAPI = tagIds.includes('e326fe36-5536-4209-87ed-f99528e1d1ee');
       const hasCloseData = tagIds.includes('ef3537b6-4d83-4eb8-84a5-9bc74e776c72');
-      if (hasSerpAPI && hasCloseData) return 0;
-      if (hasSerpAPI) return 1;
+      const hasFitAssessment = tagIds.includes('e1f0b490-d88b-403e-ba18-2c7e39d27b57');
+      if (hasSerpAPI && hasCloseData && hasFitAssessment) return 0;
+      if (hasSerpAPI && hasCloseData) return 1;
       return 2;
     };
     return getScore(a) - getScore(b);
