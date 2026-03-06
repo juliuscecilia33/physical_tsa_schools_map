@@ -434,7 +434,7 @@ export default function AddFacilitySidebar({
       // Refetch facility queries and WAIT for completion
       // This ensures map has fresh data before navigation
       await queryClient.refetchQueries({
-        queryKey: ["facilities"]
+        queryKey: ['facilities', 'background']
       });
 
       // Small buffer to ensure data is fully propagated
@@ -461,13 +461,21 @@ export default function AddFacilitySidebar({
 
   return (
     <AnimatePresence>
-      <motion.div
-        initial={{ x: "100%" }}
-        animate={{ x: 0 }}
-        exit={{ x: "100%" }}
-        transition={{ type: "spring", damping: 25, stiffness: 200 }}
-        className="fixed top-[1vh] right-4 h-[98vh] w-full md:w-[500px] bg-white shadow-2xl rounded-2xl z-50 flex flex-col overflow-hidden"
-      >
+      <>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onClose}
+          className="fixed inset-0 bg-black/30 backdrop-blur-sm z-[60]"
+        />
+        <motion.div
+          initial={{ x: "100%" }}
+          animate={{ x: 0 }}
+          exit={{ x: "100%" }}
+          transition={{ type: "spring", damping: 25, stiffness: 200 }}
+          className="fixed right-0 top-0 bottom-0 w-full sm:w-[500px] bg-white shadow-2xl z-[60] flex flex-col overflow-hidden"
+        >
         {/* Header */}
         <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-blue-700 z-20 px-6 py-4 flex justify-between items-center">
           <div>
@@ -1046,6 +1054,7 @@ export default function AddFacilitySidebar({
           </button>
         </div>
       </motion.div>
+      </>
     </AnimatePresence>
   );
 }
