@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import {
@@ -612,7 +613,19 @@ function getDefaultFilters(): FilterState {
 }
 
 export default function CRMView({ isVisible }: { isVisible: boolean }) {
-  const [activeTab, setActiveTab] = useState("facilities");
+  const searchParams = useSearchParams();
+  const [activeTab, setActiveTab] = useState(() => {
+    const tab = searchParams.get("tab");
+    return tab && ["facilities", "analytics", "close"].includes(tab) ? tab : "facilities";
+  });
+
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (tab && ["facilities", "analytics", "close"].includes(tab)) {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
+
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(100);
   const [isFiltersSidebarOpen, setIsFiltersSidebarOpen] = useState(false);

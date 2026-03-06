@@ -163,10 +163,13 @@ export default function CRMFacilityDetailsSidebar({
   const contentRef = useRef<HTMLDivElement>(null);
 
   // Fetch full facility details including reviews and additional data
-  const { data: facility, isLoading: isLoadingDetails, truncated, totalReviews, fetchFullDetails } = useFacilityDetails(
-    placeId || null,
-    !!placeId,
-  );
+  const {
+    data: facility,
+    isLoading: isLoadingDetails,
+    truncated,
+    totalReviews,
+    fetchFullDetails,
+  } = useFacilityDetails(placeId || null, !!placeId);
 
   const [loadingImages, setLoadingImages] = useState<{
     [key: string]: boolean;
@@ -245,10 +248,16 @@ export default function CRMFacilityDetailsSidebar({
   } | null>(null);
 
   // Step-based view navigation
-  const [viewMode, setViewMode] = useState<"facility" | "lead" | "call" | "email" | "generated-email">("facility");
+  const [viewMode, setViewMode] = useState<
+    "facility" | "lead" | "call" | "email" | "generated-email"
+  >("facility");
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
-  const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
-  const [generatedEmail, setGeneratedEmail] = useState<GeneratedEmail | null>(null);
+  const [selectedActivityId, setSelectedActivityId] = useState<string | null>(
+    null,
+  );
+  const [generatedEmail, setGeneratedEmail] = useState<GeneratedEmail | null>(
+    null,
+  );
   const generateEmailMutation = useGenerateEmail();
   const { data: generatedEmails = [] } = useGeneratedEmails(selectedLeadId);
 
@@ -274,7 +283,9 @@ export default function CRMFacilityDetailsSidebar({
   const latestActivityDate = useMemo(() => {
     const activities = selectedLeadActivities?.activities;
     if (!activities?.length) return 0;
-    return Math.max(...activities.map((a: any) => new Date(a.date_created).getTime()));
+    return Math.max(
+      ...activities.map((a: any) => new Date(a.date_created).getTime()),
+    );
   }, [selectedLeadActivities?.activities]);
 
   // Create a map of lead ID to lead data for efficient lookup
@@ -957,8 +968,12 @@ export default function CRMFacilityDetailsSidebar({
         await new Promise((resolve) => setTimeout(resolve, 1500));
 
         // Optimistically update the CRM table with the SerpAPI tag
-        const serpApiTag = allTags.find((t) => t.id === SERPAPI_TAG_ID)
-          ?? { id: SERPAPI_TAG_ID, name: "Scraped by SerpAPI", color: "#8b5cf6", description: null };
+        const serpApiTag = allTags.find((t) => t.id === SERPAPI_TAG_ID) ?? {
+          id: SERPAPI_TAG_ID,
+          name: "Scraped by SerpAPI",
+          color: "#8b5cf6",
+          description: null,
+        };
         let updatedTags = facilityTags;
         if (!facilityTags.some((t) => t.id === SERPAPI_TAG_ID)) {
           updatedTags = [...facilityTags, serpApiTag];
@@ -968,7 +983,13 @@ export default function CRMFacilityDetailsSidebar({
 
         // Move facility from background to serpapi segment atomically
         // so it never disappears from allFacilities during the refetch window
-        moveFacilityToSegment(queryClient, facility.place_id, 'background', 'serpapi', { tags: updatedTags });
+        moveFacilityToSegment(
+          queryClient,
+          facility.place_id,
+          "background",
+          "serpapi",
+          { tags: updatedTags },
+        );
 
         // Refetch facility data to show updates
         await queryClient.refetchQueries({
@@ -1776,7 +1797,6 @@ export default function CRMFacilityDetailsSidebar({
                       </>
                     )}
 
-
                     {/* Divider */}
                     <div className="border-t border-slate-200"></div>
 
@@ -2080,7 +2100,7 @@ export default function CRMFacilityDetailsSidebar({
                       <div className="flex items-center mb-3">
                         <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
                           <User className="w-4 h-4" />
-                          Linked Leads from Close ({linkedLeads.length})
+                          Linked Leads from Close
                         </h3>
                       </div>
 
@@ -2094,6 +2114,16 @@ export default function CRMFacilityDetailsSidebar({
                           <p className="text-sm text-slate-500">
                             No leads linked to this facility yet
                           </p>
+                          <button
+                            onClick={() => {
+                              router.push("/crm?tab=close");
+                              onClose();
+                            }}
+                            className="mt-3 flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer mx-auto"
+                          >
+                            <ExternalLink className="w-3.5 h-3.5" />
+                            Browse Leads in CRM
+                          </button>
                         </div>
                       ) : (
                         <div className="space-y-3">
@@ -2262,7 +2292,17 @@ export default function CRMFacilityDetailsSidebar({
                       )}
                     </motion.div>
 
-                    {facility.sport_types.filter(type => !["establishment","point_of_interest","health","locality","political","tourist_attraction"].includes(type)).length > 0 && (
+                    {facility.sport_types.filter(
+                      (type) =>
+                        ![
+                          "establishment",
+                          "point_of_interest",
+                          "health",
+                          "locality",
+                          "political",
+                          "tourist_attraction",
+                        ].includes(type),
+                    ).length > 0 && (
                       <>
                         {/* Divider */}
                         <div className="border-t border-slate-200"></div>
@@ -3134,13 +3174,15 @@ export default function CRMFacilityDetailsSidebar({
                           <div className="space-y-3">
                             {Object.entries(selectedLead.custom).map(
                               ([key, value]) => (
-                                <div
-                                  key={key}
-                                  className="text-sm"
-                                >
-                                  <span className="text-slate-600 font-medium">{key}:</span>
+                                <div key={key} className="text-sm">
+                                  <span className="text-slate-600 font-medium">
+                                    {key}:
+                                  </span>
                                   <p className="text-slate-900 mt-1 break-words">
-                                    <NoteText text={String(value)} truncateUrls />
+                                    <NoteText
+                                      text={String(value)}
+                                      truncateUrls
+                                    />
                                   </p>
                                 </div>
                               ),
@@ -3165,20 +3207,26 @@ export default function CRMFacilityDetailsSidebar({
                             generateEmailMutation.mutate(
                               {
                                 leadId: selectedLeadId!,
-                                leadName: selectedLead!.display_name || selectedLead!.name,
+                                leadName:
+                                  selectedLead!.display_name ||
+                                  selectedLead!.name,
                                 leadDescription: selectedLead!.description,
                                 contacts: selectedLead!.contacts,
-                                activities: selectedLeadActivities?.activities || [],
+                                activities:
+                                  selectedLeadActivities?.activities || [],
                               },
                               {
                                 onSuccess: (data) => {
                                   setGeneratedEmail(data);
                                   setViewMode("generated-email");
                                 },
-                              }
+                              },
                             );
                           }}
-                          disabled={generateEmailMutation.isPending || !selectedLeadActivities}
+                          disabled={
+                            generateEmailMutation.isPending ||
+                            !selectedLeadActivities
+                          }
                           className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors disabled:opacity-50 cursor-pointer"
                         >
                           {generateEmailMutation.isPending ? (
@@ -3186,7 +3234,9 @@ export default function CRMFacilityDetailsSidebar({
                           ) : (
                             <Sparkles className="w-3.5 h-3.5" />
                           )}
-                          {generateEmailMutation.isPending ? generateEmailMutation.generationStatus : "Generate Email"}
+                          {generateEmailMutation.isPending
+                            ? generateEmailMutation.generationStatus
+                            : "Generate Email"}
                         </button>
                       </div>
                       {selectedLeadActivities && (
@@ -3246,16 +3296,32 @@ export default function CRMFacilityDetailsSidebar({
                         )}
                       </h3>
                       {generatedEmails.length === 0 ? (
-                        <p className="text-xs text-slate-400">No generated emails yet</p>
+                        <p className="text-xs text-slate-400">
+                          No generated emails yet
+                        </p>
                       ) : (
                         <div className="space-y-2">
                           {generatedEmails.map((email) => {
                             const typeBadge = {
-                              intro: { label: "Intro", className: "bg-emerald-100 text-emerald-700" },
-                              follow_up: { label: "Follow-up", className: "bg-amber-100 text-amber-700" },
-                              reply: { label: "Reply", className: "bg-blue-100 text-blue-700" },
-                            }[email.email_type] || { label: email.email_type, className: "bg-slate-100 text-slate-700" };
-                            const isOutdated = latestActivityDate > new Date(email.created_at).getTime();
+                              intro: {
+                                label: "Intro",
+                                className: "bg-emerald-100 text-emerald-700",
+                              },
+                              follow_up: {
+                                label: "Follow-up",
+                                className: "bg-amber-100 text-amber-700",
+                              },
+                              reply: {
+                                label: "Reply",
+                                className: "bg-blue-100 text-blue-700",
+                              },
+                            }[email.email_type] || {
+                              label: email.email_type,
+                              className: "bg-slate-100 text-slate-700",
+                            };
+                            const isOutdated =
+                              latestActivityDate >
+                              new Date(email.created_at).getTime();
 
                             return (
                               <button
@@ -3267,11 +3333,19 @@ export default function CRMFacilityDetailsSidebar({
                                 className="w-full text-left p-3 rounded-lg border border-slate-100 hover:border-indigo-200 hover:bg-indigo-50/50 transition-colors cursor-pointer"
                               >
                                 <div className="flex items-center gap-2 mb-1">
-                                  <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${typeBadge.className}`}>
+                                  <span
+                                    className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${typeBadge.className}`}
+                                  >
                                     {typeBadge.label}
                                   </span>
                                   <span className="text-[10px] text-slate-400">
-                                    {new Date(email.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                                    {new Date(
+                                      email.created_at,
+                                    ).toLocaleDateString("en-US", {
+                                      month: "short",
+                                      day: "numeric",
+                                      year: "numeric",
+                                    })}
                                   </span>
                                   {isOutdated && (
                                     <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-orange-100 text-orange-600">
@@ -3315,7 +3389,10 @@ export default function CRMFacilityDetailsSidebar({
                       <ChevronLeft className="w-4 h-4" />
                       Back to Lead
                     </motion.button>
-                    <CallDetailContent callId={selectedActivityId} leadId={selectedLeadId || undefined} />
+                    <CallDetailContent
+                      callId={selectedActivityId}
+                      leadId={selectedLeadId || undefined}
+                    />
                   </motion.div>
                 ) : viewMode === "email" && selectedActivityId ? (
                   <motion.div
@@ -3338,7 +3415,10 @@ export default function CRMFacilityDetailsSidebar({
                       <ChevronLeft className="w-4 h-4" />
                       Back to Lead
                     </motion.button>
-                    <EmailDetailContent emailThreadId={selectedActivityId} leadId={selectedLeadId || undefined} />
+                    <EmailDetailContent
+                      emailThreadId={selectedActivityId}
+                      leadId={selectedLeadId || undefined}
+                    />
                   </motion.div>
                 ) : viewMode === "generated-email" && generatedEmail ? (
                   <motion.div
@@ -3363,9 +3443,14 @@ export default function CRMFacilityDetailsSidebar({
                     </motion.button>
                     <GeneratedEmailDisplay
                       email={generatedEmail}
-                      contactEmail={selectedLead?.contacts?.[0]?.emails?.[0]?.email}
+                      contactEmail={
+                        selectedLead?.contacts?.[0]?.emails?.[0]?.email
+                      }
                       contactName={selectedLead?.contacts?.[0]?.name}
-                      isOutdated={latestActivityDate > new Date(generatedEmail.created_at).getTime()}
+                      isOutdated={
+                        latestActivityDate >
+                        new Date(generatedEmail.created_at).getTime()
+                      }
                       closeLeadId={selectedLeadId!}
                     />
                   </motion.div>

@@ -2,6 +2,7 @@
 
 import { Facility, Note, FacilityTag } from "@/types/facility";
 import NoteText from "./NoteText";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
@@ -175,13 +176,19 @@ function FacilitySidebarInner({
   onUpdateFacility,
   onFacilityDataLoaded,
 }: FacilitySidebarProps) {
+  const router = useRouter();
   const supabase = createClient(); // SSR-compatible Supabase client
   const queryClient = useQueryClient();
   const contentRef = useRef<HTMLDivElement>(null);
 
   // Fetch full facility details including reviews and additional data
-  const { data: fullFacility, isLoading: isLoadingDetails, truncated, totalReviews, fetchFullDetails } =
-    useFacilityDetails(facility?.place_id || null, !!facility);
+  const {
+    data: fullFacility,
+    isLoading: isLoadingDetails,
+    truncated,
+    totalReviews,
+    fetchFullDetails,
+  } = useFacilityDetails(facility?.place_id || null, !!facility);
 
   // Use full facility data if available, otherwise fall back to lightweight data
   const displayFacility = fullFacility || facility;
@@ -254,10 +261,16 @@ function FacilitySidebarInner({
   const [facilityTags, setFacilityTags] = useState<FacilityTag[]>([]);
 
   // Linked leads state & hooks
-  const [viewMode, setViewMode] = useState<"facility" | "lead" | "call" | "email" | "generated-email">("facility");
+  const [viewMode, setViewMode] = useState<
+    "facility" | "lead" | "call" | "email" | "generated-email"
+  >("facility");
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
-  const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
-  const [generatedEmail, setGeneratedEmail] = useState<GeneratedEmail | null>(null);
+  const [selectedActivityId, setSelectedActivityId] = useState<string | null>(
+    null,
+  );
+  const [generatedEmail, setGeneratedEmail] = useState<GeneratedEmail | null>(
+    null,
+  );
   const generateEmailMutation = useGenerateEmail();
   const { data: generatedEmails = [] } = useGeneratedEmails(selectedLeadId);
 
@@ -280,7 +293,9 @@ function FacilitySidebarInner({
   const latestActivityDate = useMemo(() => {
     const activities = selectedLeadActivities?.activities;
     if (!activities?.length) return 0;
-    return Math.max(...activities.map((a: any) => new Date(a.date_created).getTime()));
+    return Math.max(
+      ...activities.map((a: any) => new Date(a.date_created).getTime()),
+    );
   }, [selectedLeadActivities?.activities]);
 
   const leadsMap = useMemo(() => {
@@ -1597,7 +1612,6 @@ function FacilitySidebarInner({
                   </>
                 )}
 
-
                 {/* Divider - only show if photos sections were displayed above */}
                 {((displayFacility.photo_references &&
                   displayFacility.photo_references.length > 0) ||
@@ -1866,7 +1880,7 @@ function FacilitySidebarInner({
                   <div className="flex items-center mb-3">
                     <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
                       <User className="w-4 h-4" />
-                      Linked Leads from Close ({linkedLeads.length})
+                      Linked Leads from Close
                     </h3>
                   </div>
 
@@ -1880,6 +1894,16 @@ function FacilitySidebarInner({
                       <p className="text-sm text-slate-500">
                         No leads linked to this facility yet
                       </p>
+                      <button
+                        onClick={() => {
+                          router.push("/crm?tab=close");
+                          onClose();
+                        }}
+                        className="mt-3 flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer mx-auto"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        Browse Leads in CRM
+                      </button>
                     </div>
                   ) : (
                     <div className="space-y-3">
@@ -2030,7 +2054,17 @@ function FacilitySidebarInner({
                   )}
                 </motion.div>
 
-                {displayFacility.sport_types.filter(type => !["establishment","point_of_interest","health","locality","political","tourist_attraction"].includes(type)).length > 0 && (
+                {displayFacility.sport_types.filter(
+                  (type) =>
+                    ![
+                      "establishment",
+                      "point_of_interest",
+                      "health",
+                      "locality",
+                      "political",
+                      "tourist_attraction",
+                    ].includes(type),
+                ).length > 0 && (
                   <>
                     {/* Divider */}
                     <div className="border-t border-slate-200"></div>
@@ -2913,11 +2947,10 @@ function FacilitySidebarInner({
                       <div className="space-y-3">
                         {Object.entries(selectedLead.custom).map(
                           ([key, value]) => (
-                            <div
-                              key={key}
-                              className="text-sm"
-                            >
-                              <span className="text-slate-600 font-medium">{key}:</span>
+                            <div key={key} className="text-sm">
+                              <span className="text-slate-600 font-medium">
+                                {key}:
+                              </span>
                               <p className="text-slate-900 mt-1 break-words">
                                 <NoteText text={String(value)} truncateUrls />
                               </p>
@@ -2944,20 +2977,25 @@ function FacilitySidebarInner({
                         generateEmailMutation.mutate(
                           {
                             leadId: selectedLeadId!,
-                            leadName: selectedLead!.display_name || selectedLead!.name,
+                            leadName:
+                              selectedLead!.display_name || selectedLead!.name,
                             leadDescription: selectedLead!.description,
                             contacts: selectedLead!.contacts,
-                            activities: selectedLeadActivities?.activities || [],
+                            activities:
+                              selectedLeadActivities?.activities || [],
                           },
                           {
                             onSuccess: (data) => {
                               setGeneratedEmail(data);
                               setViewMode("generated-email");
                             },
-                          }
+                          },
                         );
                       }}
-                      disabled={generateEmailMutation.isPending || !selectedLeadActivities}
+                      disabled={
+                        generateEmailMutation.isPending ||
+                        !selectedLeadActivities
+                      }
                       className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors disabled:opacity-50 cursor-pointer"
                     >
                       {generateEmailMutation.isPending ? (
@@ -2965,7 +3003,9 @@ function FacilitySidebarInner({
                       ) : (
                         <Sparkles className="w-3.5 h-3.5" />
                       )}
-                      {generateEmailMutation.isPending ? generateEmailMutation.generationStatus : "Generate Email"}
+                      {generateEmailMutation.isPending
+                        ? generateEmailMutation.generationStatus
+                        : "Generate Email"}
                     </button>
                   </div>
                   {selectedLeadActivities && (
@@ -3023,16 +3063,32 @@ function FacilitySidebarInner({
                     )}
                   </h3>
                   {generatedEmails.length === 0 ? (
-                    <p className="text-xs text-slate-400">No generated emails yet</p>
+                    <p className="text-xs text-slate-400">
+                      No generated emails yet
+                    </p>
                   ) : (
                     <div className="space-y-2">
                       {generatedEmails.map((email) => {
                         const typeBadge = {
-                          intro: { label: "Intro", className: "bg-emerald-100 text-emerald-700" },
-                          follow_up: { label: "Follow-up", className: "bg-amber-100 text-amber-700" },
-                          reply: { label: "Reply", className: "bg-blue-100 text-blue-700" },
-                        }[email.email_type] || { label: email.email_type, className: "bg-slate-100 text-slate-700" };
-                        const isOutdated = latestActivityDate > new Date(email.created_at).getTime();
+                          intro: {
+                            label: "Intro",
+                            className: "bg-emerald-100 text-emerald-700",
+                          },
+                          follow_up: {
+                            label: "Follow-up",
+                            className: "bg-amber-100 text-amber-700",
+                          },
+                          reply: {
+                            label: "Reply",
+                            className: "bg-blue-100 text-blue-700",
+                          },
+                        }[email.email_type] || {
+                          label: email.email_type,
+                          className: "bg-slate-100 text-slate-700",
+                        };
+                        const isOutdated =
+                          latestActivityDate >
+                          new Date(email.created_at).getTime();
 
                         return (
                           <button
@@ -3044,11 +3100,20 @@ function FacilitySidebarInner({
                             className="w-full text-left p-3 rounded-lg border border-slate-100 hover:border-indigo-200 hover:bg-indigo-50/50 transition-colors cursor-pointer"
                           >
                             <div className="flex items-center gap-2 mb-1">
-                              <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${typeBadge.className}`}>
+                              <span
+                                className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${typeBadge.className}`}
+                              >
                                 {typeBadge.label}
                               </span>
                               <span className="text-[10px] text-slate-400">
-                                {new Date(email.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                                {new Date(email.created_at).toLocaleDateString(
+                                  "en-US",
+                                  {
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric",
+                                  },
+                                )}
                               </span>
                               {isOutdated && (
                                 <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-orange-100 text-orange-600">
@@ -3072,80 +3137,89 @@ function FacilitySidebarInner({
                 </motion.div>
               </motion.div>
             ) : viewMode === "call" && selectedActivityId ? (
-                  <motion.div
-                    key="call-view"
-                    initial={{ x: 100, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    exit={{ x: 100, opacity: 0 }}
-                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                    className="space-y-4"
-                  >
-                    <motion.button
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      onClick={() => {
-                        setViewMode("lead");
-                        setSelectedActivityId(null);
-                      }}
-                      className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
-                    >
-                      <ChevronLeft className="w-4 h-4" />
-                      Back to Lead
-                    </motion.button>
-                    <CallDetailContent callId={selectedActivityId} leadId={selectedLeadId || undefined} />
-                  </motion.div>
-                ) : viewMode === "email" && selectedActivityId ? (
-                  <motion.div
-                    key="email-view"
-                    initial={{ x: 100, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    exit={{ x: 100, opacity: 0 }}
-                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                    className="space-y-4"
-                  >
-                    <motion.button
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      onClick={() => {
-                        setViewMode("lead");
-                        setSelectedActivityId(null);
-                      }}
-                      className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
-                    >
-                      <ChevronLeft className="w-4 h-4" />
-                      Back to Lead
-                    </motion.button>
-                    <EmailDetailContent emailThreadId={selectedActivityId} leadId={selectedLeadId || undefined} />
-                  </motion.div>
-                ) : viewMode === "generated-email" && generatedEmail ? (
-                  <motion.div
-                    key="generated-email-view"
-                    initial={{ x: 100, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    exit={{ x: 100, opacity: 0 }}
-                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                    className="space-y-4"
-                  >
-                    <motion.button
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      onClick={() => {
-                        setViewMode("lead");
-                        setGeneratedEmail(null);
-                      }}
-                      className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
-                    >
-                      <ChevronLeft className="w-4 h-4" />
-                      Back to Lead
-                    </motion.button>
-                    <GeneratedEmailDisplay
-                      email={generatedEmail}
-                      contactEmail={selectedLead?.contacts?.[0]?.emails?.[0]?.email}
-                      contactName={selectedLead?.contacts?.[0]?.name}
-                      isOutdated={latestActivityDate > new Date(generatedEmail.created_at).getTime()}
-                      closeLeadId={selectedLeadId!}
-                    />
-                  </motion.div>
+              <motion.div
+                key="call-view"
+                initial={{ x: 100, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: 100, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                className="space-y-4"
+              >
+                <motion.button
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  onClick={() => {
+                    setViewMode("lead");
+                    setSelectedActivityId(null);
+                  }}
+                  className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  Back to Lead
+                </motion.button>
+                <CallDetailContent
+                  callId={selectedActivityId}
+                  leadId={selectedLeadId || undefined}
+                />
+              </motion.div>
+            ) : viewMode === "email" && selectedActivityId ? (
+              <motion.div
+                key="email-view"
+                initial={{ x: 100, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: 100, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                className="space-y-4"
+              >
+                <motion.button
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  onClick={() => {
+                    setViewMode("lead");
+                    setSelectedActivityId(null);
+                  }}
+                  className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  Back to Lead
+                </motion.button>
+                <EmailDetailContent
+                  emailThreadId={selectedActivityId}
+                  leadId={selectedLeadId || undefined}
+                />
+              </motion.div>
+            ) : viewMode === "generated-email" && generatedEmail ? (
+              <motion.div
+                key="generated-email-view"
+                initial={{ x: 100, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: 100, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                className="space-y-4"
+              >
+                <motion.button
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  onClick={() => {
+                    setViewMode("lead");
+                    setGeneratedEmail(null);
+                  }}
+                  className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  Back to Lead
+                </motion.button>
+                <GeneratedEmailDisplay
+                  email={generatedEmail}
+                  contactEmail={selectedLead?.contacts?.[0]?.emails?.[0]?.email}
+                  contactName={selectedLead?.contacts?.[0]?.name}
+                  isOutdated={
+                    latestActivityDate >
+                    new Date(generatedEmail.created_at).getTime()
+                  }
+                  closeLeadId={selectedLeadId!}
+                />
+              </motion.div>
             ) : null}
           </AnimatePresence>
         </div>
