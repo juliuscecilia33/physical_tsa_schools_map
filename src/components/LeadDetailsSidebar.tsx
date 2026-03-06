@@ -21,6 +21,7 @@ import {
   Sparkles,
   Loader2,
   FileText,
+  Target,
 } from "lucide-react";
 import {
   useCloseLead,
@@ -32,9 +33,13 @@ import { CallDetailContent } from "./CallDetailContent";
 import { EmailDetailContent } from "./EmailDetailContent";
 import { CloseActivity } from "@/types/close";
 import { GeneratedEmail } from "@/types/email-generation";
+import { FitAssessment } from "@/types/fit-assessment";
 import { useGenerateEmail } from "@/hooks/useGenerateEmail";
 import { useGeneratedEmails } from "@/hooks/useGeneratedEmails";
+import { useAssessFit } from "@/hooks/useAssessFit";
+import { useFitAssessments } from "@/hooks/useFitAssessments";
 import { GeneratedEmailDisplay } from "./GeneratedEmailDisplay";
+import { FitAssessmentDisplay } from "./FitAssessmentDisplay";
 import { useEffect, useMemo, useState } from "react";
 import { Facility } from "@/types/facility";
 import {
@@ -116,11 +121,14 @@ export function LeadDetailsSidebar({
   const [facilitySearchQuery, setFacilitySearchQuery] = useState("");
 
   // Step-based navigation state
-  const [viewMode, setViewMode] = useState<"lead" | "call" | "email" | "generated-email">("lead");
+  const [viewMode, setViewMode] = useState<"lead" | "call" | "email" | "generated-email" | "fit-assessment">("lead");
   const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
   const [generatedEmail, setGeneratedEmail] = useState<GeneratedEmail | null>(null);
+  const [fitAssessment, setFitAssessment] = useState<FitAssessment | null>(null);
   const generateEmailMutation = useGenerateEmail();
   const { data: generatedEmails = [] } = useGeneratedEmails(leadId);
+  const assessFitMutation = useAssessFit();
+  const { data: fitAssessments = [] } = useFitAssessments(leadId);
 
   const handleEditEmail = (instructions: string) => {
     if (!generatedEmail || !lead) return;
@@ -156,6 +164,7 @@ export function LeadDetailsSidebar({
     setViewMode("lead");
     setSelectedActivityId(null);
     setGeneratedEmail(null);
+    setFitAssessment(null);
   }, [leadId]);
 
   // Link confirmation modal state
@@ -786,34 +795,65 @@ export function LeadDetailsSidebar({
                       <h3 className="text-sm font-semibold text-gray-900 tracking-wide">
                         Activity Timeline
                       </h3>
-                      <button
-                        onClick={() => {
-                          generateEmailMutation.mutate(
-                            {
-                              leadId: leadId!,
-                              leadName: lead.display_name || lead.name,
-                              leadDescription: lead.description,
-                              contacts: lead.contacts,
-                              activities: activitiesData?.activities || [],
-                            },
-                            {
-                              onSuccess: (data) => {
-                                setGeneratedEmail(data);
-                                setViewMode("generated-email");
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={() => {
+                            generateEmailMutation.mutate(
+                              {
+                                leadId: leadId!,
+                                leadName: lead.display_name || lead.name,
+                                leadDescription: lead.description,
+                                contacts: lead.contacts,
+                                activities: activitiesData?.activities || [],
                               },
-                            }
-                          );
-                        }}
-                        disabled={generateEmailMutation.isPending || !activitiesData}
-                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors disabled:opacity-50 cursor-pointer"
-                      >
-                        {generateEmailMutation.isPending ? (
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        ) : (
-                          <Sparkles className="w-3.5 h-3.5" />
+                              {
+                                onSuccess: (data) => {
+                                  setGeneratedEmail(data);
+                                  setViewMode("generated-email");
+                                },
+                              }
+                            );
+                          }}
+                          disabled={generateEmailMutation.isPending || !activitiesData}
+                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors disabled:opacity-50 cursor-pointer"
+                        >
+                          {generateEmailMutation.isPending ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          ) : (
+                            <Sparkles className="w-3.5 h-3.5" />
+                          )}
+                          {generateEmailMutation.isPending ? generateEmailMutation.generationStatus : "Generate Email"}
+                        </button>
+                        {linkedFacilities.length > 0 && (
+                          <button
+                            onClick={() => {
+                              assessFitMutation.mutate(
+                                {
+                                  leadId: leadId!,
+                                  leadName: lead.display_name || lead.name,
+                                  leadDescription: lead.description,
+                                  activities: activitiesData?.activities || [],
+                                },
+                                {
+                                  onSuccess: (data) => {
+                                    setFitAssessment(data);
+                                    setViewMode("fit-assessment");
+                                  },
+                                }
+                              );
+                            }}
+                            disabled={assessFitMutation.isPending || !activitiesData}
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-teal-700 bg-teal-50 hover:bg-teal-100 rounded-lg transition-colors disabled:opacity-50 cursor-pointer"
+                          >
+                            {assessFitMutation.isPending ? (
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
+                              <Target className="w-3.5 h-3.5" />
+                            )}
+                            {assessFitMutation.isPending ? assessFitMutation.assessmentStatus : "Assess Fit"}
+                          </button>
                         )}
-                        {generateEmailMutation.isPending ? generateEmailMutation.generationStatus : "Generate Email"}
-                      </button>
+                      </div>
                     </div>
                     {activitiesData && (
                       <div className="mb-3 flex flex-wrap gap-2 text-xs text-gray-600">
@@ -896,6 +936,62 @@ export function LeadDetailsSidebar({
                               {email.recipient_name && (
                                 <p className="text-[10px] text-gray-400 mt-0.5">
                                   To: {email.recipient_name}
+                                </p>
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Fit Assessments History */}
+                  <div className="bg-white border border-gray-200 rounded-lg p-5">
+                    <h3 className="text-sm font-semibold text-gray-900 tracking-wide flex items-center gap-2 mb-4">
+                      <Target className="w-4 h-4" />
+                      Fit Assessments
+                      {fitAssessments.length > 0 && (
+                        <span className="inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold text-white bg-teal-600 rounded-full">
+                          {fitAssessments.length}
+                        </span>
+                      )}
+                    </h3>
+                    {fitAssessments.length === 0 ? (
+                      <p className="text-xs text-gray-400">No fit assessments yet</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {fitAssessments.map((fa) => {
+                          const verdictBadge = {
+                            strong_fit: { label: "Strong", className: "bg-emerald-100 text-emerald-700" },
+                            moderate_fit: { label: "Moderate", className: "bg-amber-100 text-amber-700" },
+                            weak_fit: { label: "Weak", className: "bg-orange-100 text-orange-700" },
+                            poor_fit: { label: "Poor", className: "bg-red-100 text-red-700" },
+                          }[fa.verdict] || { label: fa.verdict, className: "bg-gray-100 text-gray-700" };
+
+                          return (
+                            <button
+                              key={fa.id}
+                              onClick={() => {
+                                setFitAssessment(fa);
+                                setViewMode("fit-assessment");
+                              }}
+                              className="w-full text-left p-3 rounded-lg border border-gray-100 hover:border-teal-200 hover:bg-teal-50/50 transition-colors cursor-pointer"
+                            >
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${verdictBadge.className}`}>
+                                  {verdictBadge.label}
+                                </span>
+                                <span className="text-xs font-bold text-gray-700">{fa.overall_score}</span>
+                                <span className="text-[10px] text-gray-400">
+                                  {new Date(fa.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                                </span>
+                              </div>
+                              <p className="text-xs text-gray-600 line-clamp-2">
+                                {fa.summary}
+                              </p>
+                              {fa.facility_name && (
+                                <p className="text-[10px] text-gray-400 mt-0.5">
+                                  {fa.facility_name}
                                 </p>
                               )}
                             </button>
@@ -1463,6 +1559,29 @@ export function LeadDetailsSidebar({
                       Back to Lead
                     </motion.button>
                     <EmailDetailContent emailThreadId={selectedActivityId} leadId={leadId || undefined} />
+                  </motion.div>
+                ) : viewMode === "fit-assessment" && fitAssessment ? (
+                  <motion.div
+                    key="fit-assessment-view"
+                    initial={{ x: 100, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: 100, opacity: 0 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    className="space-y-6"
+                  >
+                    <motion.button
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      onClick={() => {
+                        setViewMode("lead");
+                        setFitAssessment(null);
+                      }}
+                      className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                      Back to Lead
+                    </motion.button>
+                    <FitAssessmentDisplay assessment={fitAssessment} />
                   </motion.div>
                 ) : viewMode === "generated-email" && generatedEmail ? (
                   <motion.div
