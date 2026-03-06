@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { Copy, Check, ChevronDown, ChevronUp, AlertCircle, ThumbsUp, Lightbulb, ThumbsDown } from "lucide-react";
 import { GeneratedEmail, EmailBreakdown } from "@/types/email-generation";
+import { CloseActivity } from "@/types/close";
+import { getActivityIcon, getActivityColor } from "./CloseActivityTimeline";
 import { useEmailFeedback } from "@/hooks/useEmailFeedback";
 
 const TYPE_BADGES: Record<string, { label: string; className: string }> = {
@@ -17,6 +19,8 @@ interface Props {
   contactName?: string;
   isOutdated?: boolean;
   closeLeadId: string;
+  mostRecentActivity?: CloseActivity;
+  onActivityClick?: (activity: CloseActivity) => void;
 }
 
 function BreakdownRenderer({ breakdown }: { breakdown: EmailBreakdown }) {
@@ -88,7 +92,7 @@ const RATING_OPTIONS = [
   { value: "bad" as const, label: "Not useful", icon: ThumbsDown, activeClass: "bg-red-100 text-red-700 border-red-300", hoverClass: "hover:bg-red-50" },
 ];
 
-export function GeneratedEmailDisplay({ email, contactEmail, contactName, isOutdated, closeLeadId }: Props) {
+export function GeneratedEmailDisplay({ email, contactEmail, contactName, isOutdated, closeLeadId, mostRecentActivity, onActivityClick }: Props) {
   const [copied, setCopied] = useState(false);
   const [showReasoning, setShowReasoning] = useState(false);
   const [feedbackRating, setFeedbackRating] = useState<"used" | "helpful" | "bad" | null>(email.feedback_rating ?? null);
@@ -167,6 +171,44 @@ export function GeneratedEmailDisplay({ email, contactEmail, contactName, isOutd
           )}
         </button>
       </div>
+
+      {mostRecentActivity && (
+        <div className="border-t border-gray-100 pt-3">
+          <p className="text-xs font-medium text-gray-500 mb-2">Most Recent Activity</p>
+          <button
+            onClick={() => {
+              if ((mostRecentActivity.type === "call" || mostRecentActivity.type === "email") && onActivityClick) {
+                onActivityClick(mostRecentActivity);
+              }
+            }}
+            className={`w-full flex items-center gap-3 p-3 rounded-lg border border-gray-200 text-left transition-colors ${
+              mostRecentActivity.type === "call" || mostRecentActivity.type === "email"
+                ? "hover:bg-gray-50 cursor-pointer"
+                : "cursor-default"
+            }`}
+          >
+            <div className={`flex items-center justify-center w-8 h-8 rounded-full border ${getActivityColor(mostRecentActivity)}`}>
+              {getActivityIcon(mostRecentActivity)}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <span className={`text-xs font-medium px-1.5 py-0.5 rounded ${getActivityColor(mostRecentActivity)}`}>
+                  {mostRecentActivity.type.charAt(0).toUpperCase() + mostRecentActivity.type.slice(1)}
+                </span>
+                <span className="text-xs text-gray-400">
+                  {new Date(mostRecentActivity.date_created).toLocaleDateString()}
+                </span>
+              </div>
+              {mostRecentActivity.title && (
+                <p className="text-sm font-medium text-gray-900 truncate mt-0.5">{mostRecentActivity.title}</p>
+              )}
+              {mostRecentActivity.description && (
+                <p className="text-xs text-gray-500 line-clamp-1 mt-0.5">{mostRecentActivity.description}</p>
+              )}
+            </div>
+          </button>
+        </div>
+      )}
 
       {/* Feedback Section */}
       <div className="border-t border-gray-100 pt-3">

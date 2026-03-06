@@ -23,7 +23,7 @@ interface CloseActivityTimelineProps {
   onActivityClick?: (activity: CloseActivity) => void;
 }
 
-function getActivityIcon(activity: CloseActivity) {
+export function getActivityIcon(activity: CloseActivity) {
   switch (activity.type) {
     case "call":
       return activity.call?.direction === "inbound" ? (
@@ -52,7 +52,7 @@ function getActivityIcon(activity: CloseActivity) {
   }
 }
 
-function getActivityColor(activity: CloseActivity): string {
+export function getActivityColor(activity: CloseActivity): string {
   switch (activity.type) {
     case "call":
       return activity.call?.direction === "inbound"
