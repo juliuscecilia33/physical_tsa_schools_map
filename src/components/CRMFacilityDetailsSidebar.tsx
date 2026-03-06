@@ -2262,48 +2262,52 @@ export default function CRMFacilityDetailsSidebar({
                       )}
                     </motion.div>
 
-                    {/* Divider */}
-                    <div className="border-t border-slate-200"></div>
+                    {facility.sport_types.filter(type => !["establishment","point_of_interest","health","locality","political","tourist_attraction"].includes(type)).length > 0 && (
+                      <>
+                        {/* Divider */}
+                        <div className="border-t border-slate-200"></div>
 
-                    {/* Facility Types */}
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.12 }}
-                    >
-                      <h3 className="text-sm font-medium text-slate-700 mb-3 tracking-wide">
-                        Facility Types
-                      </h3>
-                      <div className="flex flex-wrap gap-2">
-                        {facility.sport_types
-                          .filter(
-                            (type) =>
-                              ![
-                                "establishment",
-                                "point_of_interest",
-                                "health",
-                                "locality",
-                                "political",
-                                "tourist_attraction",
-                              ].includes(type),
-                          )
-                          .map((type, idx) => (
-                            <motion.span
-                              key={type}
-                              initial={{ opacity: 0, scale: 0.8 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              transition={{ delay: 0.1 + idx * 0.05 }}
-                              whileHover={{ scale: 1.05 }}
-                              className="px-3 py-1.5 bg-white text-blue-600 border border-blue-600 rounded-full text-xs font-medium transition-all cursor-default flex items-center gap-1.5"
-                            >
-                              <span className="text-sm">
-                                {FACILITY_TYPE_EMOJIS[type] || "🏢"}
-                              </span>
-                              <span>{formatSportType(type)}</span>
-                            </motion.span>
-                          ))}
-                      </div>
-                    </motion.div>
+                        {/* Facility Types */}
+                        <motion.div
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.12 }}
+                        >
+                          <h3 className="text-sm font-medium text-slate-700 mb-3 tracking-wide">
+                            Facility Types
+                          </h3>
+                          <div className="flex flex-wrap gap-2">
+                            {facility.sport_types
+                              .filter(
+                                (type) =>
+                                  ![
+                                    "establishment",
+                                    "point_of_interest",
+                                    "health",
+                                    "locality",
+                                    "political",
+                                    "tourist_attraction",
+                                  ].includes(type),
+                              )
+                              .map((type, idx) => (
+                                <motion.span
+                                  key={type}
+                                  initial={{ opacity: 0, scale: 0.8 }}
+                                  animate={{ opacity: 1, scale: 1 }}
+                                  transition={{ delay: 0.1 + idx * 0.05 }}
+                                  whileHover={{ scale: 1.05 }}
+                                  className="px-3 py-1.5 bg-white text-blue-600 border border-blue-600 rounded-full text-xs font-medium transition-all cursor-default flex items-center gap-1.5"
+                                >
+                                  <span className="text-sm">
+                                    {FACILITY_TYPE_EMOJIS[type] || "🏢"}
+                                  </span>
+                                  <span>{formatSportType(type)}</span>
+                                </motion.span>
+                              ))}
+                          </div>
+                        </motion.div>
+                      </>
+                    )}
 
                     {/* Divider */}
                     <div className="border-t border-slate-200"></div>
@@ -2955,7 +2959,7 @@ export default function CRMFacilityDetailsSidebar({
                       transition={{ delay: 0.05 }}
                       className="bg-slate-50 rounded-lg p-5 space-y-4"
                     >
-                      <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                      <h3 className="text-sm font-semibold text-slate-900 tracking-wide flex items-center gap-2">
                         <Building2 className="w-4 h-4" />
                         About
                       </h3>
@@ -3036,7 +3040,7 @@ export default function CRMFacilityDetailsSidebar({
                           transition={{ delay: 0.1 }}
                           className="bg-white border border-slate-200 rounded-lg p-5 space-y-4"
                         >
-                          <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                          <h3 className="text-sm font-semibold text-slate-900 tracking-wide flex items-center gap-2">
                             <User className="w-4 h-4" />
                             Contacts ({selectedLead.contacts.length})
                           </h3>
@@ -3124,7 +3128,7 @@ export default function CRMFacilityDetailsSidebar({
                           transition={{ delay: 0.15 }}
                           className="bg-white border border-slate-200 rounded-lg p-5 space-y-3"
                         >
-                          <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider">
+                          <h3 className="text-sm font-semibold text-slate-900 tracking-wide">
                             Custom Fields
                           </h3>
                           <div className="space-y-3">
@@ -3153,7 +3157,7 @@ export default function CRMFacilityDetailsSidebar({
                       className="bg-white border border-slate-200 rounded-lg p-5"
                     >
                       <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider">
+                        <h3 className="text-sm font-semibold text-slate-900 tracking-wide">
                           Activity Timeline
                         </h3>
                         <button
@@ -3232,7 +3236,7 @@ export default function CRMFacilityDetailsSidebar({
                       transition={{ delay: 0.25 }}
                       className="bg-white border border-slate-200 rounded-lg p-5"
                     >
-                      <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider flex items-center gap-2 mb-4">
+                      <h3 className="text-sm font-semibold text-slate-900 tracking-wide flex items-center gap-2 mb-4">
                         <FileText className="w-4 h-4" />
                         Generated Emails
                         {generatedEmails.length > 0 && (

@@ -587,7 +587,7 @@ export function LeadDetailsSidebar({
                 <>
                   {/* About Section */}
                   <div className="bg-gray-50 rounded-lg p-5 space-y-4">
-                    <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider flex items-center gap-2">
+                    <h3 className="text-sm font-semibold text-gray-900 tracking-wide flex items-center gap-2">
                       <Building2 className="w-4 h-4" />
                       About
                     </h3>
@@ -657,7 +657,7 @@ export function LeadDetailsSidebar({
                   {/* Contacts Section */}
                   {lead.contacts && lead.contacts.length > 0 && (
                     <div className="bg-white border border-gray-200 rounded-lg p-5 space-y-4">
-                      <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider flex items-center gap-2">
+                      <h3 className="text-sm font-semibold text-gray-900 tracking-wide flex items-center gap-2">
                         <User className="w-4 h-4" />
                         Contacts ({lead.contacts.length})
                       </h3>
@@ -737,7 +737,7 @@ export function LeadDetailsSidebar({
                   {/* Custom Fields */}
                   {lead.custom && Object.keys(lead.custom).length > 0 && (
                     <div className="bg-white border border-gray-200 rounded-lg p-5 space-y-3">
-                      <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">
+                      <h3 className="text-sm font-semibold text-gray-900 tracking-wide">
                         Custom Fields
                       </h3>
                       <div className="space-y-2">
@@ -761,7 +761,7 @@ export function LeadDetailsSidebar({
                   {/* Activity Timeline */}
                   <div className="bg-white border border-gray-200 rounded-lg p-5">
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">
+                      <h3 className="text-sm font-semibold text-gray-900 tracking-wide">
                         Activity Timeline
                       </h3>
                       <button
@@ -825,7 +825,7 @@ export function LeadDetailsSidebar({
 
                   {/* Generated Emails History */}
                   <div className="bg-white border border-gray-200 rounded-lg p-5">
-                    <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider flex items-center gap-2 mb-4">
+                    <h3 className="text-sm font-semibold text-gray-900 tracking-wide flex items-center gap-2 mb-4">
                       <FileText className="w-4 h-4" />
                       Generated Emails
                       {generatedEmails.length > 0 && (
@@ -886,7 +886,7 @@ export function LeadDetailsSidebar({
                   {/* Linked & Matched Facilities */}
                   <div className="bg-white border border-gray-200 rounded-lg p-5">
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider flex items-center gap-2">
+                      <h3 className="text-sm font-semibold text-gray-900 tracking-wide flex items-center gap-2">
                         <Building2 className="w-4 h-4" />
                         {linkedFacilities.length > 0
                           ? "Linked Facilities"
@@ -916,7 +916,7 @@ export function LeadDetailsSidebar({
                     {/* Linked Facilities Section */}
                     {linkedFacilities.length > 0 && (
                       <div className="mb-6">
-                        <h4 className="text-xs font-semibold text-green-700 uppercase tracking-wider mb-3 flex items-center gap-2">
+                        <h4 className="text-xs font-semibold text-green-700 tracking-wide mb-3 flex items-center gap-2">
                           <span className="w-2 h-2 bg-green-500 rounded-full"></span>
                           Linked ({linkedFacilities.length})
                         </h4>
