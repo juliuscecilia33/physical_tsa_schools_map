@@ -354,6 +354,16 @@ export async function POST(request: NextRequest) {
     }
     console.log(`[assess-fit] SAVED — id: ${saved.id} @ ${Date.now() - startTime}ms`);
 
+    // Step 7: Auto-assign "Fit Assessment" tag to the linked facility
+    if (facility?.place_id) {
+      await supabase
+        .from("facility_tag_assignments")
+        .upsert(
+          { place_id: facility.place_id, tag_id: "e1f0b490-d88b-403e-ba18-2c7e39d27b57" },
+          { onConflict: "place_id,tag_id" }
+        );
+    }
+
     return NextResponse.json({ success: true, data: saved });
   } catch (error: any) {
     console.error(`[assess-fit] ERROR @ ${Date.now() - startTime}ms:`, error?.message || error);

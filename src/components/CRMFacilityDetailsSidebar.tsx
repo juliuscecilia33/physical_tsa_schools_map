@@ -35,6 +35,9 @@ import {
   Building2,
   Calendar,
   FileText,
+  Target,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
@@ -57,6 +60,10 @@ import { GeneratedEmail } from "@/types/email-generation";
 import { useGenerateEmail } from "@/hooks/useGenerateEmail";
 import { useGeneratedEmails } from "@/hooks/useGeneratedEmails";
 import { GeneratedEmailDisplay } from "./GeneratedEmailDisplay";
+import { FitAssessment } from "@/types/fit-assessment";
+import { useAssessFit } from "@/hooks/useAssessFit";
+import { useFitAssessments } from "@/hooks/useFitAssessments";
+import { FitAssessmentDisplay } from "./FitAssessmentDisplay";
 import {
   useLeadFacilityLinks,
   useDeleteFacilityLeadLink,
@@ -249,7 +256,7 @@ export default function CRMFacilityDetailsSidebar({
 
   // Step-based view navigation
   const [viewMode, setViewMode] = useState<
-    "facility" | "lead" | "call" | "email" | "generated-email"
+    "facility" | "lead" | "call" | "email" | "generated-email" | "fit-assessment"
   >("facility");
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
   const [selectedActivityId, setSelectedActivityId] = useState<string | null>(
@@ -258,8 +265,14 @@ export default function CRMFacilityDetailsSidebar({
   const [generatedEmail, setGeneratedEmail] = useState<GeneratedEmail | null>(
     null,
   );
+  const [fitAssessment, setFitAssessment] = useState<FitAssessment | null>(null);
+  const [aboutExpanded, setAboutExpanded] = useState(false);
+  const [contactsExpanded, setContactsExpanded] = useState(false);
+  const [customFieldsExpanded, setCustomFieldsExpanded] = useState(false);
   const generateEmailMutation = useGenerateEmail();
   const { data: generatedEmails = [] } = useGeneratedEmails(selectedLeadId);
+  const assessFitMutation = useAssessFit();
+  const { data: fitAssessments = [] } = useFitAssessments(selectedLeadId);
 
   // Linked leads
   const { data: linkedLeads = [], isLoading: linkedLeadsLoading } =
@@ -408,6 +421,7 @@ export default function CRMFacilityDetailsSidebar({
     setSelectedLeadId(null);
     setSelectedActivityId(null);
     setGeneratedEmail(null);
+    setFitAssessment(null);
   }, [placeId]);
 
   // Fetch all tags on component mount
@@ -2997,78 +3011,92 @@ export default function CRMFacilityDetailsSidebar({
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.05 }}
-                      className="bg-slate-50 rounded-lg p-5 space-y-4"
+                      className="bg-slate-50 rounded-lg p-5"
                     >
-                      <h3 className="text-sm font-semibold text-slate-900 tracking-wide flex items-center gap-2">
-                        <Building2 className="w-4 h-4" />
-                        About
-                      </h3>
+                      <button
+                        onClick={() => setAboutExpanded(!aboutExpanded)}
+                        className="w-full flex items-center justify-between cursor-pointer"
+                      >
+                        <h3 className="text-sm font-semibold text-slate-900 tracking-wide flex items-center gap-2">
+                          <Building2 className="w-4 h-4" />
+                          About
+                        </h3>
+                        {aboutExpanded ? (
+                          <ChevronUp className="w-4 h-4 text-slate-400" />
+                        ) : (
+                          <ChevronDown className="w-4 h-4 text-slate-400" />
+                        )}
+                      </button>
 
-                      {selectedLead.description && (
-                        <p className="text-sm text-slate-700">
-                          {selectedLead.description}
-                        </p>
-                      )}
+                      {aboutExpanded && (
+                        <div className="space-y-4 mt-4">
+                          {selectedLead.description && (
+                            <p className="text-sm text-slate-700">
+                              {selectedLead.description}
+                            </p>
+                          )}
 
-                      {/* Address */}
-                      {selectedLead.addresses &&
-                        selectedLead.addresses.length > 0 && (
-                          <div className="flex items-start gap-3">
-                            <MapPin className="w-4 h-4 text-slate-400 mt-0.5" />
-                            <div className="text-sm text-slate-700">
-                              {selectedLead.addresses[0].address_1}
-                              {selectedLead.addresses[0].address_2 && (
-                                <>, {selectedLead.addresses[0].address_2}</>
-                              )}
-                              {(selectedLead.addresses[0].city ||
-                                selectedLead.addresses[0].state ||
-                                selectedLead.addresses[0].zipcode) && (
-                                <div>
-                                  {selectedLead.addresses[0].city}
-                                  {selectedLead.addresses[0].state &&
-                                    `, ${selectedLead.addresses[0].state}`}
-                                  {selectedLead.addresses[0].zipcode &&
-                                    ` ${selectedLead.addresses[0].zipcode}`}
+                          {/* Address */}
+                          {selectedLead.addresses &&
+                            selectedLead.addresses.length > 0 && (
+                              <div className="flex items-start gap-3">
+                                <MapPin className="w-4 h-4 text-slate-400 mt-0.5" />
+                                <div className="text-sm text-slate-700">
+                                  {selectedLead.addresses[0].address_1}
+                                  {selectedLead.addresses[0].address_2 && (
+                                    <>, {selectedLead.addresses[0].address_2}</>
+                                  )}
+                                  {(selectedLead.addresses[0].city ||
+                                    selectedLead.addresses[0].state ||
+                                    selectedLead.addresses[0].zipcode) && (
+                                    <div>
+                                      {selectedLead.addresses[0].city}
+                                      {selectedLead.addresses[0].state &&
+                                        `, ${selectedLead.addresses[0].state}`}
+                                      {selectedLead.addresses[0].zipcode &&
+                                        ` ${selectedLead.addresses[0].zipcode}`}
+                                    </div>
+                                  )}
                                 </div>
-                              )}
+                              </div>
+                            )}
+
+                          {/* Website */}
+                          {selectedLead.url && (
+                            <div className="flex items-center gap-3">
+                              <Globe className="w-4 h-4 text-slate-400" />
+                              <a
+                                href={selectedLead.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                              >
+                                {selectedLead.url}
+                                <ExternalLink className="w-3 h-3" />
+                              </a>
+                            </div>
+                          )}
+
+                          {/* Dates */}
+                          <div className="flex items-center gap-3 text-xs text-slate-500">
+                            <Calendar className="w-4 h-4" />
+                            <div>
+                              <div>
+                                Created:{" "}
+                                {new Date(
+                                  selectedLead.date_created,
+                                ).toLocaleDateString()}
+                              </div>
+                              <div>
+                                Updated:{" "}
+                                {new Date(
+                                  selectedLead.date_updated,
+                                ).toLocaleDateString()}
+                              </div>
                             </div>
                           </div>
-                        )}
-
-                      {/* Website */}
-                      {selectedLead.url && (
-                        <div className="flex items-center gap-3">
-                          <Globe className="w-4 h-4 text-slate-400" />
-                          <a
-                            href={selectedLead.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
-                          >
-                            {selectedLead.url}
-                            <ExternalLink className="w-3 h-3" />
-                          </a>
                         </div>
                       )}
-
-                      {/* Dates */}
-                      <div className="flex items-center gap-3 text-xs text-slate-500">
-                        <Calendar className="w-4 h-4" />
-                        <div>
-                          <div>
-                            Created:{" "}
-                            {new Date(
-                              selectedLead.date_created,
-                            ).toLocaleDateString()}
-                          </div>
-                          <div>
-                            Updated:{" "}
-                            {new Date(
-                              selectedLead.date_updated,
-                            ).toLocaleDateString()}
-                          </div>
-                        </div>
-                      </div>
                     </motion.div>
 
                     {/* Contacts Section */}
@@ -3078,84 +3106,96 @@ export default function CRMFacilityDetailsSidebar({
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.1 }}
-                          className="bg-white border border-slate-200 rounded-lg p-5 space-y-4"
+                          className="bg-white border border-slate-200 rounded-lg p-5"
                         >
-                          <h3 className="text-sm font-semibold text-slate-900 tracking-wide flex items-center gap-2">
-                            <User className="w-4 h-4" />
-                            Contacts ({selectedLead.contacts.length})
-                          </h3>
+                          <button
+                            onClick={() => setContactsExpanded(!contactsExpanded)}
+                            className="w-full flex items-center justify-between cursor-pointer"
+                          >
+                            <h3 className="text-sm font-semibold text-slate-900 tracking-wide flex items-center gap-2">
+                              <User className="w-4 h-4" />
+                              Contacts ({selectedLead.contacts.length})
+                            </h3>
+                            {contactsExpanded ? (
+                              <ChevronUp className="w-4 h-4 text-slate-400" />
+                            ) : (
+                              <ChevronDown className="w-4 h-4 text-slate-400" />
+                            )}
+                          </button>
 
-                          <div className="space-y-4">
-                            {selectedLead.contacts.map((contact) => (
-                              <div
-                                key={contact.id}
-                                className="p-4 bg-slate-50 rounded-lg space-y-2"
-                              >
-                                {contact.name && (
-                                  <p className="font-medium text-slate-900">
-                                    {contact.name}
-                                  </p>
-                                )}
-                                {contact.title && (
-                                  <p className="text-sm text-slate-600">
-                                    {contact.title}
-                                  </p>
-                                )}
-
-                                {/* Emails */}
-                                {contact.emails &&
-                                  contact.emails.length > 0 && (
-                                    <div className="space-y-1">
-                                      {contact.emails.map((email, idx) => (
-                                        <div
-                                          key={idx}
-                                          className="flex items-center gap-2 text-sm"
-                                        >
-                                          <Mail className="w-4 h-4 text-slate-400" />
-                                          <a
-                                            href={`mailto:${email.email}`}
-                                            className="text-blue-600 hover:text-blue-800"
-                                          >
-                                            {email.email}
-                                          </a>
-                                          {email.type && (
-                                            <span className="text-xs text-slate-500">
-                                              ({email.type})
-                                            </span>
-                                          )}
-                                        </div>
-                                      ))}
-                                    </div>
+                          {contactsExpanded && (
+                            <div className="space-y-4 mt-4">
+                              {selectedLead.contacts.map((contact) => (
+                                <div
+                                  key={contact.id}
+                                  className="p-4 bg-slate-50 rounded-lg space-y-2"
+                                >
+                                  {contact.name && (
+                                    <p className="font-medium text-slate-900">
+                                      {contact.name}
+                                    </p>
+                                  )}
+                                  {contact.title && (
+                                    <p className="text-sm text-slate-600">
+                                      {contact.title}
+                                    </p>
                                   )}
 
-                                {/* Phones */}
-                                {contact.phones &&
-                                  contact.phones.length > 0 && (
-                                    <div className="space-y-1">
-                                      {contact.phones.map((phone, idx) => (
-                                        <div
-                                          key={idx}
-                                          className="flex items-center gap-2 text-sm"
-                                        >
-                                          <Phone className="w-4 h-4 text-slate-400" />
-                                          <a
-                                            href={`tel:${phone.phone}`}
-                                            className="text-blue-600 hover:text-blue-800"
+                                  {/* Emails */}
+                                  {contact.emails &&
+                                    contact.emails.length > 0 && (
+                                      <div className="space-y-1">
+                                        {contact.emails.map((email, idx) => (
+                                          <div
+                                            key={idx}
+                                            className="flex items-center gap-2 text-sm"
                                           >
-                                            {phone.phone}
-                                          </a>
-                                          {phone.type && (
-                                            <span className="text-xs text-slate-500">
-                                              ({phone.type})
-                                            </span>
-                                          )}
-                                        </div>
-                                      ))}
-                                    </div>
-                                  )}
-                              </div>
-                            ))}
-                          </div>
+                                            <Mail className="w-4 h-4 text-slate-400" />
+                                            <a
+                                              href={`mailto:${email.email}`}
+                                              className="text-blue-600 hover:text-blue-800"
+                                            >
+                                              {email.email}
+                                            </a>
+                                            {email.type && (
+                                              <span className="text-xs text-slate-500">
+                                                ({email.type})
+                                              </span>
+                                            )}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+
+                                  {/* Phones */}
+                                  {contact.phones &&
+                                    contact.phones.length > 0 && (
+                                      <div className="space-y-1">
+                                        {contact.phones.map((phone, idx) => (
+                                          <div
+                                            key={idx}
+                                            className="flex items-center gap-2 text-sm"
+                                          >
+                                            <Phone className="w-4 h-4 text-slate-400" />
+                                            <a
+                                              href={`tel:${phone.phone}`}
+                                              className="text-blue-600 hover:text-blue-800"
+                                            >
+                                              {phone.phone}
+                                            </a>
+                                            {phone.type && (
+                                              <span className="text-xs text-slate-500">
+                                                ({phone.type})
+                                              </span>
+                                            )}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </motion.div>
                       )}
 
@@ -3166,28 +3206,40 @@ export default function CRMFacilityDetailsSidebar({
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.15 }}
-                          className="bg-white border border-slate-200 rounded-lg p-5 space-y-3"
+                          className="bg-white border border-slate-200 rounded-lg p-5"
                         >
-                          <h3 className="text-sm font-semibold text-slate-900 tracking-wide">
-                            Custom Fields
-                          </h3>
-                          <div className="space-y-3">
-                            {Object.entries(selectedLead.custom).map(
-                              ([key, value]) => (
-                                <div key={key} className="text-sm">
-                                  <span className="text-slate-600 font-medium">
-                                    {key}:
-                                  </span>
-                                  <p className="text-slate-900 mt-1 break-words">
-                                    <NoteText
-                                      text={String(value)}
-                                      truncateUrls
-                                    />
-                                  </p>
-                                </div>
-                              ),
+                          <button
+                            onClick={() => setCustomFieldsExpanded(!customFieldsExpanded)}
+                            className="w-full flex items-center justify-between cursor-pointer"
+                          >
+                            <h3 className="text-sm font-semibold text-slate-900 tracking-wide">
+                              Custom Fields
+                            </h3>
+                            {customFieldsExpanded ? (
+                              <ChevronUp className="w-4 h-4 text-slate-400" />
+                            ) : (
+                              <ChevronDown className="w-4 h-4 text-slate-400" />
                             )}
-                          </div>
+                          </button>
+                          {customFieldsExpanded && (
+                            <div className="space-y-3 mt-4">
+                              {Object.entries(selectedLead.custom).map(
+                                ([key, value]) => (
+                                  <div key={key} className="text-sm">
+                                    <span className="text-slate-600 font-medium">
+                                      {key}:
+                                    </span>
+                                    <p className="text-slate-900 mt-1 break-words">
+                                      <NoteText
+                                        text={String(value)}
+                                        truncateUrls
+                                      />
+                                    </p>
+                                  </div>
+                                ),
+                              )}
+                            </div>
+                          )}
                         </motion.div>
                       )}
 
@@ -3202,42 +3254,79 @@ export default function CRMFacilityDetailsSidebar({
                         <h3 className="text-sm font-semibold text-slate-900 tracking-wide">
                           Activity Timeline
                         </h3>
-                        <button
-                          onClick={() => {
-                            generateEmailMutation.mutate(
-                              {
-                                leadId: selectedLeadId!,
-                                leadName:
-                                  selectedLead!.display_name ||
-                                  selectedLead!.name,
-                                leadDescription: selectedLead!.description,
-                                contacts: selectedLead!.contacts,
-                                activities:
-                                  selectedLeadActivities?.activities || [],
-                              },
-                              {
-                                onSuccess: (data) => {
-                                  setGeneratedEmail(data);
-                                  setViewMode("generated-email");
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => {
+                              generateEmailMutation.mutate(
+                                {
+                                  leadId: selectedLeadId!,
+                                  leadName:
+                                    selectedLead!.display_name ||
+                                    selectedLead!.name,
+                                  leadDescription: selectedLead!.description,
+                                  contacts: selectedLead!.contacts,
+                                  activities:
+                                    selectedLeadActivities?.activities || [],
                                 },
-                              },
-                            );
-                          }}
-                          disabled={
-                            generateEmailMutation.isPending ||
-                            !selectedLeadActivities
-                          }
-                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors disabled:opacity-50 cursor-pointer"
-                        >
-                          {generateEmailMutation.isPending ? (
-                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                          ) : (
-                            <Sparkles className="w-3.5 h-3.5" />
-                          )}
-                          {generateEmailMutation.isPending
-                            ? generateEmailMutation.generationStatus
-                            : "Generate Email"}
-                        </button>
+                                {
+                                  onSuccess: (data) => {
+                                    setGeneratedEmail(data);
+                                    setViewMode("generated-email");
+                                  },
+                                },
+                              );
+                            }}
+                            disabled={
+                              generateEmailMutation.isPending ||
+                              !selectedLeadActivities
+                            }
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors disabled:opacity-50 cursor-pointer"
+                          >
+                            {generateEmailMutation.isPending ? (
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
+                              <Sparkles className="w-3.5 h-3.5" />
+                            )}
+                            {generateEmailMutation.isPending
+                              ? generateEmailMutation.generationStatus
+                              : "Generate Email"}
+                          </button>
+                          <button
+                            onClick={() => {
+                              assessFitMutation.mutate(
+                                {
+                                  leadId: selectedLeadId!,
+                                  leadName:
+                                    selectedLead!.display_name ||
+                                    selectedLead!.name,
+                                  leadDescription: selectedLead!.description,
+                                  activities:
+                                    selectedLeadActivities?.activities || [],
+                                },
+                                {
+                                  onSuccess: (data) => {
+                                    setFitAssessment(data);
+                                    setViewMode("fit-assessment");
+                                  },
+                                },
+                              );
+                            }}
+                            disabled={
+                              assessFitMutation.isPending ||
+                              !selectedLeadActivities
+                            }
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-teal-700 bg-teal-50 hover:bg-teal-100 rounded-lg transition-colors disabled:opacity-50 cursor-pointer"
+                          >
+                            {assessFitMutation.isPending ? (
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
+                              <Target className="w-3.5 h-3.5" />
+                            )}
+                            {assessFitMutation.isPending
+                              ? assessFitMutation.assessmentStatus
+                              : "Assess Fit"}
+                          </button>
+                        </div>
                       </div>
                       {selectedLeadActivities && (
                         <div className="mb-3 flex flex-wrap gap-2 text-xs text-slate-600">
@@ -3367,6 +3456,67 @@ export default function CRMFacilityDetailsSidebar({
                         </div>
                       )}
                     </motion.div>
+
+                    {/* Fit Assessments History */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3 }}
+                      className="bg-white border border-slate-200 rounded-lg p-5"
+                    >
+                      <h3 className="text-sm font-semibold text-slate-900 tracking-wide flex items-center gap-2 mb-4">
+                        <Target className="w-4 h-4" />
+                        Fit Assessments
+                        {fitAssessments.length > 0 && (
+                          <span className="inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold text-white bg-teal-600 rounded-full">
+                            {fitAssessments.length}
+                          </span>
+                        )}
+                      </h3>
+                      {fitAssessments.length === 0 ? (
+                        <p className="text-xs text-slate-400">No fit assessments yet</p>
+                      ) : (
+                        <div className="space-y-2">
+                          {fitAssessments.map((fa) => {
+                            const verdictBadge = {
+                              strong_fit: { label: "Strong", className: "bg-emerald-100 text-emerald-700" },
+                              moderate_fit: { label: "Moderate", className: "bg-amber-100 text-amber-700" },
+                              weak_fit: { label: "Weak", className: "bg-orange-100 text-orange-700" },
+                              poor_fit: { label: "Poor", className: "bg-red-100 text-red-700" },
+                            }[fa.verdict] || { label: fa.verdict, className: "bg-slate-100 text-slate-700" };
+
+                            return (
+                              <button
+                                key={fa.id}
+                                onClick={() => {
+                                  setFitAssessment(fa);
+                                  setViewMode("fit-assessment");
+                                }}
+                                className="w-full text-left p-3 rounded-lg border border-slate-100 hover:border-teal-200 hover:bg-teal-50/50 transition-colors cursor-pointer"
+                              >
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${verdictBadge.className}`}>
+                                    {verdictBadge.label}
+                                  </span>
+                                  <span className="text-xs font-bold text-slate-700">{fa.overall_score}</span>
+                                  <span className="text-[10px] text-slate-400">
+                                    {new Date(fa.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                                  </span>
+                                </div>
+                                <p className="text-xs text-slate-600 line-clamp-2">
+                                  {fa.summary}
+                                </p>
+                                {fa.facility_name && (
+                                  <p className="text-[10px] text-slate-400 mt-0.5">
+                                    {fa.facility_name}
+                                  </p>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </motion.div>
                   </motion.div>
                 ) : viewMode === "call" && selectedActivityId ? (
                   <motion.div
@@ -3453,6 +3603,29 @@ export default function CRMFacilityDetailsSidebar({
                       }
                       closeLeadId={selectedLeadId!}
                     />
+                  </motion.div>
+                ) : viewMode === "fit-assessment" && fitAssessment ? (
+                  <motion.div
+                    key="fit-assessment-view"
+                    initial={{ x: 100, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: 100, opacity: 0 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    className="space-y-4"
+                  >
+                    <motion.button
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      onClick={() => {
+                        setViewMode("lead");
+                        setFitAssessment(null);
+                      }}
+                      className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                      Back to Lead
+                    </motion.button>
+                    <FitAssessmentDisplay assessment={fitAssessment} />
                   </motion.div>
                 ) : null}
               </AnimatePresence>
