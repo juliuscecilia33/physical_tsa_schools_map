@@ -1,11 +1,20 @@
 "use client";
 
-import { useState } from "react";
-import { Copy, Check, ChevronDown, ChevronUp, AlertCircle, ThumbsUp, Lightbulb, ThumbsDown, Pencil, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Copy, Check, ChevronDown, ChevronUp, AlertCircle, ThumbsUp, Lightbulb, ThumbsDown, Pencil, Loader2, Save, X } from "lucide-react";
 import { GeneratedEmail, EmailBreakdown } from "@/types/email-generation";
 import { CloseActivity } from "@/types/close";
 import { getActivityIcon, getActivityColor } from "./CloseActivityTimeline";
 import { useEmailFeedback } from "@/hooks/useEmailFeedback";
+import { useManualEmailEdit } from "@/hooks/useManualEmailEdit";
+
+const EDIT_SUGGESTIONS = [
+  "Make it shorter",
+  "Make it more formal",
+  "Emphasize the off-peak advantage",
+  "Add a paragraph about insurance coverage",
+  "Make the CTA stronger",
+];
 
 const TYPE_BADGES: Record<string, { label: string; className: string }> = {
   intro: { label: "Intro", className: "bg-emerald-100 text-emerald-700" },
@@ -103,19 +112,51 @@ export function GeneratedEmailDisplay({ email, contactEmail, contactName, isOutd
   const [isEditing, setIsEditing] = useState(false);
   const [showEditInput, setShowEditInput] = useState(false);
   const [editPrompt, setEditPrompt] = useState("");
+  const [isManualEditing, setIsManualEditing] = useState(false);
+  const [editSubject, setEditSubject] = useState(email.subject);
+  const [editBody, setEditBody] = useState(email.body_text);
+  useEffect(() => {
+    if (!isManualEditing) {
+      setEditSubject(email.subject);
+      setEditBody(email.body_text);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [email.subject, email.body_text]);
+
   const feedbackMutation = useEmailFeedback();
+  const manualEditMutation = useManualEmailEdit();
   const hasSavedFeedback = !!email.feedback_rating;
   const badge = TYPE_BADGES[email.email_type] || TYPE_BADGES.intro;
   const hasBreakdown = !!email.generation_context;
 
+  const handleManualEditStart = () => {
+    setEditSubject(email.subject);
+    setEditBody(email.body_text);
+    setIsManualEditing(true);
+  };
+
+  const handleManualEditCancel = () => {
+    setEditSubject(email.subject);
+    setEditBody(email.body_text);
+    setIsManualEditing(false);
+  };
+
+  const handleManualEditSave = () => {
+    manualEditMutation.mutate(
+      { emailId: email.id, closeLeadId, subject: editSubject, body_text: editBody },
+      { onSuccess: () => setIsManualEditing(false) }
+    );
+  };
+
   const handleCopy = async () => {
-    const text = `Subject: ${email.subject}\n\n${email.body_text}`;
+    const text = `Subject: ${editSubject}\n\n${editBody}`;
     await navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   return (
+    <>
     <div className="bg-white border border-gray-200 rounded-lg p-5 space-y-4">
       {isOutdated && (
         <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
@@ -131,6 +172,11 @@ export function GeneratedEmailDisplay({ email, contactEmail, contactName, isOutd
           Generated Email
         </h3>
         <div className="flex items-center gap-1.5">
+          {email.manually_edited_at && (
+            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
+              Manually Edited
+            </span>
+          )}
           {email.edit_instructions && (
             <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-violet-100 text-violet-700" title={email.edit_instructions}>
               Edited
@@ -154,51 +200,111 @@ export function GeneratedEmailDisplay({ email, contactEmail, contactName, isOutd
 
       <div>
         <p className="text-xs font-medium text-gray-500 mb-1">Subject</p>
-        <p className="text-sm font-semibold text-gray-900">{email.subject}</p>
+        {isManualEditing ? (
+          <input
+            type="text"
+            value={editSubject}
+            onChange={(e) => setEditSubject(e.target.value)}
+            className="w-full text-sm font-semibold text-gray-900 border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-blue-300"
+          />
+        ) : (
+          <p className="text-sm font-semibold text-gray-900">{editSubject}</p>
+        )}
       </div>
 
       <div>
         <p className="text-xs font-medium text-gray-500 mb-1">Body</p>
-        <div className="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed bg-gray-50 rounded-lg p-4 border border-gray-100">
-          {email.body_text}
-        </div>
+        {isManualEditing ? (
+          <textarea
+            value={editBody}
+            onChange={(e) => setEditBody(e.target.value)}
+            rows={12}
+            className="w-full text-sm text-gray-800 leading-relaxed bg-gray-50 rounded-lg p-4 border border-gray-200 resize-none focus:outline-none focus:ring-1 focus:ring-blue-300"
+          />
+        ) : (
+          <div className="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed bg-gray-50 rounded-lg p-4 border border-gray-100">
+            {editBody}
+          </div>
+        )}
       </div>
 
       <div className="flex items-center gap-2">
-        <button
-          onClick={handleCopy}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors cursor-pointer"
-        >
-          {copied ? (
-            <>
-              <Check className="w-3.5 h-3.5 text-green-600" />
-              Copied!
-            </>
-          ) : (
-            <>
-              <Copy className="w-3.5 h-3.5" />
-              Copy to Clipboard
-            </>
-          )}
-        </button>
-        {onEditSubmit && (
-          <button
-            onClick={() => setShowEditInput(!showEditInput)}
-            disabled={isRegenerating}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-violet-700 bg-violet-50 hover:bg-violet-100 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
-          >
-            {isRegenerating ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-            ) : (
+        {isManualEditing ? (
+          <>
+            <button
+              onClick={handleManualEditSave}
+              disabled={manualEditMutation.isPending}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+            >
+              <Save className="w-3.5 h-3.5" />
+              {manualEditMutation.isPending ? "Saving..." : "Save"}
+            </button>
+            <button
+              onClick={handleManualEditCancel}
+              disabled={manualEditMutation.isPending}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+            >
+              <X className="w-3.5 h-3.5" />
+              Cancel
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              onClick={handleCopy}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors cursor-pointer"
+            >
+              {copied ? (
+                <>
+                  <Check className="w-3.5 h-3.5 text-green-600" />
+                  Copied!
+                </>
+              ) : (
+                <>
+                  <Copy className="w-3.5 h-3.5" />
+                  Copy to Clipboard
+                </>
+              )}
+            </button>
+            <button
+              onClick={handleManualEditStart}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors cursor-pointer"
+            >
               <Pencil className="w-3.5 h-3.5" />
+              Edit
+            </button>
+            {onEditSubmit && (
+              <button
+                onClick={() => setShowEditInput(!showEditInput)}
+                disabled={isRegenerating}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-violet-700 bg-violet-50 hover:bg-violet-100 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+              >
+                {isRegenerating ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <Pencil className="w-3.5 h-3.5" />
+                )}
+                {isRegenerating ? "Editing..." : "Edit with AI"}
+              </button>
             )}
-            {isRegenerating ? "Editing..." : "Edit with AI"}
-          </button>
+          </>
         )}
       </div>
 
       {showEditInput && onEditSubmit && (
         <div className="space-y-2">
+          <div className="flex flex-wrap gap-1.5">
+            {EDIT_SUGGESTIONS.map((suggestion) => (
+              <button
+                key={suggestion}
+                onClick={() => setEditPrompt(suggestion)}
+                disabled={isRegenerating}
+                className="px-2.5 py-1 text-xs text-gray-600 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-full transition-colors cursor-pointer disabled:opacity-50"
+              >
+                {suggestion}
+              </button>
+            ))}
+          </div>
           <textarea
             value={editPrompt}
             onChange={(e) => setEditPrompt(e.target.value)}
@@ -219,44 +325,6 @@ export function GeneratedEmailDisplay({ email, contactEmail, contactName, isOutd
             className="px-3 py-1.5 text-xs font-medium text-white bg-violet-600 hover:bg-violet-700 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
           >
             Regenerate
-          </button>
-        </div>
-      )}
-
-      {mostRecentActivity && (
-        <div className="border-t border-gray-100 pt-3">
-          <p className="text-xs font-medium text-gray-500 mb-2">Most Recent Activity</p>
-          <button
-            onClick={() => {
-              if ((mostRecentActivity.type === "call" || mostRecentActivity.type === "email") && onActivityClick) {
-                onActivityClick(mostRecentActivity);
-              }
-            }}
-            className={`w-full flex items-center gap-3 p-3 rounded-lg border border-gray-200 text-left transition-colors ${
-              mostRecentActivity.type === "call" || mostRecentActivity.type === "email"
-                ? "hover:bg-gray-50 cursor-pointer"
-                : "cursor-default"
-            }`}
-          >
-            <div className={`flex items-center justify-center w-8 h-8 rounded-full border ${getActivityColor(mostRecentActivity)}`}>
-              {getActivityIcon(mostRecentActivity)}
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <span className={`text-xs font-medium px-1.5 py-0.5 rounded ${getActivityColor(mostRecentActivity)}`}>
-                  {mostRecentActivity.type.charAt(0).toUpperCase() + mostRecentActivity.type.slice(1)}
-                </span>
-                <span className="text-xs text-gray-400">
-                  {new Date(mostRecentActivity.date_created).toLocaleDateString()}
-                </span>
-              </div>
-              {mostRecentActivity.title && (
-                <p className="text-sm font-medium text-gray-900 truncate mt-0.5">{mostRecentActivity.title}</p>
-              )}
-              {mostRecentActivity.description && (
-                <p className="text-xs text-gray-500 line-clamp-1 mt-0.5">{mostRecentActivity.description}</p>
-              )}
-            </div>
           </button>
         </div>
       )}
@@ -362,5 +430,44 @@ export function GeneratedEmailDisplay({ email, contactEmail, contactName, isOutd
         </div>
       )}
     </div>
+
+    {mostRecentActivity && (
+      <div className="bg-white border border-gray-200 rounded-lg p-5">
+        <p className="text-xs font-medium text-gray-500 mb-2">Most Recent Activity</p>
+        <button
+          onClick={() => {
+            if ((mostRecentActivity.type === "call" || mostRecentActivity.type === "email") && onActivityClick) {
+              onActivityClick(mostRecentActivity);
+            }
+          }}
+          className={`w-full flex items-center gap-3 p-3 rounded-lg border border-gray-200 text-left transition-colors ${
+            mostRecentActivity.type === "call" || mostRecentActivity.type === "email"
+              ? "hover:bg-gray-50 cursor-pointer"
+              : "cursor-default"
+          }`}
+        >
+          <div className={`flex items-center justify-center w-8 h-8 rounded-full border ${getActivityColor(mostRecentActivity)}`}>
+            {getActivityIcon(mostRecentActivity)}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <span className={`text-xs font-medium px-1.5 py-0.5 rounded ${getActivityColor(mostRecentActivity)}`}>
+                {mostRecentActivity.type.charAt(0).toUpperCase() + mostRecentActivity.type.slice(1)}
+              </span>
+              <span className="text-xs text-gray-400">
+                {new Date(mostRecentActivity.date_created).toLocaleDateString()}
+              </span>
+            </div>
+            {mostRecentActivity.title && (
+              <p className="text-sm font-medium text-gray-900 truncate mt-0.5">{mostRecentActivity.title}</p>
+            )}
+            {mostRecentActivity.description && (
+              <p className="text-xs text-gray-500 line-clamp-1 mt-0.5">{mostRecentActivity.description}</p>
+            )}
+          </div>
+        </button>
+      </div>
+    )}
+    </>
   );
 }

@@ -34,6 +34,7 @@ export interface GeneratedEmail {
   feedback_at?: string | null;
   parent_email_id?: string | null;
   edit_instructions?: string | null;
+  manually_edited_at?: string | null;
 }
 
 export interface ActivitySummary {
