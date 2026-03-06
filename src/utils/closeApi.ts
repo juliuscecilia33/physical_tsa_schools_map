@@ -142,6 +142,23 @@ export class CloseApiClient {
     return this.request(`/lead/${leadId}/`);
   }
 
+  /**
+   * Search leads using Close CRM's natural text search
+   * GET /lead/?query=...
+   */
+  async searchLeads(query: string, limit: number = 25): Promise<{ data: any[]; total_results: number }> {
+    const queryString = this.buildQueryString({
+      query,
+      _limit: limit,
+      _fields: 'id,name,display_name,status_id,status_label,description,contacts,addresses,date_created,date_updated,url',
+    });
+    const response = await this.request<{ has_more: boolean; data: any[] }>(`/lead/${queryString}`);
+    return {
+      data: response.data,
+      total_results: response.data.length,
+    };
+  }
+
   // ============================================
   // Contact Endpoints
   // ============================================

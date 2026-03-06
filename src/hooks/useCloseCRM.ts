@@ -224,6 +224,41 @@ export function useCloseLeadActivities(
 }
 
 // ============================================
+// Lead Search
+// ============================================
+
+/**
+ * Search leads across all data using Close CRM's Advanced Filtering API
+ * Only triggers when query is at least 2 characters
+ */
+export function useSearchCloseLeads(query: string): UseQueryResult<{
+  leads: CloseLead[];
+  totalResults: number;
+}> {
+  return useQuery({
+    queryKey: ['close', 'leads', 'search', query],
+    queryFn: async () => {
+      const response = await fetch('/api/close/leads/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query, limit: 25 }),
+      });
+      const data = await response.json();
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to search leads');
+      }
+      return {
+        leads: data.data as CloseLead[],
+        totalResults: data.total_results as number,
+      };
+    },
+    enabled: query.length >= 2,
+    staleTime: 2 * 60 * 1000,
+    gcTime: 5 * 60 * 1000,
+  });
+}
+
+// ============================================
 // Contacts
 // ============================================
 
