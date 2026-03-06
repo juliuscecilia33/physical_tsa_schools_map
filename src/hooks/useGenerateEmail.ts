@@ -10,6 +10,12 @@ const STATUS_STEPS = [
   "Almost done...",
 ];
 
+const EDIT_STATUS_STEPS = [
+  "Applying edits...",
+  "Regenerating...",
+  "Almost done...",
+];
+
 export function useGenerateEmail() {
   const queryClient = useQueryClient();
   const [generationStatus, setGenerationStatus] = useState("idle");
@@ -29,6 +35,10 @@ export function useGenerateEmail() {
       leadDescription?: string;
       contacts?: CloseContact[];
       activities: CloseActivity[];
+      editInstructions?: string;
+      parentEmailId?: string;
+      parentEmailSubject?: string;
+      parentEmailBody?: string;
     }): Promise<GeneratedEmail> => {
       const contact = params.contacts?.[0];
       const contactName = contact?.name;
@@ -87,6 +97,12 @@ export function useGenerateEmail() {
             contactEmail,
             contactTitle,
             activities,
+            ...(params.editInstructions && {
+              editInstructions: params.editInstructions,
+              parentEmailId: params.parentEmailId,
+              parentEmailSubject: params.parentEmailSubject,
+              parentEmailBody: params.parentEmailBody,
+            }),
           }),
           signal: controller.signal,
         });
@@ -108,10 +124,11 @@ export function useGenerateEmail() {
         throw err;
       }
     },
-    onMutate: () => {
+    onMutate: (params) => {
       clearTimers();
-      setGenerationStatus(STATUS_STEPS[0]);
-      STATUS_STEPS.slice(1).forEach((step, i) => {
+      const steps = params.editInstructions ? EDIT_STATUS_STEPS : STATUS_STEPS;
+      setGenerationStatus(steps[0]);
+      steps.slice(1).forEach((step, i) => {
         timerRef.current.push(setTimeout(() => setGenerationStatus(step), (i + 1) * 2500));
       });
     },

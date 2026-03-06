@@ -186,8 +186,8 @@ export async function POST(request: NextRequest) {
   try {
     console.log(`[generate-email] START`);
     const body: GenerateEmailRequest = await request.json();
-    const { leadId, activities } = body;
-    console.log(`[generate-email] Lead: ${leadId}, activities: ${activities?.length ?? 0}`);
+    const { leadId, activities, editInstructions, parentEmailId, parentEmailSubject, parentEmailBody } = body;
+    console.log(`[generate-email] Lead: ${leadId}, activities: ${activities?.length ?? 0}${editInstructions ? ', edit mode' : ''}`);
 
     if (!leadId || !activities) {
       return NextResponse.json(
@@ -252,11 +252,15 @@ export async function POST(request: NextRequest) {
 
     console.log(`[generate-email] FETCH — ${dbActivities?.length ?? 0} activities, ${previousEmails?.length ?? 0} prev emails @ ${Date.now() - startTime}ms`);
 
-    const userMessage = buildUserMessage(
+    let userMessage = buildUserMessage(
       body,
       dbActivities || [],
       (previousEmails || []).reverse()
     );
+
+    if (editInstructions && parentEmailSubject && parentEmailBody) {
+      userMessage += `\n--- EDIT REQUEST ---\nThe user wants you to revise the following email based on their instructions.\n\nORIGINAL EMAIL:\nSubject: ${parentEmailSubject}\nBody: ${parentEmailBody}\n\nUSER'S EDIT INSTRUCTIONS:\n${editInstructions}\n\nRevise the email according to these instructions. Keep the same email type. Maintain the same general structure unless the instructions say otherwise.\n`;
+    }
     console.log(`[generate-email] PROMPT — ${userMessage.length} chars (~${Math.round(userMessage.length / 4)} tokens) @ ${Date.now() - startTime}ms`);
 
     // Call Gemini API
@@ -300,6 +304,8 @@ export async function POST(request: NextRequest) {
         email_type: parsed.emailType,
         reasoning: parsed.reasoning,
         generation_context: parsed.breakdown ?? null,
+        parent_email_id: parentEmailId || null,
+        edit_instructions: editInstructions || null,
       })
       .select()
       .single();

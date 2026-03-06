@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Copy, Check, ChevronDown, ChevronUp, AlertCircle, ThumbsUp, Lightbulb, ThumbsDown } from "lucide-react";
+import { Copy, Check, ChevronDown, ChevronUp, AlertCircle, ThumbsUp, Lightbulb, ThumbsDown, Pencil, Loader2 } from "lucide-react";
 import { GeneratedEmail, EmailBreakdown } from "@/types/email-generation";
 import { CloseActivity } from "@/types/close";
 import { getActivityIcon, getActivityColor } from "./CloseActivityTimeline";
@@ -21,6 +21,8 @@ interface Props {
   closeLeadId: string;
   mostRecentActivity?: CloseActivity;
   onActivityClick?: (activity: CloseActivity) => void;
+  onEditSubmit?: (instructions: string) => void;
+  isRegenerating?: boolean;
 }
 
 function BreakdownRenderer({ breakdown }: { breakdown: EmailBreakdown }) {
@@ -92,13 +94,15 @@ const RATING_OPTIONS = [
   { value: "bad" as const, label: "Not useful", icon: ThumbsDown, activeClass: "bg-red-100 text-red-700 border-red-300", hoverClass: "hover:bg-red-50" },
 ];
 
-export function GeneratedEmailDisplay({ email, contactEmail, contactName, isOutdated, closeLeadId, mostRecentActivity, onActivityClick }: Props) {
+export function GeneratedEmailDisplay({ email, contactEmail, contactName, isOutdated, closeLeadId, mostRecentActivity, onActivityClick, onEditSubmit, isRegenerating }: Props) {
   const [copied, setCopied] = useState(false);
   const [showReasoning, setShowReasoning] = useState(false);
   const [feedbackRating, setFeedbackRating] = useState<"used" | "helpful" | "bad" | null>(email.feedback_rating ?? null);
   const [feedbackNote, setFeedbackNote] = useState(email.feedback_note ?? "");
   const [showNoteInput, setShowNoteInput] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [showEditInput, setShowEditInput] = useState(false);
+  const [editPrompt, setEditPrompt] = useState("");
   const feedbackMutation = useEmailFeedback();
   const hasSavedFeedback = !!email.feedback_rating;
   const badge = TYPE_BADGES[email.email_type] || TYPE_BADGES.intro;
@@ -126,9 +130,16 @@ export function GeneratedEmailDisplay({ email, contactEmail, contactName, isOutd
         <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">
           Generated Email
         </h3>
-        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${badge.className}`}>
-          {badge.label}
-        </span>
+        <div className="flex items-center gap-1.5">
+          {email.edit_instructions && (
+            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-violet-100 text-violet-700" title={email.edit_instructions}>
+              Edited
+            </span>
+          )}
+          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${badge.className}`}>
+            {badge.label}
+          </span>
+        </div>
       </div>
 
       {(contactName || contactEmail) && (
@@ -170,7 +181,47 @@ export function GeneratedEmailDisplay({ email, contactEmail, contactName, isOutd
             </>
           )}
         </button>
+        {onEditSubmit && (
+          <button
+            onClick={() => setShowEditInput(!showEditInput)}
+            disabled={isRegenerating}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-violet-700 bg-violet-50 hover:bg-violet-100 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+          >
+            {isRegenerating ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <Pencil className="w-3.5 h-3.5" />
+            )}
+            {isRegenerating ? "Editing..." : "Edit with AI"}
+          </button>
+        )}
       </div>
+
+      {showEditInput && onEditSubmit && (
+        <div className="space-y-2">
+          <textarea
+            value={editPrompt}
+            onChange={(e) => setEditPrompt(e.target.value)}
+            placeholder="Describe how to edit this email... (e.g., &quot;make it shorter&quot;, &quot;add a paragraph about insurance coverage&quot;)"
+            rows={3}
+            disabled={isRegenerating}
+            className="w-full text-sm border border-gray-200 rounded-lg p-3 resize-none focus:outline-none focus:ring-1 focus:ring-violet-300 disabled:opacity-50"
+          />
+          <button
+            onClick={() => {
+              if (editPrompt.trim()) {
+                onEditSubmit(editPrompt.trim());
+                setEditPrompt("");
+                setShowEditInput(false);
+              }
+            }}
+            disabled={!editPrompt.trim() || isRegenerating}
+            className="px-3 py-1.5 text-xs font-medium text-white bg-violet-600 hover:bg-violet-700 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+          >
+            Regenerate
+          </button>
+        </div>
+      )}
 
       {mostRecentActivity && (
         <div className="border-t border-gray-100 pt-3">

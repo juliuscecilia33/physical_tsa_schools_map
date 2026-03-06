@@ -32,6 +32,8 @@ export interface GeneratedEmail {
   feedback_rating?: 'used' | 'helpful' | 'bad' | null;
   feedback_note?: string | null;
   feedback_at?: string | null;
+  parent_email_id?: string | null;
+  edit_instructions?: string | null;
 }
 
 export interface ActivitySummary {
@@ -61,4 +63,8 @@ export interface GenerateEmailRequest {
   contactEmail?: string;
   contactTitle?: string;
   activities: ActivitySummary[];
+  editInstructions?: string;
+  parentEmailId?: string;
+  parentEmailSubject?: string;
+  parentEmailBody?: string;
 }

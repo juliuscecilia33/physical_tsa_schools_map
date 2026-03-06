@@ -122,6 +122,28 @@ export function LeadDetailsSidebar({
   const generateEmailMutation = useGenerateEmail();
   const { data: generatedEmails = [] } = useGeneratedEmails(leadId);
 
+  const handleEditEmail = (instructions: string) => {
+    if (!generatedEmail || !lead) return;
+    generateEmailMutation.mutate(
+      {
+        leadId: leadId!,
+        leadName: lead.display_name || lead.name,
+        leadDescription: lead.description,
+        contacts: lead.contacts,
+        activities: activitiesData?.activities || [],
+        editInstructions: instructions,
+        parentEmailId: generatedEmail.id,
+        parentEmailSubject: generatedEmail.subject,
+        parentEmailBody: generatedEmail.body_text,
+      },
+      {
+        onSuccess: (data) => {
+          setGeneratedEmail(data);
+        },
+      }
+    );
+  };
+
   const latestActivityDate = useMemo(() => {
     const activities = activitiesData?.activities;
     if (!activities?.length) return 0;
@@ -1471,6 +1493,8 @@ export function LeadDetailsSidebar({
                       closeLeadId={leadId!}
                       mostRecentActivity={activitiesData?.activities?.[0]}
                       onActivityClick={handleActivityClick}
+                      onEditSubmit={handleEditEmail}
+                      isRegenerating={generateEmailMutation.isPending}
                     />
                   </motion.div>
                 ) : null}
