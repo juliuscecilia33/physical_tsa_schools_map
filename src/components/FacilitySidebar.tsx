@@ -1298,7 +1298,7 @@ function FacilitySidebarInner({
         animate={{ x: 0 }}
         exit={{ x: "-100%" }}
         transition={{ type: "spring", damping: 25, stiffness: 200 }}
-        className="fixed top-[1vh] left-20 h-[98vh] w-full md:w-[440px] bg-white shadow-2xl rounded-2xl z-50 flex flex-col overflow-hidden font-poppins"
+        className="fixed top-[1vh] left-20 h-[98vh] w-full md:w-[500px] bg-white shadow-2xl rounded-2xl z-50 flex flex-col overflow-hidden font-poppins"
       >
         {/* Header with gradient */}
         <div className="sticky top-0 bg-white border-b border-slate-200 z-20">
@@ -1997,7 +1997,15 @@ function FacilitySidebarInner({
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: idx * 0.05 }}
-                            className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-white border-2 border-blue-200 shadow-sm"
+                            className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-white border-2 border-blue-200 shadow-sm cursor-pointer hover:border-blue-400 transition-colors"
+                            onClick={() => {
+                              const lead = leadsMap[link.close_lead_id];
+                              const isLoading = leadQueries[idx]?.isLoading;
+                              if (!isLoading && lead) {
+                                setSelectedLeadId(link.close_lead_id);
+                                setViewMode("lead");
+                              }
+                            }}
                           >
                             {(() => {
                               const lead = leadsMap[link.close_lead_id];
@@ -2070,12 +2078,13 @@ function FacilitySidebarInner({
                                       View Details
                                     </button>
                                     <button
-                                      onClick={() =>
+                                      onClick={(e) => {
+                                        e.stopPropagation();
                                         handleUnlinkLead(
                                           link.id,
                                           link.close_lead_id,
-                                        )
-                                      }
+                                        );
+                                      }}
                                       disabled={deleteLinkMutation.isPending}
                                       className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 hover:border-red-300 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                                     >
@@ -3102,6 +3111,14 @@ function FacilitySidebarInner({
                               onSuccess: (data) => {
                                 setFitAssessment(data);
                                 setViewMode("fit-assessment");
+                                // Add Fit Assessment tag to local state
+                                if (data.place_id) {
+                                  const FIT_TAG_ID = "e1f0b490-d88b-403e-ba18-2c7e39d27b57";
+                                  setFacilityTags((prev) => {
+                                    if (prev.some((t) => t.id === FIT_TAG_ID)) return prev;
+                                    return [...prev, { id: FIT_TAG_ID, name: "Fit Assessment", color: "#14b8a6", description: null }];
+                                  });
+                                }
                               },
                             },
                           );
@@ -3419,7 +3436,7 @@ function FacilitySidebarInner({
                   <ChevronLeft className="w-4 h-4" />
                   Back to Lead
                 </motion.button>
-                <FitAssessmentDisplay assessment={fitAssessment} />
+                <FitAssessmentDisplay assessment={fitAssessment} openingHours={displayFacility?.opening_hours} />
               </motion.div>
             ) : null}
           </AnimatePresence>

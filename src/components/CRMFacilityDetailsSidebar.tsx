@@ -3346,6 +3346,14 @@ export default function CRMFacilityDetailsSidebar({
                                   onSuccess: (data) => {
                                     setFitAssessment(data);
                                     setViewMode("fit-assessment");
+                                    // Add Fit Assessment tag to local state
+                                    if (data.place_id) {
+                                      const FIT_TAG_ID = "e1f0b490-d88b-403e-ba18-2c7e39d27b57";
+                                      setFacilityTags((prev) => {
+                                        if (prev.some((t) => t.id === FIT_TAG_ID)) return prev;
+                                        return [...prev, { id: FIT_TAG_ID, name: "Fit Assessment", color: "#14b8a6", description: null }];
+                                      });
+                                    }
                                   },
                                 },
                               );
@@ -3668,7 +3676,7 @@ export default function CRMFacilityDetailsSidebar({
                       <ChevronLeft className="w-4 h-4" />
                       Back to Lead
                     </motion.button>
-                    <FitAssessmentDisplay assessment={fitAssessment} />
+                    <FitAssessmentDisplay assessment={fitAssessment} openingHours={facility?.opening_hours} />
                   </motion.div>
                 ) : null}
               </AnimatePresence>

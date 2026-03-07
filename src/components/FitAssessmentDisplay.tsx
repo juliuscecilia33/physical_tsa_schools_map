@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ChevronDown, ChevronUp, AlertCircle, Database, Clock, MessageSquare } from "lucide-react";
 import { FitAssessment, FitScoreBreakdown, DimensionAnalysis, FitVerdict } from "@/types/fit-assessment";
+import { OpeningHours } from "@/types/facility";
 
 const VERDICT_CONFIG: Record<FitVerdict, { label: string; className: string }> = {
   strong_fit: { label: "Strong Fit", className: "bg-emerald-100 text-emerald-700 border-emerald-300" },
@@ -44,10 +45,12 @@ function DimensionBar({
   dimension,
   score,
   weight,
+  openingHours,
 }: {
   dimension: DimensionAnalysis | undefined;
   score: number;
   weight: string;
+  openingHours?: OpeningHours;
 }) {
   const [expanded, setExpanded] = useState(false);
   const label = dimension?.label || "Unknown";
@@ -127,6 +130,31 @@ function DimensionBar({
               ))}
             </div>
           )}
+
+          {openingHours && (
+            <div className="bg-gray-50 rounded-md p-2 space-y-1.5">
+              <div className="flex items-center gap-1.5">
+                <Clock className="w-3 h-3 text-gray-500" />
+                <p className="font-semibold text-gray-700">Facility Hours</p>
+                {openingHours.open_now !== undefined && (
+                  <span className={`ml-auto text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
+                    openingHours.open_now
+                      ? "bg-emerald-100 text-emerald-700"
+                      : "bg-red-100 text-red-700"
+                  }`}>
+                    {openingHours.open_now ? "Open Now" : "Closed"}
+                  </span>
+                )}
+              </div>
+              {openingHours.weekday_text && (
+                <ul className="space-y-0.5">
+                  {openingHours.weekday_text.map((line, i) => (
+                    <li key={i} className="text-gray-500">{line}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -135,9 +163,10 @@ function DimensionBar({
 
 interface Props {
   assessment: FitAssessment;
+  openingHours?: OpeningHours;
 }
 
-export function FitAssessmentDisplay({ assessment }: Props) {
+export function FitAssessmentDisplay({ assessment, openingHours }: Props) {
   const verdict = VERDICT_CONFIG[assessment.verdict] || VERDICT_CONFIG.poor_fit;
   const reasoning = assessment.reasoning as FitScoreBreakdown | null;
 
@@ -213,6 +242,7 @@ export function FitAssessmentDisplay({ assessment }: Props) {
             dimension={reasoning?.[key]}
             score={assessment[`${key}_score` as keyof FitAssessment] as number}
             weight={weight}
+            openingHours={key === "availability" ? openingHours : undefined}
           />
         ))}
       </div>

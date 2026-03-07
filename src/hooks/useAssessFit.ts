@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect, useRef } from "react";
 import { FitAssessment, ActivitySummary } from "@/types/fit-assessment";
 import { CloseActivity } from "@/types/close";
+import { updateFacilityTags } from "@/utils/facilityCache";
 
 const STATUS_STEPS = [
   "Syncing activities...",
@@ -106,10 +107,36 @@ export function useAssessFit() {
         timerRef.current.push(setTimeout(() => setAssessmentStatus(step), (i + 1) * 2500));
       });
     },
-    onSuccess: (_data, variables) => {
+    onSuccess: (data, variables) => {
       clearTimers();
       setAssessmentStatus("idle");
       queryClient.invalidateQueries({ queryKey: ["fit-assessments", variables.leadId] });
+
+      // Optimistically update facility tags cache with the Fit Assessment tag
+      if (data.place_id) {
+        const FIT_ASSESSMENT_TAG_ID = "e1f0b490-d88b-403e-ba18-2c7e39d27b57";
+        const FIT_ASSESSMENT_TAG = {
+          id: FIT_ASSESSMENT_TAG_ID,
+          name: "Fit Assessment",
+          color: "#14b8a6",
+          description: null,
+        };
+
+        const queryCache = queryClient.getQueryCache();
+        const segments = ["serpapi", "background"] as const;
+        for (const segment of segments) {
+          const query = queryCache.find({ queryKey: ["facilities", segment] });
+          const facilities = query?.state.data as any[] | undefined;
+          const facility = facilities?.find((f: any) => f.place_id === data.place_id);
+          if (facility) {
+            const currentTags = facility.tags || [];
+            if (!currentTags.some((t: any) => t.id === FIT_ASSESSMENT_TAG_ID)) {
+              updateFacilityTags(queryClient, data.place_id, [...currentTags, FIT_ASSESSMENT_TAG]);
+            }
+            break;
+          }
+        }
+      }
     },
     onError: () => {
       clearTimers();

@@ -1581,7 +1581,7 @@ export function LeadDetailsSidebar({
                       <ChevronLeft className="w-4 h-4" />
                       Back to Lead
                     </motion.button>
-                    <FitAssessmentDisplay assessment={fitAssessment} />
+                    <FitAssessmentDisplay assessment={fitAssessment} openingHours={facilities.find(f => f.place_id === fitAssessment.place_id)?.opening_hours} />
                   </motion.div>
                 ) : viewMode === "generated-email" && generatedEmail ? (
                   <motion.div

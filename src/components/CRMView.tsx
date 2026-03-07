@@ -21,6 +21,7 @@ import {
   ChevronRight,
   Map as MapIcon,
   Eye,
+  ClipboardCheck,
 } from "lucide-react";
 import { FacilityLightweight } from "@/types/facility";
 import { useLoading } from "@/contexts/LoadingContext";
@@ -616,7 +617,9 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState(() => {
     const tab = searchParams.get("tab");
-    return tab && ["facilities", "analytics", "close"].includes(tab) ? tab : "facilities";
+    return tab && ["facilities", "analytics", "close"].includes(tab)
+      ? tab
+      : "facilities";
   });
 
   useEffect(() => {
@@ -799,10 +802,16 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
   // Sort facilities by tag priority: all 3 tags first, then Close Data + SerpAPI, then rest
   const sortedFacilities = [...filteredFacilities].sort((a, b) => {
     const getScore = (f: typeof a) => {
-      const tagIds = f.tags?.map(t => t.id) || [];
-      const hasSerpAPI = tagIds.includes('e326fe36-5536-4209-87ed-f99528e1d1ee');
-      const hasCloseData = tagIds.includes('ef3537b6-4d83-4eb8-84a5-9bc74e776c72');
-      const hasFitAssessment = tagIds.includes('e1f0b490-d88b-403e-ba18-2c7e39d27b57');
+      const tagIds = f.tags?.map((t) => t.id) || [];
+      const hasSerpAPI = tagIds.includes(
+        "e326fe36-5536-4209-87ed-f99528e1d1ee",
+      );
+      const hasCloseData = tagIds.includes(
+        "ef3537b6-4d83-4eb8-84a5-9bc74e776c72",
+      );
+      const hasFitAssessment = tagIds.includes(
+        "e1f0b490-d88b-403e-ba18-2c7e39d27b57",
+      );
       if (hasSerpAPI && hasCloseData && hasFitAssessment) return 0;
       if (hasSerpAPI && hasCloseData) return 1;
       return 2;
@@ -825,6 +834,10 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
   ).length;
   const facilitiesWithPartnership = facilities.filter((f) =>
     f.tags?.some((t) => t.id === "9482dd4a-e7c1-4b90-8bb6-31df7bdb10e4"),
+  ).length;
+
+  const facilitiesWithFitAssessment = facilities.filter((f) =>
+    f.tags?.some((t) => t.id === "e1f0b490-d88b-403e-ba18-2c7e39d27b57"),
   ).length;
 
   // Calculate display count for "Total Facilities" card
@@ -892,7 +905,7 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
             className="space-y-8"
           >
             {/* Metrics Row */}
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-5">
+            <div className="grid grid-cols-2 md:grid-cols-6 gap-5">
               <SummaryCard
                 label="Total Facilities"
                 value={displayTotalFacilities}
@@ -909,7 +922,7 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
                 icon={Users}
               />
               <SummaryCard
-                label="Scraped with SerpAPI"
+                label="Scraped by SerpAPI"
                 value={facilitiesWithSerpAPI}
                 icon={Globe}
               />
@@ -917,6 +930,11 @@ export default function CRMView({ isVisible }: { isVisible: boolean }) {
                 label="Active Partnerships"
                 value={facilitiesWithPartnership}
                 icon={Star}
+              />
+              <SummaryCard
+                label="Has Fit Assessment"
+                value={facilitiesWithFitAssessment}
+                icon={ClipboardCheck}
               />
             </div>
 
