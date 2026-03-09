@@ -173,9 +173,6 @@ export default function CRMFacilityDetailsSidebar({
   const {
     data: facility,
     isLoading: isLoadingDetails,
-    truncated,
-    totalReviews,
-    fetchFullDetails,
   } = useFacilityDetails(placeId || null, !!placeId);
 
   const [loadingImages, setLoadingImages] = useState<{
@@ -191,7 +188,6 @@ export default function CRMFacilityDetailsSidebar({
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
   const additionalPhotoScrollRef = useRef<HTMLDivElement>(null);
-  const hasTriggeredFullLoad = useRef(false);
   const [showAdditionalLeftArrow, setShowAdditionalLeftArrow] = useState(false);
   const [showAdditionalRightArrow, setShowAdditionalRightArrow] =
     useState(false);
@@ -1302,14 +1298,6 @@ export default function CRMFacilityDetailsSidebar({
       additionalPhotoScrollRef.current;
     setShowAdditionalLeftArrow(scrollLeft > 0);
     setShowAdditionalRightArrow(scrollLeft < scrollWidth - clientWidth - 1);
-
-    // Auto-load full details when scrolled near the end
-    if (truncated && !hasTriggeredFullLoad.current) {
-      if (scrollLeft + clientWidth >= scrollWidth - 300) {
-        hasTriggeredFullLoad.current = true;
-        fetchFullDetails();
-      }
-    }
   };
 
   // Handle review images scroll
@@ -1366,7 +1354,6 @@ export default function CRMFacilityDetailsSidebar({
 
   // Update arrows for additional photos when loaded or facility changes
   useEffect(() => {
-    hasTriggeredFullLoad.current = false;
     updateAdditionalPhotoArrows();
     const scrollContainer = additionalPhotoScrollRef.current;
     if (scrollContainer) {
@@ -1792,7 +1779,7 @@ export default function CRMFacilityDetailsSidebar({
                         >
                           <div className="flex items-center justify-between mb-3">
                             <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
-                              Scraped Photos ({truncated ? '...' : combinedPhotos.length})
+                              Scraped Photos ({combinedPhotos.length})
                             </h3>
                             <button
                               onClick={() => {
@@ -2798,7 +2785,6 @@ export default function CRMFacilityDetailsSidebar({
                               </h3>
                               <button
                                 onClick={() => {
-                                  if (truncated) fetchFullDetails();
                                   setIsAdditionalReviewsModalOpen(true);
                                 }}
                                 className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
@@ -3013,14 +2999,6 @@ export default function CRMFacilityDetailsSidebar({
                                   ? "Show Less"
                                   : `Show More (${facility.additional_reviews.length - 10} more reviews)`}
                               </motion.button>
-                            )}
-                            {truncated && totalReviews > 10 && (
-                              <button
-                                onClick={fetchFullDetails}
-                                className="w-full mt-2 py-2.5 text-sm font-medium text-amber-600 hover:bg-amber-50 rounded-xl transition-colors border border-amber-200 hover:border-amber-400 cursor-pointer"
-                              >
-                                Load all {totalReviews} reviews
-                              </button>
                             )}
                           </motion.div>
                         </>
@@ -3867,7 +3845,7 @@ export default function CRMFacilityDetailsSidebar({
                 <div className="flex items-center justify-between p-6 border-b border-slate-200 bg-gradient-to-r from-white to-slate-50">
                   <div>
                     <h2 className="text-xl font-medium text-slate-900">
-                      Scraped Photos ({truncated ? '...' : combinedPhotos.length})
+                      Scraped Photos ({combinedPhotos.length})
                     </h2>
                   </div>
                   <button

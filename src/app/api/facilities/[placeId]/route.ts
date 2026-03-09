@@ -27,9 +27,6 @@ export async function GET(
       );
     }
 
-    const { searchParams } = new URL(request.url);
-    const full = searchParams.get("full") === "true";
-
     // Call RPC function directly via SQL
     const result = await sql`
       SELECT * FROM get_facility_full_by_place_id(
@@ -76,8 +73,8 @@ export async function GET(
       cleaned_up: data.cleaned_up,
       has_notes: data.has_notes,
       tags: data.tags || [],
-      additional_photos: full ? allPhotos : allPhotos.slice(0, 10),
-      additional_reviews: full ? allReviews : allReviews.slice(0, 10),
+      additional_photos: allPhotos,
+      additional_reviews: allReviews,
       serp_scraped: data.serp_scraped,
       serp_scraped_at: data.serp_scraped_at,
       total_photo_count: data.total_photo_count,
@@ -87,7 +84,6 @@ export async function GET(
     return NextResponse.json(
       {
         facility,
-        truncated: !full && (allPhotos.length > 10 || allReviews.length > 10),
         totalPhotos: allPhotos.length,
         totalReviews: allReviews.length,
       },

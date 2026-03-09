@@ -190,9 +190,6 @@ function FacilitySidebarInner({
   const {
     data: fullFacility,
     isLoading: isLoadingDetails,
-    truncated,
-    totalReviews,
-    fetchFullDetails,
   } = useFacilityDetails(facility?.place_id || null, !!facility);
 
   // Use full facility data if available, otherwise fall back to lightweight data
@@ -217,7 +214,6 @@ function FacilitySidebarInner({
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
   const additionalPhotoScrollRef = useRef<HTMLDivElement>(null);
-  const hasTriggeredFullLoad = useRef(false);
   const [showAdditionalLeftArrow, setShowAdditionalLeftArrow] = useState(false);
   const [showAdditionalRightArrow, setShowAdditionalRightArrow] =
     useState(false);
@@ -551,16 +547,6 @@ function FacilitySidebarInner({
   ) => {
     const fullResUrl = photoData.image || photoData.url || photoData.thumbnail;
     const baseUrl = highRes ? fullResUrl : photoData.thumbnail;
-
-    // Try to optimize Supabase Storage images with transformation API
-    // If transformation fails (404), browser will fall back to original URL
-    if (!highRes && baseUrl.includes("supabase.co/storage")) {
-      // More aggressive compression for faster preview loading
-      // width=280: Match display size exactly (280px × 180px)
-      // quality=60: Lower quality but acceptable for thumbnails (~40% smaller files)
-      // resize=cover: Crop to fill dimensions for consistent aspect ratio
-      return `${baseUrl}?width=280&quality=60&resize=cover`;
-    }
 
     return baseUrl;
   };
@@ -1171,14 +1157,6 @@ function FacilitySidebarInner({
       additionalPhotoScrollRef.current;
     setShowAdditionalLeftArrow(scrollLeft > 0);
     setShowAdditionalRightArrow(scrollLeft < scrollWidth - clientWidth - 1);
-
-    // Auto-load full details when scrolled near the end
-    if (truncated && !hasTriggeredFullLoad.current) {
-      if (scrollLeft + clientWidth >= scrollWidth - 300) {
-        hasTriggeredFullLoad.current = true;
-        fetchFullDetails();
-      }
-    }
   };
 
   // Handle review images scroll
@@ -1235,7 +1213,6 @@ function FacilitySidebarInner({
 
   // Update arrows for additional photos when loaded or facility changes
   useEffect(() => {
-    hasTriggeredFullLoad.current = false;
     updateAdditionalPhotoArrows();
     const scrollContainer = additionalPhotoScrollRef.current;
     if (scrollContainer) {
@@ -1587,7 +1564,7 @@ function FacilitySidebarInner({
                     >
                       <div className="flex items-center justify-between mb-3">
                         <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
-                          Scraped Photos ({truncated ? (facility?.total_photo_count || combinedPhotos.length) : combinedPhotos.length})
+                          Scraped Photos ({combinedPhotos.length})
                         </h3>
                         <button
                           onClick={() => {
@@ -1657,6 +1634,9 @@ function FacilitySidebarInner({
                                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 hover:scale-110"
                                 referrerPolicy="no-referrer"
                                 loading={idx < 5 ? "eager" : "lazy"}
+                                decoding="async"
+                                width={280}
+                                height={180}
                               />
                               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity" />
                               {photo.type === "scraped" &&
@@ -2465,7 +2445,6 @@ function FacilitySidebarInner({
                           </h3>
                           <button
                             onClick={() => {
-                              if (truncated) fetchFullDetails();
                               setIsAdditionalReviewsModalOpen(true);
                             }}
                             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
@@ -2686,14 +2665,6 @@ function FacilitySidebarInner({
                               ? "Show Less"
                               : `Show More (${displayFacility.additional_reviews.length - 10} more reviews)`}
                           </motion.button>
-                        )}
-                        {truncated && totalReviews > 10 && (
-                          <button
-                            onClick={fetchFullDetails}
-                            className="w-full mt-2 py-2.5 text-sm font-medium text-amber-600 hover:bg-amber-50 rounded-xl transition-colors border border-amber-200 hover:border-amber-400 cursor-pointer"
-                          >
-                            Load all {totalReviews} reviews
-                          </button>
                         )}
                       </motion.div>
 

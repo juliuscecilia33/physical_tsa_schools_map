@@ -1,8 +1,8 @@
 {
-  "processedCount": 165,
-  "successCount": 85,
-  "failedCount": 81,
-  "skippedCount": 107,
+  "processedCount": 169,
+  "successCount": 88,
+  "failedCount": 82,
+  "skippedCount": 186,
   "processedFacilityIds": [
     "fe41e2b9-7c1c-4104-893d-75c6c5e3b12e",
     "028cb98a-02c0-4f18-aa60-4801f9c08de4",
@@ -168,16 +168,20 @@
     "3bf32ca6-9c9a-40ce-84b6-495c478dbc33",
     "6264004b-8f13-4cba-8868-f36893113ca3",
     "d282d19c-0844-4e72-ae97-034112595729",
-    "7c4e2e86-1340-41f4-94e9-a4b62a727276"
+    "7c4e2e86-1340-41f4-94e9-a4b62a727276",
+    "93d8e201-8b74-4dab-8c97-87989d859906",
+    "da17e602-d332-4365-9365-5f390b811ffd",
+    "43a3142a-6480-4a37-a0ca-39da8da49fa8",
+    "21fe7f1e-4f04-43ba-bba7-41b0d222301e"
   ],
-  "imagesProcessed": 2489,
+  "imagesProcessed": 2636,
   "imagesSkipped": 3338,
-  "imagesFailed": 184,
-  "deletionsSucceeded": 2489,
+  "imagesFailed": 185,
+  "deletionsSucceeded": 2636,
   "deletionsFailed": 0,
-  "totalBytesBefore": 6478235592,
-  "totalBytesAfter": 2674318056,
-  "lastUpdated": "2026-03-09T20:29:13.492Z",
+  "totalBytesBefore": 6714270534,
+  "totalBytesAfter": 2745058664,
+  "lastUpdated": "2026-03-09T20:56:54.752Z",
   "errors": [
     {
       "facility_id": "fe41e2b9-7c1c-4104-893d-75c6c5e3b12e",
@@ -1466,6 +1470,13 @@
       "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/6264004b-8f13-4cba-8868-f36893113ca3/1772159427777_28.jpg",
       "error": "Failed to upload compressed image",
       "timestamp": "2026-03-09T20:12:49.687Z"
+    },
+    {
+      "facility_id": "da17e602-d332-4365-9365-5f390b811ffd",
+      "facility_name": "House Of Hoopz",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/da17e602-d332-4365-9365-5f390b811ffd/1772220858869_26.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T20:50:57.765Z"
     }
   ]
 }
