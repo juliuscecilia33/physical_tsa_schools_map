@@ -1579,21 +1579,30 @@ export default function CRMFacilityDetailsSidebar({
             </div>
             {/* Quick Actions Bar */}
             {facility && viewMode === "facility" && (
-              <div className="px-6 py-2 border-t border-slate-100 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-                    onClick={handleQuickAddNote}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer ${noteFlash ? 'ring-2 ring-blue-300' : ''}`}>
-                    <StickyNote className="w-3.5 h-3.5" /> Add Note
-                    <kbd className="ml-1 px-1.5 py-0.5 text-[10px] font-mono bg-blue-500/30 rounded">N</kbd>
-                  </motion.button>
-                  <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-                    onClick={handleQuickAddTag}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all cursor-pointer ${tagFlash ? 'ring-2 ring-blue-300' : ''}`}>
-                    <Tag className="w-3.5 h-3.5" /> Add Tag
-                    <kbd className="ml-1 px-1.5 py-0.5 text-[10px] font-mono bg-slate-200 rounded">T</kbd>
-                  </motion.button>
-                </div>
+              <div className="px-6 py-3 border-t border-slate-100 flex items-center justify-start gap-6">
+                <motion.button
+                  whileHover={{ scale: 1.08 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleQuickAddNote}
+                  className={`flex flex-col items-center gap-1.5 cursor-pointer group ${noteFlash ? 'scale-105' : ''}`}
+                >
+                  <div className="w-11 h-11 rounded-full bg-blue-50 group-hover:bg-blue-100 border border-blue-200 flex items-center justify-center transition-all">
+                    <StickyNote className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <span className="text-[11px] font-medium text-slate-600">Note</span>
+                </motion.button>
+
+                <motion.button
+                  whileHover={{ scale: 1.08 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleQuickAddTag}
+                  className={`flex flex-col items-center gap-1.5 cursor-pointer group ${tagFlash ? 'scale-105' : ''}`}
+                >
+                  <div className="w-11 h-11 rounded-full bg-slate-50 group-hover:bg-slate-100 border border-slate-200 flex items-center justify-center transition-all">
+                    <Tag className="w-5 h-5 text-slate-600" />
+                  </div>
+                  <span className="text-[11px] font-medium text-slate-600">Tag</span>
+                </motion.button>
               </div>
             )}
           </div>

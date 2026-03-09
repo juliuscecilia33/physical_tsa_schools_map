@@ -1,7 +1,7 @@
 {
-  "processedCount": 169,
+  "processedCount": 170,
   "successCount": 88,
-  "failedCount": 82,
+  "failedCount": 83,
   "skippedCount": 186,
   "processedFacilityIds": [
     "fe41e2b9-7c1c-4104-893d-75c6c5e3b12e",
@@ -172,16 +172,17 @@
     "93d8e201-8b74-4dab-8c97-87989d859906",
     "da17e602-d332-4365-9365-5f390b811ffd",
     "43a3142a-6480-4a37-a0ca-39da8da49fa8",
-    "21fe7f1e-4f04-43ba-bba7-41b0d222301e"
+    "21fe7f1e-4f04-43ba-bba7-41b0d222301e",
+    "d99fd4bd-ad1f-4519-9cbb-cfceb16077ac"
   ],
-  "imagesProcessed": 2636,
+  "imagesProcessed": 2672,
   "imagesSkipped": 3338,
-  "imagesFailed": 185,
-  "deletionsSucceeded": 2636,
+  "imagesFailed": 187,
+  "deletionsSucceeded": 2672,
   "deletionsFailed": 0,
-  "totalBytesBefore": 6714270534,
-  "totalBytesAfter": 2745058664,
-  "lastUpdated": "2026-03-09T20:56:54.752Z",
+  "totalBytesBefore": 6840608572,
+  "totalBytesAfter": 2802230074,
+  "lastUpdated": "2026-03-09T21:07:27.340Z",
   "errors": [
     {
       "facility_id": "fe41e2b9-7c1c-4104-893d-75c6c5e3b12e",
@@ -1477,6 +1478,20 @@
       "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/da17e602-d332-4365-9365-5f390b811ffd/1772220858869_26.jpg",
       "error": "Failed to download image",
       "timestamp": "2026-03-09T20:50:57.765Z"
+    },
+    {
+      "facility_id": "d99fd4bd-ad1f-4519-9cbb-cfceb16077ac",
+      "facility_name": "Pecan Valley Golf Course",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d99fd4bd-ad1f-4519-9cbb-cfceb16077ac/1772246668265_17.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T21:03:59.743Z"
+    },
+    {
+      "facility_id": "d99fd4bd-ad1f-4519-9cbb-cfceb16077ac",
+      "facility_name": "Pecan Valley Golf Course",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d99fd4bd-ad1f-4519-9cbb-cfceb16077ac/1772246680688_26.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-09T21:05:10.131Z"
     }
   ]
 }

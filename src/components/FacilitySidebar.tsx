@@ -187,10 +187,8 @@ function FacilitySidebarInner({
   const contentRef = useRef<HTMLDivElement>(null);
 
   // Fetch full facility details including reviews and additional data
-  const {
-    data: fullFacility,
-    isLoading: isLoadingDetails,
-  } = useFacilityDetails(facility?.place_id || null, !!facility);
+  const { data: fullFacility, isLoading: isLoadingDetails } =
+    useFacilityDetails(facility?.place_id || null, !!facility);
 
   // Use full facility data if available, otherwise fall back to lightweight data
   const displayFacility = fullFacility || facility;
@@ -267,7 +265,12 @@ function FacilitySidebarInner({
 
   // Linked leads state & hooks
   const [viewMode, setViewMode] = useState<
-    "facility" | "lead" | "call" | "email" | "generated-email" | "fit-assessment"
+    | "facility"
+    | "lead"
+    | "call"
+    | "email"
+    | "generated-email"
+    | "fit-assessment"
   >("facility");
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
   const [selectedActivityId, setSelectedActivityId] = useState<string | null>(
@@ -276,7 +279,9 @@ function FacilitySidebarInner({
   const [generatedEmail, setGeneratedEmail] = useState<GeneratedEmail | null>(
     null,
   );
-  const [fitAssessment, setFitAssessment] = useState<FitAssessment | null>(null);
+  const [fitAssessment, setFitAssessment] = useState<FitAssessment | null>(
+    null,
+  );
   const [aboutExpanded, setAboutExpanded] = useState(false);
   const [contactsExpanded, setContactsExpanded] = useState(false);
   const [customFieldsExpanded, setCustomFieldsExpanded] = useState(false);
@@ -304,14 +309,20 @@ function FacilitySidebarInner({
   const handleQuickAddNote = () => {
     setIsAddNoteModalOpen(true);
     setTimeout(() => {
-      notesSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      notesSectionRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
     }, 100);
   };
 
   const handleQuickAddTag = () => {
     setIsTagManagementModalOpen(true);
     setTimeout(() => {
-      tagsSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      tagsSectionRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
     }, 100);
   };
 
@@ -333,7 +344,7 @@ function FacilitySidebarInner({
         onSuccess: (data) => {
           setGeneratedEmail(data);
         },
-      }
+      },
     );
   };
 
@@ -480,26 +491,37 @@ function FacilitySidebarInner({
   useEffect(() => {
     const handleQuickActionKeys = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
-      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) return;
-      if (viewMode !== 'facility') return;
-      if (isTagManagementModalOpen || isAddNoteModalOpen || isPhotoViewerOpen) return;
+      if (
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.isContentEditable
+      )
+        return;
+      if (viewMode !== "facility") return;
+      if (isTagManagementModalOpen || isAddNoteModalOpen || isPhotoViewerOpen)
+        return;
 
-      if (e.key === 'n' || e.key === 'N') {
+      if (e.key === "n" || e.key === "N") {
         e.preventDefault();
         setNoteFlash(true);
         setTimeout(() => setNoteFlash(false), 150);
         handleQuickAddNote();
       }
-      if (e.key === 't' || e.key === 'T') {
+      if (e.key === "t" || e.key === "T") {
         e.preventDefault();
         setTagFlash(true);
         setTimeout(() => setTagFlash(false), 150);
         handleQuickAddTag();
       }
     };
-    window.addEventListener('keydown', handleQuickActionKeys);
-    return () => window.removeEventListener('keydown', handleQuickActionKeys);
-  }, [viewMode, isTagManagementModalOpen, isAddNoteModalOpen, isPhotoViewerOpen]);
+    window.addEventListener("keydown", handleQuickActionKeys);
+    return () => window.removeEventListener("keydown", handleQuickActionKeys);
+  }, [
+    viewMode,
+    isTagManagementModalOpen,
+    isAddNoteModalOpen,
+    isPhotoViewerOpen,
+  ]);
 
   // Sync facility tags from displayFacility when it changes
   useEffect(() => {
@@ -601,7 +623,6 @@ function FacilitySidebarInner({
 
     return photos;
   }, [displayFacility?.additional_photos, displayFacility?.additional_reviews]);
-
 
   // Add new note
   const handleAddNote = async (noteText: string, selectedPhoto: any) => {
@@ -1388,21 +1409,30 @@ function FacilitySidebarInner({
           </div>
           {/* Quick Actions Bar */}
           {displayFacility && viewMode === "facility" && (
-            <div className="px-6 py-2 border-t border-slate-100 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-                  onClick={handleQuickAddNote}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer ${noteFlash ? 'ring-2 ring-blue-300' : ''}`}>
-                  <StickyNote className="w-3.5 h-3.5" /> Add Note
-                  <kbd className="ml-1 px-1.5 py-0.5 text-[10px] font-mono bg-blue-500/30 rounded">N</kbd>
-                </motion.button>
-                <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-                  onClick={handleQuickAddTag}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all cursor-pointer ${tagFlash ? 'ring-2 ring-blue-300' : ''}`}>
-                  <Tag className="w-3.5 h-3.5" /> Add Tag
-                  <kbd className="ml-1 px-1.5 py-0.5 text-[10px] font-mono bg-slate-200 rounded">T</kbd>
-                </motion.button>
-              </div>
+            <div className="px-6 py-3 border-t border-slate-100 flex items-center justify-start gap-6">
+              <motion.button
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleQuickAddNote}
+                className={`flex flex-col items-center gap-1.5 cursor-pointer group ${noteFlash ? 'scale-105' : ''}`}
+              >
+                <div className="w-11 h-11 rounded-full bg-blue-50 group-hover:bg-blue-100 border border-blue-200 flex items-center justify-center transition-all">
+                  <StickyNote className="w-5 h-5 text-blue-600" />
+                </div>
+                <span className="text-[11px] font-medium text-slate-600">Note</span>
+              </motion.button>
+
+              <motion.button
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleQuickAddTag}
+                className={`flex flex-col items-center gap-1.5 cursor-pointer group ${tagFlash ? 'scale-105' : ''}`}
+              >
+                <div className="w-11 h-11 rounded-full bg-slate-50 group-hover:bg-slate-100 border border-slate-200 flex items-center justify-center transition-all">
+                  <Tag className="w-5 h-5 text-slate-600" />
+                </div>
+                <span className="text-[11px] font-medium text-slate-600">Tag</span>
+              </motion.button>
             </div>
           )}
         </div>
@@ -1524,7 +1554,10 @@ function FacilitySidebarInner({
                     <h3 className="text-sm font-medium text-slate-700 tracking-wide mb-3">
                       Scraped Photos{" "}
                       <span className="text-slate-500 tabular-nums">
-                        ({facility?.total_photo_count || displayFacility.total_photo_count})
+                        (
+                        {facility?.total_photo_count ||
+                          displayFacility.total_photo_count}
+                        )
                       </span>
                     </h3>
                     <div className="flex gap-3 overflow-x-auto scrollbar-hide">
@@ -1552,10 +1585,10 @@ function FacilitySidebarInner({
                 {displayFacility.serp_scraped && combinedPhotos.length > 0 && (
                   <>
                     {/* Divider - only show if regular photos were displayed above */}
-                    {displayFacility.photo_references &&
+                    {/* {displayFacility.photo_references &&
                       displayFacility.photo_references.length > 0 && (
                         <div className="border-t border-slate-200"></div>
-                      )}
+                      )} */}
 
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
@@ -1608,7 +1641,7 @@ function FacilitySidebarInner({
                             msOverflowStyle: "none",
                           }}
                         >
-                        {combinedPhotos.map((photo, idx) => (
+                          {combinedPhotos.map((photo, idx) => (
                             <div
                               key={`combined-${idx}`}
                               onClick={() => {
@@ -1672,7 +1705,7 @@ function FacilitySidebarInner({
                                 </div>
                               )}
                             </div>
-                        ))}
+                          ))}
                         </div>
                       </div>
                     </motion.div>
@@ -2667,9 +2700,6 @@ function FacilitySidebarInner({
                           </motion.button>
                         )}
                       </motion.div>
-
-                      {/* Divider */}
-                      <div className="border-t border-slate-200"></div>
                     </>
                   )}
 
@@ -3037,7 +3067,9 @@ function FacilitySidebarInner({
                       className="bg-white border border-slate-200 rounded-lg p-5"
                     >
                       <button
-                        onClick={() => setCustomFieldsExpanded(!customFieldsExpanded)}
+                        onClick={() =>
+                          setCustomFieldsExpanded(!customFieldsExpanded)
+                        }
                         className="w-full flex items-center justify-between cursor-pointer"
                       >
                         <h3 className="text-sm font-semibold text-slate-900 tracking-wide">
@@ -3086,7 +3118,8 @@ function FacilitySidebarInner({
                             {
                               leadId: selectedLeadId!,
                               leadName:
-                                selectedLead!.display_name || selectedLead!.name,
+                                selectedLead!.display_name ||
+                                selectedLead!.name,
                               leadDescription: selectedLead!.description,
                               contacts: selectedLead!.contacts,
                               activities:
@@ -3121,7 +3154,8 @@ function FacilitySidebarInner({
                             {
                               leadId: selectedLeadId!,
                               leadName:
-                                selectedLead!.display_name || selectedLead!.name,
+                                selectedLead!.display_name ||
+                                selectedLead!.name,
                               leadDescription: selectedLead!.description,
                               activities:
                                 selectedLeadActivities?.activities || [],
@@ -3132,10 +3166,20 @@ function FacilitySidebarInner({
                                 setViewMode("fit-assessment");
                                 // Add Fit Assessment tag to local state
                                 if (data.place_id) {
-                                  const FIT_TAG_ID = "e1f0b490-d88b-403e-ba18-2c7e39d27b57";
+                                  const FIT_TAG_ID =
+                                    "e1f0b490-d88b-403e-ba18-2c7e39d27b57";
                                   setFacilityTags((prev) => {
-                                    if (prev.some((t) => t.id === FIT_TAG_ID)) return prev;
-                                    return [...prev, { id: FIT_TAG_ID, name: "Fit Assessment", color: "#14b8a6", description: null }];
+                                    if (prev.some((t) => t.id === FIT_TAG_ID))
+                                      return prev;
+                                    return [
+                                      ...prev,
+                                      {
+                                        id: FIT_TAG_ID,
+                                        name: "Fit Assessment",
+                                        color: "#14b8a6",
+                                        description: null,
+                                      },
+                                    ];
                                   });
                                 }
                               },
@@ -3143,8 +3187,7 @@ function FacilitySidebarInner({
                           );
                         }}
                         disabled={
-                          assessFitMutation.isPending ||
-                          !selectedLeadActivities
+                          assessFitMutation.isPending || !selectedLeadActivities
                         }
                         className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-teal-700 bg-teal-50 hover:bg-teal-100 rounded-lg transition-colors disabled:opacity-50 cursor-pointer"
                       >
@@ -3302,16 +3345,33 @@ function FacilitySidebarInner({
                     )}
                   </h3>
                   {fitAssessments.length === 0 ? (
-                    <p className="text-xs text-slate-400">No fit assessments yet</p>
+                    <p className="text-xs text-slate-400">
+                      No fit assessments yet
+                    </p>
                   ) : (
                     <div className="space-y-2">
                       {fitAssessments.map((fa) => {
                         const verdictBadge = {
-                          strong_fit: { label: "Strong", className: "bg-emerald-100 text-emerald-700" },
-                          moderate_fit: { label: "Moderate", className: "bg-amber-100 text-amber-700" },
-                          weak_fit: { label: "Weak", className: "bg-orange-100 text-orange-700" },
-                          poor_fit: { label: "Poor", className: "bg-red-100 text-red-700" },
-                        }[fa.verdict] || { label: fa.verdict, className: "bg-slate-100 text-slate-700" };
+                          strong_fit: {
+                            label: "Strong",
+                            className: "bg-emerald-100 text-emerald-700",
+                          },
+                          moderate_fit: {
+                            label: "Moderate",
+                            className: "bg-amber-100 text-amber-700",
+                          },
+                          weak_fit: {
+                            label: "Weak",
+                            className: "bg-orange-100 text-orange-700",
+                          },
+                          poor_fit: {
+                            label: "Poor",
+                            className: "bg-red-100 text-red-700",
+                          },
+                        }[fa.verdict] || {
+                          label: fa.verdict,
+                          className: "bg-slate-100 text-slate-700",
+                        };
 
                         return (
                           <button
@@ -3323,12 +3383,23 @@ function FacilitySidebarInner({
                             className="w-full text-left p-3 rounded-lg border border-slate-100 hover:border-teal-200 hover:bg-teal-50/50 transition-colors cursor-pointer"
                           >
                             <div className="flex items-center gap-2 mb-1">
-                              <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${verdictBadge.className}`}>
+                              <span
+                                className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${verdictBadge.className}`}
+                              >
                                 {verdictBadge.label}
                               </span>
-                              <span className="text-xs font-bold text-slate-700">{fa.overall_score}</span>
+                              <span className="text-xs font-bold text-slate-700">
+                                {fa.overall_score}
+                              </span>
                               <span className="text-[10px] text-slate-400">
-                                {new Date(fa.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                                {new Date(fa.created_at).toLocaleDateString(
+                                  "en-US",
+                                  {
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric",
+                                  },
+                                )}
                               </span>
                             </div>
                             <p className="text-xs text-slate-600 line-clamp-2">
@@ -3455,7 +3526,10 @@ function FacilitySidebarInner({
                   <ChevronLeft className="w-4 h-4" />
                   Back to Lead
                 </motion.button>
-                <FitAssessmentDisplay assessment={fitAssessment} openingHours={displayFacility?.opening_hours} />
+                <FitAssessmentDisplay
+                  assessment={fitAssessment}
+                  openingHours={displayFacility?.opening_hours}
+                />
               </motion.div>
             ) : null}
           </AnimatePresence>
