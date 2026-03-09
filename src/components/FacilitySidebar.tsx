@@ -1377,11 +1377,11 @@ function FacilitySidebarInner({
               transition={{ delay: 0.1 }}
               className="flex-1 pr-4"
             >
-              <div className="flex items-center gap-2 mb-2">
-                <h2 className="text-xl font-bold text-slate-900 leading-tight">
-                  {displayFacility.name}
-                </h2>
-                {displayFacility.business_status && (
+              <h2 className="text-xl font-bold text-slate-900 leading-tight mb-1">
+                {displayFacility.name}
+              </h2>
+              {displayFacility.business_status && (
+                <div className="mb-2">
                   <span
                     className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${
                       displayFacility.business_status === "OPERATIONAL"
@@ -1401,8 +1401,8 @@ function FacilitySidebarInner({
                       </>
                     )}
                   </span>
-                )}
-              </div>
+                </div>
+              )}
               {getCityState(displayFacility.address) && (
                 <div className="flex items-center gap-1.5 mb-2">
                   <MapPin className="w-3.5 h-3.5 text-slate-400" />
@@ -1427,10 +1427,10 @@ function FacilitySidebarInner({
             </motion.div>
             <button
               onClick={onClose}
-              className="flex-shrink-0 p-2 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+              className="flex-shrink-0 p-2 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors cursor-pointer border border-slate-200"
               aria-label="Close"
             >
-              <X className="w-5 h-5" />
+              <X className="w-5 h-5 text-slate-600" />
             </button>
           </div>
           {/* Quick Actions Bar */}
