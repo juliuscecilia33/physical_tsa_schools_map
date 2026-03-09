@@ -40,6 +40,7 @@ export interface FitAssessment {
   had_reviews: boolean;
   had_opening_hours: boolean;
   activity_count: number;
+  notes: string | null;
   created_at: string;
 }
 

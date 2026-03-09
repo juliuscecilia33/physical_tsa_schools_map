@@ -573,6 +573,7 @@ function FacilitySidebarInner({
     return photos;
   }, [displayFacility?.additional_photos, displayFacility?.additional_reviews]);
 
+
   // Add new note
   const handleAddNote = async (noteText: string, selectedPhoto: any) => {
     if (!noteText.trim() || !displayFacility || !facility) return;
@@ -1524,11 +1525,10 @@ function FacilitySidebarInner({
                     >
                       <div className="flex items-center justify-between mb-3">
                         <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
-                          Scraped Photos ({combinedPhotos.length})
+                          Scraped Photos ({truncated ? (displayFacility.total_photo_count || combinedPhotos.length) : combinedPhotos.length})
                         </h3>
                         <button
                           onClick={() => {
-                            if (truncated) fetchFullDetails();
                             setIsAdditionalPhotosModalOpen(true);
                           }}
                           className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
@@ -1569,14 +1569,9 @@ function FacilitySidebarInner({
                             msOverflowStyle: "none",
                           }}
                         >
-                          {combinedPhotos.map((photo, idx) => (
-                            <motion.div
+                        {combinedPhotos.map((photo, idx) => (
+                            <div
                               key={`combined-${idx}`}
-                              initial={{ opacity: 0, scale: 0.9 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              transition={{
-                                delay: 0.1 + Math.min(idx * 0.05, 0.5),
-                              }}
                               onClick={() => {
                                 if (photo.type === "review") {
                                   openReviewPhotoViewer(
@@ -1593,24 +1588,13 @@ function FacilitySidebarInner({
                               className="relative overflow-hidden rounded-2xl shadow-sm hover:shadow-xl transition-all cursor-pointer flex-shrink-0 snap-start"
                               style={{ width: "280px", height: "180px" }}
                             >
-                              {loadingImages[`combined-${idx}`] !== false && (
-                                <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />
-                              )}
+                              <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />
                               <img
                                 src={photo.url}
                                 alt={`${displayFacility.name} photo ${idx + 1}`}
-                                className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
+                                className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 hover:scale-110"
                                 referrerPolicy="no-referrer"
                                 loading={idx < 5 ? "eager" : "lazy"}
-                                onLoadStart={() =>
-                                  handleImageLoadStart(`combined-${idx}`)
-                                }
-                                onLoad={() =>
-                                  handleImageLoad(`combined-${idx}`)
-                                }
-                                onError={() =>
-                                  handleImageLoad(`combined-${idx}`)
-                                }
                               />
                               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity" />
                               {photo.type === "scraped" &&
@@ -1645,8 +1629,8 @@ function FacilitySidebarInner({
                                   )}
                                 </div>
                               )}
-                            </motion.div>
-                          ))}
+                            </div>
+                        ))}
                         </div>
                       </div>
                     </motion.div>
@@ -3548,11 +3532,8 @@ function FacilitySidebarInner({
                 <div className="p-6 overflow-y-auto max-h-[calc(85vh-80px)]">
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {combinedPhotos.map((photo, idx) => (
-                      <motion.div
+                      <div
                         key={`modal-combined-${idx}`}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: idx * 0.03 }}
                         onClick={() => {
                           if (photo.type === "review") {
                             openReviewPhotoViewer(
@@ -3566,23 +3547,13 @@ function FacilitySidebarInner({
                         }}
                         className="relative overflow-hidden rounded-2xl shadow-sm hover:shadow-xl transition-all cursor-pointer aspect-square group"
                       >
-                        {loadingImages[`modal-combined-${idx}`] !== false && (
-                          <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />
-                        )}
+                        <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />
                         <img
                           src={photo.url}
                           alt={`${displayFacility.name} photo ${idx + 1}`}
-                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                          className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                           referrerPolicy="no-referrer"
-                          onLoadStart={() =>
-                            handleImageLoadStart(`modal-combined-${idx}`)
-                          }
-                          onLoad={() =>
-                            handleImageLoad(`modal-combined-${idx}`)
-                          }
-                          onError={() =>
-                            handleImageLoad(`modal-combined-${idx}`)
-                          }
+                          loading="lazy"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-2">
                           <span className="text-white text-xs font-medium">
@@ -3618,7 +3589,7 @@ function FacilitySidebarInner({
                             )}
                           </div>
                         )}
-                      </motion.div>
+                      </div>
                     ))}
                   </div>
                 </div>

@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { ChevronDown, ChevronUp, AlertCircle, Database, Clock, MessageSquare } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { ChevronDown, ChevronUp, AlertCircle, Database, Clock, MessageSquare, Pencil } from "lucide-react";
 import { FitAssessment, FitScoreBreakdown, DimensionAnalysis, FitVerdict } from "@/types/fit-assessment";
 import { OpeningHours } from "@/types/facility";
+import { useUpdateFitAssessmentNotes } from "@/hooks/useUpdateFitAssessmentNotes";
 
 const VERDICT_CONFIG: Record<FitVerdict, { label: string; className: string }> = {
   strong_fit: { label: "Strong Fit", className: "bg-emerald-100 text-emerald-700 border-emerald-300" },
@@ -170,6 +171,35 @@ export function FitAssessmentDisplay({ assessment, openingHours }: Props) {
   const verdict = VERDICT_CONFIG[assessment.verdict] || VERDICT_CONFIG.poor_fit;
   const reasoning = assessment.reasoning as FitScoreBreakdown | null;
 
+  const [isEditing, setIsEditing] = useState(false);
+  const [notesDraft, setNotesDraft] = useState(assessment.notes ?? "");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const updateNotes = useUpdateFitAssessmentNotes();
+
+  useEffect(() => {
+    if (isEditing && textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [isEditing]);
+
+  const handleSave = () => {
+    updateNotes.mutate(
+      {
+        assessmentId: assessment.id,
+        closeLeadId: assessment.close_lead_id,
+        notes: notesDraft,
+      },
+      {
+        onSuccess: () => setIsEditing(false),
+      }
+    );
+  };
+
+  const handleCancel = () => {
+    setNotesDraft(assessment.notes ?? "");
+    setIsEditing(false);
+  };
+
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-5 space-y-5">
       <div className="flex items-center justify-between">
@@ -245,6 +275,56 @@ export function FitAssessmentDisplay({ assessment, openingHours }: Props) {
             openingHours={key === "availability" ? openingHours : undefined}
           />
         ))}
+      </div>
+
+      {/* Notes */}
+      <div className="space-y-2">
+        <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Notes</h4>
+        {isEditing ? (
+          <div className="space-y-2">
+            <textarea
+              ref={textareaRef}
+              value={notesDraft}
+              onChange={(e) => setNotesDraft(e.target.value)}
+              disabled={updateNotes.isPending}
+              placeholder="Add your notes..."
+              className="w-full text-sm text-gray-700 border border-gray-300 rounded-md p-2 resize-y min-h-[80px] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
+            />
+            <div className="flex gap-2">
+              <button
+                onClick={handleSave}
+                disabled={updateNotes.isPending}
+                className="text-xs font-medium px-3 py-1.5 rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+              >
+                {updateNotes.isPending ? "Saving..." : "Save"}
+              </button>
+              <button
+                onClick={handleCancel}
+                disabled={updateNotes.isPending}
+                className="text-xs font-medium px-3 py-1.5 rounded-md border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : assessment.notes ? (
+          <div className="group relative bg-gray-50 border border-gray-200 rounded-md p-3">
+            <p className="text-sm text-gray-700 whitespace-pre-wrap">{assessment.notes}</p>
+            <button
+              onClick={() => { setNotesDraft(assessment.notes ?? ""); setIsEditing(true); }}
+              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-gray-200"
+            >
+              <Pencil className="w-3 h-3 text-gray-500" />
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => { setNotesDraft(""); setIsEditing(true); }}
+            className="text-xs text-gray-400 hover:text-gray-600 font-medium"
+          >
+            + Add notes
+          </button>
+        )}
       </div>
 
       {/* Timestamp */}

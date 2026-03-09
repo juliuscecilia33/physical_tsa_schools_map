@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Facility } from "@/types/facility";
 
@@ -17,15 +18,20 @@ export function useFacilityDetails(placeId: string | null, enabled: boolean = tr
 
   const query = useQuery<FacilityDetailsResponse | null>({
     queryKey: ["facility", "full", placeId],
-    queryFn: async () => {
+    queryFn: async ({ queryKey }) => {
       if (!placeId) return null;
+
+      // If we already have non-truncated (full) data cached, refetch with ?full=true
+      // to prevent stale refetch from overwriting full data with truncated data
+      const existing = queryClient.getQueryData<FacilityDetailsResponse>(queryKey);
+      const needFull = existing && !existing.truncated;
 
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 15000);
 
       try {
         const response = await fetch(
-          `/api/facilities/${encodeURIComponent(placeId)}`,
+          `/api/facilities/${encodeURIComponent(placeId)}${needFull ? '?full=true' : ''}`,
           { signal: controller.signal }
         );
         clearTimeout(timeout);
@@ -70,6 +76,19 @@ export function useFacilityDetails(placeId: string | null, enabled: boolean = tr
       clearTimeout(timeout);
     }
   };
+
+  // Auto-fetch full details when we get truncated data
+  const autoFetchedRef = useRef(false);
+  useEffect(() => {
+    if (query.data?.truncated && !autoFetchedRef.current) {
+      autoFetchedRef.current = true;
+      fetchFullDetails();
+    }
+    // Reset when placeId changes
+    if (!query.data) {
+      autoFetchedRef.current = false;
+    }
+  }, [query.data?.truncated, placeId]);
 
   return {
     data: query.data?.facility ?? null,
