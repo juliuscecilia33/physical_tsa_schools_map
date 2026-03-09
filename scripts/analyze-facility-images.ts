@@ -27,7 +27,7 @@ const genAI = new GoogleGenerativeAI(geminiApiKey);
 
 // Configuration
 const DRY_RUN = false; // Set to false to write results to DB
-const TEST_LIMIT: number | null = 10; // Set to null for full run
+const TEST_LIMIT: number | null = 5; // Set to null for full run
 const BATCH_SIZE = 10; // Images per Gemini call
 const DELAY_BETWEEN_GEMINI_CALLS_MS = 4000; // ~15 RPM
 const CONCURRENCY_LIMIT = 5; // Parallel image downloads
@@ -531,19 +531,32 @@ async function processFacility(
   );
 
   // Build enriched additional_photos with scores merged in
-  const enrichedPhotos = (facility.additional_photos || []).map((photo: any) => {
-    const photoUrl = getPhotoUrl(photo);
-    const analysis = allResults.find((r) => r.url === photoUrl);
-    if (analysis) {
-      return {
-        ...photo,
-        usefulness_score: analysis.usefulness_score,
-        category: analysis.category,
-        description: analysis.description,
-      };
-    }
-    return photo;
-  });
+  const enrichedPhotos = (facility.additional_photos || []).map(
+    (photo: any) => {
+      const photoUrl = getPhotoUrl(photo);
+      const analysis = allResults.find((r) => r.url === photoUrl);
+      if (analysis) {
+        return {
+          ...photo,
+          usefulness_score: analysis.usefulness_score,
+          category: analysis.category,
+          description: analysis.description,
+        };
+      }
+      return photo;
+    },
+  );
+
+  // Build review image analysis array for the new column
+  const reviewImageAnalysis = allResults
+    .filter((r) => r.source === "review")
+    .map((r) => ({
+      url: r.url,
+      review_index: r.review_index,
+      usefulness_score: r.usefulness_score,
+      category: r.category,
+      description: r.description,
+    }));
 
   // Write to DB
   if (!DRY_RUN) {
@@ -552,10 +565,13 @@ async function processFacility(
         UPDATE sports_facilities
         SET
           additional_photos = ${sql.json(enrichedPhotos)},
+          review_images_analysis = ${sql.json(reviewImageAnalysis)},
           photos_analyzed = true
         WHERE id = ${facility.id}
       `;
-      console.log(`   💾 Saved to database (additional_photos enriched, photos_analyzed=true)`);
+      console.log(
+        `   💾 Saved to database (additional_photos enriched, review_images_analysis=${reviewImageAnalysis.length} entries, photos_analyzed=true)`,
+      );
     } catch (error: any) {
       console.log(`   ❌ DB update failed: ${error.message}`);
       progress.failedCount++;
@@ -570,7 +586,9 @@ async function processFacility(
       return;
     }
   } else {
-    console.log(`   🔍 DRY RUN: Would save enriched additional_photos + photos_analyzed=true to database`);
+    console.log(
+      `   🔍 DRY RUN: Would save enriched additional_photos + review_images_analysis (${reviewImageAnalysis.length} entries) + photos_analyzed=true to database`,
+    );
   }
 
   progress.successCount++;

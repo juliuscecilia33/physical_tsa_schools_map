@@ -78,6 +78,7 @@ export async function GET(
       serp_scraped: data.serp_scraped,
       serp_scraped_at: data.serp_scraped_at,
       total_photo_count: data.total_photo_count,
+      review_images_analysis: data.review_images_analysis || [],
     };
 
     // Return the facility with cache headers and truncation metadata

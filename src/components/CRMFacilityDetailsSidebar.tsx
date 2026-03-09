@@ -1189,7 +1189,18 @@ export default function CRMFacilityDetailsSidebar({
       reviewUserThumbnail?: string;
       reviewUserName?: string;
       reviewRating?: number;
+      usefulnessScore?: number;
     }> = [];
+
+    // Build a lookup map for review image analysis scores
+    const reviewAnalysisMap: Record<string, number> = {};
+    if (facility.review_images_analysis) {
+      facility.review_images_analysis.forEach((entry: any) => {
+        if (entry.url && entry.usefulness_score != null) {
+          reviewAnalysisMap[entry.url] = entry.usefulness_score;
+        }
+      });
+    }
 
     // Add all scraped photos first
     if (facility.additional_photos) {
@@ -1199,6 +1210,7 @@ export default function CRMFacilityDetailsSidebar({
           type: "scraped",
           scrapedIndex: idx,
           data: photoData,
+          usefulnessScore: photoData.usefulness_score,
         });
       });
     }
@@ -1217,6 +1229,7 @@ export default function CRMFacilityDetailsSidebar({
               reviewUserName:
                 review.user?.name || review.author_name || "Anonymous",
               reviewRating: review.rating,
+              usefulnessScore: reviewAnalysisMap[imageUrl],
             });
           });
         }
@@ -1224,7 +1237,7 @@ export default function CRMFacilityDetailsSidebar({
     }
 
     return photos;
-  }, [facility?.additional_photos, facility?.additional_reviews]);
+  }, [facility?.additional_photos, facility?.additional_reviews, facility?.review_images_analysis]);
 
   const formatSportType = (type: string) => {
     return type
@@ -1976,6 +1989,11 @@ export default function CRMFacilityDetailsSidebar({
                                     loading={idx < 5 ? "eager" : "lazy"}
                                   />
                                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity" />
+                                  {photo.usefulnessScore != null && (
+                                    <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-sm rounded-lg px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                                      {photo.usefulnessScore}
+                                    </div>
+                                  )}
                                   {photo.type === "scraped" &&
                                     photo.data?.video && (
                                       <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm rounded-full p-1.5">
@@ -4071,6 +4089,11 @@ export default function CRMFacilityDetailsSidebar({
                             Click to view
                           </span>
                         </div>
+                        {photo.usefulnessScore != null && (
+                          <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-sm rounded-lg px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                            {photo.usefulnessScore}
+                          </div>
+                        )}
                         {photo.type === "scraped" && photo.data?.video && (
                           <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm rounded-full p-1.5">
                             <Camera className="w-4 h-4 text-white" />

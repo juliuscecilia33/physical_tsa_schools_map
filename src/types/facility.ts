@@ -51,6 +51,15 @@ export interface Facility {
   sport_metadata_reassessed?: boolean; // Whether sport_metadata has been re-assessed using additional_reviews
   photos_analyzed?: boolean; // Whether photo analysis has been completed for this facility
   total_photo_count?: number; // Precomputed total photo count (including review photos)
+  review_images_analysis?: ReviewImageAnalysis[]; // Analysis scores for review images
+}
+
+export interface ReviewImageAnalysis {
+  url: string;
+  review_index: number;
+  usefulness_score: number;
+  category: string;
+  description: string;
 }
 
 export interface Review {

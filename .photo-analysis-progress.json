@@ -1,12 +1,18 @@
 {
-  "processedCount": 0,
-  "successCount": 0,
+  "processedCount": 5,
+  "successCount": 5,
   "failedCount": 0,
   "skippedCount": 0,
-  "processedFacilityIds": [],
-  "lastProcessedIndex": -1,
-  "totalImages": 0,
-  "geminiCalls": 0,
-  "lastUpdated": "",
+  "processedFacilityIds": [
+    "699b059f-23f6-42c8-8ff3-986d3b4df859",
+    "1e6b800d-9c3f-48be-b706-4ebdf070dad4",
+    "dcd6476a-e43a-419e-95cc-c9e0ddc42bca",
+    "00a79971-1d93-4490-8007-86f8f90b2c85",
+    "618c6084-9055-428a-9f43-e4f52335493d"
+  ],
+  "lastProcessedIndex": 4,
+  "totalImages": 281,
+  "geminiCalls": 31,
+  "lastUpdated": "2026-03-09T23:33:48.539Z",
   "errors": []
 }

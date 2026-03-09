@@ -1,7 +1,7 @@
 {
-  "processedCount": 185,
-  "successCount": 96,
-  "failedCount": 97,
+  "processedCount": 203,
+  "successCount": 111,
+  "failedCount": 100,
   "skippedCount": 186,
   "processedFacilityIds": [
     "fe41e2b9-7c1c-4104-893d-75c6c5e3b12e",
@@ -188,16 +188,34 @@
     "d898bf5b-eeae-4e6e-99a8-82dca50b8a72",
     "6eca5283-39cb-47e7-b02e-cb8b4bbe8173",
     "4062beaa-ad33-428b-aae8-fb76174077ce",
-    "77d2f86d-c6c9-44da-90ad-2d64e619959c"
+    "77d2f86d-c6c9-44da-90ad-2d64e619959c",
+    "1980decb-b8f0-41e7-81fb-02d52141d19f",
+    "da351cad-fcd1-4a1d-a7c1-266fe06107f2",
+    "e7c7a95b-5e83-446f-bda6-e10d652e9134",
+    "4ca53a3c-2484-4c45-97da-2a3872664673",
+    "31cceba0-359e-41a0-866e-5aea673b688a",
+    "ae69e492-b9c4-4f4f-b00a-d80c885e5733",
+    "a7035af7-e3af-41c0-a196-671dc5467062",
+    "2da583eb-3cc5-486d-901c-9d54824feb72",
+    "c2b55fc2-48a5-4f4e-a982-870f3aafc560",
+    "20ec3c89-777b-474f-96b3-b700c69d1bd0",
+    "196c043c-7c63-4a5c-95a4-de29214b51e8",
+    "bf314883-5c30-4526-83c5-03119ffc0e4e",
+    "ff0be6f1-dfae-4043-b803-3706f57b54f6",
+    "f95a09c9-a922-4520-ba10-e0855f6ab486",
+    "d2c22ea8-bb66-447e-be82-2b43b3570a1e",
+    "d4ee672e-a40c-459e-b15f-be781437afa9",
+    "b1030d32-7cf5-4885-8b52-4aa59039ad6c",
+    "960fb41e-5ead-444f-ab9e-9c3405ca624e"
   ],
-  "imagesProcessed": 3181,
+  "imagesProcessed": 3862,
   "imagesSkipped": 3338,
-  "imagesFailed": 190,
-  "deletionsSucceeded": 3181,
+  "imagesFailed": 193,
+  "deletionsSucceeded": 3862,
   "deletionsFailed": 0,
-  "totalBytesBefore": 8070652824,
-  "totalBytesAfter": 3294691320,
-  "lastUpdated": "2026-03-09T23:12:42.971Z",
+  "totalBytesBefore": 9874319871,
+  "totalBytesAfter": 4035547652,
+  "lastUpdated": "2026-03-09T23:47:34.380Z",
   "errors": [
     {
       "facility_id": "fe41e2b9-7c1c-4104-893d-75c6c5e3b12e",
@@ -1528,6 +1546,27 @@
       "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4062beaa-ad33-428b-aae8-fb76174077ce/1772220793481_17.jpg",
       "error": "Failed to download image",
       "timestamp": "2026-03-09T22:54:35.984Z"
+    },
+    {
+      "facility_id": "1980decb-b8f0-41e7-81fb-02d52141d19f",
+      "facility_name": "Sunset Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/1980decb-b8f0-41e7-81fb-02d52141d19f/1772322517660_22.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T23:19:07.818Z"
+    },
+    {
+      "facility_id": "d2c22ea8-bb66-447e-be82-2b43b3570a1e",
+      "facility_name": "Dalworth Recreation Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d2c22ea8-bb66-447e-be82-2b43b3570a1e/1772221819792_35.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-09T23:42:49.596Z"
+    },
+    {
+      "facility_id": "b1030d32-7cf5-4885-8b52-4aa59039ad6c",
+      "facility_name": "TruFit Athletic Clubs - Ridge Rd",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/b1030d32-7cf5-4885-8b52-4aa59039ad6c/1772301737374_24.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-09T23:45:37.329Z"
     }
   ]
 }

@@ -613,7 +613,18 @@ function FacilitySidebarInner({
       reviewUserThumbnail?: string;
       reviewUserName?: string;
       reviewRating?: number;
+      usefulnessScore?: number;
     }> = [];
+
+    // Build a lookup map for review image analysis scores
+    const reviewAnalysisMap = new Map<string, number>();
+    if (displayFacility.review_images_analysis) {
+      displayFacility.review_images_analysis.forEach((entry: any) => {
+        if (entry.url && entry.usefulness_score != null) {
+          reviewAnalysisMap.set(entry.url, entry.usefulness_score);
+        }
+      });
+    }
 
     // Add all scraped photos first
     if (displayFacility.additional_photos) {
@@ -623,6 +634,7 @@ function FacilitySidebarInner({
           type: "scraped",
           scrapedIndex: idx,
           data: photoData,
+          usefulnessScore: photoData.usefulness_score,
         });
       });
     }
@@ -641,6 +653,7 @@ function FacilitySidebarInner({
               reviewUserName:
                 review.user?.name || review.author_name || "Anonymous",
               reviewRating: review.rating,
+              usefulnessScore: reviewAnalysisMap.get(imageUrl),
             });
           });
         }
@@ -648,7 +661,7 @@ function FacilitySidebarInner({
     }
 
     return photos;
-  }, [displayFacility?.additional_photos, displayFacility?.additional_reviews]);
+  }, [displayFacility?.additional_photos, displayFacility?.additional_reviews, displayFacility?.review_images_analysis]);
 
   // Add new note
   const handleAddNote = async (noteText: string, selectedPhoto: any) => {
@@ -1768,6 +1781,11 @@ function FacilitySidebarInner({
                                 height={180}
                               />
                               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity" />
+                              {photo.usefulnessScore != null && (
+                                <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-sm rounded-lg px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                                  {photo.usefulnessScore}
+                                </div>
+                              )}
                               {photo.type === "scraped" &&
                                 photo.data?.video && (
                                   <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm rounded-full p-1.5">
@@ -3786,6 +3804,11 @@ function FacilitySidebarInner({
                             Click to view
                           </span>
                         </div>
+                        {photo.usefulnessScore != null && (
+                          <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-sm rounded-lg px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                            {photo.usefulnessScore}
+                          </div>
+                        )}
                         {photo.type === "scraped" && photo.data?.video && (
                           <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm rounded-full p-1.5">
                             <Camera className="w-4 h-4 text-white" />
