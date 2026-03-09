@@ -52,6 +52,7 @@ import {
   updateFacilityTags,
 } from "@/utils/facilityCache";
 import { useFacilityDetails } from "@/hooks/useFacilityDetails";
+import CollapsibleSectionCard from "./CollapsibleSectionCard";
 import { CloseLead, CloseActivity } from "@/types/close";
 import {
   useLeadFacilityLinks,
@@ -222,6 +223,17 @@ function FacilitySidebarInner({
     [key: number]: { left: boolean; right: boolean };
   }>({});
   const [showAllNotes, setShowAllNotes] = useState(false);
+  const [expandedSections, setExpandedSections] = useState({
+    notes: false,
+    tags: false,
+    linkedLeads: false,
+    sports: false,
+    contact: true,
+    facilityTypes: false,
+  });
+  const toggleSection = (section: keyof typeof expandedSections) => {
+    setExpandedSections((prev) => ({ ...prev, [section]: !prev[section] }));
+  };
   const [isPhotosModalOpen, setIsPhotosModalOpen] = useState(false);
   const [isReviewsModalOpen, setIsReviewsModalOpen] = useState(false);
   const [isPhotoViewerOpen, setIsPhotoViewerOpen] = useState(false);
@@ -1409,29 +1421,33 @@ function FacilitySidebarInner({
           </div>
           {/* Quick Actions Bar */}
           {displayFacility && viewMode === "facility" && (
-            <div className="px-6 py-3 border-t border-slate-100 flex items-center justify-start gap-6">
+            <div className="px-6 py-3 flex items-center justify-start gap-7">
               <motion.button
                 whileHover={{ scale: 1.08 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={handleQuickAddNote}
-                className={`flex flex-col items-center gap-1.5 cursor-pointer group ${noteFlash ? 'scale-105' : ''}`}
+                className={`flex flex-col items-center gap-1.5 cursor-pointer group ${noteFlash ? "scale-105" : ""}`}
               >
                 <div className="w-11 h-11 rounded-full bg-blue-50 group-hover:bg-blue-100 border border-blue-200 flex items-center justify-center transition-all">
                   <StickyNote className="w-5 h-5 text-blue-600" />
                 </div>
-                <span className="text-[11px] font-medium text-slate-600">Note</span>
+                <span className="text-[11px] font-medium text-slate-600">
+                  Add Note
+                </span>
               </motion.button>
 
               <motion.button
                 whileHover={{ scale: 1.08 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={handleQuickAddTag}
-                className={`flex flex-col items-center gap-1.5 cursor-pointer group ${tagFlash ? 'scale-105' : ''}`}
+                className={`flex flex-col items-center gap-1.5 cursor-pointer group ${tagFlash ? "scale-105" : ""}`}
               >
                 <div className="w-11 h-11 rounded-full bg-slate-50 group-hover:bg-slate-100 border border-slate-200 flex items-center justify-center transition-all">
                   <Tag className="w-5 h-5 text-slate-600" />
                 </div>
-                <span className="text-[11px] font-medium text-slate-600">Tag</span>
+                <span className="text-[11px] font-medium text-slate-600">
+                  Add Tag
+                </span>
               </motion.button>
             </div>
           )}
@@ -1712,15 +1728,6 @@ function FacilitySidebarInner({
                   </>
                 )}
 
-                {/* Divider - only show if photos sections were displayed above */}
-                {((displayFacility.photo_references &&
-                  displayFacility.photo_references.length > 0) ||
-                  (displayFacility.serp_scraped &&
-                    displayFacility.additional_photos &&
-                    displayFacility.additional_photos.length > 0)) && (
-                  <div className="border-t border-slate-200"></div>
-                )}
-
                 {/* Notes Section */}
                 <motion.div
                   ref={notesSectionRef}
@@ -1728,188 +1735,199 @@ function FacilitySidebarInner({
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.08 }}
                 >
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
-                      <StickyNote className="w-4 h-4" />
-                      Notes ({notes.length})
-                    </h3>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => setIsAddNoteModalOpen(true)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
-                      >
-                        <Plus className="w-3.5 h-3.5" />
-                        Add Note
-                      </button>
-                      {notes.length > 3 && (
+                  <CollapsibleSectionCard
+                    title="Notes"
+                    summary={`${notes.length} note(s)`}
+                    icon={StickyNote}
+                    iconBgColor="bg-amber-500"
+                    isExpanded={expandedSections.notes}
+                    onToggle={() => toggleSection("notes")}
+                  >
+                    {/* Notes List */}
+                    {loadingNotes ? (
+                      <div className="text-center py-4">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                      </div>
+                    ) : notes.length === 0 ? (
+                      <div className="text-center py-6 bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-2xl border border-slate-100">
+                        <StickyNote className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                        <p className="text-sm text-slate-500">No notes yet</p>
                         <button
-                          onClick={() => setShowAllNotes(!showAllNotes)}
+                          onClick={() => setIsAddNoteModalOpen(true)}
+                          className="mt-3 flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer mx-auto"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          Add Note
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                      <div className="flex gap-2 mb-3">
+                        <button
+                          onClick={() => setIsAddNoteModalOpen(true)}
                           className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
                         >
-                          <ExternalLink className="w-3.5 h-3.5" />
-                          {showAllNotes ? "Show Less" : "See All"}
+                          <Plus className="w-3.5 h-3.5" />
+                          Add Note
                         </button>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Notes List */}
-                  {loadingNotes ? (
-                    <div className="text-center py-4">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                    </div>
-                  ) : notes.length === 0 ? (
-                    <div className="text-center py-6 bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-2xl border border-slate-100">
-                      <StickyNote className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-                      <p className="text-sm text-slate-500">No notes yet</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {notes
-                        .slice(0, showAllNotes ? notes.length : 3)
-                        .map((note, idx) => (
-                          <motion.div
-                            key={note.id}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.1 + idx * 0.05 }}
-                            className="bg-gradient-to-br from-white to-slate-50/50 rounded-2xl p-3 shadow-sm border border-slate-100"
+                        {notes.length > 3 && (
+                          <button
+                            onClick={() => setShowAllNotes(!showAllNotes)}
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
                           >
-                            <>
-                              {/* Note Text */}
-                              <p className="text-sm text-slate-700 leading-relaxed mb-3 break-words">
-                                <NoteText text={note.note_text} />
-                              </p>
+                            <ExternalLink className="w-3.5 h-3.5" />
+                            {showAllNotes ? "Show Less" : "See All"}
+                          </button>
+                        )}
+                      </div>
+                      <div className="space-y-3">
+                        {notes
+                          .slice(0, showAllNotes ? notes.length : 3)
+                          .map((note, idx) => (
+                            <motion.div
+                              key={note.id}
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: 0.1 + idx * 0.05 }}
+                              className="bg-gradient-to-br from-white to-slate-50/50 rounded-2xl p-3 shadow-sm border border-slate-100"
+                            >
+                              <>
+                                {/* Note Text */}
+                                <p className="text-sm text-slate-700 leading-relaxed mb-3 break-words">
+                                  <NoteText text={note.note_text} />
+                                </p>
 
-                              {/* Assigned Photo */}
-                              {note.assigned_photo && (
-                                <div
-                                  onClick={() => {
-                                    if (
-                                      note.assigned_photo?.type === "review"
-                                    ) {
-                                      openReviewPhotoViewer(
-                                        note.assigned_photo.reviewIndex!,
-                                        note.assigned_photo.photoIndexInReview!,
-                                      );
-                                    } else if (
-                                      note.assigned_photo?.type === "scraped"
-                                    ) {
-                                      openPhotoViewer(
-                                        note.assigned_photo.scrapedIndex!,
-                                        "additional",
-                                      );
-                                    }
-                                  }}
-                                  className="mb-3 relative flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all cursor-pointer group"
-                                >
-                                  <img
-                                    src={
-                                      note.assigned_photo.thumbnail ||
-                                      note.assigned_photo.url
-                                    }
-                                    alt="Note photo"
-                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                                    referrerPolicy="no-referrer"
-                                  />
-                                  {note.assigned_photo.type === "review" &&
-                                    note.assigned_photo.reviewRating && (
-                                      <div className="absolute bottom-1 right-1 bg-white/95 backdrop-blur-sm rounded px-1 py-0.5 shadow-sm flex items-center gap-0.5">
-                                        <Star className="w-2.5 h-2.5 fill-yellow-400 text-yellow-400" />
-                                        <span className="text-[10px] font-semibold text-slate-900">
-                                          {note.assigned_photo.reviewRating.toFixed(
-                                            1,
-                                          )}
-                                        </span>
-                                      </div>
-                                    )}
-                                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-1">
-                                    <span className="text-white text-[10px] font-medium">
-                                      Click to view
-                                    </span>
-                                  </div>
-                                </div>
-                              )}
-
-                              {/* Creator Info, Timestamp and Actions */}
-                              <div className="flex items-center justify-between">
-                                {/* Avatar, name, and timestamp in one row */}
-                                <div className="flex items-center gap-2">
-                                  {note.created_by ? (
-                                    <>
-                                      {/* Avatar */}
-                                      {note.user_avatar_url ? (
-                                        <img
-                                          src={note.user_avatar_url}
-                                          alt={note.user_display_name || "User"}
-                                          className="w-6 h-6 rounded-full"
-                                          referrerPolicy="no-referrer"
-                                        />
-                                      ) : (
-                                        <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-semibold">
-                                          {(
-                                            note.user_display_name?.[0] || "U"
-                                          ).toUpperCase()}
+                                {/* Assigned Photo */}
+                                {note.assigned_photo && (
+                                  <div
+                                    onClick={() => {
+                                      if (
+                                        note.assigned_photo?.type === "review"
+                                      ) {
+                                        openReviewPhotoViewer(
+                                          note.assigned_photo.reviewIndex!,
+                                          note.assigned_photo
+                                            .photoIndexInReview!,
+                                        );
+                                      } else if (
+                                        note.assigned_photo?.type === "scraped"
+                                      ) {
+                                        openPhotoViewer(
+                                          note.assigned_photo.scrapedIndex!,
+                                          "additional",
+                                        );
+                                      }
+                                    }}
+                                    className="mb-3 relative flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all cursor-pointer group"
+                                  >
+                                    <img
+                                      src={
+                                        note.assigned_photo.thumbnail ||
+                                        note.assigned_photo.url
+                                      }
+                                      alt="Note photo"
+                                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                                      referrerPolicy="no-referrer"
+                                    />
+                                    {note.assigned_photo.type === "review" &&
+                                      note.assigned_photo.reviewRating && (
+                                        <div className="absolute bottom-1 right-1 bg-white/95 backdrop-blur-sm rounded px-1 py-0.5 shadow-sm flex items-center gap-0.5">
+                                          <Star className="w-2.5 h-2.5 fill-yellow-400 text-yellow-400" />
+                                          <span className="text-[10px] font-semibold text-slate-900">
+                                            {note.assigned_photo.reviewRating.toFixed(
+                                              1,
+                                            )}
+                                          </span>
                                         </div>
                                       )}
-                                      {/* Display name */}
-                                      <span className="text-xs text-slate-500">
-                                        {note.user_display_name || "User"}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-1">
+                                      <span className="text-white text-[10px] font-medium">
+                                        Click to view
                                       </span>
-                                      {/* Dot separator */}
-                                      <span className="text-xs text-slate-400">
-                                        •
-                                      </span>
-                                      {/* Timestamp */}
-                                      <span className="text-xs text-slate-500">
-                                        {formatRelativeTime(note.created_at)}
-                                        {note.updated_at !== note.created_at &&
-                                          " (edited)"}
-                                      </span>
-                                    </>
-                                  ) : (
-                                    <span className="text-xs text-slate-400 italic">
-                                      Legacy note •{" "}
-                                      {formatRelativeTime(note.created_at)}
-                                    </span>
-                                  )}
-                                </div>
-
-                                {/* Edit/Delete actions */}
-                                {currentUser &&
-                                  (note.created_by === currentUser.id ||
-                                    !note.created_by) && (
-                                    <div className="flex gap-2">
-                                      <motion.button
-                                        whileHover={{ scale: 1.1 }}
-                                        whileTap={{ scale: 0.9 }}
-                                        onClick={() => handleStartEdit(note)}
-                                        className="p-1 hover:bg-blue-100 rounded text-blue-600 cursor-pointer"
-                                      >
-                                        <Edit2 className="w-3.5 h-3.5" />
-                                      </motion.button>
-                                      <motion.button
-                                        whileHover={{ scale: 1.1 }}
-                                        whileTap={{ scale: 0.9 }}
-                                        onClick={() =>
-                                          handleDeleteNote(note.id)
-                                        }
-                                        className="p-1 hover:bg-red-100 rounded text-red-600 cursor-pointer"
-                                      >
-                                        <Trash2 className="w-3.5 h-3.5" />
-                                      </motion.button>
                                     </div>
-                                  )}
-                              </div>
-                            </>
-                          </motion.div>
-                        ))}
-                    </div>
-                  )}
-                </motion.div>
+                                  </div>
+                                )}
 
-                {/* Divider */}
-                <div className="border-t border-slate-200"></div>
+                                {/* Creator Info, Timestamp and Actions */}
+                                <div className="flex items-center justify-between">
+                                  {/* Avatar, name, and timestamp in one row */}
+                                  <div className="flex items-center gap-2">
+                                    {note.created_by ? (
+                                      <>
+                                        {/* Avatar */}
+                                        {note.user_avatar_url ? (
+                                          <img
+                                            src={note.user_avatar_url}
+                                            alt={
+                                              note.user_display_name || "User"
+                                            }
+                                            className="w-6 h-6 rounded-full"
+                                            referrerPolicy="no-referrer"
+                                          />
+                                        ) : (
+                                          <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-semibold">
+                                            {(
+                                              note.user_display_name?.[0] || "U"
+                                            ).toUpperCase()}
+                                          </div>
+                                        )}
+                                        {/* Display name */}
+                                        <span className="text-xs text-slate-500">
+                                          {note.user_display_name || "User"}
+                                        </span>
+                                        {/* Dot separator */}
+                                        <span className="text-xs text-slate-400">
+                                          •
+                                        </span>
+                                        {/* Timestamp */}
+                                        <span className="text-xs text-slate-500">
+                                          {formatRelativeTime(note.created_at)}
+                                          {note.updated_at !==
+                                            note.created_at && " (edited)"}
+                                        </span>
+                                      </>
+                                    ) : (
+                                      <span className="text-xs text-slate-400 italic">
+                                        Legacy note •{" "}
+                                        {formatRelativeTime(note.created_at)}
+                                      </span>
+                                    )}
+                                  </div>
+
+                                  {/* Edit/Delete actions */}
+                                  {currentUser &&
+                                    (note.created_by === currentUser.id ||
+                                      !note.created_by) && (
+                                      <div className="flex gap-2">
+                                        <motion.button
+                                          whileHover={{ scale: 1.1 }}
+                                          whileTap={{ scale: 0.9 }}
+                                          onClick={() => handleStartEdit(note)}
+                                          className="p-1 hover:bg-blue-100 rounded text-blue-600 cursor-pointer"
+                                        >
+                                          <Edit2 className="w-3.5 h-3.5" />
+                                        </motion.button>
+                                        <motion.button
+                                          whileHover={{ scale: 1.1 }}
+                                          whileTap={{ scale: 0.9 }}
+                                          onClick={() =>
+                                            handleDeleteNote(note.id)
+                                          }
+                                          className="p-1 hover:bg-red-100 rounded text-red-600 cursor-pointer"
+                                        >
+                                          <Trash2 className="w-3.5 h-3.5" />
+                                        </motion.button>
+                                      </div>
+                                    )}
+                                </div>
+                              </>
+                            </motion.div>
+                          ))}
+                      </div>
+                      </>
+                    )}
+                  </CollapsibleSectionCard>
+                </motion.div>
 
                 {/* Tags Section */}
                 <motion.div
@@ -1918,60 +1936,59 @@ function FacilitySidebarInner({
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 }}
                 >
-                  <div className="flex items-center mb-3">
-                    <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
-                      <Tag className="w-4 h-4" />
-                      Tags ({facilityTags.length})
-                    </h3>
-                  </div>
-
-                  {/* Assigned Tags Display */}
-                  <div className="flex flex-wrap gap-2">
-                    {facilityTags.map((tag, idx) => (
-                      <motion.div
-                        key={tag.id}
+                  <CollapsibleSectionCard
+                    title="Tags"
+                    summary={`${facilityTags.length} tag(s)`}
+                    icon={Tag}
+                    iconBgColor="bg-purple-500"
+                    isExpanded={expandedSections.tags}
+                    onToggle={() => toggleSection("tags")}
+                  >
+                    {/* Assigned Tags Display */}
+                    <div className="flex flex-wrap gap-2">
+                      {facilityTags.map((tag, idx) => (
+                        <motion.div
+                          key={tag.id}
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 0.1 + idx * 0.05 }}
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-all"
+                          style={
+                            {
+                              color: tag.color,
+                              borderColor: tag.color,
+                            } as React.CSSProperties
+                          }
+                          title={tag.description || tag.name}
+                        >
+                          <span>{tag.name}</span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRemoveTag(tag.id);
+                            }}
+                            className="opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
+                            title="Remove tag"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </motion.div>
+                      ))}
+                      {/* Inline Add Tag Button */}
+                      <motion.button
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.1 + idx * 0.05 }}
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-all"
-                        style={
-                          {
-                            color: tag.color,
-                            borderColor: tag.color,
-                          } as React.CSSProperties
-                        }
-                        title={tag.description || tag.name}
+                        transition={{ delay: 0.1 + facilityTags.length * 0.05 }}
+                        onClick={() => setIsTagManagementModalOpen(true)}
+                        disabled={assigningTag}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-600 border-2 border-dashed border-slate-300 hover:border-slate-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                       >
-                        <span>{tag.name}</span>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleRemoveTag(tag.id);
-                          }}
-                          className="opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
-                          title="Remove tag"
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                      </motion.div>
-                    ))}
-                    {/* Inline Add Tag Button */}
-                    <motion.button
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.1 + facilityTags.length * 0.05 }}
-                      onClick={() => setIsTagManagementModalOpen(true)}
-                      disabled={assigningTag}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-600 border-2 border-dashed border-slate-300 hover:border-slate-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                    >
-                      <Plus className="w-3 h-3" />
-                      <span>Add</span>
-                    </motion.button>
-                  </div>
+                        <Plus className="w-3 h-3" />
+                        <span>Add</span>
+                      </motion.button>
+                    </div>
+                  </CollapsibleSectionCard>
                 </motion.div>
-
-                {/* Divider */}
-                <div className="border-t border-slate-200"></div>
 
                 {/* Linked Leads Section */}
                 <motion.div
@@ -1979,230 +1996,223 @@ function FacilitySidebarInner({
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.11 }}
                 >
-                  <div className="flex items-center mb-3">
-                    <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
-                      <User className="w-4 h-4" />
-                      Linked Leads from Close
-                    </h3>
-                  </div>
+                  <CollapsibleSectionCard
+                    title="Linked Leads"
+                    summary={`${linkedLeads.length} linked lead(s)`}
+                    icon={User}
+                    iconBgColor="bg-blue-500"
+                    isExpanded={expandedSections.linkedLeads}
+                    onToggle={() => toggleSection("linkedLeads")}
+                  >
+                    {linkedLeadsLoading ? (
+                      <div className="text-center py-4">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                      </div>
+                    ) : linkedLeads.length === 0 ? (
+                      <div className="text-center py-6 bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-2xl border border-slate-100">
+                        <User className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                        <p className="text-sm text-slate-500">
+                          No leads linked to this facility yet
+                        </p>
+                        <button
+                          onClick={() => {
+                            router.push("/crm?tab=close");
+                            onClose();
+                          }}
+                          className="mt-3 flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer mx-auto"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                          Browse Leads in CRM
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {linkedLeads.map((link, idx) => {
+                          const getConfidenceBadge = () => {
+                            switch (link.confidence) {
+                              case 5:
+                                return {
+                                  label: "High Match",
+                                  className:
+                                    "bg-gradient-to-r from-green-50 to-green-100 text-green-800 border-green-300",
+                                  dotColor: "bg-green-500",
+                                };
+                              case 4:
+                                return {
+                                  label: "Name + City",
+                                  className:
+                                    "bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 border-blue-300",
+                                  dotColor: "bg-blue-500",
+                                };
+                              case 3:
+                                return {
+                                  label: "Name Match",
+                                  className:
+                                    "bg-gradient-to-r from-yellow-50 to-yellow-100 text-yellow-800 border-yellow-300",
+                                  dotColor: "bg-yellow-500",
+                                };
+                              case 2:
+                                return {
+                                  label: "Fuzzy Match",
+                                  className:
+                                    "bg-gradient-to-r from-orange-50 to-orange-100 text-orange-800 border-orange-300",
+                                  dotColor: "bg-orange-500",
+                                };
+                              default:
+                                return {
+                                  label: "Match",
+                                  className:
+                                    "bg-gradient-to-r from-gray-50 to-gray-100 text-gray-800 border-gray-300",
+                                  dotColor: "bg-gray-500",
+                                };
+                            }
+                          };
 
-                  {linkedLeadsLoading ? (
-                    <div className="text-center py-4">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                    </div>
-                  ) : linkedLeads.length === 0 ? (
-                    <div className="text-center py-6 bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-2xl border border-slate-100">
-                      <User className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-                      <p className="text-sm text-slate-500">
-                        No leads linked to this facility yet
-                      </p>
-                      <button
-                        onClick={() => {
-                          router.push("/crm?tab=close");
-                          onClose();
-                        }}
-                        className="mt-3 flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer mx-auto"
-                      >
-                        <ExternalLink className="w-3.5 h-3.5" />
-                        Browse Leads in CRM
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {linkedLeads.map((link, idx) => {
-                        const getConfidenceBadge = () => {
-                          switch (link.confidence) {
-                            case 5:
-                              return {
-                                label: "High Match",
-                                className:
-                                  "bg-gradient-to-r from-green-50 to-green-100 text-green-800 border-green-300",
-                                dotColor: "bg-green-500",
-                              };
-                            case 4:
-                              return {
-                                label: "Name + City",
-                                className:
-                                  "bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 border-blue-300",
-                                dotColor: "bg-blue-500",
-                              };
-                            case 3:
-                              return {
-                                label: "Name Match",
-                                className:
-                                  "bg-gradient-to-r from-yellow-50 to-yellow-100 text-yellow-800 border-yellow-300",
-                                dotColor: "bg-yellow-500",
-                              };
-                            case 2:
-                              return {
-                                label: "Fuzzy Match",
-                                className:
-                                  "bg-gradient-to-r from-orange-50 to-orange-100 text-orange-800 border-orange-300",
-                                dotColor: "bg-orange-500",
-                              };
-                            default:
-                              return {
-                                label: "Match",
-                                className:
-                                  "bg-gradient-to-r from-gray-50 to-gray-100 text-gray-800 border-gray-300",
-                                dotColor: "bg-gray-500",
-                              };
-                          }
-                        };
+                          const confidenceBadge = getConfidenceBadge();
 
-                        const confidenceBadge = getConfidenceBadge();
+                          return (
+                            <motion.div
+                              key={link.id}
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: idx * 0.05 }}
+                              className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-white border-2 border-blue-200 shadow-sm cursor-pointer hover:border-blue-400 transition-colors"
+                              onClick={() => {
+                                const lead = leadsMap[link.close_lead_id];
+                                const isLoading = leadQueries[idx]?.isLoading;
+                                if (!isLoading && lead) {
+                                  setSelectedLeadId(link.close_lead_id);
+                                  setViewMode("lead");
+                                }
+                              }}
+                            >
+                              {(() => {
+                                const lead = leadsMap[link.close_lead_id];
+                                const isLoadingLead =
+                                  leadQueries[idx]?.isLoading;
 
-                        return (
-                          <motion.div
-                            key={link.id}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: idx * 0.05 }}
-                            className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-white border-2 border-blue-200 shadow-sm cursor-pointer hover:border-blue-400 transition-colors"
-                            onClick={() => {
-                              const lead = leadsMap[link.close_lead_id];
-                              const isLoading = leadQueries[idx]?.isLoading;
-                              if (!isLoading && lead) {
-                                setSelectedLeadId(link.close_lead_id);
-                                setViewMode("lead");
-                              }
-                            }}
-                          >
-                            {(() => {
-                              const lead = leadsMap[link.close_lead_id];
-                              const isLoadingLead = leadQueries[idx]?.isLoading;
-
-                              return (
-                                <div className="space-y-2">
-                                  {/* Lead Name/Status and Badges */}
-                                  <div className="flex items-start justify-between gap-2">
-                                    <div className="flex-1">
-                                      {isLoadingLead ? (
-                                        <>
-                                          <div className="h-5 w-48 bg-slate-200 rounded animate-pulse mb-2"></div>
-                                          <div className="h-4 w-32 bg-slate-200 rounded animate-pulse"></div>
-                                        </>
-                                      ) : lead ? (
-                                        <>
-                                          <h4 className="font-bold text-gray-900 text-sm">
-                                            {lead.display_name || lead.name}
-                                          </h4>
-                                          <div className="flex items-center gap-2 mt-1">
-                                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                              {getStatusLabel(lead.status_id)}
-                                            </span>
-                                            <span className="text-xs text-gray-500">
-                                              Linked{" "}
+                                return (
+                                  <div className="space-y-2">
+                                    {/* Lead Name/Status and Badges */}
+                                    <div className="flex items-start justify-between gap-2">
+                                      <div className="flex-1">
+                                        {isLoadingLead ? (
+                                          <>
+                                            <div className="h-5 w-48 bg-slate-200 rounded animate-pulse mb-2"></div>
+                                            <div className="h-4 w-32 bg-slate-200 rounded animate-pulse"></div>
+                                          </>
+                                        ) : lead ? (
+                                          <>
+                                            <h4 className="font-bold text-gray-900 text-sm">
+                                              {lead.display_name || lead.name}
+                                            </h4>
+                                            <div className="flex items-center gap-2 mt-1">
+                                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                {getStatusLabel(lead.status_id)}
+                                              </span>
+                                              <span className="text-xs text-gray-500">
+                                                Linked{" "}
+                                                {new Date(
+                                                  link.created_at,
+                                                ).toLocaleDateString()}
+                                              </span>
+                                            </div>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <h4 className="font-bold text-gray-900 text-sm">
+                                              Lead ID: {link.close_lead_id}
+                                            </h4>
+                                            <p className="text-xs text-gray-500 mt-1">
+                                              Linked on{" "}
                                               {new Date(
                                                 link.created_at,
                                               ).toLocaleDateString()}
-                                            </span>
-                                          </div>
-                                        </>
-                                      ) : (
-                                        <>
-                                          <h4 className="font-bold text-gray-900 text-sm">
-                                            Lead ID: {link.close_lead_id}
-                                          </h4>
-                                          <p className="text-xs text-gray-500 mt-1">
-                                            Linked on{" "}
-                                            {new Date(
-                                              link.created_at,
-                                            ).toLocaleDateString()}
-                                          </p>
-                                        </>
-                                      )}
-                                    </div>
-                                    <div className="flex flex-col gap-1 items-end">
-                                      <span
-                                        className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-xs font-bold border ${confidenceBadge.className}`}
-                                      >
+                                            </p>
+                                          </>
+                                        )}
+                                      </div>
+                                      <div className="flex flex-col gap-1 items-end">
                                         <span
-                                          className={`w-1.5 h-1.5 rounded-full ${confidenceBadge.dotColor}`}
-                                        ></span>
-                                        {confidenceBadge.label}
-                                      </span>
+                                          className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-xs font-bold border ${confidenceBadge.className}`}
+                                        >
+                                          <span
+                                            className={`w-1.5 h-1.5 rounded-full ${confidenceBadge.dotColor}`}
+                                          ></span>
+                                          {confidenceBadge.label}
+                                        </span>
+                                      </div>
+                                    </div>
+
+                                    {/* Actions */}
+                                    <div className="pt-2 border-t border-blue-200 flex gap-2">
+                                      <button
+                                        onClick={() => {
+                                          setSelectedLeadId(link.close_lead_id);
+                                          setViewMode("lead");
+                                        }}
+                                        disabled={isLoadingLead}
+                                        className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 hover:border-blue-300 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                                      >
+                                        <ExternalLink className="w-3 h-3" />
+                                        View Details
+                                      </button>
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleUnlinkLead(
+                                            link.id,
+                                            link.close_lead_id,
+                                          );
+                                        }}
+                                        disabled={deleteLinkMutation.isPending}
+                                        className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 hover:border-red-300 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                                      >
+                                        <X className="w-3 h-3" />
+                                        {deleteLinkMutation.isPending
+                                          ? "Unlinking..."
+                                          : "Unlink"}
+                                      </button>
                                     </div>
                                   </div>
-
-                                  {/* Actions */}
-                                  <div className="pt-2 border-t border-blue-200 flex gap-2">
-                                    <button
-                                      onClick={() => {
-                                        setSelectedLeadId(link.close_lead_id);
-                                        setViewMode("lead");
-                                      }}
-                                      disabled={isLoadingLead}
-                                      className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 hover:border-blue-300 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                                    >
-                                      <ExternalLink className="w-3 h-3" />
-                                      View Details
-                                    </button>
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleUnlinkLead(
-                                          link.id,
-                                          link.close_lead_id,
-                                        );
-                                      }}
-                                      disabled={deleteLinkMutation.isPending}
-                                      className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 hover:border-red-300 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                                    >
-                                      <X className="w-3 h-3" />
-                                      {deleteLinkMutation.isPending
-                                        ? "Unlinking..."
-                                        : "Unlink"}
-                                    </button>
-                                  </div>
-                                </div>
-                              );
-                            })()}
-                          </motion.div>
-                        );
-                      })}
-                    </div>
-                  )}
+                                );
+                              })()}
+                            </motion.div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </CollapsibleSectionCard>
                 </motion.div>
 
-                {displayFacility.sport_types.filter(
-                  (type) =>
-                    ![
-                      "establishment",
-                      "point_of_interest",
-                      "health",
-                      "locality",
-                      "political",
-                      "tourist_attraction",
-                    ].includes(type),
-                ).length > 0 && (
-                  <>
-                    {/* Divider */}
-                    <div className="border-t border-slate-200"></div>
-
-                    {/* Facility Types */}
+                {(() => {
+                  const filteredTypes = displayFacility.sport_types.filter(
+                    (type) =>
+                      ![
+                        "establishment",
+                        "point_of_interest",
+                        "health",
+                        "locality",
+                        "political",
+                        "tourist_attraction",
+                      ].includes(type),
+                  );
+                  return filteredTypes.length > 0 ? (
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.12 }}
                     >
-                      <h3 className="text-sm font-medium text-slate-700 mb-3 tracking-wide">
-                        Facility Types
-                      </h3>
-                      <div className="flex flex-wrap gap-2">
-                        {displayFacility.sport_types
-                          .filter(
-                            (type) =>
-                              ![
-                                "establishment",
-                                "point_of_interest",
-                                "health",
-                                "locality",
-                                "political",
-                                "tourist_attraction",
-                              ].includes(type),
-                          )
-                          .map((type, idx) => (
+                      <CollapsibleSectionCard
+                        title="Facility Types"
+                        summary={`${filteredTypes.length} type(s)`}
+                        icon={Building2}
+                        iconBgColor="bg-indigo-500"
+                        isExpanded={expandedSections.facilityTypes}
+                        onToggle={() => toggleSection("facilityTypes")}
+                      >
+                        <div className="flex flex-wrap gap-2">
+                          {filteredTypes.map((type, idx) => (
                             <motion.span
                               key={type}
                               initial={{ opacity: 0, scale: 0.8 }}
@@ -2217,13 +2227,11 @@ function FacilitySidebarInner({
                               <span>{formatSportType(type)}</span>
                             </motion.span>
                           ))}
-                      </div>
+                        </div>
+                      </CollapsibleSectionCard>
                     </motion.div>
-                  </>
-                )}
-
-                {/* Divider */}
-                <div className="border-t border-slate-200"></div>
+                  ) : null;
+                })()}
 
                 {/* Identified Sports with Confidence Scores */}
                 {displayFacility.identified_sports &&
@@ -2233,229 +2241,249 @@ function FacilitySidebarInner({
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.15 }}
                     >
-                      <h3 className="text-sm font-medium text-slate-700 mb-3 tracking-wide flex items-center gap-2">
-                        Sports Scraped
-                      </h3>
-                      <div className="flex flex-wrap gap-2">
-                        {displayFacility.identified_sports.map((sport, idx) => {
-                          const metadata =
-                            displayFacility.sport_metadata?.[sport];
-                          const score = metadata?.score || 0;
-                          const confidence = metadata?.confidence || "unknown";
+                      <CollapsibleSectionCard
+                        title="Sports Scraped"
+                        summary={`${displayFacility.identified_sports?.length || 0} sport(s) identified`}
+                        icon={Target}
+                        iconBgColor="bg-green-500"
+                        isExpanded={expandedSections.sports}
+                        onToggle={() => toggleSection("sports")}
+                      >
+                        <div className="flex flex-wrap gap-2">
+                          {displayFacility.identified_sports.map(
+                            (sport, idx) => {
+                              const metadata =
+                                displayFacility.sport_metadata?.[sport];
+                              const score = metadata?.score || 0;
+                              const confidence =
+                                metadata?.confidence || "unknown";
 
-                          // Color coding based on confidence
-                          let textColor = "text-slate-700";
-                          let borderColor = "border-slate-300";
+                              // Color coding based on confidence
+                              let textColor = "text-slate-700";
+                              let borderColor = "border-slate-300";
 
-                          if (confidence === "high") {
-                            textColor = "text-green-700";
-                            borderColor = "border-green-400";
-                          } else if (confidence === "medium") {
-                            textColor = "text-yellow-700";
-                            borderColor = "border-yellow-400";
-                          } else if (confidence === "low") {
-                            textColor = "text-red-700";
-                            borderColor = "border-red-400";
-                          }
+                              if (confidence === "high") {
+                                textColor = "text-green-700";
+                                borderColor = "border-green-400";
+                              } else if (confidence === "medium") {
+                                textColor = "text-yellow-700";
+                                borderColor = "border-yellow-400";
+                              } else if (confidence === "low") {
+                                textColor = "text-red-700";
+                                borderColor = "border-red-400";
+                              }
 
-                          // Get confidence icon
-                          let confidenceIcon = "?";
-                          if (confidence === "high") {
-                            confidenceIcon = "✓";
-                          } else if (confidence === "medium") {
-                            confidenceIcon = "~";
-                          } else if (confidence === "low") {
-                            confidenceIcon = "⚠";
-                          }
+                              // Get confidence icon
+                              let confidenceIcon = "?";
+                              if (confidence === "high") {
+                                confidenceIcon = "✓";
+                              } else if (confidence === "medium") {
+                                confidenceIcon = "~";
+                              } else if (confidence === "low") {
+                                confidenceIcon = "⚠";
+                              }
 
-                          const tooltipContent = metadata
-                            ? `Score: ${score}/100 | Sources: ${metadata.sources.join(", ") || "unknown"}\nKeywords: ${metadata.keywords_matched.join(", ")}\nMatched: "${metadata.matched_text}"`
-                            : "No confidence data available - run audit script";
+                              const tooltipContent = metadata
+                                ? `Score: ${score}/100 | Sources: ${metadata.sources.join(", ") || "unknown"}\nKeywords: ${metadata.keywords_matched.join(", ")}\nMatched: "${metadata.matched_text}"`
+                                : "No confidence data available - run audit script";
 
-                          return (
-                            <motion.div
-                              key={sport}
-                              initial={{ opacity: 0, scale: 0.8 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              transition={{ delay: 0.12 + idx * 0.05 }}
-                              whileTap={{ scale: 0.95 }}
-                              className="group relative"
-                              title={tooltipContent}
-                            >
-                              <button
-                                onClick={() => setSelectedSportDetail(sport)}
-                                className={`px-3 py-1 bg-white ${textColor} rounded-full text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5 border ${borderColor}`}
-                              >
-                                <span className="text-lg">
-                                  {SPORT_EMOJIS[sport] || "🏅"}
-                                </span>
-                                <span>{sport}</span>
-                                {metadata ? (
-                                  <>
-                                    <span className="px-1 py-0.5 rounded text-xs font-bold bg-slate-100">
-                                      {score}
+                              return (
+                                <motion.div
+                                  key={sport}
+                                  initial={{ opacity: 0, scale: 0.8 }}
+                                  animate={{ opacity: 1, scale: 1 }}
+                                  transition={{ delay: 0.12 + idx * 0.05 }}
+                                  whileTap={{ scale: 0.95 }}
+                                  className="group relative"
+                                  title={tooltipContent}
+                                >
+                                  <button
+                                    onClick={() =>
+                                      setSelectedSportDetail(sport)
+                                    }
+                                    className={`px-3 py-1 bg-white ${textColor} rounded-full text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5 border ${borderColor}`}
+                                  >
+                                    <span className="text-lg">
+                                      {SPORT_EMOJIS[sport] || "🏅"}
                                     </span>
-                                  </>
-                                ) : (
-                                  <span className="text-xs opacity-75">?</span>
-                                )}
-                              </button>
+                                    <span>{sport}</span>
+                                    {metadata ? (
+                                      <>
+                                        <span className="px-1 py-0.5 rounded text-xs font-bold bg-slate-100">
+                                          {score}
+                                        </span>
+                                      </>
+                                    ) : (
+                                      <span className="text-xs opacity-75">
+                                        ?
+                                      </span>
+                                    )}
+                                  </button>
 
-                              {/* Tooltip on hover - appears below badge */}
-                              <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 hidden group-hover:block z-[100] pointer-events-none">
-                                <div className="bg-slate-900 text-white text-xs rounded-xl py-2 px-3 shadow-xl max-w-xs whitespace-pre-wrap">
-                                  {/* Arrow pointing up */}
-                                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-[-1px]">
-                                    <div className="border-8 border-transparent border-b-slate-900"></div>
-                                  </div>
-                                  {metadata ? (
-                                    <>
-                                      <div className="font-semibold mb-1">
-                                        Confidence: {score}/100 ({confidence})
+                                  {/* Tooltip on hover - appears below badge */}
+                                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 hidden group-hover:block z-[100] pointer-events-none">
+                                    <div className="bg-slate-900 text-white text-xs rounded-xl py-2 px-3 shadow-xl max-w-xs whitespace-pre-wrap">
+                                      {/* Arrow pointing up */}
+                                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-[-1px]">
+                                        <div className="border-8 border-transparent border-b-slate-900"></div>
                                       </div>
-                                      <div className="text-slate-300">
-                                        <div>
-                                          <strong>Sources:</strong>{" "}
-                                          {metadata.sources.join(", ") ||
-                                            "unknown"}
-                                        </div>
-                                        <div>
-                                          <strong>Keywords:</strong>{" "}
-                                          {metadata.keywords_matched.join(", ")}
-                                        </div>
-                                        {metadata.matched_text && (
-                                          <div className="mt-1 italic border-t border-slate-700 pt-1">
-                                            {Array.isArray(
-                                              metadata.matched_text,
-                                            ) ? (
-                                              <div>
-                                                <strong>
-                                                  {metadata.matched_text.length}{" "}
-                                                  matching review(s):
-                                                </strong>
-                                                <div className="mt-1 space-y-2 max-h-40 overflow-y-auto">
-                                                  {metadata.matched_text.map(
-                                                    (review, idx) => (
-                                                      <div
-                                                        key={idx}
-                                                        className="text-slate-300 border-l-2 border-slate-600 pl-2"
-                                                      >
-                                                        "
-                                                        {review.substring(
-                                                          0,
-                                                          100,
-                                                        )}
-                                                        {review.length > 100
-                                                          ? "..."
-                                                          : ""}
-                                                        "
-                                                      </div>
-                                                    ),
-                                                  )}
-                                                </div>
-                                              </div>
-                                            ) : (
-                                              <>
-                                                "
-                                                {metadata.matched_text.substring(
-                                                  0,
-                                                  100,
+                                      {metadata ? (
+                                        <>
+                                          <div className="font-semibold mb-1">
+                                            Confidence: {score}/100 (
+                                            {confidence})
+                                          </div>
+                                          <div className="text-slate-300">
+                                            <div>
+                                              <strong>Sources:</strong>{" "}
+                                              {metadata.sources.join(", ") ||
+                                                "unknown"}
+                                            </div>
+                                            <div>
+                                              <strong>Keywords:</strong>{" "}
+                                              {metadata.keywords_matched.join(
+                                                ", ",
+                                              )}
+                                            </div>
+                                            {metadata.matched_text && (
+                                              <div className="mt-1 italic border-t border-slate-700 pt-1">
+                                                {Array.isArray(
+                                                  metadata.matched_text,
+                                                ) ? (
+                                                  <div>
+                                                    <strong>
+                                                      {
+                                                        metadata.matched_text
+                                                          .length
+                                                      }{" "}
+                                                      matching review(s):
+                                                    </strong>
+                                                    <div className="mt-1 space-y-2 max-h-40 overflow-y-auto">
+                                                      {metadata.matched_text.map(
+                                                        (review, idx) => (
+                                                          <div
+                                                            key={idx}
+                                                            className="text-slate-300 border-l-2 border-slate-600 pl-2"
+                                                          >
+                                                            "
+                                                            {review.substring(
+                                                              0,
+                                                              100,
+                                                            )}
+                                                            {review.length > 100
+                                                              ? "..."
+                                                              : ""}
+                                                            "
+                                                          </div>
+                                                        ),
+                                                      )}
+                                                    </div>
+                                                  </div>
+                                                ) : (
+                                                  <>
+                                                    "
+                                                    {metadata.matched_text.substring(
+                                                      0,
+                                                      100,
+                                                    )}
+                                                    {metadata.matched_text
+                                                      .length > 100
+                                                      ? "..."
+                                                      : ""}
+                                                    "
+                                                  </>
                                                 )}
-                                                {metadata.matched_text.length >
-                                                100
-                                                  ? "..."
-                                                  : ""}
-                                                "
-                                              </>
+                                              </div>
                                             )}
                                           </div>
-                                        )}
-                                      </div>
-                                    </>
-                                  ) : (
-                                    <div>
-                                      No confidence data available - run audit
-                                      script
+                                        </>
+                                      ) : (
+                                        <div>
+                                          No confidence data available - run
+                                          audit script
+                                        </div>
+                                      )}
                                     </div>
-                                  )}
-                                </div>
-                              </div>
-                            </motion.div>
-                          );
-                        })}
-                      </div>
+                                  </div>
+                                </motion.div>
+                              );
+                            },
+                          )}
+                        </div>
+                      </CollapsibleSectionCard>
                     </motion.div>
                   )}
-
-                {/* Divider */}
-                <div className="border-t border-slate-200"></div>
 
                 {/* Contact Information */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.18 }}
-                  className="space-y-4"
                 >
-                  <h3 className="text-sm font-medium text-slate-700 tracking-wide">
-                    Contact Information
-                  </h3>
+                  <CollapsibleSectionCard
+                    title="Contact Information"
+                    summary={`${[displayFacility.address, displayFacility.phone, displayFacility.website, ...(displayFacility.email || [])].filter(Boolean).length} field(s)`}
+                    icon={Phone}
+                    iconBgColor="bg-blue-500"
+                    isExpanded={expandedSections.contact}
+                    onToggle={() => toggleSection("contact")}
+                  >
+                    <div className="space-y-3">
+                      <div className="flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors">
+                        <MapPin className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                        <p className="text-slate-700 text-sm leading-relaxed">
+                          {displayFacility.address}
+                        </p>
+                      </div>
 
-                  <div className="space-y-3">
-                    <div className="flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors">
-                      <MapPin className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                      <p className="text-slate-700 text-sm leading-relaxed">
-                        {displayFacility.address}
-                      </p>
-                    </div>
-
-                    {displayFacility.phone && (
-                      <motion.a
-                        href={`tel:${displayFacility.phone}`}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        className="flex items-center gap-3 p-3 rounded-xl hover:bg-blue-50 transition-colors group"
-                      >
-                        <Phone className="w-5 h-5 text-blue-600 group-hover:text-blue-600/80 transition-colors" />
-                        <span className="text-blue-600 group-hover:text-blue-600/80 font-medium text-sm">
-                          {displayFacility.phone}
-                        </span>
-                      </motion.a>
-                    )}
-
-                    {displayFacility.website && (
-                      <motion.a
-                        href={displayFacility.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        className="flex items-center gap-3 p-3 rounded-xl hover:bg-blue-50 transition-colors group"
-                      >
-                        <Globe className="w-5 h-5 text-blue-600 group-hover:text-blue-600/80 transition-colors flex-shrink-0" />
-                        <span className="text-blue-600 group-hover:text-blue-600/80 font-medium text-sm truncate">
-                          {displayFacility.website.replace(/^https?:\/\//, "")}
-                        </span>
-                      </motion.a>
-                    )}
-
-                    {displayFacility.email &&
-                      displayFacility.email.length > 0 &&
-                      displayFacility.email.map((emailAddress, idx) => (
+                      {displayFacility.phone && (
                         <motion.a
-                          key={idx}
-                          href={`mailto:${emailAddress}`}
+                          href={`tel:${displayFacility.phone}`}
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                           className="flex items-center gap-3 p-3 rounded-xl hover:bg-blue-50 transition-colors group"
                         >
-                          <Mail className="w-5 h-5 text-blue-600 group-hover:text-blue-600/80 transition-colors" />
+                          <Phone className="w-5 h-5 text-blue-600 group-hover:text-blue-600/80 transition-colors" />
                           <span className="text-blue-600 group-hover:text-blue-600/80 font-medium text-sm">
-                            {emailAddress}
+                            {displayFacility.phone}
                           </span>
                         </motion.a>
-                      ))}
-                  </div>
+                      )}
+
+                      {displayFacility.website && (
+                        <motion.a
+                          href={displayFacility.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          className="flex items-center gap-3 p-3 rounded-xl hover:bg-blue-50 transition-colors group"
+                        >
+                          <Globe className="w-5 h-5 text-blue-600 group-hover:text-blue-600/80 transition-colors flex-shrink-0" />
+                          <span className="text-blue-600 group-hover:text-blue-600/80 font-medium text-sm truncate">
+                            {displayFacility.website.replace(/^https?:\/\//, "")}
+                          </span>
+                        </motion.a>
+                      )}
+
+                      {displayFacility.email &&
+                        displayFacility.email.length > 0 &&
+                        displayFacility.email.map((emailAddress, idx) => (
+                          <motion.a
+                            key={idx}
+                            href={`mailto:${emailAddress}`}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="flex items-center gap-3 p-3 rounded-xl hover:bg-blue-50 transition-colors group"
+                          >
+                            <Mail className="w-5 h-5 text-blue-600 group-hover:text-blue-600/80 transition-colors" />
+                            <span className="text-blue-600 group-hover:text-blue-600/80 font-medium text-sm">
+                              {emailAddress}
+                            </span>
+                          </motion.a>
+                        ))}
+                    </div>
+                  </CollapsibleSectionCard>
                 </motion.div>
 
                 {/* Divider */}

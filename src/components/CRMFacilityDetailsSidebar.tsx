@@ -50,6 +50,7 @@ import {
   moveFacilityToSegment,
 } from "@/utils/facilityCache";
 import { useFacilityDetails } from "@/hooks/useFacilityDetails";
+import CollapsibleSectionCard from "./CollapsibleSectionCard";
 import { Note, FacilityTag } from "@/types/facility";
 import { CloseLead, CloseActivity } from "@/types/close";
 import SportDetailModal from "@/components/SportDetailModal";
@@ -198,6 +199,12 @@ export default function CRMFacilityDetailsSidebar({
     [key: number]: { left: boolean; right: boolean };
   }>({});
   const [showAllNotes, setShowAllNotes] = useState(false);
+  const [expandedSections, setExpandedSections] = useState({
+    notes: false, tags: false, linkedLeads: false, sports: false, contact: true, facilityTypes: false,
+  });
+  const toggleSection = (section: keyof typeof expandedSections) => {
+    setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
+  };
   const [isPhotosModalOpen, setIsPhotosModalOpen] = useState(false);
   const [isReviewsModalOpen, setIsReviewsModalOpen] = useState(false);
   const [isPhotoViewerOpen, setIsPhotoViewerOpen] = useState(false);
@@ -1900,9 +1907,6 @@ export default function CRMFacilityDetailsSidebar({
                       </>
                     )}
 
-                    {/* Divider */}
-                    <div className="border-t border-slate-200"></div>
-
                     {/* Notes Section */}
                     <motion.div
                       ref={notesSectionRef}
@@ -1910,33 +1914,14 @@ export default function CRMFacilityDetailsSidebar({
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.08 }}
                     >
-                      <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
-                          <StickyNote className="w-4 h-4" />
-                          Notes ({notes.length})
-                        </h3>
-                        <div className="flex gap-2">
-                          {!showAddNoteForm && (
-                            <button
-                              onClick={() => setShowAddNoteForm(true)}
-                              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
-                            >
-                              <Plus className="w-3.5 h-3.5" />
-                              Add Note
-                            </button>
-                          )}
-                          {notes.length > 3 && (
-                            <button
-                              onClick={() => setShowAllNotes(!showAllNotes)}
-                              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
-                            >
-                              <ExternalLink className="w-3.5 h-3.5" />
-                              {showAllNotes ? "Show Less" : "See All"}
-                            </button>
-                          )}
-                        </div>
-                      </div>
-
+                      <CollapsibleSectionCard
+                        title="Notes"
+                        summary={`${notes.length} note(s)`}
+                        icon={StickyNote}
+                        iconBgColor="bg-amber-500"
+                        isExpanded={expandedSections.notes}
+                        onToggle={() => toggleSection("notes")}
+                      >
                       {/* Add New Note Form */}
                       {showAddNoteForm && (
                         <div className="mb-4">
@@ -1989,9 +1974,38 @@ export default function CRMFacilityDetailsSidebar({
                         <div className="text-center py-6 bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-2xl border border-slate-100">
                           <StickyNote className="w-8 h-8 text-slate-400 mx-auto mb-2" />
                           <p className="text-sm text-slate-500">No notes yet</p>
+                          {!showAddNoteForm && (
+                            <button
+                              onClick={() => setShowAddNoteForm(true)}
+                              className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
+                            >
+                              <Plus className="w-3.5 h-3.5" />
+                              Add Note
+                            </button>
+                          )}
                         </div>
                       ) : (
                         <div className="space-y-3">
+                          <div className="flex gap-2 mb-3">
+                            {!showAddNoteForm && (
+                              <button
+                                onClick={() => setShowAddNoteForm(true)}
+                                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
+                              >
+                                <Plus className="w-3.5 h-3.5" />
+                                Add Note
+                              </button>
+                            )}
+                            {notes.length > 3 && (
+                              <button
+                                onClick={() => setShowAllNotes(!showAllNotes)}
+                                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
+                              >
+                                <ExternalLink className="w-3.5 h-3.5" />
+                                {showAllNotes ? "Show Less" : "See All"}
+                              </button>
+                            )}
+                          </div>
                           {notes
                             .slice(0, showAllNotes ? notes.length : 3)
                             .map((note, idx) => (
@@ -2127,10 +2141,8 @@ export default function CRMFacilityDetailsSidebar({
                             ))}
                         </div>
                       )}
+                      </CollapsibleSectionCard>
                     </motion.div>
-
-                    {/* Divider */}
-                    <div className="border-t border-slate-200"></div>
 
                     {/* Tags Section */}
                     <motion.div
@@ -2139,13 +2151,14 @@ export default function CRMFacilityDetailsSidebar({
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.1 }}
                     >
-                      <div className="flex items-center mb-3">
-                        <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
-                          <Tag className="w-4 h-4" />
-                          Tags ({facilityTags.length})
-                        </h3>
-                      </div>
-
+                      <CollapsibleSectionCard
+                        title="Tags"
+                        summary={`${facilityTags.length} tag(s)`}
+                        icon={Tag}
+                        iconBgColor="bg-purple-500"
+                        isExpanded={expandedSections.tags}
+                        onToggle={() => toggleSection("tags")}
+                      >
                       {/* Assigned Tags Display */}
                       <div className="flex flex-wrap gap-2">
                         {facilityTags.map((tag, idx) => (
@@ -2191,10 +2204,8 @@ export default function CRMFacilityDetailsSidebar({
                           <span>Add</span>
                         </motion.button>
                       </div>
+                      </CollapsibleSectionCard>
                     </motion.div>
-
-                    {/* Divider */}
-                    <div className="border-t border-slate-200"></div>
 
                     {/* Linked Leads Section */}
                     <motion.div
@@ -2202,13 +2213,14 @@ export default function CRMFacilityDetailsSidebar({
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.11 }}
                     >
-                      <div className="flex items-center mb-3">
-                        <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
-                          <User className="w-4 h-4" />
-                          Linked Leads from Close
-                        </h3>
-                      </div>
-
+                      <CollapsibleSectionCard
+                        title="Linked Leads from Close"
+                        summary={`${linkedLeads.length} linked lead(s)`}
+                        icon={User}
+                        iconBgColor="bg-blue-500"
+                        isExpanded={expandedSections.linkedLeads}
+                        onToggle={() => toggleSection("linkedLeads")}
+                      >
                       {linkedLeadsLoading ? (
                         <div className="text-center py-4">
                           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
@@ -2395,46 +2407,37 @@ export default function CRMFacilityDetailsSidebar({
                           })}
                         </div>
                       )}
+                      </CollapsibleSectionCard>
                     </motion.div>
 
-                    {facility.sport_types.filter(
-                      (type) =>
-                        ![
-                          "establishment",
-                          "point_of_interest",
-                          "health",
-                          "locality",
-                          "political",
-                          "tourist_attraction",
-                        ].includes(type),
-                    ).length > 0 && (
-                      <>
-                        {/* Divider */}
-                        <div className="border-t border-slate-200"></div>
-
-                        {/* Facility Types */}
+                    {(() => {
+                      const filteredTypes = facility.sport_types.filter(
+                        (type) =>
+                          ![
+                            "establishment",
+                            "point_of_interest",
+                            "health",
+                            "locality",
+                            "political",
+                            "tourist_attraction",
+                          ].includes(type),
+                      );
+                      return filteredTypes.length > 0 ? (
                         <motion.div
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.12 }}
                         >
-                          <h3 className="text-sm font-medium text-slate-700 mb-3 tracking-wide">
-                            Facility Types
-                          </h3>
-                          <div className="flex flex-wrap gap-2">
-                            {facility.sport_types
-                              .filter(
-                                (type) =>
-                                  ![
-                                    "establishment",
-                                    "point_of_interest",
-                                    "health",
-                                    "locality",
-                                    "political",
-                                    "tourist_attraction",
-                                  ].includes(type),
-                              )
-                              .map((type, idx) => (
+                          <CollapsibleSectionCard
+                            title="Facility Types"
+                            summary={`${filteredTypes.length} type(s)`}
+                            icon={Building2}
+                            iconBgColor="bg-indigo-500"
+                            isExpanded={expandedSections.facilityTypes}
+                            onToggle={() => toggleSection("facilityTypes")}
+                          >
+                            <div className="flex flex-wrap gap-2">
+                              {filteredTypes.map((type, idx) => (
                                 <motion.span
                                   key={type}
                                   initial={{ opacity: 0, scale: 0.8 }}
@@ -2449,13 +2452,11 @@ export default function CRMFacilityDetailsSidebar({
                                   <span>{formatSportType(type)}</span>
                                 </motion.span>
                               ))}
-                          </div>
+                            </div>
+                          </CollapsibleSectionCard>
                         </motion.div>
-                      </>
-                    )}
-
-                    {/* Divider */}
-                    <div className="border-t border-slate-200"></div>
+                      ) : null;
+                    })()}
 
                     {/* Identified Sports with Confidence Scores */}
                     {facility.identified_sports &&
@@ -2465,12 +2466,14 @@ export default function CRMFacilityDetailsSidebar({
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.15 }}
                         >
-                          <h3 className="text-sm font-medium text-slate-700 mb-3 tracking-wide flex items-center gap-2">
-                            Sports Scraped
-                            <span className="text-xs font-normal text-slate-500">
-                              (with confidence scores)
-                            </span>
-                          </h3>
+                          <CollapsibleSectionCard
+                            title="Sports Scraped"
+                            summary={`${facility.identified_sports?.length || 0} sport(s) identified`}
+                            icon={Target}
+                            iconBgColor="bg-green-500"
+                            isExpanded={expandedSections.sports}
+                            onToggle={() => toggleSection("sports")}
+                          >
                           <div className="flex flex-wrap gap-2">
                             {facility.identified_sports.map((sport, idx) => {
                               const metadata = facility.sport_metadata?.[sport];
@@ -2631,23 +2634,24 @@ export default function CRMFacilityDetailsSidebar({
                               );
                             })}
                           </div>
+                          </CollapsibleSectionCard>
                         </motion.div>
                       )}
-
-                    {/* Divider */}
-                    <div className="border-t border-slate-200"></div>
 
                     {/* Contact Information */}
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.18 }}
-                      className="space-y-4"
                     >
-                      <h3 className="text-sm font-medium text-slate-700 tracking-wide">
-                        Contact Information
-                      </h3>
-
+                      <CollapsibleSectionCard
+                        title="Contact Information"
+                        summary={`${[facility.address, facility.phone, facility.website, ...(facility.email || [])].filter(Boolean).length} contact detail(s)`}
+                        icon={Phone}
+                        iconBgColor="bg-blue-500"
+                        isExpanded={expandedSections.contact}
+                        onToggle={() => toggleSection("contact")}
+                      >
                       <div className="space-y-3">
                         <div className="flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors">
                           <MapPin className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
@@ -2703,6 +2707,7 @@ export default function CRMFacilityDetailsSidebar({
                             </motion.a>
                           ))}
                       </div>
+                      </CollapsibleSectionCard>
                     </motion.div>
 
                     {/* Divider */}
