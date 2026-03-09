@@ -1528,31 +1528,49 @@ export default function CRMFacilityDetailsSidebar({
                 ) : facility ? (
                   <>
                     <div className="flex items-center gap-2 mb-1">
-                      <h2 className="text-xl font-bold text-slate-900 leading-tight">
+                      <h2 className="text-2xl font-bold text-slate-900 leading-tight">
                         {facility.name}
                       </h2>
-                      {facility.business_status && (
-                        <span
-                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${
-                            facility.business_status === "OPERATIONAL"
-                              ? "bg-green-100 text-green-800"
-                              : "bg-red-100 text-red-800"
-                          }`}
-                        >
-                          {facility.business_status === "OPERATIONAL" ? (
-                            <>
-                              <CheckCircle2 className="w-3 h-3" />
-                              <span>OPEN</span>
-                            </>
-                          ) : (
-                            <>
-                              <XCircle className="w-3 h-3" />
-                              <span>CLOSED</span>
-                            </>
-                          )}
-                        </span>
-                      )}
                     </div>
+                    {(facility.business_status || facilityTags.length > 0) && (
+                      <div className="flex flex-wrap items-center gap-1.5 mb-1">
+                        {facility.business_status && (
+                          <span
+                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${
+                              facility.business_status === "OPERATIONAL"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-red-100 text-red-800"
+                            }`}
+                          >
+                            {facility.business_status === "OPERATIONAL" ? (
+                              <>
+                                <CheckCircle2 className="w-3 h-3" />
+                                <span>OPEN</span>
+                              </>
+                            ) : (
+                              <>
+                                <XCircle className="w-3 h-3" />
+                                <span>CLOSED</span>
+                              </>
+                            )}
+                          </span>
+                        )}
+                        {facilityTags.map((tag) => (
+                          <span
+                            key={tag.id}
+                            title={tag.description || tag.name}
+                            className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border"
+                            style={{
+                              color: tag.color,
+                              borderColor: tag.color,
+                              backgroundColor: `${tag.color}15`,
+                            }}
+                          >
+                            {tag.name}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                     {getCityState(facility.address) && (
                       <div className="flex items-center gap-1.5 mb-2">
                         <MapPin className="w-3.5 h-3.5 text-slate-400" />

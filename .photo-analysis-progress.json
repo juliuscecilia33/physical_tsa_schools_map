@@ -1,0 +1,12 @@
+{
+  "processedCount": 0,
+  "successCount": 0,
+  "failedCount": 0,
+  "skippedCount": 0,
+  "processedFacilityIds": [],
+  "lastProcessedIndex": -1,
+  "totalImages": 0,
+  "geminiCalls": 0,
+  "lastUpdated": "",
+  "errors": []
+}

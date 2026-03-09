@@ -1,7 +1,7 @@
 {
-  "processedCount": 177,
-  "successCount": 92,
-  "failedCount": 89,
+  "processedCount": 182,
+  "successCount": 95,
+  "failedCount": 93,
   "skippedCount": 186,
   "processedFacilityIds": [
     "fe41e2b9-7c1c-4104-893d-75c6c5e3b12e",
@@ -180,16 +180,21 @@
     "b29de509-d7ae-487b-b96d-dfbd841b8f7a",
     "69e4821d-853e-4f01-a8a9-f25d8ba06199",
     "4eadc233-1a40-4bbf-8b8d-8ee1ab6b0f13",
-    "cfaf9210-734c-460c-a579-b23be5bd32da"
+    "cfaf9210-734c-460c-a579-b23be5bd32da",
+    "d0009c0c-d06e-41a1-a2d7-5816f7e8ff1e",
+    "a7875537-9571-43c5-af13-9091e3094996",
+    "549e4e2e-11fb-460b-8ee3-8fc2a391bac0",
+    "9db0be67-0e54-466d-98c3-fc4f62e09b67",
+    "d898bf5b-eeae-4e6e-99a8-82dca50b8a72"
   ],
-  "imagesProcessed": 2889,
+  "imagesProcessed": 3064,
   "imagesSkipped": 3338,
-  "imagesFailed": 187,
-  "deletionsSucceeded": 2889,
+  "imagesFailed": 188,
+  "deletionsSucceeded": 3064,
   "deletionsFailed": 0,
-  "totalBytesBefore": 7384256567,
-  "totalBytesAfter": 3011311284,
-  "lastUpdated": "2026-03-09T21:55:03.207Z",
+  "totalBytesBefore": 7791159421,
+  "totalBytesAfter": 3163637810,
+  "lastUpdated": "2026-03-09T22:43:08.888Z",
   "errors": [
     {
       "facility_id": "fe41e2b9-7c1c-4104-893d-75c6c5e3b12e",
@@ -1499,6 +1504,13 @@
       "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d99fd4bd-ad1f-4519-9cbb-cfceb16077ac/1772246680688_26.jpg",
       "error": "Failed to compress image",
       "timestamp": "2026-03-09T21:05:10.131Z"
+    },
+    {
+      "facility_id": "d0009c0c-d06e-41a1-a2d7-5816f7e8ff1e",
+      "facility_name": "Copernicus Community Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d0009c0c-d06e-41a1-a2d7-5816f7e8ff1e/1772308716787_20.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T21:58:31.670Z"
     }
   ]
 }

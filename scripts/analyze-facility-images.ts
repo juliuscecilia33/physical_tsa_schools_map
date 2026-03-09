@@ -26,8 +26,8 @@ const sql = postgres(databaseUrl, {
 const genAI = new GoogleGenerativeAI(geminiApiKey);
 
 // Configuration
-const DRY_RUN = true; // Set to false to write results to DB
-const TEST_LIMIT: number | null = 3; // Set to null for full run
+const DRY_RUN = false; // Set to false to write results to DB
+const TEST_LIMIT: number | null = 10; // Set to null for full run
 const BATCH_SIZE = 10; // Images per Gemini call
 const DELAY_BETWEEN_GEMINI_CALLS_MS = 4000; // ~15 RPM
 const CONCURRENCY_LIMIT = 5; // Parallel image downloads
@@ -107,8 +107,7 @@ interface ProgressState {
 }
 
 // Helper functions
-const delay = (ms: number) =>
-  new Promise((resolve) => setTimeout(resolve, ms));
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 function loadProgress(): ProgressState {
   if (fs.existsSync(PROGRESS_FILE)) {
@@ -191,8 +190,7 @@ async function downloadImageAsBase64(
     });
     if (!response.ok) return null;
 
-    const contentType =
-      response.headers.get("content-type") || "image/jpeg";
+    const contentType = response.headers.get("content-type") || "image/jpeg";
     const buffer = await response.arrayBuffer();
     const base64 = Buffer.from(buffer).toString("base64");
 
@@ -203,7 +201,10 @@ async function downloadImageAsBase64(
     else if (contentType.includes("gif")) mimeType = "image/gif";
 
     return { base64, mimeType };
-  } catch {
+  } catch (error) {
+    console.log(
+      `      ⚠️  Download error for ${url.substring(0, 80)}: ${error instanceof Error ? error.message : "Unknown error"}`,
+    );
     return null;
   }
 }
@@ -211,9 +212,7 @@ async function downloadImageAsBase64(
 /**
  * Download multiple images with concurrency limit
  */
-async function downloadImagesWithConcurrency(
-  images: ImageToAnalyze[],
-): Promise<
+async function downloadImagesWithConcurrency(images: ImageToAnalyze[]): Promise<
   Array<{
     image: ImageToAnalyze;
     base64: string;
@@ -226,17 +225,27 @@ async function downloadImagesWithConcurrency(
     mimeType: string;
   }> = [];
   const queue = [...images];
+  let completed = 0;
+  const total = images.length;
 
   async function worker() {
     while (queue.length > 0) {
       const img = queue.shift()!;
       const downloaded = await downloadImageAsBase64(img.url);
+      completed++;
       if (downloaded) {
         results.push({
           image: img,
           base64: downloaded.base64,
           mimeType: downloaded.mimeType,
         });
+        console.log(
+          `      ✓ [${completed}/${total}] Downloaded: ${img.url.substring(0, 80)}...`,
+        );
+      } else {
+        console.log(
+          `      ✗ [${completed}/${total}] Failed: ${img.url.substring(0, 80)}...`,
+        );
       }
     }
   }
@@ -276,14 +285,26 @@ Categories:
 - group_activity: Group sports, classes, organized activities
 - event: Events, tournaments, ceremonies
 - signage: Signs, banners, facility information
+- nature_scenery: Sky, sunset, clouds, landscape with no facility focus
+- people_closeup: Close-up portraits/photos of individuals (not showing facility)
+- carnival_amusement: Carnival rides, bounce houses, festival attractions, temporary entertainment
+- animal_art: Animals, sculptures, art installations unrelated to sports
 - irrelevant: Anything not related to the facility
 
 Scoring guide:
 - 80-100: Playable space clearly visible (courts, fields, gym interior, pool)
 - 60-79: Facility exterior, amenities, equipment, parking
 - 40-59: Partially useful (event photo showing facility, signage with info)
-- 20-39: Minimal use (logo, map screenshot, distant/blurry)
-- 0-19: Not useful (selfie, food, completely irrelevant)
+- 20-39: Minimal use (logo, map screenshot, distant/blurry, facility barely visible in background but main subject is irrelevant like a sunset with bleachers in the corner)
+- 0-19: Not useful (selfies, food, nature/sky photos, animal sculptures, carnival rides, bounce houses, close-up portraits of people, anything where the sports facility is not visible)
+
+Low-scoring examples (score these types LOW):
+- Photo of the sky/sunset even if taken at a facility → 5-15
+- Giant sculpture or art installation at a festival → 0-10
+- Person on a carnival ride → 0-10
+- Close-up of a player's face/body (facility not visible) → 10-20
+- Kids on a bounce house → 5-15
+- Decorative animals or statues → 0-10
 
 Respond with a JSON array. Each element must have:
 - "index": the image number (0-based, matching the order provided)
@@ -294,7 +315,9 @@ Respond with a JSON array. Each element must have:
 Example response:
 [
   {"index": 0, "usefulness_score": 85, "category": "court_field", "description": "Indoor basketball court with hardwood floor"},
-  {"index": 1, "usefulness_score": 10, "category": "selfie", "description": "Person taking selfie in parking lot"}
+  {"index": 1, "usefulness_score": 10, "category": "selfie", "description": "Person taking selfie in parking lot"},
+  {"index": 2, "usefulness_score": 5, "category": "nature_scenery", "description": "Sunset sky with no facility visible"},
+  {"index": 3, "usefulness_score": 5, "category": "carnival_amusement", "description": "Kids bouncing on inflatable bounce house"}
 ]`;
 
 /**
@@ -325,8 +348,7 @@ async function analyzeImageBatch(
 
   // Build parts: text prompt + inline images
   const parts: Array<
-    | { text: string }
-    | { inlineData: { mimeType: string; data: string } }
+    { text: string } | { inlineData: { mimeType: string; data: string } }
   > = [];
 
   parts.push({
@@ -497,9 +519,7 @@ async function processFacility(
   progress.totalImages += allResults.length;
 
   // Compute summary
-  const usefulCount = allResults.filter(
-    (r) => r.usefulness_score >= 50,
-  ).length;
+  const usefulCount = allResults.filter((r) => r.usefulness_score >= 50).length;
   const avgUsefulness =
     allResults.length > 0
       ? Math.round(
@@ -529,7 +549,9 @@ async function processFacility(
     `   📊 Summary: ${usefulCount}/${allResults.length} useful (avg: ${avgUsefulness})`,
   );
   console.log(
-    `      Categories: ${Object.entries(categoryBreakdown).map(([k, v]) => `${k}:${v}`).join(", ")}`,
+    `      Categories: ${Object.entries(categoryBreakdown)
+      .map(([k, v]) => `${k}:${v}`)
+      .join(", ")}`,
   );
 
   // Write to DB
@@ -537,7 +559,7 @@ async function processFacility(
     try {
       await sql`
         UPDATE sports_facilities
-        SET photo_analysis = ${sql.json(photoAnalysis)}
+        SET photo_analysis = ${sql.json(photoAnalysis as any)}
         WHERE id = ${facility.id}
       `;
       console.log(`   💾 Saved to database`);

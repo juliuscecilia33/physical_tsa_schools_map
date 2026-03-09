@@ -1380,27 +1380,43 @@ function FacilitySidebarInner({
               <h2 className="text-xl font-bold text-slate-900 leading-tight mb-1">
                 {displayFacility.name}
               </h2>
-              {displayFacility.business_status && (
-                <div className="mb-2">
-                  <span
-                    className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${
-                      displayFacility.business_status === "OPERATIONAL"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
-                    }`}
-                  >
-                    {displayFacility.business_status === "OPERATIONAL" ? (
-                      <>
-                        <CheckCircle2 className="w-3 h-3" />
-                        <span>OPEN</span>
-                      </>
-                    ) : (
-                      <>
-                        <XCircle className="w-3 h-3" />
-                        <span>CLOSED</span>
-                      </>
-                    )}
-                  </span>
+              {(displayFacility.business_status || facilityTags.length > 0) && (
+                <div className="flex flex-wrap items-center gap-1.5 mb-2">
+                  {displayFacility.business_status && (
+                    <span
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${
+                        displayFacility.business_status === "OPERATIONAL"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-red-100 text-red-800"
+                      }`}
+                    >
+                      {displayFacility.business_status === "OPERATIONAL" ? (
+                        <>
+                          <CheckCircle2 className="w-3 h-3" />
+                          <span>OPEN</span>
+                        </>
+                      ) : (
+                        <>
+                          <XCircle className="w-3 h-3" />
+                          <span>CLOSED</span>
+                        </>
+                      )}
+                    </span>
+                  )}
+                  {facilityTags.map((tag) => (
+                    <span
+                      key={tag.id}
+                      title={tag.description || tag.name}
+                      className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border"
+                      style={{
+                        color: tag.color,
+                        borderColor: tag.color,
+                        backgroundColor: `${tag.color}15`,
+                      }}
+                    >
+                      {tag.name}
+                    </span>
+                  ))}
                 </div>
               )}
               {getCityState(displayFacility.address) && (
