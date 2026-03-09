@@ -1485,7 +1485,7 @@ function FacilitySidebarInner({
                     <h3 className="text-sm font-medium text-slate-700 tracking-wide mb-3">
                       Scraped Photos{" "}
                       <span className="text-slate-500 tabular-nums">
-                        ({displayFacility.total_photo_count})
+                        ({facility?.total_photo_count || displayFacility.total_photo_count})
                       </span>
                     </h3>
                     <div className="flex gap-3 overflow-x-auto scrollbar-hide">
@@ -1525,7 +1525,7 @@ function FacilitySidebarInner({
                     >
                       <div className="flex items-center justify-between mb-3">
                         <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
-                          Scraped Photos ({truncated ? (displayFacility.total_photo_count || combinedPhotos.length) : combinedPhotos.length})
+                          Scraped Photos ({truncated ? (facility?.total_photo_count || combinedPhotos.length) : combinedPhotos.length})
                         </h3>
                         <button
                           onClick={() => {

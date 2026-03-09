@@ -1728,7 +1728,7 @@ export default function CRMFacilityDetailsSidebar({
                         >
                           <div className="flex items-center justify-between mb-3">
                             <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
-                              Scraped Photos ({combinedPhotos.length})
+                              Scraped Photos ({truncated ? '...' : combinedPhotos.length})
                             </h3>
                             <button
                               onClick={() => {
@@ -3801,7 +3801,7 @@ export default function CRMFacilityDetailsSidebar({
                 <div className="flex items-center justify-between p-6 border-b border-slate-200 bg-gradient-to-r from-white to-slate-50">
                   <div>
                     <h2 className="text-xl font-medium text-slate-900">
-                      Scraped Photos ({combinedPhotos.length})
+                      Scraped Photos ({truncated ? '...' : combinedPhotos.length})
                     </h2>
                   </div>
                   <button
