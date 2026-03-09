@@ -1,7 +1,7 @@
 {
-  "processedCount": 182,
-  "successCount": 95,
-  "failedCount": 93,
+  "processedCount": 185,
+  "successCount": 96,
+  "failedCount": 97,
   "skippedCount": 186,
   "processedFacilityIds": [
     "fe41e2b9-7c1c-4104-893d-75c6c5e3b12e",
@@ -185,16 +185,19 @@
     "a7875537-9571-43c5-af13-9091e3094996",
     "549e4e2e-11fb-460b-8ee3-8fc2a391bac0",
     "9db0be67-0e54-466d-98c3-fc4f62e09b67",
-    "d898bf5b-eeae-4e6e-99a8-82dca50b8a72"
+    "d898bf5b-eeae-4e6e-99a8-82dca50b8a72",
+    "6eca5283-39cb-47e7-b02e-cb8b4bbe8173",
+    "4062beaa-ad33-428b-aae8-fb76174077ce",
+    "77d2f86d-c6c9-44da-90ad-2d64e619959c"
   ],
-  "imagesProcessed": 3064,
+  "imagesProcessed": 3181,
   "imagesSkipped": 3338,
-  "imagesFailed": 188,
-  "deletionsSucceeded": 3064,
+  "imagesFailed": 190,
+  "deletionsSucceeded": 3181,
   "deletionsFailed": 0,
-  "totalBytesBefore": 7791159421,
-  "totalBytesAfter": 3163637810,
-  "lastUpdated": "2026-03-09T22:43:08.888Z",
+  "totalBytesBefore": 8070652824,
+  "totalBytesAfter": 3294691320,
+  "lastUpdated": "2026-03-09T23:12:42.971Z",
   "errors": [
     {
       "facility_id": "fe41e2b9-7c1c-4104-893d-75c6c5e3b12e",
@@ -1511,6 +1514,20 @@
       "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/d0009c0c-d06e-41a1-a2d7-5816f7e8ff1e/1772308716787_20.jpg",
       "error": "Failed to download image",
       "timestamp": "2026-03-09T21:58:31.670Z"
+    },
+    {
+      "facility_id": "6eca5283-39cb-47e7-b02e-cb8b4bbe8173",
+      "facility_name": "Beverly Hills Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/6eca5283-39cb-47e7-b02e-cb8b4bbe8173/1772220282881_2.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T22:48:17.606Z"
+    },
+    {
+      "facility_id": "4062beaa-ad33-428b-aae8-fb76174077ce",
+      "facility_name": "Highlands Community Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4062beaa-ad33-428b-aae8-fb76174077ce/1772220793481_17.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T22:54:35.984Z"
     }
   ]
 }

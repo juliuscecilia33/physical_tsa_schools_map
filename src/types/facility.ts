@@ -11,6 +11,10 @@ export interface PhotoData {
   thumbnail: string; // Thumbnail URL
   video?: string; // Optional video URL
   photo_meta_serpapi_link: string; // SerpAPI metadata link
+  // Photo analysis fields (populated by analyze-facility-images script)
+  usefulness_score?: number;
+  category?: string;
+  description?: string;
 }
 
 export interface Facility {
@@ -45,6 +49,7 @@ export interface Facility {
   serp_scraped?: boolean; // Whether this facility has been enriched with SerpAPI data
   serp_scraped_at?: string; // Timestamp of when SerpAPI enrichment was performed
   sport_metadata_reassessed?: boolean; // Whether sport_metadata has been re-assessed using additional_reviews
+  photos_analyzed?: boolean; // Whether photo analysis has been completed for this facility
   total_photo_count?: number; // Precomputed total photo count (including review photos)
 }
 

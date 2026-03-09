@@ -76,18 +76,6 @@ interface PhotoAnalysisResult {
   description: string;
 }
 
-interface PhotoAnalysis {
-  analyzed_at: string;
-  model: string;
-  photos: PhotoAnalysisResult[];
-  summary: {
-    total_images: number;
-    useful_count: number;
-    avg_usefulness: number;
-    category_breakdown: Record<string, number>;
-  };
-}
-
 interface ProgressState {
   processedCount: number;
   successCount: number;
@@ -533,18 +521,6 @@ async function processFacility(
     categoryBreakdown[r.category] = (categoryBreakdown[r.category] || 0) + 1;
   }
 
-  const photoAnalysis: PhotoAnalysis = {
-    analyzed_at: new Date().toISOString(),
-    model: MODEL_NAME,
-    photos: allResults,
-    summary: {
-      total_images: allResults.length,
-      useful_count: usefulCount,
-      avg_usefulness: avgUsefulness,
-      category_breakdown: categoryBreakdown,
-    },
-  };
-
   console.log(
     `   📊 Summary: ${usefulCount}/${allResults.length} useful (avg: ${avgUsefulness})`,
   );
@@ -554,15 +530,32 @@ async function processFacility(
       .join(", ")}`,
   );
 
+  // Build enriched additional_photos with scores merged in
+  const enrichedPhotos = (facility.additional_photos || []).map((photo: any) => {
+    const photoUrl = getPhotoUrl(photo);
+    const analysis = allResults.find((r) => r.url === photoUrl);
+    if (analysis) {
+      return {
+        ...photo,
+        usefulness_score: analysis.usefulness_score,
+        category: analysis.category,
+        description: analysis.description,
+      };
+    }
+    return photo;
+  });
+
   // Write to DB
   if (!DRY_RUN) {
     try {
       await sql`
         UPDATE sports_facilities
-        SET photo_analysis = ${sql.json(photoAnalysis as any)}
+        SET
+          additional_photos = ${sql.json(enrichedPhotos)},
+          photos_analyzed = true
         WHERE id = ${facility.id}
       `;
-      console.log(`   💾 Saved to database`);
+      console.log(`   💾 Saved to database (additional_photos enriched, photos_analyzed=true)`);
     } catch (error: any) {
       console.log(`   ❌ DB update failed: ${error.message}`);
       progress.failedCount++;
@@ -577,7 +570,7 @@ async function processFacility(
       return;
     }
   } else {
-    console.log(`   🔍 DRY RUN: Would save photo_analysis to database`);
+    console.log(`   🔍 DRY RUN: Would save enriched additional_photos + photos_analyzed=true to database`);
   }
 
   progress.successCount++;
@@ -641,7 +634,7 @@ async function analyzeFacilityImages() {
   const query = sql<FacilityRow[]>`
     SELECT id, name, place_id, additional_photos, additional_reviews
     FROM sports_facilities
-    WHERE serp_scraped = true AND photo_analysis IS NULL
+    WHERE serp_scraped = true AND photos_analyzed = false
     ORDER BY name
   `;
 

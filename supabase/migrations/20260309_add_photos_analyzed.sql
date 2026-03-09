@@ -1,0 +1,1 @@
+ALTER TABLE sports_facilities ADD COLUMN IF NOT EXISTS photos_analyzed BOOLEAN DEFAULT FALSE;
