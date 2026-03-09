@@ -490,6 +490,20 @@ function FacilitySidebarInner({
     setSelectedActivityId(null);
     setGeneratedEmail(null);
     setFitAssessment(null);
+    // Reset collapsible sections
+    setExpandedSections({
+      notes: false,
+      tags: false,
+      linkedLeads: false,
+      sports: false,
+      contact: false,
+      facilityTypes: false,
+    });
+    setShowCreateTagSection(false);
+    setShowManageTagsSection(false);
+    setAboutExpanded(false);
+    setContactsExpanded(false);
+    setCustomFieldsExpanded(false);
   }, [facility?.place_id]);
 
   // Reset scroll position when view mode changes
@@ -1460,7 +1474,9 @@ function FacilitySidebarInner({
                   <div className="w-11 h-11 rounded-full bg-green-50 group-hover:bg-green-100 border border-green-200 flex items-center justify-center transition-all">
                     <Phone className="w-5 h-5 text-green-600" />
                   </div>
-                  <span className="text-[11px] font-medium text-slate-600">Call</span>
+                  <span className="text-[11px] font-medium text-slate-600">
+                    Call
+                  </span>
                 </motion.a>
               )}
 
@@ -1474,7 +1490,9 @@ function FacilitySidebarInner({
                   <div className="w-11 h-11 rounded-full bg-orange-50 group-hover:bg-orange-100 border border-orange-200 flex items-center justify-center transition-all">
                     <Mail className="w-5 h-5 text-orange-600" />
                   </div>
-                  <span className="text-[11px] font-medium text-slate-600">Email</span>
+                  <span className="text-[11px] font-medium text-slate-600">
+                    Email
+                  </span>
                 </motion.a>
               )}
 
@@ -1490,7 +1508,9 @@ function FacilitySidebarInner({
                   <div className="w-11 h-11 rounded-full bg-purple-50 group-hover:bg-purple-100 border border-purple-200 flex items-center justify-center transition-all">
                     <Globe className="w-5 h-5 text-purple-600" />
                   </div>
-                  <span className="text-[11px] font-medium text-slate-600">Website</span>
+                  <span className="text-[11px] font-medium text-slate-600">
+                    Website
+                  </span>
                 </motion.a>
               )}
             </div>
@@ -1806,168 +1826,174 @@ function FacilitySidebarInner({
                       </div>
                     ) : (
                       <>
-                      <div className="flex gap-2 mb-3">
-                        <button
-                          onClick={() => setIsAddNoteModalOpen(true)}
-                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
-                        >
-                          <Plus className="w-3.5 h-3.5" />
-                          Add Note
-                        </button>
-                        {notes.length > 3 && (
+                        <div className="flex gap-2 mb-3">
                           <button
-                            onClick={() => setShowAllNotes(!showAllNotes)}
+                            onClick={() => setIsAddNoteModalOpen(true)}
                             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
                           >
-                            <ExternalLink className="w-3.5 h-3.5" />
-                            {showAllNotes ? "Show Less" : "See All"}
+                            <Plus className="w-3.5 h-3.5" />
+                            Add Note
                           </button>
-                        )}
-                      </div>
-                      <div className="space-y-3">
-                        {notes
-                          .slice(0, showAllNotes ? notes.length : 3)
-                          .map((note, idx) => (
-                            <motion.div
-                              key={note.id}
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: 0.1 + idx * 0.05 }}
-                              className="bg-gradient-to-br from-white to-slate-50/50 rounded-2xl p-3 shadow-sm border border-slate-100"
+                          {notes.length > 3 && (
+                            <button
+                              onClick={() => setShowAllNotes(!showAllNotes)}
+                              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
                             >
-                              <>
-                                {/* Note Text */}
-                                <p className="text-sm text-slate-700 leading-relaxed mb-3 break-words">
-                                  <NoteText text={note.note_text} />
-                                </p>
+                              <ExternalLink className="w-3.5 h-3.5" />
+                              {showAllNotes ? "Show Less" : "See All"}
+                            </button>
+                          )}
+                        </div>
+                        <div className="space-y-3">
+                          {notes
+                            .slice(0, showAllNotes ? notes.length : 3)
+                            .map((note, idx) => (
+                              <motion.div
+                                key={note.id}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.1 + idx * 0.05 }}
+                                className="bg-gradient-to-br from-white to-slate-50/50 rounded-2xl p-3 shadow-sm border border-slate-100"
+                              >
+                                <>
+                                  {/* Note Text */}
+                                  <p className="text-sm text-slate-700 leading-relaxed mb-3 break-words">
+                                    <NoteText text={note.note_text} />
+                                  </p>
 
-                                {/* Assigned Photo */}
-                                {note.assigned_photo && (
-                                  <div
-                                    onClick={() => {
-                                      if (
-                                        note.assigned_photo?.type === "review"
-                                      ) {
-                                        openReviewPhotoViewer(
-                                          note.assigned_photo.reviewIndex!,
-                                          note.assigned_photo
-                                            .photoIndexInReview!,
-                                        );
-                                      } else if (
-                                        note.assigned_photo?.type === "scraped"
-                                      ) {
-                                        openPhotoViewer(
-                                          note.assigned_photo.scrapedIndex!,
-                                          "additional",
-                                        );
-                                      }
-                                    }}
-                                    className="mb-3 relative flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all cursor-pointer group"
-                                  >
-                                    <img
-                                      src={
-                                        note.assigned_photo.thumbnail ||
-                                        note.assigned_photo.url
-                                      }
-                                      alt="Note photo"
-                                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                                      referrerPolicy="no-referrer"
-                                    />
-                                    {note.assigned_photo.type === "review" &&
-                                      note.assigned_photo.reviewRating && (
-                                        <div className="absolute bottom-1 right-1 bg-white/95 backdrop-blur-sm rounded px-1 py-0.5 shadow-sm flex items-center gap-0.5">
-                                          <Star className="w-2.5 h-2.5 fill-yellow-400 text-yellow-400" />
-                                          <span className="text-[10px] font-semibold text-slate-900">
-                                            {note.assigned_photo.reviewRating.toFixed(
-                                              1,
-                                            )}
-                                          </span>
-                                        </div>
-                                      )}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-1">
-                                      <span className="text-white text-[10px] font-medium">
-                                        Click to view
-                                      </span>
-                                    </div>
-                                  </div>
-                                )}
-
-                                {/* Creator Info, Timestamp and Actions */}
-                                <div className="flex items-center justify-between">
-                                  {/* Avatar, name, and timestamp in one row */}
-                                  <div className="flex items-center gap-2">
-                                    {note.created_by ? (
-                                      <>
-                                        {/* Avatar */}
-                                        {note.user_avatar_url ? (
-                                          <img
-                                            src={note.user_avatar_url}
-                                            alt={
-                                              note.user_display_name || "User"
-                                            }
-                                            className="w-6 h-6 rounded-full"
-                                            referrerPolicy="no-referrer"
-                                          />
-                                        ) : (
-                                          <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-semibold">
-                                            {(
-                                              note.user_display_name?.[0] || "U"
-                                            ).toUpperCase()}
+                                  {/* Assigned Photo */}
+                                  {note.assigned_photo && (
+                                    <div
+                                      onClick={() => {
+                                        if (
+                                          note.assigned_photo?.type === "review"
+                                        ) {
+                                          openReviewPhotoViewer(
+                                            note.assigned_photo.reviewIndex!,
+                                            note.assigned_photo
+                                              .photoIndexInReview!,
+                                          );
+                                        } else if (
+                                          note.assigned_photo?.type ===
+                                          "scraped"
+                                        ) {
+                                          openPhotoViewer(
+                                            note.assigned_photo.scrapedIndex!,
+                                            "additional",
+                                          );
+                                        }
+                                      }}
+                                      className="mb-3 relative flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all cursor-pointer group"
+                                    >
+                                      <img
+                                        src={
+                                          note.assigned_photo.thumbnail ||
+                                          note.assigned_photo.url
+                                        }
+                                        alt="Note photo"
+                                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                                        referrerPolicy="no-referrer"
+                                      />
+                                      {note.assigned_photo.type === "review" &&
+                                        note.assigned_photo.reviewRating && (
+                                          <div className="absolute bottom-1 right-1 bg-white/95 backdrop-blur-sm rounded px-1 py-0.5 shadow-sm flex items-center gap-0.5">
+                                            <Star className="w-2.5 h-2.5 fill-yellow-400 text-yellow-400" />
+                                            <span className="text-[10px] font-semibold text-slate-900">
+                                              {note.assigned_photo.reviewRating.toFixed(
+                                                1,
+                                              )}
+                                            </span>
                                           </div>
                                         )}
-                                        {/* Display name */}
-                                        <span className="text-xs text-slate-500">
-                                          {note.user_display_name || "User"}
+                                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-1">
+                                        <span className="text-white text-[10px] font-medium">
+                                          Click to view
                                         </span>
-                                        {/* Dot separator */}
-                                        <span className="text-xs text-slate-400">
-                                          •
-                                        </span>
-                                        {/* Timestamp */}
-                                        <span className="text-xs text-slate-500">
-                                          {formatRelativeTime(note.created_at)}
-                                          {note.updated_at !==
-                                            note.created_at && " (edited)"}
-                                        </span>
-                                      </>
-                                    ) : (
-                                      <span className="text-xs text-slate-400 italic">
-                                        Legacy note •{" "}
-                                        {formatRelativeTime(note.created_at)}
-                                      </span>
-                                    )}
-                                  </div>
-
-                                  {/* Edit/Delete actions */}
-                                  {currentUser &&
-                                    (note.created_by === currentUser.id ||
-                                      !note.created_by) && (
-                                      <div className="flex gap-2">
-                                        <motion.button
-                                          whileHover={{ scale: 1.1 }}
-                                          whileTap={{ scale: 0.9 }}
-                                          onClick={() => handleStartEdit(note)}
-                                          className="p-1 hover:bg-blue-100 rounded text-blue-600 cursor-pointer"
-                                        >
-                                          <Edit2 className="w-3.5 h-3.5" />
-                                        </motion.button>
-                                        <motion.button
-                                          whileHover={{ scale: 1.1 }}
-                                          whileTap={{ scale: 0.9 }}
-                                          onClick={() =>
-                                            handleDeleteNote(note.id)
-                                          }
-                                          className="p-1 hover:bg-red-100 rounded text-red-600 cursor-pointer"
-                                        >
-                                          <Trash2 className="w-3.5 h-3.5" />
-                                        </motion.button>
                                       </div>
-                                    )}
-                                </div>
-                              </>
-                            </motion.div>
-                          ))}
-                      </div>
+                                    </div>
+                                  )}
+
+                                  {/* Creator Info, Timestamp and Actions */}
+                                  <div className="flex items-center justify-between">
+                                    {/* Avatar, name, and timestamp in one row */}
+                                    <div className="flex items-center gap-2">
+                                      {note.created_by ? (
+                                        <>
+                                          {/* Avatar */}
+                                          {note.user_avatar_url ? (
+                                            <img
+                                              src={note.user_avatar_url}
+                                              alt={
+                                                note.user_display_name || "User"
+                                              }
+                                              className="w-6 h-6 rounded-full"
+                                              referrerPolicy="no-referrer"
+                                            />
+                                          ) : (
+                                            <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-semibold">
+                                              {(
+                                                note.user_display_name?.[0] ||
+                                                "U"
+                                              ).toUpperCase()}
+                                            </div>
+                                          )}
+                                          {/* Display name */}
+                                          <span className="text-xs text-slate-500">
+                                            {note.user_display_name || "User"}
+                                          </span>
+                                          {/* Dot separator */}
+                                          <span className="text-xs text-slate-400">
+                                            •
+                                          </span>
+                                          {/* Timestamp */}
+                                          <span className="text-xs text-slate-500">
+                                            {formatRelativeTime(
+                                              note.created_at,
+                                            )}
+                                            {note.updated_at !==
+                                              note.created_at && " (edited)"}
+                                          </span>
+                                        </>
+                                      ) : (
+                                        <span className="text-xs text-slate-400 italic">
+                                          Legacy note •{" "}
+                                          {formatRelativeTime(note.created_at)}
+                                        </span>
+                                      )}
+                                    </div>
+
+                                    {/* Edit/Delete actions */}
+                                    {currentUser &&
+                                      (note.created_by === currentUser.id ||
+                                        !note.created_by) && (
+                                        <div className="flex gap-2">
+                                          <motion.button
+                                            whileHover={{ scale: 1.1 }}
+                                            whileTap={{ scale: 0.9 }}
+                                            onClick={() =>
+                                              handleStartEdit(note)
+                                            }
+                                            className="p-1 hover:bg-blue-100 rounded text-blue-600 cursor-pointer"
+                                          >
+                                            <Edit2 className="w-3.5 h-3.5" />
+                                          </motion.button>
+                                          <motion.button
+                                            whileHover={{ scale: 1.1 }}
+                                            whileTap={{ scale: 0.9 }}
+                                            onClick={() =>
+                                              handleDeleteNote(note.id)
+                                            }
+                                            className="p-1 hover:bg-red-100 rounded text-red-600 cursor-pointer"
+                                          >
+                                            <Trash2 className="w-3.5 h-3.5" />
+                                          </motion.button>
+                                        </div>
+                                      )}
+                                  </div>
+                                </>
+                              </motion.div>
+                            ))}
+                        </div>
                       </>
                     )}
                   </CollapsibleSectionCard>
@@ -2505,7 +2531,10 @@ function FacilitySidebarInner({
                         >
                           <Globe className="w-5 h-5 text-blue-600 group-hover:text-blue-600/80 transition-colors flex-shrink-0" />
                           <span className="text-blue-600 group-hover:text-blue-600/80 font-medium text-sm truncate">
-                            {displayFacility.website.replace(/^https?:\/\//, "")}
+                            {displayFacility.website.replace(
+                              /^https?:\/\//,
+                              "",
+                            )}
                           </span>
                         </motion.a>
                       )}

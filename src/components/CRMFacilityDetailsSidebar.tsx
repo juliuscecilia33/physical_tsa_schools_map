@@ -171,10 +171,10 @@ export default function CRMFacilityDetailsSidebar({
   const contentRef = useRef<HTMLDivElement>(null);
 
   // Fetch full facility details including reviews and additional data
-  const {
-    data: facility,
-    isLoading: isLoadingDetails,
-  } = useFacilityDetails(placeId || null, !!placeId);
+  const { data: facility, isLoading: isLoadingDetails } = useFacilityDetails(
+    placeId || null,
+    !!placeId,
+  );
 
   const [loadingImages, setLoadingImages] = useState<{
     [key: string]: boolean;
@@ -200,10 +200,15 @@ export default function CRMFacilityDetailsSidebar({
   }>({});
   const [showAllNotes, setShowAllNotes] = useState(false);
   const [expandedSections, setExpandedSections] = useState({
-    notes: false, tags: false, linkedLeads: false, sports: false, contact: true, facilityTypes: false,
+    notes: false,
+    tags: false,
+    linkedLeads: false,
+    sports: false,
+    contact: true,
+    facilityTypes: false,
   });
   const toggleSection = (section: keyof typeof expandedSections) => {
-    setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
+    setExpandedSections((prev) => ({ ...prev, [section]: !prev[section] }));
   };
   const [isPhotosModalOpen, setIsPhotosModalOpen] = useState(false);
   const [isReviewsModalOpen, setIsReviewsModalOpen] = useState(false);
@@ -263,7 +268,12 @@ export default function CRMFacilityDetailsSidebar({
 
   // Step-based view navigation
   const [viewMode, setViewMode] = useState<
-    "facility" | "lead" | "call" | "email" | "generated-email" | "fit-assessment"
+    | "facility"
+    | "lead"
+    | "call"
+    | "email"
+    | "generated-email"
+    | "fit-assessment"
   >("facility");
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
   const [selectedActivityId, setSelectedActivityId] = useState<string | null>(
@@ -272,7 +282,9 @@ export default function CRMFacilityDetailsSidebar({
   const [generatedEmail, setGeneratedEmail] = useState<GeneratedEmail | null>(
     null,
   );
-  const [fitAssessment, setFitAssessment] = useState<FitAssessment | null>(null);
+  const [fitAssessment, setFitAssessment] = useState<FitAssessment | null>(
+    null,
+  );
   const [aboutExpanded, setAboutExpanded] = useState(false);
   const [contactsExpanded, setContactsExpanded] = useState(false);
   const [customFieldsExpanded, setCustomFieldsExpanded] = useState(false);
@@ -318,7 +330,7 @@ export default function CRMFacilityDetailsSidebar({
         onSuccess: (data) => {
           setGeneratedEmail(data);
         },
-      }
+      },
     );
   };
 
@@ -371,9 +383,9 @@ export default function CRMFacilityDetailsSidebar({
   // Lock body scroll when sidebar is open
   useEffect(() => {
     if (placeId) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
       return () => {
-        document.body.style.overflow = '';
+        document.body.style.overflow = "";
       };
     }
   }, [placeId]);
@@ -461,6 +473,20 @@ export default function CRMFacilityDetailsSidebar({
     setSelectedActivityId(null);
     setGeneratedEmail(null);
     setFitAssessment(null);
+    // Reset collapsible sections
+    setExpandedSections({
+      notes: false,
+      tags: false,
+      linkedLeads: false,
+      sports: false,
+      contact: false,
+      facilityTypes: false,
+    });
+    setShowCreateTagSection(false);
+    setShowManageTagsSection(false);
+    setAboutExpanded(false);
+    setContactsExpanded(false);
+    setCustomFieldsExpanded(false);
   }, [placeId]);
 
   // Reset scroll position when view mode changes
@@ -474,25 +500,31 @@ export default function CRMFacilityDetailsSidebar({
   useEffect(() => {
     const handleQuickActionKeys = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement;
-      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) return;
-      if (viewMode !== 'facility') return;
-      if (isTagManagementModalOpen || showAddNoteForm || isPhotoViewerOpen) return;
+      if (
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.isContentEditable
+      )
+        return;
+      if (viewMode !== "facility") return;
+      if (isTagManagementModalOpen || showAddNoteForm || isPhotoViewerOpen)
+        return;
 
-      if (e.key === 'n' || e.key === 'N') {
+      if (e.key === "n" || e.key === "N") {
         e.preventDefault();
         setNoteFlash(true);
         setTimeout(() => setNoteFlash(false), 150);
         handleQuickAddNote();
       }
-      if (e.key === 't' || e.key === 'T') {
+      if (e.key === "t" || e.key === "T") {
         e.preventDefault();
         setTagFlash(true);
         setTimeout(() => setTagFlash(false), 150);
         handleQuickAddTag();
       }
     };
-    window.addEventListener('keydown', handleQuickActionKeys);
-    return () => window.removeEventListener('keydown', handleQuickActionKeys);
+    window.addEventListener("keydown", handleQuickActionKeys);
+    return () => window.removeEventListener("keydown", handleQuickActionKeys);
   }, [viewMode, isTagManagementModalOpen, showAddNoteForm, isPhotoViewerOpen]);
 
   // Fetch all tags on component mount
@@ -919,14 +951,20 @@ export default function CRMFacilityDetailsSidebar({
   const handleQuickAddNote = () => {
     setShowAddNoteForm(true);
     setTimeout(() => {
-      notesSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      notesSectionRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
     }, 100);
   };
 
   const handleQuickAddTag = () => {
     setIsTagManagementModalOpen(true);
     setTimeout(() => {
-      tagsSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      tagsSectionRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
     }, 100);
   };
 
@@ -1187,7 +1225,6 @@ export default function CRMFacilityDetailsSidebar({
 
     return photos;
   }, [facility?.additional_photos, facility?.additional_reviews]);
-
 
   const formatSportType = (type: string) => {
     return type
@@ -1482,107 +1519,107 @@ export default function CRMFacilityDetailsSidebar({
           {/* Header */}
           <div className="sticky top-0 bg-white border-b border-slate-200 z-10">
             <div className="px-6 py-4 flex items-start justify-between">
-            <div className="flex-1 pr-4">
-              {isLoadingDetails ? (
-                <div className="space-y-2">
-                  <div className="h-6 w-48 bg-slate-200 rounded animate-pulse"></div>
-                  <div className="h-4 w-32 bg-slate-200 rounded animate-pulse"></div>
-                </div>
-              ) : facility ? (
-                <>
-                  <div className="flex items-center gap-2 mb-1">
-                    <h2 className="text-xl font-bold text-slate-900 leading-tight">
-                      {facility.name}
-                    </h2>
-                    {facility.business_status && (
-                      <span
-                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${
-                          facility.business_status === "OPERATIONAL"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
-                      >
-                        {facility.business_status === "OPERATIONAL" ? (
-                          <>
-                            <CheckCircle2 className="w-3 h-3" />
-                            <span>OPEN</span>
-                          </>
-                        ) : (
-                          <>
-                            <XCircle className="w-3 h-3" />
-                            <span>CLOSED</span>
-                          </>
-                        )}
-                      </span>
-                    )}
+              <div className="flex-1 pr-4">
+                {isLoadingDetails ? (
+                  <div className="space-y-2">
+                    <div className="h-6 w-48 bg-slate-200 rounded animate-pulse"></div>
+                    <div className="h-4 w-32 bg-slate-200 rounded animate-pulse"></div>
                   </div>
-                  {getCityState(facility.address) && (
-                    <div className="flex items-center gap-1.5 mb-2">
-                      <MapPin className="w-3.5 h-3.5 text-slate-400" />
-                      <span className="text-sm text-slate-500">
-                        {getCityState(facility.address)}
-                      </span>
+                ) : facility ? (
+                  <>
+                    <div className="flex items-center gap-2 mb-1">
+                      <h2 className="text-xl font-bold text-slate-900 leading-tight">
+                        {facility.name}
+                      </h2>
+                      {facility.business_status && (
+                        <span
+                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${
+                            facility.business_status === "OPERATIONAL"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {facility.business_status === "OPERATIONAL" ? (
+                            <>
+                              <CheckCircle2 className="w-3 h-3" />
+                              <span>OPEN</span>
+                            </>
+                          ) : (
+                            <>
+                              <XCircle className="w-3 h-3" />
+                              <span>CLOSED</span>
+                            </>
+                          )}
+                        </span>
+                      )}
                     </div>
-                  )}
-                  {facility.rating && (
-                    <div className="flex items-center gap-2">
-                      <div className="flex gap-0.5">
-                        {renderStars(facility.rating)}
+                    {getCityState(facility.address) && (
+                      <div className="flex items-center gap-1.5 mb-2">
+                        <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                        <span className="text-sm text-slate-500">
+                          {getCityState(facility.address)}
+                        </span>
                       </div>
-                      <span className="text-sm font-semibold text-slate-800 tabular-nums">
-                        {facility.rating.toFixed(1)}
-                      </span>
-                      <span className="text-sm text-slate-500 tabular-nums">
-                        ({facility.user_ratings_total} reviews)
-                      </span>
-                    </div>
-                  )}
+                    )}
+                    {facility.rating && (
+                      <div className="flex items-center gap-2">
+                        <div className="flex gap-0.5">
+                          {renderStars(facility.rating)}
+                        </div>
+                        <span className="text-sm font-semibold text-slate-800 tabular-nums">
+                          {facility.rating.toFixed(1)}
+                        </span>
+                        <span className="text-sm text-slate-500 tabular-nums">
+                          ({facility.user_ratings_total} reviews)
+                        </span>
+                      </div>
+                    )}
 
-                  {/* Action Buttons */}
-                  <div className="mt-3 flex gap-2">
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={handleViewOnMap}
-                      className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium shadow-sm transition-all cursor-pointer"
-                    >
-                      <Map className="w-4 h-4" />
-                      <span>View on Map</span>
-                    </motion.button>
-
-                    {/* Enrich with SerpAPI Button - only show if not already scraped */}
-                    {!hasSerpApiTag && (
+                    {/* Action Buttons */}
+                    <div className="mt-3 flex gap-2">
                       <motion.button
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        onClick={handleEnrichWithSerpApi}
-                        disabled={isEnriching}
-                        className="flex items-center gap-2 px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-sm font-medium shadow-sm transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        onClick={handleViewOnMap}
+                        className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium shadow-sm transition-all cursor-pointer"
                       >
-                        {isEnriching ? (
-                          <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            <span>Enriching...</span>
-                          </>
-                        ) : (
-                          <>
-                            <Sparkles className="w-4 h-4" />
-                            <span>Enrich with SerpAPI</span>
-                          </>
-                        )}
+                        <Map className="w-4 h-4" />
+                        <span>View on Map</span>
                       </motion.button>
-                    )}
-                  </div>
-                </>
-              ) : null}
-            </div>
-            <button
-              onClick={onClose}
-              className="flex-shrink-0 p-2 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
-              aria-label="Close"
-            >
-              <X className="w-5 h-5 text-slate-600" />
-            </button>
+
+                      {/* Enrich with SerpAPI Button - only show if not already scraped */}
+                      {!hasSerpApiTag && (
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={handleEnrichWithSerpApi}
+                          disabled={isEnriching}
+                          className="flex items-center gap-2 px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-sm font-medium shadow-sm transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {isEnriching ? (
+                            <>
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                              <span>Enriching...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Sparkles className="w-4 h-4" />
+                              <span>Enrich with SerpAPI</span>
+                            </>
+                          )}
+                        </motion.button>
+                      )}
+                    </div>
+                  </>
+                ) : null}
+              </div>
+              <button
+                onClick={onClose}
+                className="flex-shrink-0 p-2 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                aria-label="Close"
+              >
+                <X className="w-5 h-5 text-slate-600" />
+              </button>
             </div>
             {/* Quick Actions Bar */}
             {facility && viewMode === "facility" && (
@@ -1591,24 +1628,28 @@ export default function CRMFacilityDetailsSidebar({
                   whileHover={{ scale: 1.08 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={handleQuickAddNote}
-                  className={`flex flex-col items-center gap-1.5 cursor-pointer group ${noteFlash ? 'scale-105' : ''}`}
+                  className={`flex flex-col items-center gap-1.5 cursor-pointer group ${noteFlash ? "scale-105" : ""}`}
                 >
                   <div className="w-11 h-11 rounded-full bg-blue-50 group-hover:bg-blue-100 border border-blue-200 flex items-center justify-center transition-all">
                     <StickyNote className="w-5 h-5 text-blue-600" />
                   </div>
-                  <span className="text-[11px] font-medium text-slate-600">Note</span>
+                  <span className="text-[11px] font-medium text-slate-600">
+                    Note
+                  </span>
                 </motion.button>
 
                 <motion.button
                   whileHover={{ scale: 1.08 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={handleQuickAddTag}
-                  className={`flex flex-col items-center gap-1.5 cursor-pointer group ${tagFlash ? 'scale-105' : ''}`}
+                  className={`flex flex-col items-center gap-1.5 cursor-pointer group ${tagFlash ? "scale-105" : ""}`}
                 >
                   <div className="w-11 h-11 rounded-full bg-slate-50 group-hover:bg-slate-100 border border-slate-200 flex items-center justify-center transition-all">
                     <Tag className="w-5 h-5 text-slate-600" />
                   </div>
-                  <span className="text-[11px] font-medium text-slate-600">Tag</span>
+                  <span className="text-[11px] font-medium text-slate-600">
+                    Tag
+                  </span>
                 </motion.button>
 
                 {facility.phone && (
@@ -1621,7 +1662,9 @@ export default function CRMFacilityDetailsSidebar({
                     <div className="w-11 h-11 rounded-full bg-green-50 group-hover:bg-green-100 border border-green-200 flex items-center justify-center transition-all">
                       <Phone className="w-5 h-5 text-green-600" />
                     </div>
-                    <span className="text-[11px] font-medium text-slate-600">Call</span>
+                    <span className="text-[11px] font-medium text-slate-600">
+                      Call
+                    </span>
                   </motion.a>
                 )}
 
@@ -1635,7 +1678,9 @@ export default function CRMFacilityDetailsSidebar({
                     <div className="w-11 h-11 rounded-full bg-orange-50 group-hover:bg-orange-100 border border-orange-200 flex items-center justify-center transition-all">
                       <Mail className="w-5 h-5 text-orange-600" />
                     </div>
-                    <span className="text-[11px] font-medium text-slate-600">Email</span>
+                    <span className="text-[11px] font-medium text-slate-600">
+                      Email
+                    </span>
                   </motion.a>
                 )}
 
@@ -1651,7 +1696,9 @@ export default function CRMFacilityDetailsSidebar({
                     <div className="w-11 h-11 rounded-full bg-purple-50 group-hover:bg-purple-100 border border-purple-200 flex items-center justify-center transition-all">
                       <Globe className="w-5 h-5 text-purple-600" />
                     </div>
-                    <span className="text-[11px] font-medium text-slate-600">Website</span>
+                    <span className="text-[11px] font-medium text-slate-600">
+                      Website
+                    </span>
                   </motion.a>
                 )}
               </div>
@@ -1966,225 +2013,232 @@ export default function CRMFacilityDetailsSidebar({
                         isExpanded={expandedSections.notes}
                         onToggle={() => toggleSection("notes")}
                       >
-                      {/* Add New Note Form */}
-                      {showAddNoteForm && (
-                        <div className="mb-4">
-                          <div className="flex gap-2">
-                            <textarea
-                              value={newNoteText}
-                              onChange={(e) => setNewNoteText(e.target.value)}
-                              placeholder="Add a note..."
-                              className="flex-1 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all resize-none"
-                              rows={2}
-                              disabled={addingNote}
-                              autoFocus
-                            />
+                        {/* Add New Note Form */}
+                        {showAddNoteForm && (
+                          <div className="mb-4">
+                            <div className="flex gap-2">
+                              <textarea
+                                value={newNoteText}
+                                onChange={(e) => setNewNoteText(e.target.value)}
+                                placeholder="Add a note..."
+                                className="flex-1 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all resize-none"
+                                rows={2}
+                                disabled={addingNote}
+                                autoFocus
+                              />
+                            </div>
+                            <div className="mt-2 flex gap-2">
+                              <motion.button
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={handleAddNote}
+                                disabled={!newNoteText.trim() || addingNote}
+                                className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                              >
+                                <Plus className="w-4 h-4" />
+                                <span>
+                                  {addingNote ? "Adding..." : "Add Note"}
+                                </span>
+                              </motion.button>
+                              <motion.button
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={() => {
+                                  setShowAddNoteForm(false);
+                                  setNewNoteText("");
+                                }}
+                                disabled={addingNote}
+                                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                              >
+                                Cancel
+                              </motion.button>
+                            </div>
                           </div>
-                          <div className="mt-2 flex gap-2">
-                            <motion.button
-                              whileHover={{ scale: 1.02 }}
-                              whileTap={{ scale: 0.98 }}
-                              onClick={handleAddNote}
-                              disabled={!newNoteText.trim() || addingNote}
-                              className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                            >
-                              <Plus className="w-4 h-4" />
-                              <span>
-                                {addingNote ? "Adding..." : "Add Note"}
-                              </span>
-                            </motion.button>
-                            <motion.button
-                              whileHover={{ scale: 1.02 }}
-                              whileTap={{ scale: 0.98 }}
-                              onClick={() => {
-                                setShowAddNoteForm(false);
-                                setNewNoteText("");
-                              }}
-                              disabled={addingNote}
-                              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                            >
-                              Cancel
-                            </motion.button>
-                          </div>
-                        </div>
-                      )}
+                        )}
 
-                      {/* Notes List */}
-                      {loadingNotes ? (
-                        <div className="text-center py-4">
-                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                        </div>
-                      ) : notes.length === 0 ? (
-                        <div className="text-center py-6 bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-2xl border border-slate-100">
-                          <StickyNote className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-                          <p className="text-sm text-slate-500">No notes yet</p>
-                          {!showAddNoteForm && (
-                            <button
-                              onClick={() => setShowAddNoteForm(true)}
-                              className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
-                            >
-                              <Plus className="w-3.5 h-3.5" />
-                              Add Note
-                            </button>
-                          )}
-                        </div>
-                      ) : (
-                        <div className="space-y-3">
-                          <div className="flex gap-2 mb-3">
+                        {/* Notes List */}
+                        {loadingNotes ? (
+                          <div className="text-center py-4">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                          </div>
+                        ) : notes.length === 0 ? (
+                          <div className="text-center py-6 bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-2xl border border-slate-100">
+                            <StickyNote className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                            <p className="text-sm text-slate-500">
+                              No notes yet
+                            </p>
                             {!showAddNoteForm && (
                               <button
                                 onClick={() => setShowAddNoteForm(true)}
-                                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
+                                className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
                               >
                                 <Plus className="w-3.5 h-3.5" />
                                 Add Note
                               </button>
                             )}
-                            {notes.length > 3 && (
-                              <button
-                                onClick={() => setShowAllNotes(!showAllNotes)}
-                                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
-                              >
-                                <ExternalLink className="w-3.5 h-3.5" />
-                                {showAllNotes ? "Show Less" : "See All"}
-                              </button>
-                            )}
                           </div>
-                          {notes
-                            .slice(0, showAllNotes ? notes.length : 3)
-                            .map((note, idx) => (
-                              <motion.div
-                                key={note.id}
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.1 + idx * 0.05 }}
-                                className="bg-gradient-to-br from-white to-slate-50/50 rounded-2xl p-3 shadow-sm border border-slate-100"
-                              >
-                                {editingNoteId === note.id ? (
-                                  // Edit Mode
-                                  <div className="space-y-2">
-                                    <textarea
-                                      value={editNoteText}
-                                      onChange={(e) =>
-                                        setEditNoteText(e.target.value)
-                                      }
-                                      className="w-full px-3 py-2 text-sm text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                                      rows={3}
-                                    />
-                                    <div className="flex gap-2">
-                                      <motion.button
-                                        whileHover={{ scale: 1.05 }}
-                                        whileTap={{ scale: 0.95 }}
-                                        onClick={() => handleSaveEdit(note.id)}
-                                        className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-xl text-xs font-medium cursor-pointer"
-                                      >
-                                        <Save className="w-3 h-3" />
-                                        Save
-                                      </motion.button>
-                                      <motion.button
-                                        whileHover={{ scale: 1.05 }}
-                                        whileTap={{ scale: 0.95 }}
-                                        onClick={handleCancelEdit}
-                                        className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-medium cursor-pointer"
-                                      >
-                                        <XIcon className="w-3 h-3" />
-                                        Cancel
-                                      </motion.button>
+                        ) : (
+                          <div className="space-y-3">
+                            <div className="flex gap-2 mb-3">
+                              {!showAddNoteForm && (
+                                <button
+                                  onClick={() => setShowAddNoteForm(true)}
+                                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
+                                >
+                                  <Plus className="w-3.5 h-3.5" />
+                                  Add Note
+                                </button>
+                              )}
+                              {notes.length > 3 && (
+                                <button
+                                  onClick={() => setShowAllNotes(!showAllNotes)}
+                                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
+                                >
+                                  <ExternalLink className="w-3.5 h-3.5" />
+                                  {showAllNotes ? "Show Less" : "See All"}
+                                </button>
+                              )}
+                            </div>
+                            {notes
+                              .slice(0, showAllNotes ? notes.length : 3)
+                              .map((note, idx) => (
+                                <motion.div
+                                  key={note.id}
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ delay: 0.1 + idx * 0.05 }}
+                                  className="bg-gradient-to-br from-white to-slate-50/50 rounded-2xl p-3 shadow-sm border border-slate-100"
+                                >
+                                  {editingNoteId === note.id ? (
+                                    // Edit Mode
+                                    <div className="space-y-2">
+                                      <textarea
+                                        value={editNoteText}
+                                        onChange={(e) =>
+                                          setEditNoteText(e.target.value)
+                                        }
+                                        className="w-full px-3 py-2 text-sm text-slate-900 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                                        rows={3}
+                                      />
+                                      <div className="flex gap-2">
+                                        <motion.button
+                                          whileHover={{ scale: 1.05 }}
+                                          whileTap={{ scale: 0.95 }}
+                                          onClick={() =>
+                                            handleSaveEdit(note.id)
+                                          }
+                                          className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-xl text-xs font-medium cursor-pointer"
+                                        >
+                                          <Save className="w-3 h-3" />
+                                          Save
+                                        </motion.button>
+                                        <motion.button
+                                          whileHover={{ scale: 1.05 }}
+                                          whileTap={{ scale: 0.95 }}
+                                          onClick={handleCancelEdit}
+                                          className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-medium cursor-pointer"
+                                        >
+                                          <XIcon className="w-3 h-3" />
+                                          Cancel
+                                        </motion.button>
+                                      </div>
                                     </div>
-                                  </div>
-                                ) : (
-                                  // View Mode
-                                  <>
-                                    <p className="text-sm text-slate-700 leading-relaxed mb-2 break-words">
-                                      <NoteText text={note.note_text} />
-                                    </p>
+                                  ) : (
+                                    // View Mode
+                                    <>
+                                      <p className="text-sm text-slate-700 leading-relaxed mb-2 break-words">
+                                        <NoteText text={note.note_text} />
+                                      </p>
 
-                                    {/* Creator Info and Actions */}
-                                    <div className="flex items-center justify-between">
-                                      {/* Avatar, name, and timestamp in one row */}
-                                      <div className="flex items-center gap-2">
-                                        {note.created_by ? (
-                                          <>
-                                            {/* Avatar */}
-                                            {note.user_avatar_url ? (
-                                              <img
-                                                src={note.user_avatar_url}
-                                                alt={
-                                                  note.user_display_name ||
-                                                  "User"
-                                                }
-                                                className="w-6 h-6 rounded-full"
-                                                referrerPolicy="no-referrer"
-                                              />
-                                            ) : (
-                                              <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-semibold">
-                                                {(
-                                                  note.user_display_name?.[0] ||
-                                                  "U"
-                                                ).toUpperCase()}
-                                              </div>
-                                            )}
-                                            {/* Display name */}
-                                            <span className="text-xs text-slate-500">
-                                              {note.user_display_name || "User"}
-                                            </span>
-                                            {/* Dot separator */}
-                                            <span className="text-xs text-slate-400">
-                                              •
-                                            </span>
-                                            {/* Timestamp */}
-                                            <span className="text-xs text-slate-500">
+                                      {/* Creator Info and Actions */}
+                                      <div className="flex items-center justify-between">
+                                        {/* Avatar, name, and timestamp in one row */}
+                                        <div className="flex items-center gap-2">
+                                          {note.created_by ? (
+                                            <>
+                                              {/* Avatar */}
+                                              {note.user_avatar_url ? (
+                                                <img
+                                                  src={note.user_avatar_url}
+                                                  alt={
+                                                    note.user_display_name ||
+                                                    "User"
+                                                  }
+                                                  className="w-6 h-6 rounded-full"
+                                                  referrerPolicy="no-referrer"
+                                                />
+                                              ) : (
+                                                <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-semibold">
+                                                  {(
+                                                    note
+                                                      .user_display_name?.[0] ||
+                                                    "U"
+                                                  ).toUpperCase()}
+                                                </div>
+                                              )}
+                                              {/* Display name */}
+                                              <span className="text-xs text-slate-500">
+                                                {note.user_display_name ||
+                                                  "User"}
+                                              </span>
+                                              {/* Dot separator */}
+                                              <span className="text-xs text-slate-400">
+                                                •
+                                              </span>
+                                              {/* Timestamp */}
+                                              <span className="text-xs text-slate-500">
+                                                {formatRelativeTime(
+                                                  note.created_at,
+                                                )}
+                                                {note.updated_at !==
+                                                  note.created_at &&
+                                                  " (edited)"}
+                                              </span>
+                                            </>
+                                          ) : (
+                                            <span className="text-xs text-slate-400 italic">
+                                              Legacy note •{" "}
                                               {formatRelativeTime(
                                                 note.created_at,
                                               )}
-                                              {note.updated_at !==
-                                                note.created_at && " (edited)"}
                                             </span>
-                                          </>
-                                        ) : (
-                                          <span className="text-xs text-slate-400 italic">
-                                            Legacy note •{" "}
-                                            {formatRelativeTime(
-                                              note.created_at,
-                                            )}
-                                          </span>
-                                        )}
-                                      </div>
+                                          )}
+                                        </div>
 
-                                      {/* Edit/Delete actions */}
-                                      {currentUser &&
-                                        (note.created_by === currentUser.id ||
-                                          !note.created_by) && (
-                                          <div className="flex gap-2">
-                                            <motion.button
-                                              whileHover={{ scale: 1.1 }}
-                                              whileTap={{ scale: 0.9 }}
-                                              onClick={() =>
-                                                handleStartEdit(note)
-                                              }
-                                              className="p-1 hover:bg-blue-100 rounded text-blue-600 cursor-pointer"
-                                            >
-                                              <Edit2 className="w-3.5 h-3.5" />
-                                            </motion.button>
-                                            <motion.button
-                                              whileHover={{ scale: 1.1 }}
-                                              whileTap={{ scale: 0.9 }}
-                                              onClick={() =>
-                                                handleDeleteNote(note.id)
-                                              }
-                                              className="p-1 hover:bg-red-100 rounded text-red-600 cursor-pointer"
-                                            >
-                                              <Trash2 className="w-3.5 h-3.5" />
-                                            </motion.button>
-                                          </div>
-                                        )}
-                                    </div>
-                                  </>
-                                )}
-                              </motion.div>
-                            ))}
-                        </div>
-                      )}
+                                        {/* Edit/Delete actions */}
+                                        {currentUser &&
+                                          (note.created_by === currentUser.id ||
+                                            !note.created_by) && (
+                                            <div className="flex gap-2">
+                                              <motion.button
+                                                whileHover={{ scale: 1.1 }}
+                                                whileTap={{ scale: 0.9 }}
+                                                onClick={() =>
+                                                  handleStartEdit(note)
+                                                }
+                                                className="p-1 hover:bg-blue-100 rounded text-blue-600 cursor-pointer"
+                                              >
+                                                <Edit2 className="w-3.5 h-3.5" />
+                                              </motion.button>
+                                              <motion.button
+                                                whileHover={{ scale: 1.1 }}
+                                                whileTap={{ scale: 0.9 }}
+                                                onClick={() =>
+                                                  handleDeleteNote(note.id)
+                                                }
+                                                className="p-1 hover:bg-red-100 rounded text-red-600 cursor-pointer"
+                                              >
+                                                <Trash2 className="w-3.5 h-3.5" />
+                                              </motion.button>
+                                            </div>
+                                          )}
+                                      </div>
+                                    </>
+                                  )}
+                                </motion.div>
+                              ))}
+                          </div>
+                        )}
                       </CollapsibleSectionCard>
                     </motion.div>
 
@@ -2203,51 +2257,51 @@ export default function CRMFacilityDetailsSidebar({
                         isExpanded={expandedSections.tags}
                         onToggle={() => toggleSection("tags")}
                       >
-                      {/* Assigned Tags Display */}
-                      <div className="flex flex-wrap gap-2">
-                        {facilityTags.map((tag, idx) => (
-                          <motion.div
-                            key={tag.id}
+                        {/* Assigned Tags Display */}
+                        <div className="flex flex-wrap gap-2">
+                          {facilityTags.map((tag, idx) => (
+                            <motion.div
+                              key={tag.id}
+                              initial={{ opacity: 0, scale: 0.8 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              transition={{ delay: 0.1 + idx * 0.05 }}
+                              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-all"
+                              style={
+                                {
+                                  color: tag.color,
+                                  borderColor: tag.color,
+                                } as React.CSSProperties
+                              }
+                              title={tag.description || tag.name}
+                            >
+                              <span>{tag.name}</span>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleRemoveTag(tag.id);
+                                }}
+                                className="opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
+                                title="Remove tag"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </motion.div>
+                          ))}
+                          {/* Inline Add Tag Button */}
+                          <motion.button
                             initial={{ opacity: 0, scale: 0.8 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: 0.1 + idx * 0.05 }}
-                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-all"
-                            style={
-                              {
-                                color: tag.color,
-                                borderColor: tag.color,
-                              } as React.CSSProperties
-                            }
-                            title={tag.description || tag.name}
+                            transition={{
+                              delay: 0.1 + facilityTags.length * 0.05,
+                            }}
+                            onClick={() => setIsTagManagementModalOpen(true)}
+                            disabled={assigningTag}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-600 border-2 border-dashed border-slate-300 hover:border-slate-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                           >
-                            <span>{tag.name}</span>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleRemoveTag(tag.id);
-                              }}
-                              className="opacity-80 hover:opacity-100 transition-opacity cursor-pointer"
-                              title="Remove tag"
-                            >
-                              <X className="w-3 h-3" />
-                            </button>
-                          </motion.div>
-                        ))}
-                        {/* Inline Add Tag Button */}
-                        <motion.button
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{
-                            delay: 0.1 + facilityTags.length * 0.05,
-                          }}
-                          onClick={() => setIsTagManagementModalOpen(true)}
-                          disabled={assigningTag}
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-600 border-2 border-dashed border-slate-300 hover:border-slate-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                        >
-                          <Plus className="w-3 h-3" />
-                          <span>Add</span>
-                        </motion.button>
-                      </div>
+                            <Plus className="w-3 h-3" />
+                            <span>Add</span>
+                          </motion.button>
+                        </div>
                       </CollapsibleSectionCard>
                     </motion.div>
 
@@ -2265,192 +2319,194 @@ export default function CRMFacilityDetailsSidebar({
                         isExpanded={expandedSections.linkedLeads}
                         onToggle={() => toggleSection("linkedLeads")}
                       >
-                      {linkedLeadsLoading ? (
-                        <div className="text-center py-4">
-                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                        </div>
-                      ) : linkedLeads.length === 0 ? (
-                        <div className="text-center py-6 bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-2xl border border-slate-100">
-                          <User className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-                          <p className="text-sm text-slate-500">
-                            No leads linked to this facility yet
-                          </p>
-                          <button
-                            onClick={() => {
-                              router.push("/crm?tab=close");
-                              onClose();
-                            }}
-                            className="mt-3 flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer mx-auto"
-                          >
-                            <ExternalLink className="w-3.5 h-3.5" />
-                            Browse Leads in CRM
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="space-y-3">
-                          {linkedLeads.map((link, idx) => {
-                            // Get confidence badge styling
-                            const getConfidenceBadge = () => {
-                              switch (link.confidence) {
-                                case 5:
-                                  return {
-                                    label: "High Match",
-                                    className:
-                                      "bg-gradient-to-r from-green-50 to-green-100 text-green-800 border-green-300",
-                                    dotColor: "bg-green-500",
-                                  };
-                                case 4:
-                                  return {
-                                    label: "Name + City",
-                                    className:
-                                      "bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 border-blue-300",
-                                    dotColor: "bg-blue-500",
-                                  };
-                                case 3:
-                                  return {
-                                    label: "Name Match",
-                                    className:
-                                      "bg-gradient-to-r from-yellow-50 to-yellow-100 text-yellow-800 border-yellow-300",
-                                    dotColor: "bg-yellow-500",
-                                  };
-                                case 2:
-                                  return {
-                                    label: "Fuzzy Match",
-                                    className:
-                                      "bg-gradient-to-r from-orange-50 to-orange-100 text-orange-800 border-orange-300",
-                                    dotColor: "bg-orange-500",
-                                  };
-                                default:
-                                  return {
-                                    label: "Match",
-                                    className:
-                                      "bg-gradient-to-r from-gray-50 to-gray-100 text-gray-800 border-gray-300",
-                                    dotColor: "bg-gray-500",
-                                  };
-                              }
-                            };
+                        {linkedLeadsLoading ? (
+                          <div className="text-center py-4">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                          </div>
+                        ) : linkedLeads.length === 0 ? (
+                          <div className="text-center py-6 bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-2xl border border-slate-100">
+                            <User className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                            <p className="text-sm text-slate-500">
+                              No leads linked to this facility yet
+                            </p>
+                            <button
+                              onClick={() => {
+                                router.push("/crm?tab=close");
+                                onClose();
+                              }}
+                              className="mt-3 flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer mx-auto"
+                            >
+                              <ExternalLink className="w-3.5 h-3.5" />
+                              Browse Leads in CRM
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="space-y-3">
+                            {linkedLeads.map((link, idx) => {
+                              // Get confidence badge styling
+                              const getConfidenceBadge = () => {
+                                switch (link.confidence) {
+                                  case 5:
+                                    return {
+                                      label: "High Match",
+                                      className:
+                                        "bg-gradient-to-r from-green-50 to-green-100 text-green-800 border-green-300",
+                                      dotColor: "bg-green-500",
+                                    };
+                                  case 4:
+                                    return {
+                                      label: "Name + City",
+                                      className:
+                                        "bg-gradient-to-r from-blue-50 to-blue-100 text-blue-800 border-blue-300",
+                                      dotColor: "bg-blue-500",
+                                    };
+                                  case 3:
+                                    return {
+                                      label: "Name Match",
+                                      className:
+                                        "bg-gradient-to-r from-yellow-50 to-yellow-100 text-yellow-800 border-yellow-300",
+                                      dotColor: "bg-yellow-500",
+                                    };
+                                  case 2:
+                                    return {
+                                      label: "Fuzzy Match",
+                                      className:
+                                        "bg-gradient-to-r from-orange-50 to-orange-100 text-orange-800 border-orange-300",
+                                      dotColor: "bg-orange-500",
+                                    };
+                                  default:
+                                    return {
+                                      label: "Match",
+                                      className:
+                                        "bg-gradient-to-r from-gray-50 to-gray-100 text-gray-800 border-gray-300",
+                                      dotColor: "bg-gray-500",
+                                    };
+                                }
+                              };
 
-                            const confidenceBadge = getConfidenceBadge();
+                              const confidenceBadge = getConfidenceBadge();
 
-                            return (
-                              <motion.div
-                                key={link.id}
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: idx * 0.05 }}
-                                className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-white border-2 border-blue-200 shadow-sm cursor-pointer hover:border-blue-400 transition-colors"
-                                onClick={() => {
-                                  const lead = leadsMap[link.close_lead_id];
-                                  const isLoading = leadQueries[idx]?.isLoading;
-                                  if (!isLoading && lead) {
-                                    setSelectedLeadId(link.close_lead_id);
-                                    setViewMode("lead");
-                                  }
-                                }}
-                              >
-                                {(() => {
-                                  // Get the lead data for this link
-                                  const lead = leadsMap[link.close_lead_id];
-                                  const isLoadingLead =
-                                    leadQueries[idx]?.isLoading;
+                              return (
+                                <motion.div
+                                  key={link.id}
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ delay: idx * 0.05 }}
+                                  className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-white border-2 border-blue-200 shadow-sm cursor-pointer hover:border-blue-400 transition-colors"
+                                  onClick={() => {
+                                    const lead = leadsMap[link.close_lead_id];
+                                    const isLoading =
+                                      leadQueries[idx]?.isLoading;
+                                    if (!isLoading && lead) {
+                                      setSelectedLeadId(link.close_lead_id);
+                                      setViewMode("lead");
+                                    }
+                                  }}
+                                >
+                                  {(() => {
+                                    // Get the lead data for this link
+                                    const lead = leadsMap[link.close_lead_id];
+                                    const isLoadingLead =
+                                      leadQueries[idx]?.isLoading;
 
-                                  return (
-                                    <div className="space-y-2">
-                                      {/* Lead Name/Status and Badges */}
-                                      <div className="flex items-start justify-between gap-2">
-                                        <div className="flex-1">
-                                          {isLoadingLead ? (
-                                            <>
-                                              <div className="h-5 w-48 bg-slate-200 rounded animate-pulse mb-2"></div>
-                                              <div className="h-4 w-32 bg-slate-200 rounded animate-pulse"></div>
-                                            </>
-                                          ) : lead ? (
-                                            <>
-                                              <h4 className="font-bold text-gray-900 text-sm">
-                                                {lead.display_name || lead.name}
-                                              </h4>
-                                              <div className="flex items-center gap-2 mt-1">
-                                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                  {getStatusLabel(
-                                                    lead.status_id,
-                                                  )}
-                                                </span>
-                                                <span className="text-xs text-gray-500">
-                                                  Linked{" "}
+                                    return (
+                                      <div className="space-y-2">
+                                        {/* Lead Name/Status and Badges */}
+                                        <div className="flex items-start justify-between gap-2">
+                                          <div className="flex-1">
+                                            {isLoadingLead ? (
+                                              <>
+                                                <div className="h-5 w-48 bg-slate-200 rounded animate-pulse mb-2"></div>
+                                                <div className="h-4 w-32 bg-slate-200 rounded animate-pulse"></div>
+                                              </>
+                                            ) : lead ? (
+                                              <>
+                                                <h4 className="font-bold text-gray-900 text-sm">
+                                                  {lead.display_name ||
+                                                    lead.name}
+                                                </h4>
+                                                <div className="flex items-center gap-2 mt-1">
+                                                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                    {getStatusLabel(
+                                                      lead.status_id,
+                                                    )}
+                                                  </span>
+                                                  <span className="text-xs text-gray-500">
+                                                    Linked{" "}
+                                                    {new Date(
+                                                      link.created_at,
+                                                    ).toLocaleDateString()}
+                                                  </span>
+                                                </div>
+                                              </>
+                                            ) : (
+                                              <>
+                                                <h4 className="font-bold text-gray-900 text-sm">
+                                                  Lead ID: {link.close_lead_id}
+                                                </h4>
+                                                <p className="text-xs text-gray-500 mt-1">
+                                                  Linked on{" "}
                                                   {new Date(
                                                     link.created_at,
                                                   ).toLocaleDateString()}
-                                                </span>
-                                              </div>
-                                            </>
-                                          ) : (
-                                            <>
-                                              <h4 className="font-bold text-gray-900 text-sm">
-                                                Lead ID: {link.close_lead_id}
-                                              </h4>
-                                              <p className="text-xs text-gray-500 mt-1">
-                                                Linked on{" "}
-                                                {new Date(
-                                                  link.created_at,
-                                                ).toLocaleDateString()}
-                                              </p>
-                                            </>
-                                          )}
-                                        </div>
-                                        <div className="flex flex-col gap-1 items-end">
-                                          <span
-                                            className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-xs font-bold border ${confidenceBadge.className}`}
-                                          >
+                                                </p>
+                                              </>
+                                            )}
+                                          </div>
+                                          <div className="flex flex-col gap-1 items-end">
                                             <span
-                                              className={`w-1.5 h-1.5 rounded-full ${confidenceBadge.dotColor}`}
-                                            ></span>
-                                            {confidenceBadge.label}
-                                          </span>
+                                              className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-xs font-bold border ${confidenceBadge.className}`}
+                                            >
+                                              <span
+                                                className={`w-1.5 h-1.5 rounded-full ${confidenceBadge.dotColor}`}
+                                              ></span>
+                                              {confidenceBadge.label}
+                                            </span>
+                                          </div>
+                                        </div>
+
+                                        {/* Actions */}
+                                        <div className="pt-2 border-t border-blue-200 flex gap-2">
+                                          <button
+                                            onClick={() => {
+                                              setSelectedLeadId(
+                                                link.close_lead_id,
+                                              );
+                                              setViewMode("lead");
+                                            }}
+                                            disabled={isLoadingLead}
+                                            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 hover:border-blue-300 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                                          >
+                                            <ExternalLink className="w-3 h-3" />
+                                            View Details
+                                          </button>
+                                          <button
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              handleUnlinkLead(
+                                                link.id,
+                                                link.close_lead_id,
+                                              );
+                                            }}
+                                            disabled={
+                                              deleteLinkMutation.isPending
+                                            }
+                                            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 hover:border-red-300 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                                          >
+                                            <X className="w-3 h-3" />
+                                            {deleteLinkMutation.isPending
+                                              ? "Unlinking..."
+                                              : "Unlink"}
+                                          </button>
                                         </div>
                                       </div>
-
-                                      {/* Actions */}
-                                      <div className="pt-2 border-t border-blue-200 flex gap-2">
-                                        <button
-                                          onClick={() => {
-                                            setSelectedLeadId(
-                                              link.close_lead_id,
-                                            );
-                                            setViewMode("lead");
-                                          }}
-                                          disabled={isLoadingLead}
-                                          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 hover:border-blue-300 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                                        >
-                                          <ExternalLink className="w-3 h-3" />
-                                          View Details
-                                        </button>
-                                        <button
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleUnlinkLead(
-                                              link.id,
-                                              link.close_lead_id,
-                                            );
-                                          }}
-                                          disabled={
-                                            deleteLinkMutation.isPending
-                                          }
-                                          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 hover:border-red-300 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                                        >
-                                          <X className="w-3 h-3" />
-                                          {deleteLinkMutation.isPending
-                                            ? "Unlinking..."
-                                            : "Unlink"}
-                                        </button>
-                                      </div>
-                                    </div>
-                                  );
-                                })()}
-                              </motion.div>
-                            );
-                          })}
-                        </div>
-                      )}
+                                    );
+                                  })()}
+                                </motion.div>
+                              );
+                            })}
+                          </div>
+                        )}
                       </CollapsibleSectionCard>
                     </motion.div>
 
@@ -2518,166 +2574,168 @@ export default function CRMFacilityDetailsSidebar({
                             isExpanded={expandedSections.sports}
                             onToggle={() => toggleSection("sports")}
                           >
-                          <div className="flex flex-wrap gap-2">
-                            {facility.identified_sports.map((sport, idx) => {
-                              const metadata = facility.sport_metadata?.[sport];
-                              const score = metadata?.score || 0;
-                              const confidence =
-                                metadata?.confidence || "unknown";
+                            <div className="flex flex-wrap gap-2">
+                              {facility.identified_sports.map((sport, idx) => {
+                                const metadata =
+                                  facility.sport_metadata?.[sport];
+                                const score = metadata?.score || 0;
+                                const confidence =
+                                  metadata?.confidence || "unknown";
 
-                              // Color coding based on confidence
-                              let textColor = "text-slate-700";
-                              let borderColor = "border-slate-300";
+                                // Color coding based on confidence
+                                let textColor = "text-slate-700";
+                                let borderColor = "border-slate-300";
 
-                              if (confidence === "high") {
-                                textColor = "text-green-700";
-                                borderColor = "border-green-400";
-                              } else if (confidence === "medium") {
-                                textColor = "text-yellow-700";
-                                borderColor = "border-yellow-400";
-                              } else if (confidence === "low") {
-                                textColor = "text-red-700";
-                                borderColor = "border-red-400";
-                              }
+                                if (confidence === "high") {
+                                  textColor = "text-green-700";
+                                  borderColor = "border-green-400";
+                                } else if (confidence === "medium") {
+                                  textColor = "text-yellow-700";
+                                  borderColor = "border-yellow-400";
+                                } else if (confidence === "low") {
+                                  textColor = "text-red-700";
+                                  borderColor = "border-red-400";
+                                }
 
-                              // Get confidence icon
-                              let confidenceIcon = "?";
-                              if (confidence === "high") {
-                                confidenceIcon = "✓";
-                              } else if (confidence === "medium") {
-                                confidenceIcon = "~";
-                              } else if (confidence === "low") {
-                                confidenceIcon = "⚠";
-                              }
+                                // Get confidence icon
+                                let confidenceIcon = "?";
+                                if (confidence === "high") {
+                                  confidenceIcon = "✓";
+                                } else if (confidence === "medium") {
+                                  confidenceIcon = "~";
+                                } else if (confidence === "low") {
+                                  confidenceIcon = "⚠";
+                                }
 
-                              const tooltipContent = metadata
-                                ? `Score: ${score}/100 | Sources: ${metadata.sources.join(", ") || "unknown"}\nKeywords: ${metadata.keywords_matched.join(", ")}\nMatched: "${metadata.matched_text}"`
-                                : "No confidence data available - run audit script";
+                                const tooltipContent = metadata
+                                  ? `Score: ${score}/100 | Sources: ${metadata.sources.join(", ") || "unknown"}\nKeywords: ${metadata.keywords_matched.join(", ")}\nMatched: "${metadata.matched_text}"`
+                                  : "No confidence data available - run audit script";
 
-                              return (
-                                <motion.div
-                                  key={sport}
-                                  initial={{ opacity: 0, scale: 0.8 }}
-                                  animate={{ opacity: 1, scale: 1 }}
-                                  transition={{ delay: 0.12 + idx * 0.05 }}
-                                  className="group relative"
-                                  title={tooltipContent}
-                                >
-                                  <button
-                                    onClick={() =>
-                                      setSelectedSportDetail(sport)
-                                    }
-                                    className={`px-3 py-1.5 bg-white ${textColor} rounded-full text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5 border ${borderColor}`}
+                                return (
+                                  <motion.div
+                                    key={sport}
+                                    initial={{ opacity: 0, scale: 0.8 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    transition={{ delay: 0.12 + idx * 0.05 }}
+                                    className="group relative"
+                                    title={tooltipContent}
                                   >
-                                    <span className="text-sm">
-                                      {SPORT_EMOJIS[sport] || "🏅"}
-                                    </span>
-                                    <span>{sport}</span>
-                                    {metadata ? (
-                                      <>
-                                        <span className="text-xs opacity-75">
-                                          {confidenceIcon}
-                                        </span>
-                                        <span className="px-1.5 py-0.5 rounded text-xs font-bold bg-slate-100">
-                                          {score}
-                                        </span>
-                                      </>
-                                    ) : (
-                                      <span className="text-xs opacity-75">
-                                        ?
+                                    <button
+                                      onClick={() =>
+                                        setSelectedSportDetail(sport)
+                                      }
+                                      className={`px-3 py-1.5 bg-white ${textColor} rounded-full text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5 border ${borderColor}`}
+                                    >
+                                      <span className="text-sm">
+                                        {SPORT_EMOJIS[sport] || "🏅"}
                                       </span>
-                                    )}
-                                  </button>
-
-                                  {/* Tooltip on hover - appears below badge */}
-                                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 hidden group-hover:block z-[100] pointer-events-none">
-                                    <div className="bg-slate-900 text-white text-xs rounded-xl py-2 px-3 shadow-xl max-w-xs whitespace-pre-wrap">
-                                      {/* Arrow pointing up */}
-                                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-[-1px]">
-                                        <div className="border-8 border-transparent border-b-slate-900"></div>
-                                      </div>
+                                      <span>{sport}</span>
                                       {metadata ? (
                                         <>
-                                          <div className="font-semibold mb-1">
-                                            Confidence: {score}/100 (
-                                            {confidence})
-                                          </div>
-                                          <div className="text-slate-300">
-                                            <div>
-                                              <strong>Sources:</strong>{" "}
-                                              {metadata.sources.join(", ") ||
-                                                "unknown"}
-                                            </div>
-                                            <div>
-                                              <strong>Keywords:</strong>{" "}
-                                              {metadata.keywords_matched.join(
-                                                ", ",
-                                              )}
-                                            </div>
-                                            {metadata.matched_text && (
-                                              <div className="mt-1 italic border-t border-slate-700 pt-1">
-                                                {Array.isArray(
-                                                  metadata.matched_text,
-                                                ) ? (
-                                                  <div>
-                                                    <strong>
-                                                      {
-                                                        metadata.matched_text
-                                                          .length
-                                                      }{" "}
-                                                      matching review(s):
-                                                    </strong>
-                                                    <div className="mt-1 space-y-2 max-h-40 overflow-y-auto">
-                                                      {metadata.matched_text.map(
-                                                        (review, idx) => (
-                                                          <div
-                                                            key={idx}
-                                                            className="text-slate-300 border-l-2 border-slate-600 pl-2"
-                                                          >
-                                                            "
-                                                            {review.substring(
-                                                              0,
-                                                              100,
-                                                            )}
-                                                            {review.length > 100
-                                                              ? "..."
-                                                              : ""}
-                                                            "
-                                                          </div>
-                                                        ),
-                                                      )}
-                                                    </div>
-                                                  </div>
-                                                ) : (
-                                                  <>
-                                                    "
-                                                    {metadata.matched_text.substring(
-                                                      0,
-                                                      100,
-                                                    )}
-                                                    {metadata.matched_text
-                                                      .length > 100
-                                                      ? "..."
-                                                      : ""}
-                                                    "
-                                                  </>
-                                                )}
-                                              </div>
-                                            )}
-                                          </div>
+                                          <span className="text-xs opacity-75">
+                                            {confidenceIcon}
+                                          </span>
+                                          <span className="px-1.5 py-0.5 rounded text-xs font-bold bg-slate-100">
+                                            {score}
+                                          </span>
                                         </>
                                       ) : (
-                                        <div>
-                                          No confidence data available - run
-                                          audit script
-                                        </div>
+                                        <span className="text-xs opacity-75">
+                                          ?
+                                        </span>
                                       )}
+                                    </button>
+
+                                    {/* Tooltip on hover - appears below badge */}
+                                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 hidden group-hover:block z-[100] pointer-events-none">
+                                      <div className="bg-slate-900 text-white text-xs rounded-xl py-2 px-3 shadow-xl max-w-xs whitespace-pre-wrap">
+                                        {/* Arrow pointing up */}
+                                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-[-1px]">
+                                          <div className="border-8 border-transparent border-b-slate-900"></div>
+                                        </div>
+                                        {metadata ? (
+                                          <>
+                                            <div className="font-semibold mb-1">
+                                              Confidence: {score}/100 (
+                                              {confidence})
+                                            </div>
+                                            <div className="text-slate-300">
+                                              <div>
+                                                <strong>Sources:</strong>{" "}
+                                                {metadata.sources.join(", ") ||
+                                                  "unknown"}
+                                              </div>
+                                              <div>
+                                                <strong>Keywords:</strong>{" "}
+                                                {metadata.keywords_matched.join(
+                                                  ", ",
+                                                )}
+                                              </div>
+                                              {metadata.matched_text && (
+                                                <div className="mt-1 italic border-t border-slate-700 pt-1">
+                                                  {Array.isArray(
+                                                    metadata.matched_text,
+                                                  ) ? (
+                                                    <div>
+                                                      <strong>
+                                                        {
+                                                          metadata.matched_text
+                                                            .length
+                                                        }{" "}
+                                                        matching review(s):
+                                                      </strong>
+                                                      <div className="mt-1 space-y-2 max-h-40 overflow-y-auto">
+                                                        {metadata.matched_text.map(
+                                                          (review, idx) => (
+                                                            <div
+                                                              key={idx}
+                                                              className="text-slate-300 border-l-2 border-slate-600 pl-2"
+                                                            >
+                                                              "
+                                                              {review.substring(
+                                                                0,
+                                                                100,
+                                                              )}
+                                                              {review.length >
+                                                              100
+                                                                ? "..."
+                                                                : ""}
+                                                              "
+                                                            </div>
+                                                          ),
+                                                        )}
+                                                      </div>
+                                                    </div>
+                                                  ) : (
+                                                    <>
+                                                      "
+                                                      {metadata.matched_text.substring(
+                                                        0,
+                                                        100,
+                                                      )}
+                                                      {metadata.matched_text
+                                                        .length > 100
+                                                        ? "..."
+                                                        : ""}
+                                                      "
+                                                    </>
+                                                  )}
+                                                </div>
+                                              )}
+                                            </div>
+                                          </>
+                                        ) : (
+                                          <div>
+                                            No confidence data available - run
+                                            audit script
+                                          </div>
+                                        )}
+                                      </div>
                                     </div>
-                                  </div>
-                                </motion.div>
-                              );
-                            })}
-                          </div>
+                                  </motion.div>
+                                );
+                              })}
+                            </div>
                           </CollapsibleSectionCard>
                         </motion.div>
                       )}
@@ -2696,61 +2754,61 @@ export default function CRMFacilityDetailsSidebar({
                         isExpanded={expandedSections.contact}
                         onToggle={() => toggleSection("contact")}
                       >
-                      <div className="space-y-3">
-                        <div className="flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors">
-                          <MapPin className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                          <p className="text-slate-700 text-sm leading-relaxed">
-                            {facility.address}
-                          </p>
-                        </div>
+                        <div className="space-y-3">
+                          <div className="flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors">
+                            <MapPin className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                            <p className="text-slate-700 text-sm leading-relaxed">
+                              {facility.address}
+                            </p>
+                          </div>
 
-                        {facility.phone && (
-                          <motion.a
-                            href={`tel:${facility.phone}`}
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="flex items-center gap-3 p-3 rounded-xl hover:bg-blue-50 transition-colors group"
-                          >
-                            <Phone className="w-5 h-5 text-blue-600 group-hover:text-blue-700 transition-colors" />
-                            <span className="text-blue-600 group-hover:text-blue-700 font-medium text-sm">
-                              {facility.phone}
-                            </span>
-                          </motion.a>
-                        )}
-
-                        {facility.website && (
-                          <motion.a
-                            href={facility.website}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="flex items-center gap-3 p-3 rounded-xl hover:bg-blue-50 transition-colors group"
-                          >
-                            <Globe className="w-5 h-5 text-blue-600 group-hover:text-blue-700 transition-colors flex-shrink-0" />
-                            <span className="text-blue-600 group-hover:text-blue-700 font-medium text-sm truncate">
-                              {facility.website.replace(/^https?:\/\//, "")}
-                            </span>
-                          </motion.a>
-                        )}
-
-                        {facility.email &&
-                          facility.email.length > 0 &&
-                          facility.email.map((emailAddress, idx) => (
+                          {facility.phone && (
                             <motion.a
-                              key={idx}
-                              href={`mailto:${emailAddress}`}
+                              href={`tel:${facility.phone}`}
                               whileHover={{ scale: 1.02 }}
                               whileTap={{ scale: 0.98 }}
                               className="flex items-center gap-3 p-3 rounded-xl hover:bg-blue-50 transition-colors group"
                             >
-                              <Mail className="w-5 h-5 text-blue-600 group-hover:text-blue-700 transition-colors" />
+                              <Phone className="w-5 h-5 text-blue-600 group-hover:text-blue-700 transition-colors" />
                               <span className="text-blue-600 group-hover:text-blue-700 font-medium text-sm">
-                                {emailAddress}
+                                {facility.phone}
                               </span>
                             </motion.a>
-                          ))}
-                      </div>
+                          )}
+
+                          {facility.website && (
+                            <motion.a
+                              href={facility.website}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                              className="flex items-center gap-3 p-3 rounded-xl hover:bg-blue-50 transition-colors group"
+                            >
+                              <Globe className="w-5 h-5 text-blue-600 group-hover:text-blue-700 transition-colors flex-shrink-0" />
+                              <span className="text-blue-600 group-hover:text-blue-700 font-medium text-sm truncate">
+                                {facility.website.replace(/^https?:\/\//, "")}
+                              </span>
+                            </motion.a>
+                          )}
+
+                          {facility.email &&
+                            facility.email.length > 0 &&
+                            facility.email.map((emailAddress, idx) => (
+                              <motion.a
+                                key={idx}
+                                href={`mailto:${emailAddress}`}
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                className="flex items-center gap-3 p-3 rounded-xl hover:bg-blue-50 transition-colors group"
+                              >
+                                <Mail className="w-5 h-5 text-blue-600 group-hover:text-blue-700 transition-colors" />
+                                <span className="text-blue-600 group-hover:text-blue-700 font-medium text-sm">
+                                  {emailAddress}
+                                </span>
+                              </motion.a>
+                            ))}
+                        </div>
                       </CollapsibleSectionCard>
                     </motion.div>
 
@@ -3240,7 +3298,9 @@ export default function CRMFacilityDetailsSidebar({
                           className="bg-white border border-slate-200 rounded-lg p-5"
                         >
                           <button
-                            onClick={() => setContactsExpanded(!contactsExpanded)}
+                            onClick={() =>
+                              setContactsExpanded(!contactsExpanded)
+                            }
                             className="w-full flex items-center justify-between cursor-pointer"
                           >
                             <h3 className="text-sm font-semibold text-slate-900 tracking-wide flex items-center gap-2">
@@ -3340,7 +3400,9 @@ export default function CRMFacilityDetailsSidebar({
                           className="bg-white border border-slate-200 rounded-lg p-5"
                         >
                           <button
-                            onClick={() => setCustomFieldsExpanded(!customFieldsExpanded)}
+                            onClick={() =>
+                              setCustomFieldsExpanded(!customFieldsExpanded)
+                            }
                             className="w-full flex items-center justify-between cursor-pointer"
                           >
                             <h3 className="text-sm font-semibold text-slate-900 tracking-wide">
@@ -3440,10 +3502,22 @@ export default function CRMFacilityDetailsSidebar({
                                     setViewMode("fit-assessment");
                                     // Add Fit Assessment tag to local state
                                     if (data.place_id) {
-                                      const FIT_TAG_ID = "e1f0b490-d88b-403e-ba18-2c7e39d27b57";
+                                      const FIT_TAG_ID =
+                                        "e1f0b490-d88b-403e-ba18-2c7e39d27b57";
                                       setFacilityTags((prev) => {
-                                        if (prev.some((t) => t.id === FIT_TAG_ID)) return prev;
-                                        return [...prev, { id: FIT_TAG_ID, name: "Fit Assessment", color: "#14b8a6", description: null }];
+                                        if (
+                                          prev.some((t) => t.id === FIT_TAG_ID)
+                                        )
+                                          return prev;
+                                        return [
+                                          ...prev,
+                                          {
+                                            id: FIT_TAG_ID,
+                                            name: "Fit Assessment",
+                                            color: "#14b8a6",
+                                            description: null,
+                                          },
+                                        ];
                                       });
                                     }
                                   },
@@ -3613,16 +3687,33 @@ export default function CRMFacilityDetailsSidebar({
                         )}
                       </h3>
                       {fitAssessments.length === 0 ? (
-                        <p className="text-xs text-slate-400">No fit assessments yet</p>
+                        <p className="text-xs text-slate-400">
+                          No fit assessments yet
+                        </p>
                       ) : (
                         <div className="space-y-2">
                           {fitAssessments.map((fa) => {
                             const verdictBadge = {
-                              strong_fit: { label: "Strong", className: "bg-emerald-100 text-emerald-700" },
-                              moderate_fit: { label: "Moderate", className: "bg-amber-100 text-amber-700" },
-                              weak_fit: { label: "Weak", className: "bg-orange-100 text-orange-700" },
-                              poor_fit: { label: "Poor", className: "bg-red-100 text-red-700" },
-                            }[fa.verdict] || { label: fa.verdict, className: "bg-slate-100 text-slate-700" };
+                              strong_fit: {
+                                label: "Strong",
+                                className: "bg-emerald-100 text-emerald-700",
+                              },
+                              moderate_fit: {
+                                label: "Moderate",
+                                className: "bg-amber-100 text-amber-700",
+                              },
+                              weak_fit: {
+                                label: "Weak",
+                                className: "bg-orange-100 text-orange-700",
+                              },
+                              poor_fit: {
+                                label: "Poor",
+                                className: "bg-red-100 text-red-700",
+                              },
+                            }[fa.verdict] || {
+                              label: fa.verdict,
+                              className: "bg-slate-100 text-slate-700",
+                            };
 
                             return (
                               <button
@@ -3634,12 +3725,23 @@ export default function CRMFacilityDetailsSidebar({
                                 className="w-full text-left p-3 rounded-lg border border-slate-100 hover:border-teal-200 hover:bg-teal-50/50 transition-colors cursor-pointer"
                               >
                                 <div className="flex items-center gap-2 mb-1">
-                                  <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${verdictBadge.className}`}>
+                                  <span
+                                    className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${verdictBadge.className}`}
+                                  >
                                     {verdictBadge.label}
                                   </span>
-                                  <span className="text-xs font-bold text-slate-700">{fa.overall_score}</span>
+                                  <span className="text-xs font-bold text-slate-700">
+                                    {fa.overall_score}
+                                  </span>
                                   <span className="text-[10px] text-slate-400">
-                                    {new Date(fa.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                                    {new Date(fa.created_at).toLocaleDateString(
+                                      "en-US",
+                                      {
+                                        month: "short",
+                                        day: "numeric",
+                                        year: "numeric",
+                                      },
+                                    )}
                                   </span>
                                 </div>
                                 <p className="text-xs text-slate-600 line-clamp-2">
@@ -3743,7 +3845,9 @@ export default function CRMFacilityDetailsSidebar({
                       closeLeadId={selectedLeadId!}
                       onEditSubmit={handleEditEmail}
                       isRegenerating={generateEmailMutation.isPending}
-                      mostRecentActivity={selectedLeadActivities?.activities?.[0]}
+                      mostRecentActivity={
+                        selectedLeadActivities?.activities?.[0]
+                      }
                       onActivityClick={handleActivityClick}
                     />
                   </motion.div>
@@ -3768,7 +3872,10 @@ export default function CRMFacilityDetailsSidebar({
                       <ChevronLeft className="w-4 h-4" />
                       Back to Lead
                     </motion.button>
-                    <FitAssessmentDisplay assessment={fitAssessment} openingHours={facility?.opening_hours} />
+                    <FitAssessmentDisplay
+                      assessment={fitAssessment}
+                      openingHours={facility?.opening_hours}
+                    />
                   </motion.div>
                 ) : null}
               </AnimatePresence>
