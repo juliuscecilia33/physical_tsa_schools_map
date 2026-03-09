@@ -1610,6 +1610,50 @@ export default function CRMFacilityDetailsSidebar({
                   </div>
                   <span className="text-[11px] font-medium text-slate-600">Tag</span>
                 </motion.button>
+
+                {facility.phone && (
+                  <motion.a
+                    href={`tel:${facility.phone}`}
+                    whileHover={{ scale: 1.08 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="flex flex-col items-center gap-1.5 cursor-pointer group"
+                  >
+                    <div className="w-11 h-11 rounded-full bg-green-50 group-hover:bg-green-100 border border-green-200 flex items-center justify-center transition-all">
+                      <Phone className="w-5 h-5 text-green-600" />
+                    </div>
+                    <span className="text-[11px] font-medium text-slate-600">Call</span>
+                  </motion.a>
+                )}
+
+                {facility.email && facility.email.length > 0 && (
+                  <motion.a
+                    href={`mailto:${facility.email[0]}`}
+                    whileHover={{ scale: 1.08 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="flex flex-col items-center gap-1.5 cursor-pointer group"
+                  >
+                    <div className="w-11 h-11 rounded-full bg-orange-50 group-hover:bg-orange-100 border border-orange-200 flex items-center justify-center transition-all">
+                      <Mail className="w-5 h-5 text-orange-600" />
+                    </div>
+                    <span className="text-[11px] font-medium text-slate-600">Email</span>
+                  </motion.a>
+                )}
+
+                {facility.website && (
+                  <motion.a
+                    href={facility.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    whileHover={{ scale: 1.08 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="flex flex-col items-center gap-1.5 cursor-pointer group"
+                  >
+                    <div className="w-11 h-11 rounded-full bg-purple-50 group-hover:bg-purple-100 border border-purple-200 flex items-center justify-center transition-all">
+                      <Globe className="w-5 h-5 text-purple-600" />
+                    </div>
+                    <span className="text-[11px] font-medium text-slate-600">Website</span>
+                  </motion.a>
+                )}
               </div>
             )}
           </div>
