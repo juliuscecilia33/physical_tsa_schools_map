@@ -252,6 +252,10 @@ function FacilitySidebarInner({
   const [loadingTags, setLoadingTags] = useState(false);
   const [isTagManagementModalOpen, setIsTagManagementModalOpen] =
     useState(false);
+  const [noteFlash, setNoteFlash] = useState(false);
+  const [tagFlash, setTagFlash] = useState(false);
+  const notesSectionRef = useRef<HTMLDivElement>(null);
+  const tagsSectionRef = useRef<HTMLDivElement>(null);
   const [showCreateTagSection, setShowCreateTagSection] = useState(false);
   const [showManageTagsSection, setShowManageTagsSection] = useState(false);
   const [newTagName, setNewTagName] = useState("");
@@ -300,6 +304,20 @@ function FacilitySidebarInner({
     data: selectedLeadActivities,
     isLoading: selectedLeadActivitiesLoading,
   } = useCloseLeadActivities(selectedLeadId);
+
+  const handleQuickAddNote = () => {
+    setIsAddNoteModalOpen(true);
+    setTimeout(() => {
+      notesSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+  };
+
+  const handleQuickAddTag = () => {
+    setIsTagManagementModalOpen(true);
+    setTimeout(() => {
+      tagsSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+  };
 
   const handleEditEmail = (instructions: string) => {
     if (!generatedEmail || !selectedLead) return;
@@ -461,6 +479,31 @@ function FacilitySidebarInner({
       contentRef.current.scrollTop = 0;
     }
   }, [viewMode]);
+
+  // Quick action keyboard shortcuts
+  useEffect(() => {
+    const handleQuickActionKeys = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) return;
+      if (viewMode !== 'facility') return;
+      if (isTagManagementModalOpen || isAddNoteModalOpen || isPhotoViewerOpen) return;
+
+      if (e.key === 'n' || e.key === 'N') {
+        e.preventDefault();
+        setNoteFlash(true);
+        setTimeout(() => setNoteFlash(false), 150);
+        handleQuickAddNote();
+      }
+      if (e.key === 't' || e.key === 'T') {
+        e.preventDefault();
+        setTagFlash(true);
+        setTimeout(() => setTagFlash(false), 150);
+        handleQuickAddTag();
+      }
+    };
+    window.addEventListener('keydown', handleQuickActionKeys);
+    return () => window.removeEventListener('keydown', handleQuickActionKeys);
+  }, [viewMode, isTagManagementModalOpen, isAddNoteModalOpen, isPhotoViewerOpen]);
 
   // Sync facility tags from displayFacility when it changes
   useEffect(() => {
@@ -1366,6 +1409,25 @@ function FacilitySidebarInner({
               <X className="w-5 h-5" />
             </button>
           </div>
+          {/* Quick Actions Bar */}
+          {displayFacility && viewMode === "facility" && (
+            <div className="px-6 py-2 border-t border-slate-100 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                  onClick={handleQuickAddNote}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer ${noteFlash ? 'ring-2 ring-blue-300' : ''}`}>
+                  <StickyNote className="w-3.5 h-3.5" /> Add Note
+                  <kbd className="ml-1 px-1.5 py-0.5 text-[10px] font-mono bg-blue-500/30 rounded">N</kbd>
+                </motion.button>
+                <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                  onClick={handleQuickAddTag}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all cursor-pointer ${tagFlash ? 'ring-2 ring-blue-300' : ''}`}>
+                  <Tag className="w-3.5 h-3.5" /> Add Tag
+                  <kbd className="ml-1 px-1.5 py-0.5 text-[10px] font-mono bg-slate-200 rounded">T</kbd>
+                </motion.button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Content */}
@@ -1648,6 +1710,7 @@ function FacilitySidebarInner({
 
                 {/* Notes Section */}
                 <motion.div
+                  ref={notesSectionRef}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.08 }}
@@ -1837,6 +1900,7 @@ function FacilitySidebarInner({
 
                 {/* Tags Section */}
                 <motion.div
+                  ref={tagsSectionRef}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 }}

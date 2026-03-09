@@ -1,8 +1,8 @@
 {
-  "processedCount": 160,
-  "successCount": 83,
-  "failedCount": 78,
-  "skippedCount": 31,
+  "processedCount": 165,
+  "successCount": 85,
+  "failedCount": 81,
+  "skippedCount": 107,
   "processedFacilityIds": [
     "fe41e2b9-7c1c-4104-893d-75c6c5e3b12e",
     "028cb98a-02c0-4f18-aa60-4801f9c08de4",
@@ -163,16 +163,21 @@
     "017d6952-ce73-4a24-a595-de793fbcc5e0",
     "56407e8c-bc67-4292-bd91-0ce4756f612e",
     "59f53700-3e13-4ed1-9184-9a744ee43db1",
-    "8c4f2b9f-c3c6-4cbb-ad7a-d2c3cf16a8a7"
+    "8c4f2b9f-c3c6-4cbb-ad7a-d2c3cf16a8a7",
+    "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+    "3bf32ca6-9c9a-40ce-84b6-495c478dbc33",
+    "6264004b-8f13-4cba-8868-f36893113ca3",
+    "d282d19c-0844-4e72-ae97-034112595729",
+    "7c4e2e86-1340-41f4-94e9-a4b62a727276"
   ],
-  "imagesProcessed": 2352,
+  "imagesProcessed": 2489,
   "imagesSkipped": 3338,
-  "imagesFailed": 142,
-  "deletionsSucceeded": 2352,
+  "imagesFailed": 184,
+  "deletionsSucceeded": 2489,
   "deletionsFailed": 0,
-  "totalBytesBefore": 6083605307,
-  "totalBytesAfter": 2484806752,
-  "lastUpdated": "2026-03-09T19:42:39.674Z",
+  "totalBytesBefore": 6478235592,
+  "totalBytesAfter": 2674318056,
+  "lastUpdated": "2026-03-09T20:29:13.492Z",
   "errors": [
     {
       "facility_id": "fe41e2b9-7c1c-4104-893d-75c6c5e3b12e",
@@ -1167,6 +1172,300 @@
       "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/56b80932-80a1-4404-9a15-32953763816b/1772157956081_14.jpg",
       "error": "Failed to download image",
       "timestamp": "2026-03-09T19:18:59.636Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157362816_0.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:14.357Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157364786_1.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:14.777Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157366449_2.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:15.272Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157368349_3.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:15.920Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157370020_4.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:16.565Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157371725_5.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:17.470Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157373715_6.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:18.496Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157374877_7.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:19.353Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157375875_8.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:20.105Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157377460_9.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:20.617Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157379332_10.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:21.197Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157380425_11.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:21.822Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157381500_12.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:22.355Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157383744_13.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:23.223Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157385894_14.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:24.013Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157387825_15.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:24.792Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157389266_16.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:25.258Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157390169_17.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:25.889Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157391065_18.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:26.470Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157391918_19.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:27.072Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157392789_20.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:27.730Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157393838_21.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:29.416Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157394744_22.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:29.867Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157396691_23.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:30.371Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157397712_24.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:31.064Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157398654_25.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:31.699Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157399557_26.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:32.176Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157400359_27.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:32.725Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157401223_28.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:33.310Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157402099_29.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:33.785Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157403474_30.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:34.184Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157405097_31.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:34.641Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157406060_32.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:35.141Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157406988_33.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:35.656Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157407761_34.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:36.182Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157408909_35.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:36.770Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157409904_36.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:37.349Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157410884_37.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:37.802Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157411678_38.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:38.442Z"
+    },
+    {
+      "facility_id": "4d156ce2-c187-49c2-be70-5fea2a7efd50",
+      "facility_name": "Central Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/4d156ce2-c187-49c2-be70-5fea2a7efd50/1772157412816_39.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T19:59:38.902Z"
+    },
+    {
+      "facility_id": "3bf32ca6-9c9a-40ce-84b6-495c478dbc33",
+      "facility_name": "Parker Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/3bf32ca6-9c9a-40ce-84b6-495c478dbc33/1772155716868_10.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-09T20:07:13.222Z"
+    },
+    {
+      "facility_id": "6264004b-8f13-4cba-8868-f36893113ca3",
+      "facility_name": "City Park",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/6264004b-8f13-4cba-8868-f36893113ca3/1772159427777_28.jpg",
+      "error": "Failed to upload compressed image",
+      "timestamp": "2026-03-09T20:12:49.687Z"
     }
   ]
 }

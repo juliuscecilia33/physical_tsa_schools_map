@@ -226,6 +226,10 @@ export default function CRMFacilityDetailsSidebar({
   const [loadingTags, setLoadingTags] = useState(false);
   const [isTagManagementModalOpen, setIsTagManagementModalOpen] =
     useState(false);
+  const [noteFlash, setNoteFlash] = useState(false);
+  const [tagFlash, setTagFlash] = useState(false);
+  const notesSectionRef = useRef<HTMLDivElement>(null);
+  const tagsSectionRef = useRef<HTMLDivElement>(null);
   const [newTagName, setNewTagName] = useState("");
   const [newTagColor, setNewTagColor] = useState("#004aad");
   const [newTagDescription, setNewTagDescription] = useState("");
@@ -462,6 +466,31 @@ export default function CRMFacilityDetailsSidebar({
       contentRef.current.scrollTop = 0;
     }
   }, [viewMode]);
+
+  // Quick action keyboard shortcuts
+  useEffect(() => {
+    const handleQuickActionKeys = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) return;
+      if (viewMode !== 'facility') return;
+      if (isTagManagementModalOpen || showAddNoteForm || isPhotoViewerOpen) return;
+
+      if (e.key === 'n' || e.key === 'N') {
+        e.preventDefault();
+        setNoteFlash(true);
+        setTimeout(() => setNoteFlash(false), 150);
+        handleQuickAddNote();
+      }
+      if (e.key === 't' || e.key === 'T') {
+        e.preventDefault();
+        setTagFlash(true);
+        setTimeout(() => setTagFlash(false), 150);
+        handleQuickAddTag();
+      }
+    };
+    window.addEventListener('keydown', handleQuickActionKeys);
+    return () => window.removeEventListener('keydown', handleQuickActionKeys);
+  }, [viewMode, isTagManagementModalOpen, showAddNoteForm, isPhotoViewerOpen]);
 
   // Fetch all tags on component mount
   useEffect(() => {
@@ -884,6 +913,20 @@ export default function CRMFacilityDetailsSidebar({
   };
 
   // Navigate to map view and focus on this facility
+  const handleQuickAddNote = () => {
+    setShowAddNoteForm(true);
+    setTimeout(() => {
+      notesSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+  };
+
+  const handleQuickAddTag = () => {
+    setIsTagManagementModalOpen(true);
+    setTimeout(() => {
+      tagsSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+  };
+
   const handleViewOnMap = () => {
     if (facility) {
       router.push(`/?focus=${facility.place_id}`);
@@ -1443,7 +1486,8 @@ export default function CRMFacilityDetailsSidebar({
           className="fixed right-0 top-0 bottom-0 w-full sm:w-[560px] bg-white shadow-2xl z-[60] flex flex-col overflow-hidden"
         >
           {/* Header */}
-          <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-start justify-between z-10">
+          <div className="sticky top-0 bg-white border-b border-slate-200 z-10">
+            <div className="px-6 py-4 flex items-start justify-between">
             <div className="flex-1 pr-4">
               {isLoadingDetails ? (
                 <div className="space-y-2">
@@ -1545,6 +1589,26 @@ export default function CRMFacilityDetailsSidebar({
             >
               <X className="w-5 h-5 text-slate-600" />
             </button>
+            </div>
+            {/* Quick Actions Bar */}
+            {facility && viewMode === "facility" && (
+              <div className="px-6 py-2 border-t border-slate-100 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                    onClick={handleQuickAddNote}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer ${noteFlash ? 'ring-2 ring-blue-300' : ''}`}>
+                    <StickyNote className="w-3.5 h-3.5" /> Add Note
+                    <kbd className="ml-1 px-1.5 py-0.5 text-[10px] font-mono bg-blue-500/30 rounded">N</kbd>
+                  </motion.button>
+                  <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                    onClick={handleQuickAddTag}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all cursor-pointer ${tagFlash ? 'ring-2 ring-blue-300' : ''}`}>
+                    <Tag className="w-3.5 h-3.5" /> Add Tag
+                    <kbd className="ml-1 px-1.5 py-0.5 text-[10px] font-mono bg-slate-200 rounded">T</kbd>
+                  </motion.button>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Content */}
@@ -1845,6 +1909,7 @@ export default function CRMFacilityDetailsSidebar({
 
                     {/* Notes Section */}
                     <motion.div
+                      ref={notesSectionRef}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.08 }}
@@ -2073,6 +2138,7 @@ export default function CRMFacilityDetailsSidebar({
 
                     {/* Tags Section */}
                     <motion.div
+                      ref={tagsSectionRef}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.1 }}
