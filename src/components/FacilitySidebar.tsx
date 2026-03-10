@@ -2,6 +2,7 @@
 
 import { Facility, Note, FacilityTag } from "@/types/facility";
 import NoteText from "./NoteText";
+import CallPopover from "./CallPopover";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -1509,19 +1510,11 @@ function FacilitySidebarInner({
               </motion.button>
 
               {displayFacility.phone && (
-                <motion.a
-                  href={`tel:${displayFacility.phone}`}
-                  whileHover={{ scale: 1.08 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="flex flex-col items-center gap-1.5 cursor-pointer group"
-                >
-                  <div className="w-11 h-11 rounded-full bg-green-50 group-hover:bg-green-100 border border-green-200 flex items-center justify-center transition-all">
-                    <Phone className="w-5 h-5 text-green-600" />
-                  </div>
-                  <span className="text-[11px] font-medium text-slate-600">
-                    Call
-                  </span>
-                </motion.a>
+                <CallPopover
+                  phone={displayFacility.phone}
+                  linkedLeads={linkedLeads}
+                  leadsMap={leadsMap}
+                />
               )}
 
               {displayFacility.email && displayFacility.email.length > 0 && (
