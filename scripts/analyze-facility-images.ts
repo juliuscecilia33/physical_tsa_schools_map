@@ -27,13 +27,16 @@ const genAI = new GoogleGenerativeAI(geminiApiKey);
 
 // Configuration
 const DRY_RUN = false; // Set to false to write results to DB
-const TEST_LIMIT: number | null = 5; // Set to null for full run
+const TEST_LIMIT: number | null = 50; // Set to null for full run
 const BATCH_SIZE = 10; // Images per Gemini call
 const DELAY_BETWEEN_GEMINI_CALLS_MS = 4000; // ~15 RPM
 const CONCURRENCY_LIMIT = 5; // Parallel image downloads
 const MODEL_NAME = "gemini-2.0-flash";
 
-const PROGRESS_FILE = path.join(__dirname, "../progress/photo-analysis-progress.json");
+const PROGRESS_FILE = path.join(
+  __dirname,
+  "../progress/photo-analysis-progress.json",
+);
 
 // Types
 interface PhotoData {
@@ -277,6 +280,7 @@ Categories:
 - people_closeup: Close-up portraits/photos of individuals (not showing facility)
 - carnival_amusement: Carnival rides, bounce houses, festival attractions, temporary entertainment
 - animal_art: Animals, sculptures, art installations unrelated to sports
+- flyer: Promotional flyers, posters, printed notices, event advertisements
 - irrelevant: Anything not related to the facility
 
 Scoring guide:
@@ -293,6 +297,7 @@ Low-scoring examples (score these types LOW):
 - Close-up of a player's face/body (facility not visible) → 10-20
 - Kids on a bounce house → 5-15
 - Decorative animals or statues → 0-10
+- Flyer or promotional poster → 5-15
 
 Respond with a JSON array. Each element must have:
 - "index": the image number (0-based, matching the order provided)
