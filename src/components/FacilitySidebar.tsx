@@ -3690,16 +3690,14 @@ function FacilitySidebarInner({
         {hasOpenedPhotosModal &&
           createPortal(
             <div style={{ display: isPhotosModalOpen ? undefined : 'none' }}>
-            <motion.div
-              animate={{ opacity: isPhotosModalOpen ? 1 : 0 }}
-              transition={{ duration: 0.2 }}
-              className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-6 z-[9999]"
+            <div
+              className="fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-[9999] transition-opacity duration-200"
+              style={{ opacity: isPhotosModalOpen ? 1 : 0 }}
               onClick={() => setIsPhotosModalOpen(false)}
             >
-              <motion.div
-                animate={{ scale: isPhotosModalOpen ? 1 : 0.95, opacity: isPhotosModalOpen ? 1 : 0 }}
-                transition={{ type: "spring", damping: 25 }}
-                className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[85vh] overflow-hidden"
+              <div
+                className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[85vh] overflow-hidden transition-all duration-200"
+                style={{ transform: isPhotosModalOpen ? 'scale(1)' : 'scale(0.95)', opacity: isPhotosModalOpen ? 1 : 0 }}
                 onClick={(e) => e.stopPropagation()}
               >
                 {/* Header */}
@@ -3719,11 +3717,8 @@ function FacilitySidebarInner({
                 <div className="p-6 overflow-y-auto max-h-[calc(85vh-80px)]">
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {facility?.photo_references?.map((photoRef, idx) => (
-                      <motion.div
+                      <div
                         key={idx}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: idx * 0.03 }}
                         onClick={() => openPhotoViewer(idx)}
                         className="relative overflow-hidden rounded-2xl shadow-sm hover:shadow-xl transition-all cursor-pointer aspect-square group"
                       >
@@ -3743,12 +3738,12 @@ function FacilitySidebarInner({
                             Click to view
                           </span>
                         </div>
-                      </motion.div>
+                      </div>
                     ))}
                   </div>
                 </div>
-              </motion.div>
-            </motion.div>
+              </div>
+            </div>
             </div>,
             document.body,
           )}
@@ -3758,16 +3753,14 @@ function FacilitySidebarInner({
           combinedPhotos.length > 0 &&
           createPortal(
             <div style={{ display: isAdditionalPhotosModalOpen ? undefined : 'none' }}>
-            <motion.div
-              animate={{ opacity: isAdditionalPhotosModalOpen ? 1 : 0 }}
-              transition={{ duration: 0.2 }}
-              className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-6 z-[9999]"
+            <div
+              className="fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-[9999] transition-opacity duration-200"
+              style={{ opacity: isAdditionalPhotosModalOpen ? 1 : 0 }}
               onClick={() => { setIsAdditionalPhotosModalOpen(false); setShowHiddenPhotos(false); }}
             >
-              <motion.div
-                animate={{ scale: isAdditionalPhotosModalOpen ? 1 : 0.95, opacity: isAdditionalPhotosModalOpen ? 1 : 0 }}
-                transition={{ type: "spring", damping: 25 }}
-                className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[85vh] overflow-hidden"
+              <div
+                className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[85vh] overflow-hidden transition-all duration-200"
+                style={{ transform: isAdditionalPhotosModalOpen ? 'scale(1)' : 'scale(0.95)', opacity: isAdditionalPhotosModalOpen ? 1 : 0 }}
                 onClick={(e) => e.stopPropagation()}
               >
                 {/* Header */}
@@ -3804,7 +3797,7 @@ function FacilitySidebarInner({
                         }}
                         className="relative overflow-hidden rounded-2xl shadow-sm hover:shadow-xl transition-all cursor-pointer aspect-square group"
                       >
-                        <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />
+                        {isAdditionalPhotosModalOpen && <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />}
                         <img
                           src={photo.url}
                           alt={`${displayFacility.name} photo ${idx + 1}`}
@@ -3818,12 +3811,12 @@ function FacilitySidebarInner({
                           </span>
                         </div>
                         {photo.usefulnessScore != null && (
-                          <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-sm rounded-lg px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                          <div className="absolute top-2 left-2 bg-black/70 rounded-lg px-1.5 py-0.5 text-[10px] font-semibold text-white">
                             {photo.usefulnessScore}
                           </div>
                         )}
                         {photo.type === "scraped" && photo.data?.video && (
-                          <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm rounded-full p-1.5">
+                          <div className="absolute top-2 right-2 bg-black/70 rounded-full p-1.5">
                             <Camera className="w-4 h-4 text-white" />
                           </div>
                         )}
@@ -3842,7 +3835,7 @@ function FacilitySidebarInner({
                               </div>
                             )}
                             {photo.reviewRating && (
-                              <div className="bg-white/95 backdrop-blur-sm rounded-lg px-1.5 py-0.5 shadow-lg flex items-center gap-0.5">
+                              <div className="bg-white/95 rounded-lg px-1.5 py-0.5 shadow-lg flex items-center gap-0.5">
                                 <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
                                 <span className="text-xs font-semibold text-slate-900">
                                   {photo.reviewRating.toFixed(1)}
@@ -3891,7 +3884,7 @@ function FacilitySidebarInner({
                                 }}
                                 className="relative overflow-hidden rounded-2xl shadow-sm hover:shadow-xl transition-all cursor-pointer aspect-square group"
                               >
-                                <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />
+                                {isAdditionalPhotosModalOpen && <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />}
                                 <img
                                   src={photo.url}
                                   alt={`${displayFacility.name} hidden photo ${idx + 1}`}
@@ -3905,12 +3898,12 @@ function FacilitySidebarInner({
                                   </p>
                                 </div>
                                 {photo.usefulnessScore != null && (
-                                  <div className="absolute top-2 left-2 bg-red-500/80 backdrop-blur-sm rounded-lg px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                                  <div className="absolute top-2 left-2 bg-red-500/80 rounded-lg px-1.5 py-0.5 text-[10px] font-semibold text-white">
                                     {photo.usefulnessScore}
                                   </div>
                                 )}
                                 {photo.type === "scraped" && photo.data?.video && (
-                                  <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm rounded-full p-1.5">
+                                  <div className="absolute top-2 right-2 bg-black/70 rounded-full p-1.5">
                                     <Camera className="w-4 h-4 text-white" />
                                   </div>
                                 )}
@@ -3922,8 +3915,8 @@ function FacilitySidebarInner({
                     </div>
                   )}
                 </div>
-              </motion.div>
-            </motion.div>
+              </div>
+            </div>
             </div>,
             document.body,
           )}

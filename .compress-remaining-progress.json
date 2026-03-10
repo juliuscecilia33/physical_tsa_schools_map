@@ -1,7 +1,7 @@
 {
-  "processedCount": 233,
-  "successCount": 138,
-  "failedCount": 103,
+  "processedCount": 240,
+  "successCount": 144,
+  "failedCount": 104,
   "skippedCount": 186,
   "processedFacilityIds": [
     "fe41e2b9-7c1c-4104-893d-75c6c5e3b12e",
@@ -236,16 +236,23 @@
     "26eb9e0e-f60a-47f1-a4be-dc8fde00d7d1",
     "edf7620b-56ab-45f0-8d11-4920bb49bf2f",
     "7b8de648-7f79-4053-aa09-1bd76c877fe6",
-    "7494e3d8-f1f7-4ad0-bfca-cbc0a916c35e"
+    "7494e3d8-f1f7-4ad0-bfca-cbc0a916c35e",
+    "b7174973-7d62-4854-9390-dca7f43ec6cc",
+    "cf8bde4e-0603-4869-a114-21dc728cc09e",
+    "2d424cef-656c-43c8-b1a9-b9726ca34c57",
+    "ef6b36f9-c753-4099-b9f0-8d6fac6bfb3e",
+    "30808557-ebe6-4571-87ee-955721ad1768",
+    "7a8c390a-f532-45cd-93dc-79129a495967",
+    "06600847-9e72-4fde-8ceb-eaa2ece00f3d"
   ],
-  "imagesProcessed": 4898,
+  "imagesProcessed": 5152,
   "imagesSkipped": 3373,
-  "imagesFailed": 203,
-  "deletionsSucceeded": 4898,
+  "imagesFailed": 204,
+  "deletionsSucceeded": 5152,
   "deletionsFailed": 0,
-  "totalBytesBefore": 12416774354,
-  "totalBytesAfter": 5116150168,
-  "lastUpdated": "2026-03-10T00:38:06.189Z",
+  "totalBytesBefore": 12927429272,
+  "totalBytesAfter": 5328260680,
+  "lastUpdated": "2026-03-10T00:48:48.910Z",
   "errors": [
     {
       "facility_id": "fe41e2b9-7c1c-4104-893d-75c6c5e3b12e",
@@ -1667,6 +1674,13 @@
       "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/edf7620b-56ab-45f0-8d11-4920bb49bf2f/1772215148774_16.jpg",
       "error": "Failed to compress image",
       "timestamp": "2026-03-10T00:33:43.205Z"
+    },
+    {
+      "facility_id": "cf8bde4e-0603-4869-a114-21dc728cc09e",
+      "facility_name": "Alamo Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/cf8bde4e-0603-4869-a114-21dc728cc09e/1772084767569_2.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-10T00:40:08.025Z"
     }
   ]
 }
