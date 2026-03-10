@@ -1,6 +1,6 @@
 {
-  "processedCount": 203,
-  "successCount": 111,
+  "processedCount": 214,
+  "successCount": 122,
   "failedCount": 100,
   "skippedCount": 186,
   "processedFacilityIds": [
@@ -206,16 +206,27 @@
     "d2c22ea8-bb66-447e-be82-2b43b3570a1e",
     "d4ee672e-a40c-459e-b15f-be781437afa9",
     "b1030d32-7cf5-4885-8b52-4aa59039ad6c",
-    "960fb41e-5ead-444f-ab9e-9c3405ca624e"
+    "960fb41e-5ead-444f-ab9e-9c3405ca624e",
+    "71d47082-1a57-4190-8939-003d4ef66cfa",
+    "8ce8d497-776e-4733-8a7b-05664b4bb12f",
+    "178b4538-e4a9-4ab1-93eb-d40571b8be53",
+    "e0f9b84c-c26f-4ed6-8ee1-49835d9c5492",
+    "76257685-ffaa-4fc3-9b7e-511b6695f897",
+    "9dff1850-4146-4684-a8d6-5c8e42197b3e",
+    "67a592dc-9af3-46b0-94df-a7cca7a14bed",
+    "52ca916b-f27d-4b98-96aa-5c0928ec3e3a",
+    "0ff42931-9e1d-4ccc-8155-b06bb9c778bb",
+    "1dfb4265-865d-49a3-8bc6-dcd1d70592e3",
+    "823bbaf1-128b-4cbc-9953-fecd6dea36b9"
   ],
-  "imagesProcessed": 3862,
+  "imagesProcessed": 4272,
   "imagesSkipped": 3338,
   "imagesFailed": 193,
-  "deletionsSucceeded": 3862,
+  "deletionsSucceeded": 4272,
   "deletionsFailed": 0,
-  "totalBytesBefore": 9874319871,
-  "totalBytesAfter": 4035547652,
-  "lastUpdated": "2026-03-09T23:47:34.380Z",
+  "totalBytesBefore": 10976247194,
+  "totalBytesAfter": 4535096932,
+  "lastUpdated": "2026-03-10T00:07:29.935Z",
   "errors": [
     {
       "facility_id": "fe41e2b9-7c1c-4104-893d-75c6c5e3b12e",

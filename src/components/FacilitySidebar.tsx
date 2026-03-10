@@ -42,6 +42,7 @@ import {
   Sparkles,
   Loader2,
   Target,
+  AlertCircle,
 } from "lucide-react";
 import { useState, useEffect, useRef, useMemo, memo } from "react";
 import { createPortal } from "react-dom";
@@ -245,6 +246,7 @@ function FacilitySidebarInner({
   const [showAddNoteForm, setShowAddNoteForm] = useState(false);
   const [isAdditionalPhotosModalOpen, setIsAdditionalPhotosModalOpen] =
     useState(false);
+  const [showHiddenPhotos, setShowHiddenPhotos] = useState(false);
   const [isAdditionalReviewsModalOpen, setIsAdditionalReviewsModalOpen] =
     useState(false);
   const [showAllAdditionalReviews, setShowAllAdditionalReviews] =
@@ -614,14 +616,15 @@ function FacilitySidebarInner({
       reviewUserName?: string;
       reviewRating?: number;
       usefulnessScore?: number;
+      description?: string;
     }> = [];
 
-    // Build a lookup map for review image analysis scores
-    const reviewAnalysisMap = new Map<string, number>();
+    // Build a lookup map for review image analysis scores and descriptions
+    const reviewAnalysisMap = new Map<string, { score: number; description?: string }>();
     if (displayFacility.review_images_analysis) {
       displayFacility.review_images_analysis.forEach((entry: any) => {
         if (entry.url && entry.usefulness_score != null) {
-          reviewAnalysisMap.set(entry.url, entry.usefulness_score);
+          reviewAnalysisMap.set(entry.url, { score: entry.usefulness_score, description: entry.description });
         }
       });
     }
@@ -635,6 +638,7 @@ function FacilitySidebarInner({
           scrapedIndex: idx,
           data: photoData,
           usefulnessScore: photoData.usefulness_score,
+          description: photoData.description,
         });
       });
     }
@@ -653,7 +657,8 @@ function FacilitySidebarInner({
               reviewUserName:
                 review.user?.name || review.author_name || "Anonymous",
               reviewRating: review.rating,
-              usefulnessScore: reviewAnalysisMap.get(imageUrl),
+              usefulnessScore: reviewAnalysisMap.get(imageUrl)?.score,
+              description: reviewAnalysisMap.get(imageUrl)?.description,
             });
           });
         }
@@ -662,6 +667,12 @@ function FacilitySidebarInner({
 
     return photos;
   }, [displayFacility?.additional_photos, displayFacility?.additional_reviews, displayFacility?.review_images_analysis]);
+
+  const { visiblePhotos, hiddenPhotos } = useMemo(() => {
+    const visible = combinedPhotos.filter(p => p.usefulnessScore == null || p.usefulnessScore > 30);
+    const hidden = combinedPhotos.filter(p => p.usefulnessScore != null && p.usefulnessScore <= 30);
+    return { visiblePhotos: visible, hiddenPhotos: hidden };
+  }, [combinedPhotos]);
 
   // Add new note
   const handleAddNote = async (noteText: string, selectedPhoto: any) => {
@@ -1691,7 +1702,7 @@ function FacilitySidebarInner({
                 ) : null}
 
                 {/* Additional Photos from SerpAPI */}
-                {displayFacility.serp_scraped && combinedPhotos.length > 0 && (
+                {displayFacility.serp_scraped && visiblePhotos.length > 0 && (
                   <>
                     {/* Divider - only show if regular photos were displayed above */}
                     {/* {displayFacility.photo_references &&
@@ -1706,7 +1717,7 @@ function FacilitySidebarInner({
                     >
                       <div className="flex items-center justify-between mb-3">
                         <h3 className="text-sm font-medium text-slate-700 tracking-wide flex items-center gap-2">
-                          Scraped Photos ({combinedPhotos.length})
+                          Scraped Photos ({visiblePhotos.length})
                         </h3>
                         <button
                           onClick={() => {
@@ -1750,7 +1761,7 @@ function FacilitySidebarInner({
                             msOverflowStyle: "none",
                           }}
                         >
-                          {combinedPhotos.map((photo, idx) => (
+                          {visiblePhotos.map((photo, idx) => (
                             <div
                               key={`combined-${idx}`}
                               onClick={() => {
@@ -3747,7 +3758,7 @@ function FacilitySidebarInner({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-6 z-[9999]"
-              onClick={() => setIsAdditionalPhotosModalOpen(false)}
+              onClick={() => { setIsAdditionalPhotosModalOpen(false); setShowHiddenPhotos(false); }}
             >
               <motion.div
                 initial={{ scale: 0.95, opacity: 0 }}
@@ -3761,11 +3772,11 @@ function FacilitySidebarInner({
                 <div className="flex items-center justify-between p-6 border-b border-slate-200 bg-gradient-to-r from-white to-slate-50">
                   <div>
                     <h2 className="text-xl font-medium text-slate-900">
-                      Scraped Photos ({combinedPhotos.length})
+                      Scraped Photos ({visiblePhotos.length}{hiddenPhotos.length > 0 ? ` + ${hiddenPhotos.length} hidden` : ''})
                     </h2>
                   </div>
                   <button
-                    onClick={() => setIsAdditionalPhotosModalOpen(false)}
+                    onClick={() => { setIsAdditionalPhotosModalOpen(false); setShowHiddenPhotos(false); }}
                     className="p-2 hover:bg-slate-100 rounded-full transition-colors"
                   >
                     <X className="w-5 h-5 text-slate-600" />
@@ -3775,7 +3786,7 @@ function FacilitySidebarInner({
                 {/* Photos Grid */}
                 <div className="p-6 overflow-y-auto max-h-[calc(85vh-80px)]">
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {combinedPhotos.map((photo, idx) => (
+                    {visiblePhotos.map((photo, idx) => (
                       <div
                         key={`modal-combined-${idx}`}
                         onClick={() => {
@@ -3841,6 +3852,73 @@ function FacilitySidebarInner({
                       </div>
                     ))}
                   </div>
+                  {hiddenPhotos.length > 0 && (
+                    <div className="mt-6">
+                      {!showHiddenPhotos ? (
+                        <button
+                          onClick={() => setShowHiddenPhotos(true)}
+                          className="w-full py-3 px-4 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                        >
+                          <AlertCircle className="w-4 h-4" />
+                          View {hiddenPhotos.length} hidden photo{hiddenPhotos.length !== 1 ? 's' : ''} (low score)
+                        </button>
+                      ) : (
+                        <>
+                          <div className="flex items-center justify-between mb-3">
+                            <h3 className="text-sm font-medium text-slate-500">
+                              Hidden Photos ({hiddenPhotos.length})
+                            </h3>
+                            <button
+                              onClick={() => setShowHiddenPhotos(false)}
+                              className="text-xs text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                            >
+                              Hide
+                            </button>
+                          </div>
+                          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            {hiddenPhotos.map((photo, idx) => (
+                              <div
+                                key={`modal-hidden-${idx}`}
+                                onClick={() => {
+                                  if (photo.type === "review") {
+                                    openReviewPhotoViewer(photo.reviewIndex!, photo.photoIndexInReview!);
+                                  } else {
+                                    openPhotoViewer(photo.scrapedIndex!, "additional");
+                                  }
+                                  setIsAdditionalPhotosModalOpen(false);
+                                }}
+                                className="relative overflow-hidden rounded-2xl shadow-sm hover:shadow-xl transition-all cursor-pointer aspect-square group"
+                              >
+                                <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />
+                                <img
+                                  src={photo.url}
+                                  alt={`${displayFacility.name} hidden photo ${idx + 1}`}
+                                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                                  referrerPolicy="no-referrer"
+                                  loading="lazy"
+                                />
+                                <div className="absolute inset-0 bg-black/50 flex items-end p-2">
+                                  <p className="text-white text-[10px] leading-tight line-clamp-3">
+                                    {photo.description || 'Low usefulness score'}
+                                  </p>
+                                </div>
+                                {photo.usefulnessScore != null && (
+                                  <div className="absolute top-2 left-2 bg-red-500/80 backdrop-blur-sm rounded-lg px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                                    {photo.usefulnessScore}
+                                  </div>
+                                )}
+                                {photo.type === "scraped" && photo.data?.video && (
+                                  <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm rounded-full p-1.5">
+                                    <Camera className="w-4 h-4 text-white" />
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  )}
                 </div>
               </motion.div>
             </motion.div>,
