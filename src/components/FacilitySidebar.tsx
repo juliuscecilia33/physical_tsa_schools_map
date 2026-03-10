@@ -3786,7 +3786,6 @@ function FacilitySidebarInner({
                           } else {
                             openPhotoViewer(photo.scrapedIndex!, "additional");
                           }
-                          setIsAdditionalPhotosModalOpen(false);
                         }}
                         className="relative overflow-hidden rounded-2xl shadow-sm hover:shadow-xl transition-all cursor-pointer aspect-square group"
                       >
@@ -3873,7 +3872,6 @@ function FacilitySidebarInner({
                                   } else {
                                     openPhotoViewer(photo.scrapedIndex!, "additional");
                                   }
-                                  setIsAdditionalPhotosModalOpen(false);
                                 }}
                                 className="relative overflow-hidden rounded-2xl shadow-sm hover:shadow-xl transition-all cursor-pointer aspect-square group"
                               >
