@@ -482,7 +482,7 @@ interface ProgressState {
 
 const PROGRESS_FILE = path.join(
   __dirname,
-  "../.medium-texas-cities-facilities-progress.json",
+  "../progress/medium-texas-cities-facilities-progress.json",
 );
 
 // ===== HELPER FUNCTIONS =====

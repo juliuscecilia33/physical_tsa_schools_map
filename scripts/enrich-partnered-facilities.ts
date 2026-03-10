@@ -60,7 +60,7 @@ interface ProgressState {
 
 const PROGRESS_FILE = path.join(
   __dirname,
-  "../.enrich-partnered-facilities-progress.json",
+  "../progress/enrich-partnered-facilities-progress.json",
 );
 const STORAGE_BUCKET = "facility-photos";
 

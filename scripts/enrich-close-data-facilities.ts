@@ -36,7 +36,7 @@ const MAX_PHOTOS = 40;
 const MAX_REVIEWS = 58;
 const PROGRESS_FILE = path.join(
   __dirname,
-  "../.serpapi-enrich-close-data-progress.json",
+  "../progress/serpapi-enrich-close-data-progress.json",
 );
 
 const delay = (ms: number) =>

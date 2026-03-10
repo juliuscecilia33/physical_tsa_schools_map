@@ -49,7 +49,7 @@ interface ProgressState {
   }>;
 }
 
-const PROGRESS_FILE = path.join(__dirname, "../.email-scraping-progress.json");
+const PROGRESS_FILE = path.join(__dirname, "../progress/email-scraping-progress.json");
 
 // Test mode: Set to a number to limit processing (e.g., 10 for testing), or null to process all
 const TEST_LIMIT: number | null = null;

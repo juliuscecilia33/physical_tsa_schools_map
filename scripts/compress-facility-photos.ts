@@ -65,7 +65,7 @@ interface ProgressState {
   }>;
 }
 
-const PROGRESS_FILE = path.join(__dirname, "../.compress-progress.json");
+const PROGRESS_FILE = path.join(__dirname, "../progress/compress-progress.json");
 const STORAGE_BUCKET = "facility-photos";
 
 // Configuration

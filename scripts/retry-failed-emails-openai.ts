@@ -52,7 +52,7 @@ interface ProgressState {
   }>;
 }
 
-const PROGRESS_FILE = path.join(__dirname, "../.email-retry-openai-progress.json");
+const PROGRESS_FILE = path.join(__dirname, "../progress/email-retry-openai-progress.json");
 
 // Test mode: Set to a number to limit processing (e.g., 10 for testing), or null to process all
 const TEST_LIMIT: number | null = 10;

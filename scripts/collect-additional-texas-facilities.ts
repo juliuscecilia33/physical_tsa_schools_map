@@ -315,7 +315,7 @@ interface FilterResult {
 
 const PROGRESS_FILE = path.join(
   __dirname,
-  "../.additional-facilities-progress.json"
+  "../progress/additional-facilities-progress.json"
 );
 const PROXIMITY_THRESHOLD_METERS = 50; // 50 meters for duplicate detection
 const COMPLETENESS_THRESHOLD = 30; // Minimum completeness score (0-100)

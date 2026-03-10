@@ -27,7 +27,7 @@ const CSV_PATH = path.join(
 );
 const PROGRESS_FILE = path.join(
   __dirname,
-  "../.import-partnered-facilities-progress.json",
+  "../progress/import-partnered-facilities-progress.json",
 );
 const DRY_RUN_REPORT_FILE = path.join(
   __dirname,

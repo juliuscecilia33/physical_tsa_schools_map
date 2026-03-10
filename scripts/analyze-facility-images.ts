@@ -33,7 +33,7 @@ const DELAY_BETWEEN_GEMINI_CALLS_MS = 4000; // ~15 RPM
 const CONCURRENCY_LIMIT = 5; // Parallel image downloads
 const MODEL_NAME = "gemini-2.0-flash";
 
-const PROGRESS_FILE = path.join(__dirname, "../.photo-analysis-progress.json");
+const PROGRESS_FILE = path.join(__dirname, "../progress/photo-analysis-progress.json");
 
 // Types
 interface PhotoData {

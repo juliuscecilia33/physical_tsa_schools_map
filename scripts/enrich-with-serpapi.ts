@@ -55,7 +55,7 @@ interface ProgressState {
   }>;
 }
 
-const PROGRESS_FILE = path.join(__dirname, "../.serpapi-progress-next-batch.json");
+const PROGRESS_FILE = path.join(__dirname, "../progress/serpapi-progress-next-batch.json");
 const FACILITIES_FILE = path.join(
   __dirname,
   "../data/next-2500-high-quality-texas-facilities.json",
