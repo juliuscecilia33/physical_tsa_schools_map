@@ -1,7 +1,7 @@
 {
-  "processedCount": 214,
-  "successCount": 122,
-  "failedCount": 100,
+  "processedCount": 233,
+  "successCount": 138,
+  "failedCount": 103,
   "skippedCount": 186,
   "processedFacilityIds": [
     "fe41e2b9-7c1c-4104-893d-75c6c5e3b12e",
@@ -217,16 +217,35 @@
     "52ca916b-f27d-4b98-96aa-5c0928ec3e3a",
     "0ff42931-9e1d-4ccc-8155-b06bb9c778bb",
     "1dfb4265-865d-49a3-8bc6-dcd1d70592e3",
-    "823bbaf1-128b-4cbc-9953-fecd6dea36b9"
+    "823bbaf1-128b-4cbc-9953-fecd6dea36b9",
+    "9a4c67ac-4ee2-41d1-8aed-346a9c1ef3eb",
+    "eebed6b9-9031-4736-a36b-bfff9ad2c719",
+    "ad5a3f88-a476-46ae-9bac-9e1d87441af0",
+    "ff49353b-cc4c-4ef2-b30c-05aa6380f256",
+    "f5b54d85-9ccc-49f7-8d5e-6f2dc77e5d74",
+    "79ed75d0-5226-4b70-8245-051e82026d27",
+    "85c55299-ee4d-449f-a346-d935ff1c9a96",
+    "8ef27669-7021-4854-be61-e5b70d406fad",
+    "1162fcf2-9300-41eb-8f3d-5a2c035b6d25",
+    "b88dd0b5-cc1b-4f7f-9dc3-4323f2e84f8a",
+    "b599078d-8d04-451c-8c1e-a44e8f2617e6",
+    "955a6319-1a7d-4db0-abbd-43e0aad35274",
+    "dea224b6-196c-4671-bbe4-a2707c8eb90a",
+    "14fe025f-d07d-4aa3-a607-8d6be457630f",
+    "7122afd6-2001-4113-9097-7a1e75f99d6f",
+    "26eb9e0e-f60a-47f1-a4be-dc8fde00d7d1",
+    "edf7620b-56ab-45f0-8d11-4920bb49bf2f",
+    "7b8de648-7f79-4053-aa09-1bd76c877fe6",
+    "7494e3d8-f1f7-4ad0-bfca-cbc0a916c35e"
   ],
-  "imagesProcessed": 4272,
-  "imagesSkipped": 3338,
-  "imagesFailed": 193,
-  "deletionsSucceeded": 4272,
+  "imagesProcessed": 4898,
+  "imagesSkipped": 3373,
+  "imagesFailed": 203,
+  "deletionsSucceeded": 4898,
   "deletionsFailed": 0,
-  "totalBytesBefore": 10976247194,
-  "totalBytesAfter": 4535096932,
-  "lastUpdated": "2026-03-10T00:07:29.935Z",
+  "totalBytesBefore": 12416774354,
+  "totalBytesAfter": 5116150168,
+  "lastUpdated": "2026-03-10T00:38:06.189Z",
   "errors": [
     {
       "facility_id": "fe41e2b9-7c1c-4104-893d-75c6c5e3b12e",
@@ -1578,6 +1597,76 @@
       "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/b1030d32-7cf5-4885-8b52-4aa59039ad6c/1772301737374_24.jpg",
       "error": "Failed to compress image",
       "timestamp": "2026-03-09T23:45:37.329Z"
+    },
+    {
+      "facility_id": "ff49353b-cc4c-4ef2-b30c-05aa6380f256",
+      "facility_name": "Joe R. Sanchez Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/ff49353b-cc4c-4ef2-b30c-05aa6380f256/1772245198958_2.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-10T00:11:58.033Z"
+    },
+    {
+      "facility_id": "ff49353b-cc4c-4ef2-b30c-05aa6380f256",
+      "facility_name": "Joe R. Sanchez Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/ff49353b-cc4c-4ef2-b30c-05aa6380f256/1772245208730_10.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-10T00:12:17.536Z"
+    },
+    {
+      "facility_id": "ff49353b-cc4c-4ef2-b30c-05aa6380f256",
+      "facility_name": "Joe R. Sanchez Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/ff49353b-cc4c-4ef2-b30c-05aa6380f256/1772245209688_11.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-10T00:12:18.465Z"
+    },
+    {
+      "facility_id": "ff49353b-cc4c-4ef2-b30c-05aa6380f256",
+      "facility_name": "Joe R. Sanchez Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/ff49353b-cc4c-4ef2-b30c-05aa6380f256/1772245211471_13.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-10T00:12:21.486Z"
+    },
+    {
+      "facility_id": "ff49353b-cc4c-4ef2-b30c-05aa6380f256",
+      "facility_name": "Joe R. Sanchez Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/ff49353b-cc4c-4ef2-b30c-05aa6380f256/1772245214994_16.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-10T00:12:28.802Z"
+    },
+    {
+      "facility_id": "ff49353b-cc4c-4ef2-b30c-05aa6380f256",
+      "facility_name": "Joe R. Sanchez Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/ff49353b-cc4c-4ef2-b30c-05aa6380f256/1772245215829_17.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-10T00:12:30.141Z"
+    },
+    {
+      "facility_id": "ff49353b-cc4c-4ef2-b30c-05aa6380f256",
+      "facility_name": "Joe R. Sanchez Stadium",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/ff49353b-cc4c-4ef2-b30c-05aa6380f256/1772245218025_19.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-10T00:12:33.364Z"
+    },
+    {
+      "facility_id": "85c55299-ee4d-449f-a346-d935ff1c9a96",
+      "facility_name": "H7 Sports Training and Wellness Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/85c55299-ee4d-449f-a346-d935ff1c9a96/1772248466616_29.jpg",
+      "error": "Failed to download image",
+      "timestamp": "2026-03-10T00:18:59.895Z"
+    },
+    {
+      "facility_id": "85c55299-ee4d-449f-a346-d935ff1c9a96",
+      "facility_name": "H7 Sports Training and Wellness Center",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/85c55299-ee4d-449f-a346-d935ff1c9a96/1772248472923_34.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-10T00:19:13.195Z"
+    },
+    {
+      "facility_id": "edf7620b-56ab-45f0-8d11-4920bb49bf2f",
+      "facility_name": "The Den Sports Facility",
+      "image_url": "https://ukrdbbculuysmvcfaolc.supabase.co/storage/v1/object/public/facility-photos/edf7620b-56ab-45f0-8d11-4920bb49bf2f/1772215148774_16.jpg",
+      "error": "Failed to compress image",
+      "timestamp": "2026-03-10T00:33:43.205Z"
     }
   ]
 }

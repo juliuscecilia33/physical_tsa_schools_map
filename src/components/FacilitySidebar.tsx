@@ -246,6 +246,8 @@ function FacilitySidebarInner({
   const [showAddNoteForm, setShowAddNoteForm] = useState(false);
   const [isAdditionalPhotosModalOpen, setIsAdditionalPhotosModalOpen] =
     useState(false);
+  const [hasOpenedPhotosModal, setHasOpenedPhotosModal] = useState(false);
+  const [hasOpenedAdditionalPhotosModal, setHasOpenedAdditionalPhotosModal] = useState(false);
   const [showHiddenPhotos, setShowHiddenPhotos] = useState(false);
   const [isAdditionalReviewsModalOpen, setIsAdditionalReviewsModalOpen] =
     useState(false);
@@ -506,6 +508,8 @@ function FacilitySidebarInner({
     setAboutExpanded(false);
     setContactsExpanded(false);
     setCustomFieldsExpanded(false);
+    setHasOpenedPhotosModal(false);
+    setHasOpenedAdditionalPhotosModal(false);
   }, [facility?.place_id]);
 
   // Reset scroll position when view mode changes
@@ -1591,7 +1595,7 @@ function FacilitySidebarInner({
                         </span>
                       </h3>
                       <button
-                        onClick={() => setIsPhotosModalOpen(true)}
+                        onClick={() => { setHasOpenedPhotosModal(true); setIsPhotosModalOpen(true); }}
                         className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
                       >
                         <Maximize2 className="w-3.5 h-3.5" />
@@ -1721,6 +1725,7 @@ function FacilitySidebarInner({
                         </h3>
                         <button
                           onClick={() => {
+                            setHasOpenedAdditionalPhotosModal(true);
                             setIsAdditionalPhotosModalOpen(true);
                           }}
                           className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
@@ -3682,19 +3687,17 @@ function FacilitySidebarInner({
         </div>
 
         {/* Photos Grid Modal */}
-        {isPhotosModalOpen &&
+        {hasOpenedPhotosModal &&
           createPortal(
+            <div style={{ display: isPhotosModalOpen ? undefined : 'none' }}>
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+              animate={{ opacity: isPhotosModalOpen ? 1 : 0 }}
+              transition={{ duration: 0.2 }}
               className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-6 z-[9999]"
               onClick={() => setIsPhotosModalOpen(false)}
             >
               <motion.div
-                initial={{ scale: 0.95, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: isPhotosModalOpen ? 1 : 0.95, opacity: isPhotosModalOpen ? 1 : 0 }}
                 transition={{ type: "spring", damping: 25 }}
                 className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[85vh] overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
@@ -3745,25 +3748,24 @@ function FacilitySidebarInner({
                   </div>
                 </div>
               </motion.div>
-            </motion.div>,
+            </motion.div>
+            </div>,
             document.body,
           )}
 
         {/* Additional Photos Grid Modal */}
-        {isAdditionalPhotosModalOpen &&
+        {hasOpenedAdditionalPhotosModal &&
           combinedPhotos.length > 0 &&
           createPortal(
+            <div style={{ display: isAdditionalPhotosModalOpen ? undefined : 'none' }}>
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+              animate={{ opacity: isAdditionalPhotosModalOpen ? 1 : 0 }}
+              transition={{ duration: 0.2 }}
               className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-6 z-[9999]"
               onClick={() => { setIsAdditionalPhotosModalOpen(false); setShowHiddenPhotos(false); }}
             >
               <motion.div
-                initial={{ scale: 0.95, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: isAdditionalPhotosModalOpen ? 1 : 0.95, opacity: isAdditionalPhotosModalOpen ? 1 : 0 }}
                 transition={{ type: "spring", damping: 25 }}
                 className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[85vh] overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
@@ -3898,7 +3900,7 @@ function FacilitySidebarInner({
                                   loading="lazy"
                                 />
                                 <div className="absolute inset-0 bg-black/50 flex items-end p-2">
-                                  <p className="text-white text-[10px] leading-tight line-clamp-3">
+                                  <p className="text-white text-xs leading-tight line-clamp-3">
                                     {photo.description || 'Low usefulness score'}
                                   </p>
                                 </div>
@@ -3921,7 +3923,8 @@ function FacilitySidebarInner({
                   )}
                 </div>
               </motion.div>
-            </motion.div>,
+            </motion.div>
+            </div>,
             document.body,
           )}
 
