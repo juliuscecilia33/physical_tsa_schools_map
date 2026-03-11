@@ -27,7 +27,7 @@ const genAI = new GoogleGenerativeAI(geminiApiKey);
 
 // Configuration
 const DRY_RUN = false; // Set to false to write results to DB
-const TEST_LIMIT: number | null = 500; // Set to null for full run
+const TEST_LIMIT: number | null = 1000; // Set to null for full run
 const BATCH_SIZE = 10; // Images per Gemini call
 const DELAY_BETWEEN_GEMINI_CALLS_MS = 4000; // ~15 RPM
 const CONCURRENCY_LIMIT = 5; // Parallel image downloads
