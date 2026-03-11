@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -23,8 +24,10 @@ export default function CollapsibleSectionCard({
   onToggle,
   children,
 }: CollapsibleSectionCardProps) {
+  const [animationComplete, setAnimationComplete] = useState(false);
+
   return (
-    <div className="bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden">
+    <div className="bg-slate-50 border border-slate-200 rounded-2xl">
       {/* Header - always visible */}
       <button
         onClick={onToggle}
@@ -55,7 +58,15 @@ export default function CollapsibleSectionCard({
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.25, ease: "easeInOut" }}
-            className="overflow-hidden"
+            className={animationComplete ? "overflow-visible" : "overflow-hidden"}
+            onAnimationComplete={(definition) => {
+              if (typeof definition === "object" && "height" in definition && definition.height === "auto") {
+                setAnimationComplete(true);
+              }
+            }}
+            onAnimationStart={() => {
+              setAnimationComplete(false);
+            }}
           >
             <div className="px-3 py-3">{children}</div>
           </motion.div>

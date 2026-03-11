@@ -18,7 +18,8 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
-import { FacilityTag } from "@/types/facility";
+import { FacilityTag, FacilityLightweight } from "@/types/facility";
+import { addFacilityToSegment } from "@/utils/facilityCache";
 import { getAllSportTypes } from "@/constants/sportKeywords";
 import { useFacilitySearch } from "@/hooks/useFacilitySearch";
 
@@ -431,14 +432,36 @@ export default function AddFacilitySidebar({
         }
       }
 
-      // Refetch facility queries and WAIT for completion
-      // This ensures map has fresh data before navigation
-      await queryClient.refetchQueries({
-        queryKey: ['facilities', 'background']
-      });
+      // Optimistically insert the new facility into the correct cache segment
+      const SERPAPI_TAG_ID = 'e326fe36-5536-4209-87ed-f99528e1d1ee';
+      const targetSegment = selectedTags.some(t => t.id === SERPAPI_TAG_ID) ? 'serpapi' : 'background';
 
-      // Small buffer to ensure data is fully propagated
-      await new Promise((resolve) => setTimeout(resolve, 300));
+      const newFacility: FacilityLightweight = {
+        id: facility.id,
+        place_id: facility.place_id,
+        name: facility.name,
+        sport_types: selectedSportTypes,
+        identified_sports: [],
+        address: facility.address,
+        location: formData.location!,
+        phone: formData.phone || undefined,
+        website: formData.website || undefined,
+        rating: facilityDetails?.rating,
+        user_ratings_total: facilityDetails?.user_ratings_total,
+        photo_references: facilityDetails?.photo_references || [],
+        additional_photos_count: 0,
+        opening_hours: facilityDetails?.opening_hours,
+        business_status: facilityDetails?.business_status,
+        hidden: false,
+        cleaned_up: false,
+        has_notes: notes.length > 0,
+        tags: selectedTags.map(t => ({ id: t.id, name: t.name, color: t.color, description: t.description })),
+        serp_scraped: enableSerpApiEnrichment,
+        serp_scraped_at: enableSerpApiEnrichment ? new Date().toISOString() : undefined,
+        total_photo_count: facilityDetails?.photo_references?.length || 0,
+      };
+
+      addFacilityToSegment(queryClient, newFacility, targetSegment);
 
       // Also invalidate individual facility cache for fresh details
       queryClient.invalidateQueries({

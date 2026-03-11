@@ -126,6 +126,32 @@ export function moveFacilityToSegment(
 }
 
 /**
+ * Add a new facility to a specific cache segment.
+ * Deduplicates by place_id and preserves dataUpdatedAt.
+ * If the segment hasn't loaded yet, sets it as a single-element array.
+ */
+export function addFacilityToSegment(
+  queryClient: QueryClient,
+  facility: FacilityLightweight,
+  segment: 'serpapi' | 'background'
+) {
+  const queryCache = queryClient.getQueryCache();
+  const query = queryCache.find({ queryKey: ['facilities', segment] });
+  const currentData = query?.state.data as FacilityLightweight[] | undefined;
+
+  if (currentData && query) {
+    const filtered = currentData.filter((f) => f.place_id !== facility.place_id);
+    queryClient.setQueryData(
+      ['facilities', segment],
+      [...filtered, facility],
+      { updatedAt: query.state.dataUpdatedAt }
+    );
+  } else {
+    queryClient.setQueryData(['facilities', segment], [facility]);
+  }
+}
+
+/**
  * Remove a facility from a specific cache segment
  * Used when a facility moves between segments (e.g., after SerpAPI enrichment)
  */
