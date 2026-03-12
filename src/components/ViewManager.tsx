@@ -35,6 +35,9 @@ export default function ViewManager() {
   const isMapView = pathname === "/";
   const isCRMView = pathname === "/crm";
 
+  // SAM3 Explorer has its own layout – don't render Map/CRM views
+  if (pathname.startsWith("/sam3")) return null;
+
   return (
     <>
       <Suspense fallback={<div />}>

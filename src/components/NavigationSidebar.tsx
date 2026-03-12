@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Map, Building2, LogOut } from "lucide-react";
+import { Map, Building2, ScanSearch, LogOut } from "lucide-react";
 import { motion } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -47,6 +47,11 @@ export default function NavigationSidebar() {
       icon: Building2,
       label: "CRM",
     },
+    {
+      href: "/sam3",
+      icon: ScanSearch,
+      label: "SAM3 Explorer",
+    },
   ];
 
   // Don't show navigation on auth pages or when not authenticated
@@ -74,7 +79,7 @@ export default function NavigationSidebar() {
       <div className="flex-1 flex flex-col items-center justify-center gap-4">
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = pathname === item.href;
+          const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
 
           return (
             <Link
