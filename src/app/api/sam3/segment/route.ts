@@ -10,13 +10,13 @@ const TEXAS_BOUNDS = {
   north: 36.5,
 };
 
-// Max bbox area in square degrees (~50km x 50km at Texas latitudes)
-const MAX_BBOX_AREA = 0.05;
+// Max bbox area in square degrees (~5km x 5km at Texas latitudes)
+const MAX_BBOX_AREA = 0.005;
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { bbox, prompt, zoom, box_threshold, text_threshold } = body;
+    const { bbox, prompt, zoom, box_threshold, text_threshold, min_area_sqm, shape_filter } = body;
 
     // Validate bbox
     if (!bbox || !Array.isArray(bbox) || bbox.length !== 4) {
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
     if (area > MAX_BBOX_AREA) {
       return NextResponse.json(
         {
-          error: `Bounding box too large (${area.toFixed(4)} sq deg). Max: ${MAX_BBOX_AREA} sq deg. Zoom in more.`,
+          error: `Bounding box too large (${area.toFixed(4)} sq deg). Max: ${MAX_BBOX_AREA} sq deg. Zoom in to a specific campus or park.`,
         },
         { status: 400 }
       );
@@ -68,8 +68,10 @@ export async function POST(request: NextRequest) {
         bbox,
         prompt: prompt.trim(),
         zoom: zoom ?? 18,
-        box_threshold: box_threshold ?? 0.24,
-        text_threshold: text_threshold ?? 0.24,
+        box_threshold: box_threshold ?? 0.30,
+        text_threshold: text_threshold ?? 0.30,
+        min_area_sqm: min_area_sqm ?? 0,
+        shape_filter: shape_filter ?? true,
       }),
     });
 

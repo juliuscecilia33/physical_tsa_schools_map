@@ -145,22 +145,36 @@ export default function SAM3Map({
         </Source>
       )}
 
-      {/* Segmentation results overlay */}
+      {/* Segmentation results overlay — color by rectangularity */}
       {geojsonResult && geojsonResult.features.length > 0 && (
         <Source type="geojson" data={geojsonResult}>
           <Layer
             id="sam3-fill"
             type="fill"
             paint={{
-              "fill-color": "#22c55e",
-              "fill-opacity": 0.4,
+              "fill-color": [
+                "interpolate",
+                ["linear"],
+                ["coalesce", ["get", "rectangularity"], 0.5],
+                0.3, "#ef4444",   // red — poor match
+                0.5, "#f97316",   // orange — borderline
+                0.7, "#22c55e",   // green — good match
+              ],
+              "fill-opacity": 0.45,
             }}
           />
           <Layer
             id="sam3-outline"
             type="line"
             paint={{
-              "line-color": "#16a34a",
+              "line-color": [
+                "interpolate",
+                ["linear"],
+                ["coalesce", ["get", "rectangularity"], 0.5],
+                0.3, "#dc2626",
+                0.5, "#ea580c",
+                0.7, "#16a34a",
+              ],
               "line-width": 2,
             }}
           />

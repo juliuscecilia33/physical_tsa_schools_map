@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import { ScanSearch } from "lucide-react";
 import SAM3Map from "@/components/sam3/SAM3Map";
 import SAM3Controls from "@/components/sam3/SAM3Controls";
+import type { SegmentParams } from "@/components/sam3/SAM3Controls";
 import SAM3Results from "@/components/sam3/SAM3Results";
 
 type BBox = [number, number, number, number];
@@ -17,8 +18,14 @@ export default function SAM3Page() {
   const [geojsonResult, setGeojsonResult] =
     useState<GeoJSON.FeatureCollection | null>(null);
   const [featureCount, setFeatureCount] = useState(0);
+  const [totalBeforeFilter, setTotalBeforeFilter] = useState(0);
+  const [areaFilteredCount, setAreaFilteredCount] = useState(0);
+  const [shapeFilteredCount, setShapeFilteredCount] = useState(0);
+  const [effectivePrompt, setEffectivePrompt] = useState<string | null>(null);
+  const [areaStats, setAreaStats] = useState<Record<string, number> | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [clientMinArea, setClientMinArea] = useState(0);
 
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -57,6 +64,11 @@ export default function SAM3Page() {
           setIsProcessing(false);
           setGeojsonResult(data.result?.geojson || null);
           setFeatureCount(data.result?.feature_count || 0);
+          setTotalBeforeFilter(data.result?.total_before_filter || 0);
+          setAreaFilteredCount(data.result?.area_filtered_count || 0);
+          setShapeFilteredCount(data.result?.shape_filtered_count || 0);
+          setEffectivePrompt(data.result?.effective_prompt || null);
+          setAreaStats(data.result?.area_stats || null);
           setElapsedSeconds(data.elapsed_seconds || null);
           setIsDrawing(false);
         } else if (data.status === "error") {
@@ -77,22 +89,36 @@ export default function SAM3Page() {
   }, []);
 
   const handleSubmit = useCallback(
-    async (prompt: string) => {
+    async (params: SegmentParams) => {
       if (!bbox) return;
 
       setIsProcessing(true);
       setError(null);
       setGeojsonResult(null);
       setFeatureCount(0);
+      setTotalBeforeFilter(0);
+      setAreaFilteredCount(0);
+      setShapeFilteredCount(0);
+      setEffectivePrompt(null);
+      setAreaStats(null);
       setElapsedSeconds(null);
       setProgress(0);
       setStatusMessage("Submitting...");
+      setClientMinArea(0);
 
       try {
         const res = await fetch("/api/sam3/segment", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ bbox, prompt, zoom: 18 }),
+          body: JSON.stringify({
+            bbox,
+            prompt: params.prompt,
+            zoom: 18,
+            box_threshold: params.boxThreshold,
+            text_threshold: params.textThreshold,
+            min_area_sqm: params.minAreaSqm,
+            shape_filter: params.shapeFilter,
+          }),
         });
 
         const data = await res.json();
@@ -113,6 +139,19 @@ export default function SAM3Page() {
     [bbox, pollStatus]
   );
 
+  // Client-side area filtering
+  const filteredGeojson = useMemo(() => {
+    if (!geojsonResult || clientMinArea <= 0) return geojsonResult;
+    return {
+      ...geojsonResult,
+      features: geojsonResult.features.filter((f) => {
+        const area = (f.properties as Record<string, unknown>)?.area_sqm;
+        if (typeof area !== "number") return true;
+        return area >= clientMinArea;
+      }),
+    };
+  }, [geojsonResult, clientMinArea]);
+
   const handleClear = useCallback(() => {
     if (pollRef.current) clearInterval(pollRef.current);
     setBbox(null);
@@ -122,8 +161,14 @@ export default function SAM3Page() {
     setProgress(0);
     setGeojsonResult(null);
     setFeatureCount(0);
+    setTotalBeforeFilter(0);
+    setAreaFilteredCount(0);
+    setShapeFilteredCount(0);
+    setEffectivePrompt(null);
+    setAreaStats(null);
     setElapsedSeconds(null);
     setError(null);
+    setClientMinArea(0);
   }, []);
 
   const handleBboxChange = useCallback((newBbox: BBox | null) => {
@@ -140,7 +185,7 @@ export default function SAM3Page() {
         <SAM3Map
           bbox={bbox}
           onBboxChange={handleBboxChange}
-          geojsonResult={geojsonResult}
+          geojsonResult={filteredGeojson}
           isDrawing={isDrawing}
         />
       </div>
@@ -200,10 +245,17 @@ export default function SAM3Page() {
         {(geojsonResult || error) && (
           <div className="px-4 pb-4 border-t border-gray-100 pt-3">
             <SAM3Results
-              geojson={geojsonResult}
+              geojson={filteredGeojson}
               featureCount={featureCount}
+              totalBeforeFilter={totalBeforeFilter}
+              areaFilteredCount={areaFilteredCount}
+              shapeFilteredCount={shapeFilteredCount}
+              effectivePrompt={effectivePrompt}
+              areaStats={areaStats}
               elapsedSeconds={elapsedSeconds}
               error={error}
+              clientMinArea={clientMinArea}
+              onClientMinAreaChange={setClientMinArea}
             />
           </div>
         )}

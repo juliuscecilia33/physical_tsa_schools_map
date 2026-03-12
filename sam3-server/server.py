@@ -5,10 +5,13 @@ os.environ["SSL_CERT_FILE"] = certifi.where()
 os.environ["REQUESTS_CA_BUNDLE"] = certifi.where()
 ssl._create_default_https_context = lambda: ssl.create_default_context(cafile=certifi.where())
 
+import logging
 import uuid
 import time
 import threading
 from typing import Optional
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s %(message)s")
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
@@ -42,8 +45,10 @@ class SegmentRequest(BaseModel):
     bbox: list[float] = Field(..., min_length=4, max_length=4, description="[west, south, east, north]")
     prompt: str = Field(..., min_length=1, max_length=200)
     zoom: int = Field(default=18, ge=14, le=20)
-    box_threshold: float = Field(default=0.24, ge=0.0, le=1.0)
-    text_threshold: float = Field(default=0.24, ge=0.0, le=1.0)
+    box_threshold: float = Field(default=0.30, ge=0.0, le=1.0)
+    text_threshold: float = Field(default=0.30, ge=0.0, le=1.0)
+    min_area_sqm: float = Field(default=0, ge=0, description="Minimum area in sq meters to keep")
+    shape_filter: bool = Field(default=True, description="Apply shape-based filtering for recognized presets")
 
 
 class SegmentResponse(BaseModel):
@@ -78,6 +83,8 @@ def _run_job(job_id: str, params: SegmentRequest):
             zoom=params.zoom,
             box_threshold=params.box_threshold,
             text_threshold=params.text_threshold,
+            min_area_sqm=params.min_area_sqm,
+            shape_filter=params.shape_filter,
             progress_callback=progress_cb,
         )
         with _lock:
