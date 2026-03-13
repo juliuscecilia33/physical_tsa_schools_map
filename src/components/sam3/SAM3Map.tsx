@@ -20,6 +20,7 @@ interface SAM3MapProps {
   bbox: [number, number, number, number] | null;
   onBboxChange: (bbox: [number, number, number, number] | null) => void;
   geojsonResult: GeoJSON.FeatureCollection | null;
+  savedFeatures: GeoJSON.FeatureCollection | null;
   isDrawing: boolean;
 }
 
@@ -27,6 +28,7 @@ export default function SAM3Map({
   bbox,
   onBboxChange,
   geojsonResult,
+  savedFeatures,
   isDrawing,
 }: SAM3MapProps) {
   const mapRef = useRef<MapRef>(null);
@@ -140,6 +142,29 @@ export default function SAM3Map({
               "line-color": "#004aad",
               "line-width": 2,
               "line-dasharray": [3, 2],
+            }}
+          />
+        </Source>
+      )}
+
+      {/* Saved features — blue, rendered below fresh results */}
+      {savedFeatures && savedFeatures.features.length > 0 && (
+        <Source type="geojson" data={savedFeatures}>
+          <Layer
+            id="saved-fill"
+            type="fill"
+            paint={{
+              "fill-color": "#3b82f6",
+              "fill-opacity": 0.3,
+            }}
+          />
+          <Layer
+            id="saved-outline"
+            type="line"
+            paint={{
+              "line-color": "#1d4ed8",
+              "line-width": 2,
+              "line-dasharray": [4, 3],
             }}
           />
         </Source>

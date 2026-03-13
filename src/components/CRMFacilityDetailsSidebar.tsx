@@ -14,6 +14,8 @@ import {
   StarHalf,
   CheckCircle2,
   XCircle,
+  Eye,
+  EyeOff,
   StickyNote,
   Plus,
   Edit2,
@@ -49,6 +51,7 @@ import {
   updateFacilityNotesFlag,
   updateFacilityTags,
   moveFacilityToSegment,
+  updatePhotoVisibilityOverride,
 } from "@/utils/facilityCache";
 import { useFacilityDetails } from "@/hooks/useFacilityDetails";
 import CollapsibleSectionCard from "./CollapsibleSectionCard";
@@ -223,7 +226,8 @@ export default function CRMFacilityDetailsSidebar({
   const [isAdditionalPhotosModalOpen, setIsAdditionalPhotosModalOpen] =
     useState(false);
   const [hasOpenedPhotosModal, setHasOpenedPhotosModal] = useState(false);
-  const [hasOpenedAdditionalPhotosModal, setHasOpenedAdditionalPhotosModal] = useState(false);
+  const [hasOpenedAdditionalPhotosModal, setHasOpenedAdditionalPhotosModal] =
+    useState(false);
   const [showHiddenPhotos, setShowHiddenPhotos] = useState(false);
   const [isAdditionalReviewsModalOpen, setIsAdditionalReviewsModalOpen] =
     useState(false);
@@ -1197,14 +1201,22 @@ export default function CRMFacilityDetailsSidebar({
       reviewRating?: number;
       usefulnessScore?: number;
       description?: string;
+      manuallyShown?: boolean;
+      manuallyHidden?: boolean;
     }> = [];
 
     // Build a lookup map for review image analysis scores
-    const reviewAnalysisMap: Record<string, { score: number; description?: string }> = {};
+    const reviewAnalysisMap: Record<
+      string,
+      { score: number; description?: string }
+    > = {};
     if (facility.review_images_analysis) {
       facility.review_images_analysis.forEach((entry: any) => {
         if (entry.url && entry.usefulness_score != null) {
-          reviewAnalysisMap[entry.url] = { score: entry.usefulness_score, description: entry.description };
+          reviewAnalysisMap[entry.url] = {
+            score: entry.usefulness_score,
+            description: entry.description,
+          };
         }
       });
     }
@@ -1246,13 +1258,74 @@ export default function CRMFacilityDetailsSidebar({
     }
 
     return photos;
-  }, [facility?.additional_photos, facility?.additional_reviews, facility?.review_images_analysis]);
+  }, [
+    facility?.additional_photos,
+    facility?.additional_reviews,
+    facility?.review_images_analysis,
+  ]);
 
   const { visiblePhotos, hiddenPhotos } = useMemo(() => {
-    const visible = combinedPhotos.filter(p => p.usefulnessScore == null || p.usefulnessScore > 30);
-    const hidden = combinedPhotos.filter(p => p.usefulnessScore != null && p.usefulnessScore <= 30);
+    const overrides = facility?.photo_visibility_overrides ?? {};
+    const visible: typeof combinedPhotos = [];
+    const hidden: typeof combinedPhotos = [];
+
+    for (const photo of combinedPhotos) {
+      const override = overrides[photo.url];
+      if (override === "show") {
+        visible.push({ ...photo, manuallyShown: true });
+      } else if (override === "hide") {
+        hidden.push({ ...photo, manuallyHidden: true });
+      } else {
+        if (photo.usefulnessScore == null || photo.usefulnessScore > 30) {
+          visible.push(photo);
+        } else {
+          hidden.push(photo);
+        }
+      }
+    }
     return { visiblePhotos: visible, hiddenPhotos: hidden };
-  }, [combinedPhotos]);
+  }, [combinedPhotos, facility?.photo_visibility_overrides]);
+
+  const handleTogglePhotoVisibility = async (
+    photoUrl: string,
+    currentlyHidden: boolean,
+  ) => {
+    if (!facility) return;
+    const placeId = facility.place_id;
+    const overrides = facility.photo_visibility_overrides ?? {};
+    const existingOverride = overrides[photoUrl];
+
+    let newOverride: "show" | "hide" | null;
+    if (existingOverride != null) {
+      newOverride = null;
+    } else if (currentlyHidden) {
+      newOverride = "show";
+    } else {
+      newOverride = "hide";
+    }
+
+    updatePhotoVisibilityOverride(queryClient, placeId, photoUrl, newOverride);
+
+    try {
+      const res = await fetch(
+        `/api/facilities/${encodeURIComponent(placeId)}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ photoUrl, override: newOverride }),
+        },
+      );
+      if (!res.ok) throw new Error("Failed to update photo visibility");
+    } catch (err) {
+      console.error(err);
+      updatePhotoVisibilityOverride(
+        queryClient,
+        placeId,
+        photoUrl,
+        existingOverride ?? null,
+      );
+    }
+  };
 
   const formatSportType = (type: string) => {
     return type
@@ -1831,7 +1904,10 @@ export default function CRMFacilityDetailsSidebar({
                             </span>
                           </h3>
                           <button
-                            onClick={() => { setHasOpenedPhotosModal(true); setIsPhotosModalOpen(true); }}
+                            onClick={() => {
+                              setHasOpenedPhotosModal(true);
+                              setIsPhotosModalOpen(true);
+                            }}
                             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all cursor-pointer"
                           >
                             <Maximize2 className="w-3.5 h-3.5" />
@@ -1985,7 +2061,7 @@ export default function CRMFacilityDetailsSidebar({
                                       );
                                     }
                                   }}
-                                  className="relative overflow-hidden rounded-2xl shadow-sm hover:shadow-xl transition-all cursor-pointer flex-shrink-0 snap-start"
+                                  className="relative overflow-hidden rounded-2xl shadow-sm hover:shadow-xl transition-all cursor-pointer flex-shrink-0 snap-start group"
                                   style={{ width: "280px", height: "180px" }}
                                 >
                                   <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />
@@ -2000,6 +2076,29 @@ export default function CRMFacilityDetailsSidebar({
                                   {photo.usefulnessScore != null && (
                                     <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-sm rounded-lg px-1.5 py-0.5 text-[10px] font-semibold text-white">
                                       {photo.usefulnessScore}
+                                    </div>
+                                  )}
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleTogglePhotoVisibility(
+                                        photo.url,
+                                        false,
+                                      );
+                                    }}
+                                    className="absolute top-2 right-2 z-20 w-7 h-7 bg-black/60 hover:bg-black/80 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                                    title={
+                                      photo.manuallyShown
+                                        ? "Remove manual override (revert to score)"
+                                        : "Hide this photo"
+                                    }
+                                  >
+                                    <EyeOff className="w-3.5 h-3.5 text-white" />
+                                  </button>
+                                  {photo.manuallyShown && (
+                                    <div className="absolute bottom-2 left-2 bg-emerald-500/80 rounded-lg px-1.5 py-0.5 text-[10px] font-semibold text-white flex items-center gap-1">
+                                      <Eye className="w-3 h-3" />
+                                      Unhidden
                                     </div>
                                   )}
                                   {photo.type === "scraped" &&
@@ -2037,6 +2136,95 @@ export default function CRMFacilityDetailsSidebar({
                                 </div>
                               ))}
                             </div>
+                            {hiddenPhotos.length > 0 && (
+                              <div className="mt-2">
+                                <button
+                                  onClick={() =>
+                                    setShowHiddenPhotos((prev) => !prev)
+                                  }
+                                  className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-700 transition-colors"
+                                >
+                                  {showHiddenPhotos ? (
+                                    <ChevronUp className="w-3.5 h-3.5" />
+                                  ) : (
+                                    <ChevronDown className="w-3.5 h-3.5" />
+                                  )}
+                                  {showHiddenPhotos ? "Hide" : "Show"}{" "}
+                                  {hiddenPhotos.length} hidden photo
+                                  {hiddenPhotos.length !== 1 ? "s" : ""}
+                                  <span className="text-slate-400">
+                                    (
+                                    {hiddenPhotos.some((p) => p.manuallyHidden)
+                                      ? "score + manual"
+                                      : "low score"}
+                                    )
+                                  </span>
+                                </button>
+                                {showHiddenPhotos && (
+                                  <div
+                                    className="mt-2 flex gap-3 overflow-x-auto"
+                                    style={{ scrollbarWidth: "none" }}
+                                  >
+                                    {hiddenPhotos.map((photo, idx) => (
+                                      <div
+                                        key={`hidden-${idx}`}
+                                        className="relative overflow-hidden rounded-2xl flex-shrink-0 group opacity-60 hover:opacity-90 transition-opacity cursor-pointer"
+                                        style={{
+                                          width: "180px",
+                                          height: "120px",
+                                        }}
+                                        onClick={() => {
+                                          if (photo.type === "review") {
+                                            openReviewPhotoViewer(
+                                              photo.reviewIndex!,
+                                              photo.photoIndexInReview!,
+                                            );
+                                          } else {
+                                            openPhotoViewer(
+                                              photo.scrapedIndex!,
+                                              "additional",
+                                            );
+                                          }
+                                        }}
+                                      >
+                                        <img
+                                          src={photo.url}
+                                          className="w-full h-full object-cover"
+                                          referrerPolicy="no-referrer"
+                                        />
+                                        {photo.usefulnessScore != null && (
+                                          <div className="absolute top-2 left-2 bg-black/60 rounded-lg px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                                            {photo.usefulnessScore}
+                                          </div>
+                                        )}
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleTogglePhotoVisibility(
+                                              photo.url,
+                                              true,
+                                            );
+                                          }}
+                                          className="absolute top-2 right-2 z-20 w-7 h-7 bg-white/80 hover:bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                                          title={
+                                            photo.manuallyHidden
+                                              ? "Remove manual override"
+                                              : "Show this photo"
+                                          }
+                                        >
+                                          <Eye className="w-3.5 h-3.5 text-slate-700" />
+                                        </button>
+                                        {photo.manuallyHidden && (
+                                          <div className="absolute bottom-1 left-1 bg-orange-500/80 rounded px-1 py-0.5 text-[9px] font-semibold text-white">
+                                            Manual
+                                          </div>
+                                        )}
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </motion.div>
                       </>
@@ -3966,61 +4154,64 @@ export default function CRMFacilityDetailsSidebar({
         {hasOpenedPhotosModal &&
           facility?.photo_references &&
           createPortal(
-            <div style={{ display: isPhotosModalOpen ? undefined : 'none' }}>
-            <div
-              className="fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-[9999] transition-opacity duration-200"
-              style={{ opacity: isPhotosModalOpen ? 1 : 0 }}
-              onClick={() => setIsPhotosModalOpen(false)}
-            >
+            <div style={{ display: isPhotosModalOpen ? undefined : "none" }}>
               <div
-                className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[85vh] overflow-hidden transition-all duration-200"
-                style={{ transform: isPhotosModalOpen ? 'scale(1)' : 'scale(0.95)', opacity: isPhotosModalOpen ? 1 : 0 }}
-                onClick={(e) => e.stopPropagation()}
+                className="fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-[9999] transition-opacity duration-200"
+                style={{ opacity: isPhotosModalOpen ? 1 : 0 }}
+                onClick={() => setIsPhotosModalOpen(false)}
               >
-                {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-slate-200 bg-gradient-to-r from-white to-slate-50">
-                  <h2 className="text-xl font-medium text-slate-900">
-                    Photos ({facility.photo_references.length})
-                  </h2>
-                  <button
-                    onClick={() => setIsPhotosModalOpen(false)}
-                    className="p-2 hover:bg-slate-100 rounded-full transition-colors"
-                  >
-                    <X className="w-5 h-5 text-slate-600" />
-                  </button>
-                </div>
+                <div
+                  className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[85vh] overflow-hidden transition-all duration-200"
+                  style={{
+                    transform: isPhotosModalOpen ? "scale(1)" : "scale(0.95)",
+                    opacity: isPhotosModalOpen ? 1 : 0,
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {/* Header */}
+                  <div className="flex items-center justify-between p-6 border-b border-slate-200 bg-gradient-to-r from-white to-slate-50">
+                    <h2 className="text-xl font-medium text-slate-900">
+                      Photos ({facility.photo_references.length})
+                    </h2>
+                    <button
+                      onClick={() => setIsPhotosModalOpen(false)}
+                      className="p-2 hover:bg-slate-100 rounded-full transition-colors"
+                    >
+                      <X className="w-5 h-5 text-slate-600" />
+                    </button>
+                  </div>
 
-                {/* Photos Grid */}
-                <div className="p-6 overflow-y-auto max-h-[calc(85vh-80px)]">
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {facility.photo_references.map((photoRef, idx) => (
-                      <div
-                        key={idx}
-                        onClick={() => openPhotoViewer(idx)}
-                        className="relative overflow-hidden rounded-2xl shadow-sm hover:shadow-xl transition-all cursor-pointer aspect-square group"
-                      >
-                        {loadingImages[idx] !== false && (
-                          <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />
-                        )}
-                        <img
-                          src={getPhotoUrl(photoRef)}
-                          alt={`${facility.name} photo ${idx + 1}`}
-                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                          onLoadStart={() => handleImageLoadStart(idx)}
-                          onLoad={() => handleImageLoad(idx)}
-                          onError={() => handleImageLoad(idx)}
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-2">
-                          <span className="text-white text-xs font-medium">
-                            Click to view
-                          </span>
+                  {/* Photos Grid */}
+                  <div className="p-6 overflow-y-auto max-h-[calc(85vh-80px)]">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {facility.photo_references.map((photoRef, idx) => (
+                        <div
+                          key={idx}
+                          onClick={() => openPhotoViewer(idx)}
+                          className="relative overflow-hidden rounded-2xl shadow-sm hover:shadow-xl transition-all cursor-pointer aspect-square group"
+                        >
+                          {loadingImages[idx] !== false && (
+                            <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />
+                          )}
+                          <img
+                            src={getPhotoUrl(photoRef)}
+                            alt={`${facility.name} photo ${idx + 1}`}
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                            onLoadStart={() => handleImageLoadStart(idx)}
+                            onLoad={() => handleImageLoad(idx)}
+                            onError={() => handleImageLoad(idx)}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-2">
+                            <span className="text-white text-xs font-medium">
+                              Click to view
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
             </div>,
             document.body,
           )}
@@ -4029,169 +4220,248 @@ export default function CRMFacilityDetailsSidebar({
         {hasOpenedAdditionalPhotosModal &&
           facility?.serp_scraped &&
           createPortal(
-            <div style={{ display: isAdditionalPhotosModalOpen ? undefined : 'none' }}>
             <div
-              className="fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-[9999] transition-opacity duration-200"
-              style={{ opacity: isAdditionalPhotosModalOpen ? 1 : 0 }}
-              onClick={() => { setIsAdditionalPhotosModalOpen(false); setShowHiddenPhotos(false); }}
+              style={{
+                display: isAdditionalPhotosModalOpen ? undefined : "none",
+              }}
             >
               <div
-                className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[85vh] overflow-hidden transition-all duration-200"
-                style={{ transform: isAdditionalPhotosModalOpen ? 'scale(1)' : 'scale(0.95)', opacity: isAdditionalPhotosModalOpen ? 1 : 0 }}
-                onClick={(e) => e.stopPropagation()}
+                className="fixed inset-0 bg-black/80 flex items-center justify-center p-6 z-[9999] transition-opacity duration-200"
+                style={{ opacity: isAdditionalPhotosModalOpen ? 1 : 0 }}
+                onClick={() => {
+                  setIsAdditionalPhotosModalOpen(false);
+                  setShowHiddenPhotos(false);
+                }}
               >
-                {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-slate-200 bg-gradient-to-r from-white to-slate-50">
-                  <div>
-                    <h2 className="text-xl font-medium text-slate-900">
-                      Scraped Photos ({visiblePhotos.length}{hiddenPhotos.length > 0 ? ` + ${hiddenPhotos.length} hidden` : ''})
-                    </h2>
+                <div
+                  className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[85vh] overflow-hidden transition-all duration-200"
+                  style={{
+                    transform: isAdditionalPhotosModalOpen
+                      ? "scale(1)"
+                      : "scale(0.95)",
+                    opacity: isAdditionalPhotosModalOpen ? 1 : 0,
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {/* Header */}
+                  <div className="flex items-center justify-between p-6 border-b border-slate-200 bg-gradient-to-r from-white to-slate-50">
+                    <div>
+                      <h2 className="text-xl font-medium text-slate-900">
+                        Scraped Photos ({visiblePhotos.length}
+                        {hiddenPhotos.length > 0
+                          ? ` + ${hiddenPhotos.length} hidden`
+                          : ""}
+                        )
+                      </h2>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setIsAdditionalPhotosModalOpen(false);
+                        setShowHiddenPhotos(false);
+                      }}
+                      className="p-2 hover:bg-slate-100 rounded-full transition-colors"
+                    >
+                      <X className="w-5 h-5 text-slate-600" />
+                    </button>
                   </div>
-                  <button
-                    onClick={() => { setIsAdditionalPhotosModalOpen(false); setShowHiddenPhotos(false); }}
-                    className="p-2 hover:bg-slate-100 rounded-full transition-colors"
-                  >
-                    <X className="w-5 h-5 text-slate-600" />
-                  </button>
-                </div>
 
-                {/* Photos Grid */}
-                <div className="p-6 overflow-y-auto max-h-[calc(85vh-80px)]">
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {visiblePhotos.map((photo, idx) => (
-                      <div
-                        key={`modal-combined-${idx}`}
-                        onClick={() => {
-                          if (photo.type === "review") {
-                            openReviewPhotoViewer(
-                              photo.reviewIndex!,
-                              photo.photoIndexInReview!,
-                            );
-                          } else {
-                            openPhotoViewer(photo.scrapedIndex!, "additional");
-                          }
-                        }}
-                        className="relative overflow-hidden rounded-2xl shadow-sm hover:shadow-xl transition-all cursor-pointer aspect-square group"
-                      >
-                        {isAdditionalPhotosModalOpen && <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />}
-                        <img
-                          src={photo.url}
-                          alt={`${facility.name} photo ${idx + 1}`}
-                          className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                          referrerPolicy="no-referrer"
-                          loading="lazy"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-2">
-                          <span className="text-white text-xs font-medium">
-                            Click to view
-                          </span>
+                  {/* Photos Grid */}
+                  <div className="p-6 overflow-y-auto max-h-[calc(85vh-80px)]">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {visiblePhotos.map((photo, idx) => (
+                        <div
+                          key={`modal-combined-${idx}`}
+                          onClick={() => {
+                            if (photo.type === "review") {
+                              openReviewPhotoViewer(
+                                photo.reviewIndex!,
+                                photo.photoIndexInReview!,
+                              );
+                            } else {
+                              openPhotoViewer(
+                                photo.scrapedIndex!,
+                                "additional",
+                              );
+                            }
+                          }}
+                          className="relative overflow-hidden rounded-2xl shadow-sm hover:shadow-xl transition-all cursor-pointer aspect-square group"
+                        >
+                          {isAdditionalPhotosModalOpen && (
+                            <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />
+                          )}
+                          <img
+                            src={photo.url}
+                            alt={`${facility.name} photo ${idx + 1}`}
+                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                            referrerPolicy="no-referrer"
+                            loading="lazy"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-2">
+                            <span className="text-white text-xs font-medium">
+                              Click to view
+                            </span>
+                          </div>
+                          {photo.usefulnessScore != null && (
+                            <div className="absolute top-2 left-2 bg-black/70 rounded-lg px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                              {photo.usefulnessScore}
+                            </div>
+                          )}
+                          {photo.type === "scraped" && photo.data?.video && (
+                            <div className="absolute top-2 right-2 bg-black/70 rounded-full p-1.5">
+                              <Camera className="w-4 h-4 text-white" />
+                            </div>
+                          )}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleTogglePhotoVisibility(photo.url, false);
+                            }}
+                            className="absolute top-2 right-2 z-20 w-7 h-7 bg-black/60 hover:bg-black/80 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                            title={
+                              photo.manuallyShown
+                                ? "Remove manual override (revert to score)"
+                                : "Hide this photo"
+                            }
+                          >
+                            <EyeOff className="w-3.5 h-3.5 text-white" />
+                          </button>
+                          {photo.manuallyShown && (
+                            <div className="absolute bottom-2 left-2 bg-emerald-500/80 rounded-lg px-1.5 py-0.5 text-[10px] font-semibold text-white flex items-center gap-1">
+                              <Eye className="w-3 h-3" />
+                              Unhidden
+                            </div>
+                          )}
+                          {photo.type === "review" && (
+                            <div className="absolute bottom-2 right-2 flex items-center gap-1.5">
+                              {photo.reviewUserThumbnail ? (
+                                <img
+                                  src={photo.reviewUserThumbnail}
+                                  alt={photo.reviewUserName}
+                                  className="w-8 h-8 rounded-full border-2 border-white shadow-lg object-cover"
+                                  referrerPolicy="no-referrer"
+                                />
+                              ) : (
+                                <div className="w-8 h-8 rounded-full border-2 border-white shadow-lg bg-slate-400 flex items-center justify-center text-white text-xs font-semibold">
+                                  {photo.reviewUserName
+                                    ?.charAt(0)
+                                    .toUpperCase()}
+                                </div>
+                              )}
+                              {photo.reviewRating && (
+                                <div className="bg-white/95 rounded-lg px-1.5 py-0.5 shadow-lg flex items-center gap-0.5">
+                                  <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                                  <span className="text-xs font-semibold text-slate-900">
+                                    {photo.reviewRating.toFixed(1)}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
-                        {photo.usefulnessScore != null && (
-                          <div className="absolute top-2 left-2 bg-black/70 rounded-lg px-1.5 py-0.5 text-[10px] font-semibold text-white">
-                            {photo.usefulnessScore}
-                          </div>
-                        )}
-                        {photo.type === "scraped" && photo.data?.video && (
-                          <div className="absolute top-2 right-2 bg-black/70 rounded-full p-1.5">
-                            <Camera className="w-4 h-4 text-white" />
-                          </div>
-                        )}
-                        {photo.type === "review" && (
-                          <div className="absolute bottom-2 right-2 flex items-center gap-1.5">
-                            {photo.reviewUserThumbnail ? (
-                              <img
-                                src={photo.reviewUserThumbnail}
-                                alt={photo.reviewUserName}
-                                className="w-8 h-8 rounded-full border-2 border-white shadow-lg object-cover"
-                                referrerPolicy="no-referrer"
-                              />
-                            ) : (
-                              <div className="w-8 h-8 rounded-full border-2 border-white shadow-lg bg-slate-400 flex items-center justify-center text-white text-xs font-semibold">
-                                {photo.reviewUserName?.charAt(0).toUpperCase()}
-                              </div>
-                            )}
-                            {photo.reviewRating && (
-                              <div className="bg-white/95 rounded-lg px-1.5 py-0.5 shadow-lg flex items-center gap-0.5">
-                                <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                                <span className="text-xs font-semibold text-slate-900">
-                                  {photo.reviewRating.toFixed(1)}
-                                </span>
-                              </div>
-                            )}
-                          </div>
+                      ))}
+                    </div>
+                    {hiddenPhotos.length > 0 && (
+                      <div className="mt-6">
+                        {!showHiddenPhotos ? (
+                          <button
+                            onClick={() => setShowHiddenPhotos(true)}
+                            className="w-full py-3 px-4 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors flex items-center justify-center gap-2"
+                          >
+                            <AlertCircle className="w-4 h-4" />
+                            View {hiddenPhotos.length} hidden photo
+                            {hiddenPhotos.length !== 1 ? "s" : ""} (low score)
+                          </button>
+                        ) : (
+                          <>
+                            <div className="flex items-center justify-between mb-3">
+                              <h3 className="text-sm font-medium text-slate-500">
+                                Hidden Photos ({hiddenPhotos.length})
+                              </h3>
+                              <button
+                                onClick={() => setShowHiddenPhotos(false)}
+                                className="text-xs text-slate-400 hover:text-slate-600 transition-colors"
+                              >
+                                Hide
+                              </button>
+                            </div>
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                              {hiddenPhotos.map((photo, idx) => (
+                                <div
+                                  key={`modal-hidden-${idx}`}
+                                  onClick={() => {
+                                    if (photo.type === "review") {
+                                      openReviewPhotoViewer(
+                                        photo.reviewIndex!,
+                                        photo.photoIndexInReview!,
+                                      );
+                                    } else {
+                                      openPhotoViewer(
+                                        photo.scrapedIndex!,
+                                        "additional",
+                                      );
+                                    }
+                                  }}
+                                  className="relative overflow-hidden rounded-2xl shadow-sm hover:shadow-xl transition-all cursor-pointer aspect-square group"
+                                >
+                                  {isAdditionalPhotosModalOpen && (
+                                    <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />
+                                  )}
+                                  <img
+                                    src={photo.url}
+                                    alt={`${facility.name} hidden photo ${idx + 1}`}
+                                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                                    referrerPolicy="no-referrer"
+                                    loading="lazy"
+                                  />
+                                  <div className="absolute inset-0 bg-black/50 flex items-end p-2">
+                                    <p className="text-white text-xs leading-tight line-clamp-3">
+                                      {photo.description ||
+                                        "Low usefulness score"}
+                                    </p>
+                                  </div>
+                                  {photo.usefulnessScore != null && (
+                                    <div className="absolute top-2 left-2 bg-red-500/80 rounded-lg px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                                      {photo.usefulnessScore}
+                                    </div>
+                                  )}
+                                  {photo.type === "scraped" &&
+                                    photo.data?.video && (
+                                      <div className="absolute top-2 right-2 bg-black/70 rounded-full p-1.5">
+                                        <Camera className="w-4 h-4 text-white" />
+                                      </div>
+                                    )}
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleTogglePhotoVisibility(
+                                        photo.url,
+                                        true,
+                                      );
+                                    }}
+                                    className="absolute top-2 right-2 z-20 w-7 h-7 bg-white/80 hover:bg-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                                    title={
+                                      photo.manuallyHidden
+                                        ? "Remove manual override"
+                                        : "Show this photo"
+                                    }
+                                  >
+                                    <Eye className="w-3.5 h-3.5 text-slate-700" />
+                                  </button>
+                                  {photo.manuallyHidden && (
+                                    <div className="absolute bottom-1 left-1 bg-orange-500/80 rounded px-1 py-0.5 text-[9px] font-semibold text-white">
+                                      Manual
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </>
                         )}
                       </div>
-                    ))}
+                    )}
                   </div>
-                  {hiddenPhotos.length > 0 && (
-                    <div className="mt-6">
-                      {!showHiddenPhotos ? (
-                        <button
-                          onClick={() => setShowHiddenPhotos(true)}
-                          className="w-full py-3 px-4 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors flex items-center justify-center gap-2"
-                        >
-                          <AlertCircle className="w-4 h-4" />
-                          View {hiddenPhotos.length} hidden photo{hiddenPhotos.length !== 1 ? 's' : ''} (low score)
-                        </button>
-                      ) : (
-                        <>
-                          <div className="flex items-center justify-between mb-3">
-                            <h3 className="text-sm font-medium text-slate-500">
-                              Hidden Photos ({hiddenPhotos.length})
-                            </h3>
-                            <button
-                              onClick={() => setShowHiddenPhotos(false)}
-                              className="text-xs text-slate-400 hover:text-slate-600 transition-colors"
-                            >
-                              Hide
-                            </button>
-                          </div>
-                          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                            {hiddenPhotos.map((photo, idx) => (
-                              <div
-                                key={`modal-hidden-${idx}`}
-                                onClick={() => {
-                                  if (photo.type === "review") {
-                                    openReviewPhotoViewer(photo.reviewIndex!, photo.photoIndexInReview!);
-                                  } else {
-                                    openPhotoViewer(photo.scrapedIndex!, "additional");
-                                  }
-                                }}
-                                className="relative overflow-hidden rounded-2xl shadow-sm hover:shadow-xl transition-all cursor-pointer aspect-square group"
-                              >
-                                {isAdditionalPhotosModalOpen && <div className="absolute inset-0 bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 animate-pulse" />}
-                                <img
-                                  src={photo.url}
-                                  alt={`${facility.name} hidden photo ${idx + 1}`}
-                                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                                  referrerPolicy="no-referrer"
-                                  loading="lazy"
-                                />
-                                <div className="absolute inset-0 bg-black/50 flex items-end p-2">
-                                  <p className="text-white text-xs leading-tight line-clamp-3">
-                                    {photo.description || 'Low usefulness score'}
-                                  </p>
-                                </div>
-                                {photo.usefulnessScore != null && (
-                                  <div className="absolute top-2 left-2 bg-red-500/80 rounded-lg px-1.5 py-0.5 text-[10px] font-semibold text-white">
-                                    {photo.usefulnessScore}
-                                  </div>
-                                )}
-                                {photo.type === "scraped" && photo.data?.video && (
-                                  <div className="absolute top-2 right-2 bg-black/70 rounded-full p-1.5">
-                                    <Camera className="w-4 h-4 text-white" />
-                                  </div>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  )}
                 </div>
               </div>
-            </div>
             </div>,
             document.body,
           )}

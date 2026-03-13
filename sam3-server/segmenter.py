@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 # Prompt expansions — map short preset names to descriptive GroundingDINO prompts
 # ---------------------------------------------------------------------------
 PROMPT_EXPANSIONS: dict[str, str] = {
-    "football fields": "green football field or practice field on grass",
+    "football fields": "football field . football stadium . green athletic field . running track with field . rectangular grass field . artificial turf field",
     "soccer fields": "green soccer field or soccer pitch on grass",
     "baseball diamonds": "baseball diamond with brown dirt infield and green grass outfield",
     "tennis courts": "rectangular tennis court with net and marked lines",
@@ -30,7 +30,7 @@ PROMPT_EXPANSIONS: dict[str, str] = {
 # Shape filter presets — per-sport geometry constraints
 # ---------------------------------------------------------------------------
 SHAPE_PRESETS: dict[str, dict] = {
-    "football fields": {"min_rect": 0.35, "aspect_min": 1.1, "aspect_max": 5.0, "min_compact": 0.3},
+    "football fields": {"min_rect": 0.20, "aspect_min": 1.0, "aspect_max": 6.0, "min_compact": 0.2},
     "soccer fields":   {"min_rect": 0.35, "aspect_min": 1.1, "aspect_max": 4.0, "min_compact": 0.3},
     "baseball diamonds": {"min_rect": 0.30, "aspect_min": 0.8, "aspect_max": 1.8, "min_compact": 0.3},
     "tennis courts":   {"min_rect": 0.55, "aspect_min": 1.3, "aspect_max": 4.0, "min_compact": 0.35},
@@ -222,10 +222,14 @@ def run_segmentation(
                     rect = props.get("rectangularity", 0)
                     aspect = props.get("aspect_ratio", 1)
                     compact = props.get("compactness", 0)
+                    area = props.get("area_sqm", 0)
                     if (rect >= shape_preset["min_rect"]
                             and shape_preset["aspect_min"] <= aspect <= shape_preset["aspect_max"]
                             and compact >= shape_preset["min_compact"]):
                         filtered.append(feat)
+                    else:
+                        logger.info("Shape REJECT: area=%.0f rect=%.3f aspect=%.2f compact=%.3f",
+                                    area, rect, aspect, compact)
                 geojson["features"] = filtered
                 shape_filtered_count = before - len(filtered)
                 logger.info("Shape filter (%s): %d removed, %d remaining",

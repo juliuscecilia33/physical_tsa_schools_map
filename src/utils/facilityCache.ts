@@ -1,5 +1,5 @@
 import { QueryClient } from "@tanstack/react-query";
-import { FacilityLightweight } from "@/types/facility";
+import { Facility, FacilityLightweight } from "@/types/facility";
 
 /**
  * Utility functions for updating facility data in React Query cache
@@ -149,6 +149,36 @@ export function addFacilityToSegment(
   } else {
     queryClient.setQueryData(['facilities', segment], [facility]);
   }
+}
+
+/**
+ * Optimistically update a photo visibility override in the full facility cache.
+ * Pass null as override to remove the key (revert to score-based logic).
+ */
+export function updatePhotoVisibilityOverride(
+  queryClient: QueryClient,
+  placeId: string,
+  photoUrl: string,
+  override: "show" | "hide" | null
+) {
+  queryClient.setQueryData(
+    ["facility", "full", placeId],
+    (old: any) => {
+      if (!old?.facility) return old;
+      const current: Record<string, string> = {
+        ...(old.facility.photo_visibility_overrides ?? {}),
+      };
+      if (override === null) {
+        delete current[photoUrl];
+      } else {
+        current[photoUrl] = override;
+      }
+      return {
+        ...old,
+        facility: { ...old.facility, photo_visibility_overrides: current },
+      };
+    }
+  );
 }
 
 /**

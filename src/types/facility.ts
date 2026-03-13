@@ -52,6 +52,7 @@ export interface Facility {
   photos_analyzed?: boolean; // Whether photo analysis has been completed for this facility
   total_photo_count?: number; // Precomputed total photo count (including review photos)
   review_images_analysis?: ReviewImageAnalysis[]; // Analysis scores for review images
+  photo_visibility_overrides?: Record<string, "show" | "hide">; // Manual per-photo show/hide overrides keyed by URL
 }
 
 export interface ReviewImageAnalysis {

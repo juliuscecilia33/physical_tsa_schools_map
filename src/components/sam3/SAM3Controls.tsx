@@ -11,14 +11,14 @@ const PRESETS = [
 ];
 
 const PRESET_MIN_AREAS: Record<string, number> = {
-  "football fields": 400,
+  "football fields": 200,
   "soccer fields": 300,
   "baseball diamonds": 300,
   "tennis courts": 80,
 };
 
 const PRESET_THRESHOLDS: Record<string, { box: number; text: number }> = {
-  "football fields": { box: 0.25, text: 0.25 },
+  "football fields": { box: 0.20, text: 0.20 },
   "soccer fields": { box: 0.25, text: 0.25 },
   "baseball diamonds": { box: 0.30, text: 0.30 },
   "tennis courts": { box: 0.30, text: 0.30 },
@@ -52,8 +52,8 @@ export default function SAM3Controls({
   onClear,
 }: SAM3ControlsProps) {
   const [prompt, setPrompt] = useState("football fields");
-  const [boxThreshold, setBoxThreshold] = useState(0.35);
-  const [textThreshold, setTextThreshold] = useState(0.35);
+  const [boxThreshold, setBoxThreshold] = useState(PRESET_THRESHOLDS["football fields"].box);
+  const [textThreshold, setTextThreshold] = useState(PRESET_THRESHOLDS["football fields"].text);
   const [minAreaSqm, setMinAreaSqm] = useState(PRESET_MIN_AREAS["football fields"]);
   const [shapeFilter, setShapeFilter] = useState(true);
   const [showAdvanced, setShowAdvanced] = useState(false);

@@ -26,8 +26,28 @@ export default function SAM3Page() {
   const [elapsedSeconds, setElapsedSeconds] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [clientMinArea, setClientMinArea] = useState(0);
+  const [savedFeatures, setSavedFeatures] =
+    useState<GeoJSON.FeatureCollection | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Load saved features on mount
+  const loadSavedFeatures = useCallback(async () => {
+    try {
+      const res = await fetch("/api/sam3/features");
+      if (res.ok) {
+        const data = await res.json();
+        setSavedFeatures(data);
+      }
+    } catch (err) {
+      console.error("Failed to load saved features:", err);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadSavedFeatures();
+  }, [loadSavedFeatures]);
 
   // Clean up polling on unmount
   useEffect(() => {
@@ -171,6 +191,31 @@ export default function SAM3Page() {
     setClientMinArea(0);
   }, []);
 
+  const handleSave = useCallback(async () => {
+    if (!filteredGeojson?.features?.length || !effectivePrompt) return;
+    setIsSaving(true);
+    try {
+      const res = await fetch("/api/sam3/features", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          geojson: filteredGeojson,
+          sport_type: effectivePrompt,
+        }),
+      });
+      if (res.ok) {
+        await loadSavedFeatures();
+      } else {
+        const data = await res.json();
+        console.error("Save failed:", data.error);
+      }
+    } catch (err) {
+      console.error("Failed to save features:", err);
+    } finally {
+      setIsSaving(false);
+    }
+  }, [filteredGeojson, effectivePrompt, loadSavedFeatures]);
+
   const handleBboxChange = useCallback((newBbox: BBox | null) => {
     setBbox(newBbox);
     if (newBbox) {
@@ -186,6 +231,7 @@ export default function SAM3Page() {
           bbox={bbox}
           onBboxChange={handleBboxChange}
           geojsonResult={filteredGeojson}
+          savedFeatures={savedFeatures}
           isDrawing={isDrawing}
         />
       </div>
@@ -256,6 +302,8 @@ export default function SAM3Page() {
               error={error}
               clientMinArea={clientMinArea}
               onClientMinAreaChange={setClientMinArea}
+              onSave={handleSave}
+              isSaving={isSaving}
             />
           </div>
         )}

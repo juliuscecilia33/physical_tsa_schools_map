@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, MapPin, ChevronDown, ChevronUp, Filter } from "lucide-react";
+import { Download, MapPin, ChevronDown, ChevronUp, Filter, Database } from "lucide-react";
 import { useState, useMemo } from "react";
 
 interface SAM3ResultsProps {
@@ -15,6 +15,8 @@ interface SAM3ResultsProps {
   error: string | null;
   clientMinArea: number;
   onClientMinAreaChange: (value: number) => void;
+  onSave: () => void;
+  isSaving: boolean;
 }
 
 /** Compute centroid of a polygon's first ring */
@@ -55,6 +57,8 @@ export default function SAM3Results({
   error,
   clientMinArea,
   onClientMinAreaChange,
+  onSave,
+  isSaving,
 }: SAM3ResultsProps) {
   const [expanded, setExpanded] = useState(false);
 
@@ -230,13 +234,23 @@ export default function SAM3Results({
       )}
 
       {displayedCount > 0 && (
-        <button
-          onClick={handleExport}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-        >
-          <Download size={14} />
-          Export GeoJSON ({displayedCount} features)
-        </button>
+        <div className="space-y-2">
+          <button
+            onClick={handleExport}
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+          >
+            <Download size={14} />
+            Export GeoJSON ({displayedCount} features)
+          </button>
+          <button
+            onClick={onSave}
+            disabled={isSaving}
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-[#004aad] text-white rounded-lg text-sm hover:bg-[#003a8c] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Database size={14} />
+            {isSaving ? "Saving..." : `Save to Database (${displayedCount} features)`}
+          </button>
+        </div>
       )}
     </div>
   );
