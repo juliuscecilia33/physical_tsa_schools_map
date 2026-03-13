@@ -456,7 +456,7 @@ async function processFacility(
     progress.failedCount++;
     progress.processedCount++;
     progress.lastProcessedIndex = index;
-    progress.processedFacilityIds.push(facility.id);
+    // Don't add to processedFacilityIds so this facility can be retried
     progress.errors.push({
       facility_id: facility.id,
       facility_name: facility.name,
@@ -684,7 +684,7 @@ async function analyzeFacilityImages() {
 
   console.log(`📸 Processing ${totalToProcess} facilities...\n`);
 
-  for (let i = progress.lastProcessedIndex + 1; i < totalToProcess; i++) {
+  for (let i = 0; i < totalToProcess; i++) {
     await processFacility(facilities[i], progress, i, totalToProcess);
     saveProgress(progress);
 
