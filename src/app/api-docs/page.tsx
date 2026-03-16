@@ -124,30 +124,31 @@ function TryItPanel({ endpoint, fields }: { endpoint: string; fields: { name: st
   const [response, setResponse] = useState<string | null>(null);
   const [status, setStatus] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
-  const [requestUrl, setRequestUrl] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const buildUrl = useCallback(() => {
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    if (endpoint === "detail") {
+      const id = values.id || "";
+      return `${origin}/api/v1/facilities/${encodeURIComponent(id)}`;
+    }
+    const params = new URLSearchParams();
+    for (const f of fields) {
+      const v = values[f.name];
+      if (v !== undefined && v !== "") {
+        params.set(f.name, v);
+      }
+    }
+    const qs = params.toString();
+    return `${origin}/api/v1/facilities${qs ? `?${qs}` : ""}`;
+  }, [values, endpoint, fields]);
 
   const send = useCallback(async () => {
     setLoading(true);
     setResponse(null);
     setStatus(null);
 
-    let url: string;
-    if (endpoint === "detail") {
-      const id = values.id || "";
-      url = `${window.location.origin}/api/v1/facilities/${encodeURIComponent(id)}`;
-    } else {
-      const params = new URLSearchParams();
-      for (const f of fields) {
-        const v = values[f.name];
-        if (v !== undefined && v !== "") {
-          params.set(f.name, v);
-        }
-      }
-      const qs = params.toString();
-      url = `${window.location.origin}/api/v1/facilities${qs ? `?${qs}` : ""}`;
-    }
-
-    setRequestUrl(url);
+    const url = buildUrl();
 
     try {
       const res = await fetch(url);
@@ -160,7 +161,15 @@ function TryItPanel({ endpoint, fields }: { endpoint: string; fields: { name: st
     } finally {
       setLoading(false);
     }
-  }, [values, endpoint, fields]);
+  }, [buildUrl]);
+
+  const copyUrl = useCallback(async () => {
+    await navigator.clipboard.writeText(buildUrl());
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  }, [buildUrl]);
+
+  const liveUrl = buildUrl();
 
   return (
     <div className="bg-gray-950/50 border border-gray-700 rounded-lg overflow-hidden">
@@ -186,20 +195,26 @@ function TryItPanel({ endpoint, fields }: { endpoint: string; fields: { name: st
           ))}
         </div>
 
-        <button
-          onClick={send}
-          disabled={loading}
-          className="bg-blue-600 hover:bg-blue-500 disabled:bg-blue-600/50 disabled:cursor-not-allowed text-white text-sm font-medium px-5 py-2 rounded-md transition-colors"
-        >
-          {loading ? "Sending..." : "Send Request"}
-        </button>
+        <div>
+          <p className="text-xs font-mono text-gray-500 mb-1">Request URL</p>
+          <code className="text-xs text-blue-400 break-all">{liveUrl}</code>
+        </div>
 
-        {requestUrl && (
-          <div>
-            <p className="text-xs font-mono text-gray-500 mb-1">Request URL</p>
-            <code className="text-xs text-blue-400 break-all">{requestUrl}</code>
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={send}
+            disabled={loading}
+            className="bg-blue-600 hover:bg-blue-500 disabled:bg-blue-600/50 disabled:cursor-not-allowed text-white text-sm font-medium px-5 py-2 rounded-md transition-colors"
+          >
+            {loading ? "Sending..." : "Send Request"}
+          </button>
+          <button
+            onClick={copyUrl}
+            className="bg-gray-700 hover:bg-gray-600 text-gray-200 text-sm font-medium px-4 py-2 rounded-md transition-colors"
+          >
+            {copied ? "Copied!" : "Copy URL"}
+          </button>
+        </div>
 
         {response !== null && (
           <div>
